@@ -26,6 +26,7 @@
 | Variable | Wert |
 |---|---|
 | `DATABASE_URL` | Neon Connection String (mit Pooling) |
+| `DIRECT_URL` | Optional: identisch zu `DATABASE_URL` setzen (Fallback) |
 | `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | `https://IHRE-APP.vercel.app` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token |
@@ -34,7 +35,7 @@
 
 > Die Datenbank muss **vorab** einmalig eingerichtet werden (lokal mit `npm run db:push` oder per CI/Migrations-Job), nicht im Vercel-Build.
 
-> Falls in Vercel weiterhin `prisma generate && prisma db push && next build` läuft: **Project Settings → Build & Development Settings → Build Command** prüfen und auf `prisma generate && next build` setzen (oder leeren, damit `vercel.json` genutzt wird).
+> Falls in Vercel weiterhin `prisma generate && prisma db push && next build` läuft: **Project Settings → Build & Development Settings → Build Command** prüfen und auf `prisma generate && next build` setzen (oder leeren, damit `vercel.json` genutzt wird). Als Sofort-Fix kann zusätzlich `DIRECT_URL` (gleich wie `DATABASE_URL`) gesetzt werden.
 
 ### Schritt 4: Demo-Zugang einrichten
 
