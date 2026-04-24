@@ -2,11 +2,15 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const registered = searchParams.get('registered')
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -34,20 +38,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-slide-up">
       <div className="text-center mb-8">
-        <Link href="/" className="inline-flex items-center gap-2 mb-6">
-          <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-bold">RC</span>
-          </div>
-          <span className="font-semibold text-text-primary">RefCheck</span>
-        </Link>
-        <h1 className="text-2xl font-bold text-text-primary">Willkommen zurück</h1>
-        <p className="text-text-secondary text-sm mt-2">Melden Sie sich in Ihrem Konto an</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Willkommen zurück</h1>
+        <p className="text-sm text-white/40 mt-2">Melden Sie sich in Ihrem RefCheck-Konto an</p>
       </div>
 
-      <div className="card">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      {registered && (
+        <div className="mb-4 px-4 py-3 rounded-xl text-sm text-status-success border border-status-success/20"
+          style={{ background: 'rgba(48,209,88,0.08)' }}>
+          Konto erstellt — bitte anmelden.
+        </div>
+      )}
+
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="label">E-Mail</label>
             <input
@@ -74,39 +79,44 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="bg-status-errorBg border border-status-error/20 rounded-lg px-4 py-3 text-sm text-status-error">
+            <div className="px-4 py-3 rounded-xl text-sm text-status-error border border-status-error/20"
+              style={{ background: 'rgba(255,69,58,0.08)' }}>
               {error}
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
+          <button type="submit" disabled={loading} className="btn-primary w-full py-3 rounded-xl text-sm">
             {loading ? (
-              <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                 Anmelden…
               </span>
-            ) : (
-              'Anmelden'
-            )}
+            ) : 'Anmelden'}
           </button>
         </form>
 
-        <div className="divider" />
-
-        <p className="text-sm text-text-secondary text-center">
-          Noch kein Konto?{' '}
-          <Link href="/register" className="text-accent hover:text-accent-hover transition-colors font-medium">
-            Jetzt registrieren
-          </Link>
-        </p>
+        <div className="px-6 pb-5 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <p className="text-sm text-white/35 pt-4">
+            Noch kein Konto?{' '}
+            <Link href="/register" className="text-accent hover:text-white transition-colors font-medium">
+              Registrieren
+            </Link>
+          </p>
+        </div>
       </div>
 
-      <p className="text-xs text-text-muted text-center mt-6">
-        Mit der Anmeldung akzeptieren Sie unsere{' '}
-        <Link href="/datenschutz" className="underline hover:text-text-secondary">
-          Datenschutzerklärung
-        </Link>
+      <p className="text-[11px] text-white/20 text-center mt-5 leading-relaxed">
+        Durch die Anmeldung stimmen Sie unserer{' '}
+        <Link href="/datenschutz" className="underline hover:text-white/40 transition-colors">Datenschutzerklärung</Link> zu.
       </p>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-16"><div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" /></div>}>
+      <LoginForm />
+    </Suspense>
   )
 }
