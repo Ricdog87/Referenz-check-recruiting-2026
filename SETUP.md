@@ -9,7 +9,6 @@
 3. Region: **EU Central (Frankfurt)** wählen
 4. Nach Erstellung: **Connection Details** öffnen
    - "Connection string" kopieren → das ist `DATABASE_URL`
-   - Bei "Pooling" deaktivieren → zweiten String kopieren → das ist `DIRECT_URL`
 
 ### Schritt 2: Vercel Blob (Datei-Uploads)
 
@@ -27,14 +26,15 @@
 | Variable | Wert |
 |---|---|
 | `DATABASE_URL` | Neon Connection String (mit Pooling) |
-| `DIRECT_URL` | Neon Connection String (ohne Pooling) |
 | `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | `https://IHRE-APP.vercel.app` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token |
 
 4. **Deploy** klicken
 
-> Die Datenbank wird beim ersten Build automatisch eingerichtet (`prisma db push`).
+> Die Datenbank muss **vorab** einmalig eingerichtet werden (lokal mit `npm run db:push` oder per CI/Migrations-Job), nicht im Vercel-Build.
+
+> Falls in Vercel weiterhin `prisma generate && prisma db push && next build` läuft: **Project Settings → Build & Development Settings → Build Command** prüfen und auf `prisma generate && next build` setzen (oder leeren, damit `vercel.json` genutzt wird).
 
 ### Schritt 4: Demo-Zugang einrichten
 
@@ -69,7 +69,6 @@ npm run dev
 ### Datenbank
 - In hPanel → MySQL-Datenbank anlegen
 - `schema.prisma` anpassen: `provider = "mysql"` (statt "postgresql")
-- `DIRECT_URL` Zeile in schema.prisma entfernen
 
 ### Node.js App
 1. hPanel → **Node.js** → App erstellen
