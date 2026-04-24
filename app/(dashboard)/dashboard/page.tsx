@@ -6,34 +6,46 @@ import { getAppSession } from '@/lib/app-session'
 
 export default async function DashboardPage() {
   const session = await getAppSession()
-  
-  const [totalCandidates, activeCandidates, completedChecks, openChecks, recentCandidates, recentChecks] =
-    await Promise.all([
-      prisma.candidate.count({ where: { userId: session.user.id } }),
-      prisma.candidate.count({ where: { userId: session.user.id, status: 'IN_REVIEW' } }),
-      prisma.referenceCheck.count({
-        where: { candidate: { userId: session.user.id }, status: 'COMPLETED' },
-      }),
-      prisma.referenceCheck.count({
-        where: { candidate: { userId: session.user.id }, status: 'OPEN' },
-      }),
-      prisma.candidate.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        include: { _count: { select: { checks: true } } },
-      }),
-      prisma.referenceCheck.findMany({
-        where: { candidate: { userId: session.user.id } },
-        orderBy: { updatedAt: 'desc' },
-        take: 5,
-        include: { candidate: { select: { firstName: true, lastName: true } } },
-      }),
-    ])
 
-  const discrepancies = await prisma.referenceCheck.count({
-    where: { candidate: { userId: session.user.id }, result: 'DISCREPANCY_FOUND' },
-  })
+  let totalCandidates = 0
+  let activeCandidates = 0
+  let completedChecks = 0
+  let openChecks = 0
+  let discrepancies = 0
+  let recentCandidates: any[] = []
+  let recentChecks: any[] = []
+
+  try {
+    ;[totalCandidates, activeCandidates, completedChecks, openChecks, recentCandidates, recentChecks] =
+      await Promise.all([
+        prisma.candidate.count({ where: { userId: session.user.id } }),
+        prisma.candidate.count({ where: { userId: session.user.id, status: 'IN_REVIEW' } }),
+        prisma.referenceCheck.count({
+          where: { candidate: { userId: session.user.id }, status: 'COMPLETED' },
+        }),
+        prisma.referenceCheck.count({
+          where: { candidate: { userId: session.user.id }, status: 'OPEN' },
+        }),
+        prisma.candidate.findMany({
+          where: { userId: session.user.id },
+          orderBy: { createdAt: 'desc' },
+          take: 5,
+          include: { _count: { select: { checks: true } } },
+        }),
+        prisma.referenceCheck.findMany({
+          where: { candidate: { userId: session.user.id } },
+          orderBy: { updatedAt: 'desc' },
+          take: 5,
+          include: { candidate: { select: { firstName: true, lastName: true } } },
+        }),
+      ])
+
+    discrepancies = await prisma.referenceCheck.count({
+      where: { candidate: { userId: session.user.id }, result: 'DISCREPANCY_FOUND' },
+    })
+  } catch (error) {
+    console.error('Dashboard loaded in fallback mode (database unavailable):', error)
+  }
 
   const stats = [
     { label: 'Kandidaten gesamt', value: totalCandidates, sub: 'erfasst', color: 'text-text-primary' },
@@ -55,6 +67,10 @@ export default async function DashboardPage() {
       />
 
       <div className="p-6 space-y-6">
+        <div className="card bg-status-infoBg border-status-info/20 text-status-info text-sm">
+          Demo-Modus aktiv: Falls keine Datenbank erreichbar ist, werden Live-Kennzahlen als 0 angezeigt.
+        </div>
+
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s) => (
@@ -78,34 +94,26 @@ export default async function DashboardPage() {
             {recentCandidates.length === 0 ? (
               <div className="text-center py-8">
                 <div className="text-text-muted text-sm mb-3">Noch keine Kandidaten</div>
-                <Link href="/candidates/new" className="btn-primary text-xs py-2">
+                <Link href="/candidates/new" className="btn-primary text-sm py-2">
                   Ersten Kandidaten anlegen
                 </Link>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {recentCandidates.map((c) => {
                   const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
                   return (
-                    <Link
-                      key={c.id}
-                      href={`/candidates/${c.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-bg-hover transition-colors group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-accent-muted border border-accent/20 flex items-center justify-center flex-shrink-0 text-xs font-medium text-accent">
-                          {c.firstName[0]}{c.lastName[0]}
-                        </div>
+                    <Link key={c.id} href={`/candidates/${c.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
+                      <div className="flex justify-between items-start gap-3">
                         <div className="min-w-0">
-                          <div className="text-sm font-medium text-text-primary truncate">
-                            {c.firstName} {c.lastName}
-                          </div>
+                          <div className="text-sm font-medium text-text-primary truncate">{c.firstName} {c.lastName}</div>
                           <div className="text-xs text-text-secondary truncate">{c.position}</div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
                         <span className={`badge ${st.color}`}>{st.label}</span>
-                        <span className="text-xs text-text-muted">{c._count.checks} Prüfungen</span>
+                      </div>
+                      <div className="mt-2 text-xs text-text-muted flex justify-between">
+                        <span>{c._count.checks} Prüfungen</span>
+                        <span>{formatDateTime(c.createdAt)}</span>
                       </div>
                     </Link>
                   )
@@ -123,29 +131,21 @@ export default async function DashboardPage() {
               </Link>
             </div>
             {recentChecks.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-text-muted text-sm">Noch keine Referenzprüfungen</div>
-              </div>
+              <div className="text-center py-8 text-text-muted text-sm">Noch keine Prüfungen</div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {recentChecks.map((chk) => {
                   const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
                   return (
-                    <Link
-                      key={chk.id}
-                      href={`/checks/${chk.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-bg-hover transition-colors"
-                    >
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-text-primary truncate">
-                          {chk.candidate.firstName} {chk.candidate.lastName}
+                    <Link key={chk.id} href={`/checks/${chk.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-text-primary truncate">{chk.employerName}</div>
+                          <div className="text-xs text-text-secondary truncate">{chk.candidate.firstName} {chk.candidate.lastName}</div>
                         </div>
-                        <div className="text-xs text-text-secondary truncate">{chk.employerName}</div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
                         <span className={`badge ${st.color}`}>{st.label}</span>
-                        <span className="text-xs text-text-muted">{formatDateTime(chk.updatedAt).split(',')[0]}</span>
                       </div>
+                      <div className="mt-2 text-xs text-text-muted">{formatDateTime(chk.updatedAt)}</div>
                     </Link>
                   )
                 })}
@@ -153,29 +153,6 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
-
-        {/* Quick actions */}
-        {totalCandidates === 0 && (
-          <div className="card border-accent/20 bg-accent-glow">
-            <div className="flex items-start gap-4">
-              <div className="text-2xl">🚀</div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-text-primary mb-1">Willkommen bei RefCheck</h3>
-                <p className="text-sm text-text-secondary mb-4">
-                  Beginnen Sie, indem Sie Ihren ersten Kandidaten anlegen und Referenzprüfungen starten.
-                </p>
-                <div className="flex gap-3">
-                  <Link href="/candidates/new" className="btn-primary text-sm py-2">
-                    Ersten Kandidaten anlegen
-                  </Link>
-                  <Link href="/settings" className="btn-secondary text-sm py-2">
-                    Konto einrichten
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
