@@ -31,7 +31,7 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) return null
 
         const normalizedEmail = credentials.email.toLowerCase()
-        let user = await prisma.user.findUnique({
+        let user = await prisma.user.findFirst({
           where: { email: normalizedEmail },
         })
 
@@ -39,29 +39,33 @@ export const authOptions: NextAuthOptions = {
           const hashedPassword = await bcrypt.hash(DEMO_LOGIN.password, 12)
 
           try {
-            await prisma.user.upsert({
-              where: { email: DEMO_LOGIN.email },
-              update: {
-                password: hashedPassword,
-                name: DEMO_LOGIN.name,
-                company: DEMO_LOGIN.company,
-                role: DEMO_LOGIN.role,
-              },
-              create: {
-                email: DEMO_LOGIN.email,
-                name: DEMO_LOGIN.name,
-                company: DEMO_LOGIN.company,
-                role: DEMO_LOGIN.role,
-                password: hashedPassword,
-              },
-            })
+            if (user) {
+              user = await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  password: hashedPassword,
+                  name: DEMO_LOGIN.name,
+                  company: DEMO_LOGIN.company,
+                  role: DEMO_LOGIN.role,
+                },
+              })
+            } else {
+              user = await prisma.user.create({
+                data: {
+                  email: DEMO_LOGIN.email,
+                  name: DEMO_LOGIN.name,
+                  company: DEMO_LOGIN.company,
+                  role: DEMO_LOGIN.role,
+                  password: hashedPassword,
+                },
+              })
+            }
           } catch (error) {
-            console.error('Demo account upsert failed:', error)
+            console.error('Demo account create/update failed:', error)
+            user = await prisma.user.findFirst({
+              where: { email: DEMO_LOGIN.email },
+            })
           }
-
-          user = await prisma.user.findUnique({
-            where: { email: DEMO_LOGIN.email },
-          })
         }
 
         if (!user) return null
