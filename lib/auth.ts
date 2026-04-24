@@ -35,20 +35,29 @@ export const authOptions: NextAuthOptions = {
           where: { email: normalizedEmail },
         })
 
-        if (!user && normalizedEmail === DEMO_LOGIN.email && credentials.password === DEMO_LOGIN.password) {
+        if (normalizedEmail === DEMO_LOGIN.email && credentials.password === DEMO_LOGIN.password) {
           const hashedPassword = await bcrypt.hash(DEMO_LOGIN.password, 12)
 
-          await prisma.user.upsert({
-            where: { email: DEMO_LOGIN.email },
-            update: {},
-            create: {
-              email: DEMO_LOGIN.email,
-              name: DEMO_LOGIN.name,
-              company: DEMO_LOGIN.company,
-              role: DEMO_LOGIN.role,
-              password: hashedPassword,
-            },
-          })
+          try {
+            await prisma.user.upsert({
+              where: { email: DEMO_LOGIN.email },
+              update: {
+                password: hashedPassword,
+                name: DEMO_LOGIN.name,
+                company: DEMO_LOGIN.company,
+                role: DEMO_LOGIN.role,
+              },
+              create: {
+                email: DEMO_LOGIN.email,
+                name: DEMO_LOGIN.name,
+                company: DEMO_LOGIN.company,
+                role: DEMO_LOGIN.role,
+                password: hashedPassword,
+              },
+            })
+          } catch (error) {
+            console.error('Demo account upsert failed:', error)
+          }
 
           user = await prisma.user.findUnique({
             where: { email: DEMO_LOGIN.email },
