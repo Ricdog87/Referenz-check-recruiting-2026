@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  name          String
+  company       String
+  password      String
+  role          String        @default("CLIENT")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  candidates    Candidate[]
+  gdprConsents  GdprConsent[]
+  auditLogs     AuditLog[]
+}
+
+model Candidate {
+  id               String           @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String?
+  phone            String?
+  position         String
+  department       String?
+  notes            String?
+  status           String           @default("PENDING")
+  gdprConsent      Boolean          @default(false)
+  gdprConsentDate  DateTime?
+  gdprConsentIp    String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents        Document[]
+  checks           ReferenceCheck[]
+
+  @@index([userId])
+}
+
+model Document {
+  id           String    @id @default(cuid())
+  name         String
+  originalName String
+  mimeType     String
+  size         Int
+  path         String
+  type         String    @default("CV")
+  createdAt    DateTime  @default(now())
+  candidateId  String
+  candidate    Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@index([candidateId])
+}
+
+model ReferenceCheck {
+  id              String    @id @default(cuid())
+  employerName    String
+  employerContact String?
+  employerPhone   String?
+  employerEmail   String?
+  position        String?
+  startDate       String?
+  endDate         String?
+  status          String    @default("OPEN")
+  result          String?
+  callNotes       String?
+  discrepancies   String?
+  rating          Int?
+  calledAt        DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  candidateId     String
+  candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@index([candidateId])
+}
+
+model GdprConsent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  granted   Boolean
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
