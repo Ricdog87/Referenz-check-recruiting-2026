@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Suspense } from 'react'
 
+const DEMO_EMAIL = 'demo@refcheck.de'
+const DEMO_PASSWORD = 'demo1234'
+
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -15,6 +18,27 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+
+  async function handleDemoLogin() {
+    setError('')
+    setLoading(true)
+
+    const res = await signIn('credentials', {
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+      redirect: false,
+    })
+
+    setLoading(false)
+
+    if (res?.error) {
+      setError('Demo-Login fehlgeschlagen. Bitte erneut versuchen.')
+    } else {
+      router.push('/dashboard')
+      router.refresh()
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -92,6 +116,15 @@ function LoginForm() {
                 Anmelden…
               </span>
             ) : 'Anmelden'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="w-full py-3 rounded-xl text-sm border border-white/15 text-white/90 hover:bg-white/5 transition-colors disabled:opacity-60"
+          >
+            Demo-Zugang testen (demo@refcheck.de)
           </button>
         </form>
 

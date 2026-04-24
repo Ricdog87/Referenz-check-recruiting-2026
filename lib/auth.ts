@@ -3,6 +3,14 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 
+const DEMO_LOGIN = {
+  email: 'demo@refcheck.de',
+  password: 'demo1234',
+  name: 'Demo Benutzer',
+  company: 'Demo GmbH',
+  role: 'CLIENT',
+} as const
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
@@ -22,9 +30,30 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
+        const normalizedEmail = credentials.email.toLowerCase()
+        let user = await prisma.user.findUnique({
+          where: { email: normalizedEmail },
         })
+
+        if (!user && normalizedEmail === DEMO_LOGIN.email && credentials.password === DEMO_LOGIN.password) {
+          const hashedPassword = await bcrypt.hash(DEMO_LOGIN.password, 12)
+
+          await prisma.user.upsert({
+            where: { email: DEMO_LOGIN.email },
+            update: {},
+            create: {
+              email: DEMO_LOGIN.email,
+              name: DEMO_LOGIN.name,
+              company: DEMO_LOGIN.company,
+              role: DEMO_LOGIN.role,
+              password: hashedPassword,
+            },
+          })
+
+          user = await prisma.user.findUnique({
+            where: { email: DEMO_LOGIN.email },
+          })
+        }
 
         if (!user) return null
 
