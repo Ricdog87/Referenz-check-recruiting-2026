@@ -1,59 +1,91 @@
-# RefCheck — Setup-Anleitung
+# RefCheck — Setup & Deploy
 
-## Voraussetzungen
-- Node.js 18+
-- npm oder pnpm
+## Vercel (empfohlen für Demo & Produktion)
+
+### Schritt 1: Neon Datenbank (kostenlos)
+
+1. https://neon.tech → Account erstellen (kostenlos)
+2. **New Project** → Name: `refcheck`
+3. Region: **EU Central (Frankfurt)** wählen
+4. Nach Erstellung: **Connection Details** öffnen
+   - "Connection string" kopieren → das ist `DATABASE_URL`
+   - Bei "Pooling" deaktivieren → zweiten String kopieren → das ist `DIRECT_URL`
+
+### Schritt 2: Vercel Blob (Datei-Uploads)
+
+1. https://vercel.com → Dashboard → **Storage** Tab
+2. **Create Database** → **Blob** → Name: `refcheck-uploads`
+3. Nach Erstellung: **Environments** → `.env.local` anzeigen
+   - `BLOB_READ_WRITE_TOKEN` kopieren
+
+### Schritt 3: Vercel Deployment
+
+1. https://vercel.com → **Add New Project**
+2. GitHub Repo `ricdog87/Referenz-check-recruiting-2026` verbinden
+3. **Environment Variables** setzen:
+
+| Variable | Wert |
+|---|---|
+| `DATABASE_URL` | Neon Connection String (mit Pooling) |
+| `DIRECT_URL` | Neon Connection String (ohne Pooling) |
+| `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | `https://IHRE-APP.vercel.app` |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token |
+
+4. **Deploy** klicken
+
+> Die Datenbank wird beim ersten Build automatisch eingerichtet (`prisma db push`).
+
+### Schritt 4: Demo-Zugang einrichten
+
+Nach dem ersten Deploy auf der Live-URL registrieren:
+- https://ihre-app.vercel.app/register
+- Unternehmenskonto anlegen
+
+---
 
 ## Lokale Entwicklung
 
 ```bash
-# 1. Abhängigkeiten installieren
+# 1. Abhängigkeiten
 npm install
 
-# 2. Umgebungsvariablen konfigurieren
+# 2. Umgebungsvariablen
 cp .env.example .env
-# Bearbeiten Sie .env und setzen Sie NEXTAUTH_SECRET
+# .env bearbeiten — DATABASE_URL, NEXTAUTH_SECRET, BLOB_READ_WRITE_TOKEN
 
-# 3. Datenbank initialisieren
+# 3. Datenbank anlegen
 npm run db:push
 
-# 4. Demo-Daten laden (optional)
-npm run db:seed
-
-# 5. Entwicklungsserver starten
+# 4. Entwicklungsserver
 npm run dev
+# → http://localhost:3000
 ```
 
-Öffnen Sie http://localhost:3000
+---
 
-Demo-Login: demo@refcheck.de / demo1234
+## Hostinger (alternativ zu Vercel)
 
-## Produktion (Hostinger)
+### Datenbank
+- In hPanel → MySQL-Datenbank anlegen
+- `schema.prisma` anpassen: `provider = "mysql"` (statt "postgresql")
+- `DIRECT_URL` Zeile in schema.prisma entfernen
 
-### Node.js App auf Hostinger
+### Node.js App
+1. hPanel → **Node.js** → App erstellen
+2. Node.js Version: 18 oder 20
+3. Startup: `npm start`
+4. Umgebungsvariablen in hPanel setzen (gleiche wie oben)
 
-1. Node.js-App in hPanel anlegen
-2. Umgebungsvariablen in hPanel setzen:
-   - `DATABASE_URL` — MySQL-Verbindungsstring
-   - `NEXTAUTH_SECRET` — sicherer Zufallsstring (openssl rand -base64 32)
-   - `NEXTAUTH_URL` — Ihre Domain (https://ihre-domain.de)
+### File-Uploads
+- `BLOB_READ_WRITE_TOKEN` nicht nötig
+- In `app/api/upload/route.ts`: Vercel Blob durch lokales Dateisystem ersetzen
+  (Original-Code aus Git-History verfügbar)
 
-3. Für MySQL/PostgreSQL in prisma/schema.prisma ändern:
-   ```prisma
-   datasource db {
-     provider = "mysql"
-     url      = env("DATABASE_URL")
-   }
-   ```
+---
 
-4. Build und Deploy:
-   ```bash
-   npm run build
-   npm start
-   ```
-
-### Wichtige Sicherheitshinweise
-- NEXTAUTH_SECRET niemals ins Repository committen
-- UPLOAD_DIR auf absoluten Pfad außerhalb des Web-Roots setzen
-- HTTPS erzwingen (Let's Encrypt via hPanel)
-- Regelmäßige Datenbankbackups einrichten
+## Sicherheitshinweise
+- `NEXTAUTH_SECRET` niemals teilen oder ins Repository committen
+- `.env` ist in `.gitignore` — wird nie committed
+- HTTPS ist auf Vercel automatisch aktiv
+- Alle API-Routen prüfen die Session vor jedem Datenzugriff

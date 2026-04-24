@@ -1,25 +1,25 @@
 {
   "name": "refcheck-saas",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && prisma db push && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
-    "db:seed": "npx ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
+    "db:studio": "prisma studio",
     "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.7.0",
+    "@vercel/blob": "^0.22.0",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.0.0",
     "next": "14.0.4",
     "next-auth": "^4.24.5",
     "react": "^18",
     "react-dom": "^18",
-    "react-dropzone": "^14.2.3",
     "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {

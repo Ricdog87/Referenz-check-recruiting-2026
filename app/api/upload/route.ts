@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { writeFile, mkdir } from 'fs/promises'
-import { join, extname } from 'path'
+import { put } from '@vercel/blob'
+import { extname } from 'path'
 import { randomUUID } from 'crypto'
 
 const ALLOWED_TYPES = [
@@ -13,7 +13,7 @@ const ALLOWED_TYPES = [
   'image/jpeg',
   'image/png',
 ]
-const MAX_SIZE = 10 * 1024 * 1024 // 10 MB
+const MAX_SIZE = 4 * 1024 * 1024 // 4 MB (Vercel serverless limit)
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -28,10 +28,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Datei und Kandidaten-ID erforderlich.' }, { status: 400 })
   }
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return NextResponse.json({ error: 'Dateityp nicht erlaubt.' }, { status: 400 })
+    return NextResponse.json({ error: 'Dateityp nicht erlaubt. Erlaubt: PDF, DOC, DOCX, JPG, PNG' }, { status: 400 })
   }
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: 'Datei zu groß (max. 10 MB).' }, { status: 400 })
+    return NextResponse.json({ error: 'Datei zu groß (max. 4 MB).' }, { status: 400 })
   }
 
   const candidate = await prisma.candidate.findFirst({
@@ -40,20 +40,21 @@ export async function POST(req: NextRequest) {
   if (!candidate) return NextResponse.json({ error: 'Kandidat nicht gefunden.' }, { status: 404 })
 
   const ext = extname(file.name) || '.bin'
-  const filename = `${randomUUID()}${ext}`
-  const uploadDir = join(process.cwd(), 'public', 'uploads', session.user.id)
+  const blobPath = `candidates/${session.user.id}/${candidateId}/${randomUUID()}${ext}`
 
-  await mkdir(uploadDir, { recursive: true })
-  const buffer = Buffer.from(await file.arrayBuffer())
-  await writeFile(join(uploadDir, filename), buffer)
+  const blob = await put(blobPath, file, {
+    access: 'public',
+    addRandomSuffix: false,
+    contentType: file.type,
+  })
 
   const doc = await prisma.document.create({
     data: {
-      name: filename,
+      name: blobPath,
       originalName: file.name,
       mimeType: file.type,
       size: file.size,
-      path: `/uploads/${session.user.id}/${filename}`,
+      path: blob.url,
       type,
       candidateId,
     },
