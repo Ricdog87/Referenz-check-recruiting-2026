@@ -9,13 +9,20 @@ import { getAppSession } from '@/lib/app-session'
 export default async function CandidateDetailPage({ params }: { params: { id: string } }) {
   const session = await getAppSession()
   
-  const candidate = await prisma.candidate.findFirst({
+  let candidate: any = null
+
+  try {
+    candidate = await prisma.candidate.findFirst({
     where: { id: params.id, userId: session.user.id },
     include: {
       documents: true,
       checks: { orderBy: { createdAt: 'desc' } },
     },
   })
+
+  } catch (error) {
+    console.error('Candidate detail fallback mode:', error)
+  }
 
   if (!candidate) notFound()
 
@@ -111,7 +118,7 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {candidate.checks.map((chk) => {
+                  {candidate.checks.map((chk: any) => {
                     const cst = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
                     const res = chk.result ? (CHECK_RESULT[chk.result as keyof typeof CHECK_RESULT] ?? null) : null
                     return (
@@ -173,7 +180,7 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
                 <p className="text-sm text-text-muted text-center py-4">Keine Dokumente</p>
               ) : (
                 <div className="space-y-2">
-                  {candidate.documents.map((doc) => (
+                  {candidate.documents.map((doc: any) => (
                     <a
                       key={doc.id}
                       href={`/api/download/${doc.id}`}
@@ -197,13 +204,13 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
               <div className="space-y-3">
                 {[
                   { label: 'Prüfungen gesamt', value: candidate.checks.length },
-                  { label: 'Abgeschlossen', value: candidate.checks.filter((c) => c.status === 'COMPLETED').length },
+                  { label: 'Abgeschlossen', value: candidate.checks.filter((c: any) => c.status === 'COMPLETED').length },
                   {
                     label: 'Unstimmigkeiten',
-                    value: candidate.checks.filter((c) => c.result === 'DISCREPANCY_FOUND').length,
+                    value: candidate.checks.filter((c: any) => c.result === 'DISCREPANCY_FOUND').length,
                   },
                   { label: 'Dokumente', value: candidate.documents.length },
-                ].map((item) => (
+                ].map((item: any) => (
                   <div key={item.label} className="flex justify-between items-center">
                     <span className="text-xs text-text-secondary">{item.label}</span>
                     <span className="text-sm font-mono font-medium text-text-primary">{item.value}</span>

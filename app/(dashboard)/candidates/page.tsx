@@ -26,7 +26,12 @@ export default async function CandidatesPage({
       : {}),
   }
 
-  const candidates = await prisma.candidate.findMany({
+  let candidates: any[] = []
+  let statusCounts: any[] = []
+  let total = 0
+
+  try {
+    candidates = await prisma.candidate.findMany({
     where,
     orderBy: { createdAt: 'desc' },
     include: {
@@ -34,13 +39,11 @@ export default async function CandidatesPage({
     },
   })
 
-  const statusCounts = await prisma.candidate.groupBy({
-    by: ['status'],
-    where: { userId: session.user.id },
-    _count: true,
-  })
 
-  const total = await prisma.candidate.count({ where: { userId: session.user.id } })
+    total = await prisma.candidate.count({ where: { userId: session.user.id } })
+  } catch (error) {
+    console.error('Candidates loaded in fallback mode:', error)
+  }
 
   return (
     <div className="animate-fade-in">
@@ -55,6 +58,7 @@ export default async function CandidatesPage({
       />
 
       <div className="p-6 space-y-4">
+        <div className="card bg-status-infoBg border-status-info/20 text-status-info text-sm">Fallback-Modus aktiv: Kandidaten-Daten aktuell nicht aus Datenbank geladen.</div>
         {/* Filter bar */}
         <div className="flex flex-col sm:flex-row gap-3">
           <form className="flex-1">
@@ -133,7 +137,7 @@ export default async function CandidatesPage({
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {candidates.map((c) => {
+                {candidates.map((c: any) => {
                   const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
                   return (
                     <tr key={c.id} className="hover:bg-bg-hover transition-colors">

@@ -73,7 +73,7 @@ export default async function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((s) => (
+          {stats.map((s: any) => (
             <div key={s.label} className="card">
               <div className="text-xs text-text-secondary mb-2">{s.label}</div>
               <div className={`stat-value ${s.color}`}>{s.value}</div>
@@ -100,7 +100,7 @@ export default async function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {recentCandidates.map((c) => {
+                {recentCandidates.map((c: any) => {
                   const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
                   return (
                     <Link key={c.id} href={`/candidates/${c.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
@@ -134,7 +134,7 @@ export default async function DashboardPage() {
               <div className="text-center py-8 text-text-muted text-sm">Noch keine Prüfungen</div>
             ) : (
               <div className="space-y-3">
-                {recentChecks.map((chk) => {
+                {recentChecks.map((chk: any) => {
                   const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
                   return (
                     <Link key={chk.id} href={`/checks/${chk.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">

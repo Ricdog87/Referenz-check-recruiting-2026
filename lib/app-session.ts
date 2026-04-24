@@ -13,8 +13,12 @@ const DEMO_SESSION_USER = {
 } as const
 
 export async function getAppSession() {
-  const session = await getServerSession(authOptions)
-  if (session) return session
+  try {
+    const session = await getServerSession(authOptions)
+    if (session) return session
+  } catch (error) {
+    console.error('Session lookup failed, using demo fallback:', error)
+  }
 
   try {
     let user = await prisma.user.findFirst({

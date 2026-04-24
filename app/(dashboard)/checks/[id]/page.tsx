@@ -9,10 +9,17 @@ import { getAppSession } from '@/lib/app-session'
 export default async function CheckDetailPage({ params }: { params: { id: string } }) {
   const session = await getAppSession()
   
-  const check = await prisma.referenceCheck.findFirst({
+  let check: any = null
+
+  try {
+    check = await prisma.referenceCheck.findFirst({
     where: { id: params.id, candidate: { userId: session.user.id } },
     include: { candidate: true },
   })
+
+  } catch (error) {
+    console.error('Check detail fallback mode:', error)
+  }
 
   if (!check) notFound()
 

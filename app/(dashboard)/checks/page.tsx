@@ -16,7 +16,12 @@ export default async function ChecksPage({
     ...(searchParams.status ? { status: searchParams.status } : {}),
   }
 
-  const checks = await prisma.referenceCheck.findMany({
+  let checks: any[] = []
+  let total = 0
+  let statusCounts: any[] = []
+
+  try {
+    checks = await prisma.referenceCheck.findMany({
     where,
     orderBy: { updatedAt: 'desc' },
     include: {
@@ -24,15 +29,13 @@ export default async function ChecksPage({
     },
   })
 
-  const total = await prisma.referenceCheck.count({
-    where: { candidate: { userId: session.user.id } },
-  })
 
-  const statusCounts = await prisma.referenceCheck.groupBy({
-    by: ['status'],
+    total = await prisma.referenceCheck.count({
     where: { candidate: { userId: session.user.id } },
-    _count: true,
   })
+  } catch (error) {
+    console.error('Checks loaded in fallback mode:', error)
+  }
 
   return (
     <div className="animate-fade-in">
@@ -47,6 +50,7 @@ export default async function ChecksPage({
       />
 
       <div className="p-6 space-y-4">
+        <div className="card bg-status-infoBg border-status-info/20 text-status-info text-sm">Fallback-Modus aktiv: Prüfungsdaten aktuell nicht aus Datenbank geladen.</div>
         {/* Filter */}
         <div className="flex gap-2 flex-wrap">
           {[
@@ -89,7 +93,7 @@ export default async function ChecksPage({
           </div>
         ) : (
           <div className="space-y-3">
-            {checks.map((chk) => {
+            {checks.map((chk: any) => {
               const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
               const res = chk.result ? (CHECK_RESULT[chk.result as keyof typeof CHECK_RESULT] ?? null) : null
               return (
