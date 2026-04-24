@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { getAppSession } from '@/lib/app-session'
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const check = await prisma.referenceCheck.findFirst({
     where: { id: params.id, candidate: { userId: session.user.id } },
   })
@@ -24,9 +22,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const check = await prisma.referenceCheck.findFirst({
     where: { id: params.id, candidate: { userId: session.user.id } },
   })

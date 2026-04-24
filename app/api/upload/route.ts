@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { put } from '@vercel/blob'
 import { extname } from 'path'
 import { randomUUID } from 'crypto'
+import { getAppSession } from '@/lib/app-session'
 
 const ALLOWED_TYPES = [
   'application/pdf',
@@ -16,9 +15,8 @@ const ALLOWED_TYPES = [
 const MAX_SIZE = 4 * 1024 * 1024 // 4 MB (Vercel serverless limit)
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const formData = await req.formData()
   const file = formData.get('file') as File | null
   const candidateId = formData.get('candidateId') as string

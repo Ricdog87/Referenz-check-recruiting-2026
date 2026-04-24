@@ -1,10 +1,5 @@
-export { default } from 'next-auth/middleware'
+import { NextResponse } from 'next/server'
 
-export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/candidates/:path*',
-    '/checks/:path*',
-    '/settings/:path*',
-  ],
+export function middleware() {
+  return NextResponse.next()
 }

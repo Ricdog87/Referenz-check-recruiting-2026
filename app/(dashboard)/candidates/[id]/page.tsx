@@ -1,16 +1,14 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, formatDateTime, formatFileSize, CANDIDATE_STATUS, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import { CandidateActions } from './CandidateActions'
+import { getAppSession } from '@/lib/app-session'
 
 export default async function CandidateDetailPage({ params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return null
-
+  const session = await getAppSession()
+  
   const candidate = await prisma.candidate.findFirst({
     where: { id: params.id, userId: session.user.id },
     include: {

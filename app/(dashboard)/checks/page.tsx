@@ -1,18 +1,16 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
+import { getAppSession } from '@/lib/app-session'
 
 export default async function ChecksPage({
   searchParams,
 }: {
   searchParams: { status?: string }
 }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return null
-
+  const session = await getAppSession()
+  
   const where = {
     candidate: { userId: session.user.id },
     ...(searchParams.status ? { status: searchParams.status } : {}),

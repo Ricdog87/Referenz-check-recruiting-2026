@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { getAppSession } from '@/lib/app-session'
 
 export async function GET() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const checks = await prisma.referenceCheck.findMany({
     where: { candidate: { userId: session.user.id } },
     orderBy: { updatedAt: 'desc' },
@@ -17,9 +15,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const body = await req.json()
   const { candidateId, employerName, employerContact, employerPhone, employerEmail, position, startDate, endDate } = body
 

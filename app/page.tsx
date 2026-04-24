@@ -16,13 +16,13 @@ export default function LandingPage() {
             <span className="text-sm font-semibold text-white/90 tracking-tight">RefCheck</span>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/login"
+            <Link href="/dashboard"
               className="text-sm font-medium text-white/60 hover:text-white px-4 py-1.5 rounded-full transition-colors duration-150">
-              Anmelden
+              Dashboard öffnen
             </Link>
-            <Link href="/register"
+            <Link href="/dashboard"
               className="btn-primary text-xs py-1.5 px-4">
-              Kostenlos starten
+              Jetzt testen
             </Link>
           </div>
         </div>
@@ -67,12 +67,12 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link href="/register"
+            <Link href="/dashboard"
               className="btn-primary text-base py-3.5 px-8 rounded-full font-semibold"
               style={{ background: 'linear-gradient(135deg, #0a84ff, #0070e0)', boxShadow: '0 4px 24px rgba(10,132,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' }}>
-              Jetzt kostenlos starten
+              Jetzt live testen
             </Link>
-            <Link href="/login"
+            <Link href="/dashboard"
               className="text-base py-3.5 px-8 rounded-full font-medium text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all duration-200"
               style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(10px)' }}>
               Demo ansehen →
@@ -260,6 +260,38 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ——— Pricing ——— */}
+      <section className="py-28 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-4">Preisstaffelung</p>
+            <h2 className="text-[clamp(30px,5vw,52px)] font-bold tracking-tighter gradient-text-white mb-5">Flexible Pakete pro Monat</h2>
+            <p className="text-lg text-white/45">Alle Pakete inklusive DSGVO-Dokumentation, Dashboard und Referenz-Tracking.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { name: 'Starter', price: '199€', cvs: '15 CVs / Monat', note: 'Für kleine Teams und erste Pilotphasen.' },
+              { name: 'Growth', price: '399€', cvs: '45 CVs / Monat', note: 'Ideal für aktive Recruiting-Teams.', featured: true },
+              { name: 'Scale', price: '699€', cvs: '90 CVs / Monat', note: 'Für hohe Volumen und mehrere Hiring-Manager.' },
+            ].map((plan) => (
+              <div key={plan.name} className="rounded-3xl p-7 border relative" style={{
+                background: plan.featured ? 'linear-gradient(180deg, rgba(10,132,255,0.14), rgba(255,255,255,0.03))' : 'rgba(255,255,255,0.03)',
+                borderColor: plan.featured ? 'rgba(10,132,255,0.5)' : 'rgba(255,255,255,0.08)',
+                boxShadow: plan.featured ? '0 12px 40px rgba(10,132,255,0.22)' : 'none',
+              }}>
+                {plan.featured && <span className="absolute top-4 right-4 text-[10px] px-2 py-1 rounded-full border border-accent/30 text-accent">Beliebt</span>}
+                <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
+                <p className="text-4xl font-bold tracking-tight mb-1">{plan.price}</p>
+                <p className="text-sm text-white/60 mb-6">{plan.cvs}</p>
+                <p className="text-sm text-white/45 mb-8">{plan.note}</p>
+                <Link href="/dashboard" className="btn-primary w-full text-center py-3 rounded-xl block">Paket wählen</Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ——— CTA ——— */}
       <section className="py-40 px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
@@ -273,10 +305,10 @@ export default function LandingPage() {
           <p className="text-lg text-white/40 mb-10">
             Kostenlos testen. Keine Kreditkarte. Kein Commitment.
           </p>
-          <Link href="/register"
+          <Link href="/dashboard"
             className="inline-flex items-center gap-2 text-base py-4 px-10 rounded-full font-semibold text-white transition-all duration-200"
             style={{ background: 'linear-gradient(135deg, #0a84ff, #0070e0)', boxShadow: '0 8px 32px rgba(10,132,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' }}>
-            Konto erstellen
+            Zum Live-Dashboard
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

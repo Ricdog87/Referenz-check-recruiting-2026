@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { getAppSession } from '@/lib/app-session'
 
 async function getCandidate(id: string, userId: string) {
   return prisma.candidate.findFirst({ where: { id, userId } })
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const candidate = await getCandidate(params.id, session.user.id)
   if (!candidate) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 })
 
@@ -26,9 +24,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
+  const session = await getAppSession()
+  
   const candidate = await getCandidate(params.id, session.user.id)
   if (!candidate) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 })
 
