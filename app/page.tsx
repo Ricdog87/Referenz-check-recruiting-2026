@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const painPoints = [
   {
@@ -59,6 +62,19 @@ const pricing = [
 ]
 
 export default function LandingPage() {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY || 0)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const heroParallax = Math.min(scrollY * 0.18, 120)
+  const cardParallax = Math.min(scrollY * 0.12, 90)
+  const glowShift = Math.min(scrollY * 0.06, 60)
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
       {/* 3D-style background layers */}
@@ -68,7 +84,7 @@ export default function LandingPage() {
           style={{
             background: 'radial-gradient(ellipse at center, rgba(10,132,255,0.26) 0%, rgba(10,132,255,0.06) 35%, transparent 70%)',
             filter: 'blur(8px)',
-            transform: 'perspective(900px) rotateX(58deg)'
+            transform: `perspective(900px) rotateX(58deg) translateY(${glowShift}px)`,
           }}
         />
         <div
@@ -119,7 +135,7 @@ export default function LandingPage() {
 
       <section className="pt-36 pb-28 px-6 relative">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
+          <div style={{ transform: `translateY(${heroParallax * -0.4}px)` }}>
             <div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium mb-7 border border-accent/25 text-accent"
               style={{ background: 'rgba(10,132,255,0.1)' }}
@@ -166,7 +182,7 @@ export default function LandingPage() {
                 background: 'linear-gradient(165deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))',
                 borderColor: 'rgba(255,255,255,0.14)',
                 boxShadow: '0 20px 70px rgba(0,0,0,0.65), 0 8px 28px rgba(10,132,255,0.22)',
-                transform: 'perspective(1200px) rotateY(-10deg) rotateX(6deg)',
+                transform: `perspective(1200px) rotateY(-10deg) rotateX(6deg) translateY(${cardParallax * -1}px)`,
               }}
             >
               <div className="text-xs uppercase tracking-widest text-white/35 mb-4">Executive Snapshot</div>
@@ -201,8 +217,12 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
-            {painPoints.map((item) => (
-              <div key={item.title} className="rounded-2xl p-6 border border-white/10 bg-white/[0.03]">
+            {painPoints.map((item, idx) => (
+              <div
+                key={item.title}
+                className="rounded-2xl p-6 border border-white/10 bg-white/[0.03] transition-transform duration-200"
+                style={{ transform: `translateY(${Math.max(0, heroParallax * 0.15 - idx * 4)}px)` }}
+              >
                 <div className="text-3xl font-bold mb-3">{item.stat}</div>
                 <h3 className="text-white font-semibold mb-2">{item.title}</h3>
                 <p className="text-sm text-white/45 leading-relaxed">{item.text}</p>
