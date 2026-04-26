@@ -74,6 +74,14 @@ export default function LandingPage() {
   const heroParallax = Math.min(scrollY * 0.18, 120)
   const cardParallax = Math.min(scrollY * 0.12, 90)
   const glowShift = Math.min(scrollY * 0.06, 60)
+  const sectionReveal = (start: number) => {
+    const p = Math.min(Math.max((scrollY - start) / 260, 0), 1)
+    return {
+      opacity: 0.15 + p * 0.85,
+      transform: `translateY(${(1 - p) * 40}px) scale(${0.97 + p * 0.03})`,
+      transition: 'opacity 220ms linear, transform 220ms linear',
+    } as const
+  }
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -207,7 +215,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-24 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <section className="py-24 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', ...sectionReveal(220) }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs uppercase tracking-widest text-accent font-semibold mb-3">Pain Points</p>
@@ -232,7 +240,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-24 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <section className="py-24 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', ...sectionReveal(560) }}>
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs uppercase tracking-widest text-status-success font-semibold mb-3">Story</p>
@@ -255,7 +263,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="pricing" className="py-24 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <section id="pricing" className="py-24 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', ...sectionReveal(900) }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs uppercase tracking-widest text-accent font-semibold mb-3">Preisstaffelung</p>
@@ -288,7 +296,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-28 px-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+      <section className="py-28 px-6 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', ...sectionReveal(1260) }}>
         <h2 className="text-[clamp(32px,5vw,58px)] font-bold tracking-tight gradient-text-white mb-5">
           Ihr Kunde sitzt im Meeting —
           <br />

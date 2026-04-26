@@ -21,6 +21,8 @@ export default function NewCandidatePage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [parsing, setParsing] = useState(false)
+  const [parseMessage, setParseMessage] = useState('')
 
   function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -39,6 +41,39 @@ export default function NewCandidatePage() {
       return ok && f.size < 10 * 1024 * 1024
     })
     setFiles((prev) => [...prev, ...valid])
+
+    if (valid.length > 0) {
+      void parseCvAndPrefill(valid[0])
+    }
+  }
+
+  async function parseCvAndPrefill(file: File) {
+    setParsing(true)
+    setParseMessage('')
+
+    const fd = new FormData()
+    fd.append('file', file)
+
+    try {
+      const res = await fetch('/api/cv/parse', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok || !data?.parsed) return
+
+      const parsed = data.parsed as Record<string, string>
+      setForm((prev) => ({
+        ...prev,
+        firstName: prev.firstName || parsed.firstName || '',
+        lastName: prev.lastName || parsed.lastName || '',
+        email: prev.email || parsed.email || '',
+        phone: prev.phone || parsed.phone || '',
+        position: prev.position || parsed.position || '',
+      }))
+      setParseMessage(data.note || 'CV erfolgreich ausgelesen.')
+    } catch (e) {
+      console.error('CV parsing client failed:', e)
+    } finally {
+      setParsing(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -146,6 +181,16 @@ export default function NewCandidatePage() {
               <p className="text-sm text-text-secondary">
                 Laden Sie den CV direkt beim Anlegen hoch. So startet der Referenzprüfungsprozess ohne Medienbruch.
               </p>
+              {parsing && (
+                <div className="text-xs text-accent bg-accent-glow border border-accent/20 rounded-lg px-3 py-2">
+                  CV wird analysiert und Felder werden automatisch vorausgefüllt…
+                </div>
+              )}
+              {parseMessage && (
+                <div className="text-xs text-status-success bg-status-successBg border border-status-success/20 rounded-lg px-3 py-2">
+                  {parseMessage}
+                </div>
+              )}
 
               <div
                 onDragOver={(e) => {
