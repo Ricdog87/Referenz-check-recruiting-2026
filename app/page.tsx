@@ -79,6 +79,15 @@ export default function LandingPage() {
           className="absolute bottom-[12%] right-[10%] w-[460px] h-[460px]"
           style={{ background: 'radial-gradient(circle, rgba(48,209,88,0.14) 0%, transparent 66%)', filter: 'blur(20px)' }}
         />
+        <div
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px)',
+            backgroundSize: '120px 120px',
+            transform: 'perspective(1200px) rotateX(74deg) translateY(-240px)',
+            transformOrigin: 'top',
+          }}
+        />
       </div>
 
       <nav
@@ -143,6 +152,14 @@ export default function LandingPage() {
           </div>
 
           <div className="relative">
+            <div className="absolute -top-6 -right-6 rounded-xl px-3 py-2 text-xs border border-accent/30 text-accent bg-black/60"
+              style={{ transform: 'perspective(800px) rotateY(-20deg) rotateX(8deg)' }}>
+              Live Risk Score
+            </div>
+            <div className="absolute -bottom-5 -left-6 rounded-xl px-3 py-2 text-xs border border-status-success/30 text-status-success bg-black/60"
+              style={{ transform: 'perspective(800px) rotateY(20deg) rotateX(-6deg)' }}>
+              DSGVO Ready
+            </div>
             <div
               className="rounded-3xl p-6 border"
               style={{

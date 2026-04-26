@@ -48,109 +48,130 @@ export default async function DashboardPage() {
   }
 
   const stats = [
-    { label: 'Kandidaten gesamt', value: totalCandidates, sub: 'erfasst', color: 'text-text-primary' },
-    { label: 'In Prüfung', value: activeCandidates, sub: 'aktiv', color: 'text-status-info' },
-    { label: 'Abgeschlossen', value: completedChecks, sub: 'Prüfungen', color: 'text-status-success' },
+    { label: 'Kandidaten gesamt', value: totalCandidates, sub: 'im Workspace', color: 'text-text-primary' },
+    { label: 'Aktiv in Prüfung', value: activeCandidates, sub: 'laufend', color: 'text-status-info' },
+    { label: 'Abgeschlossen', value: completedChecks, sub: 'Checks', color: 'text-status-success' },
     { label: 'Unstimmigkeiten', value: discrepancies, sub: 'gefunden', color: 'text-status-error' },
   ]
 
   return (
     <div className="animate-fade-in">
       <Header
-        title={`Guten Tag, ${session.user.name.split(' ')[0]}`}
-        subtitle={`${session.user.company} · Übersicht`}
+        title={`Willkommen, ${session.user.name.split(' ')[0]}`}
+        subtitle={`${session.user.company} · Recruiting Control Center`}
         action={
           <Link href="/candidates/new" className="btn-primary">
-            + Kandidat hinzufügen
+            + Neuer Kandidat (inkl. CV)
           </Link>
         }
       />
 
       <div className="p-6 space-y-6">
         <div className="card bg-status-infoBg border-status-info/20 text-status-info text-sm">
-          Demo-Modus aktiv: Falls keine Datenbank erreichbar ist, werden Live-Kennzahlen als 0 angezeigt.
+          Demo-Modus aktiv: Falls Ihre Datenbank kurzzeitig nicht erreichbar ist, bleibt das Dashboard stabil und zeigt sichere Fallback-Werte.
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s: any) => (
             <div key={s.label} className="card">
-              <div className="text-xs text-text-secondary mb-2">{s.label}</div>
+              <div className="text-xs text-text-secondary mb-2 uppercase tracking-wider">{s.label}</div>
               <div className={`stat-value ${s.color}`}>{s.value}</div>
               <div className="text-xs text-text-muted mt-1">{s.sub}</div>
             </div>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Recent candidates */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title">Neueste Kandidaten</h2>
-              <Link href="/candidates" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                Alle anzeigen →
-              </Link>
-            </div>
-            {recentCandidates.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-text-muted text-sm mb-3">Noch keine Kandidaten</div>
-                <Link href="/candidates/new" className="btn-primary text-sm py-2">
-                  Ersten Kandidaten anlegen
+        <div className="grid xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2 space-y-6">
+            <div className="card">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="section-title">Neueste Kandidaten</h2>
+                <Link href="/candidates" className="text-xs text-accent hover:text-accent-hover transition-colors">
+                  Alle anzeigen →
                 </Link>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {recentCandidates.map((c: any) => {
-                  const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
-                  return (
-                    <Link key={c.id} href={`/candidates/${c.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium text-text-primary truncate">{c.firstName} {c.lastName}</div>
-                          <div className="text-xs text-text-secondary truncate">{c.position}</div>
+              {recentCandidates.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-text-muted text-sm mb-3">Noch keine Kandidaten angelegt</div>
+                  <Link href="/candidates/new" className="btn-primary text-sm py-2">
+                    Ersten Kandidaten + CV anlegen
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {recentCandidates.map((c: any) => {
+                    const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
+                    return (
+                      <Link key={c.id} href={`/candidates/${c.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-text-primary truncate">{c.firstName} {c.lastName}</div>
+                            <div className="text-xs text-text-secondary truncate">{c.position}</div>
+                          </div>
+                          <span className={`badge ${st.color}`}>{st.label}</span>
                         </div>
-                        <span className={`badge ${st.color}`}>{st.label}</span>
-                      </div>
-                      <div className="mt-2 text-xs text-text-muted flex justify-between">
-                        <span>{c._count.checks} Prüfungen</span>
-                        <span>{formatDateTime(c.createdAt)}</span>
-                      </div>
-                    </Link>
-                  )
-                })}
+                        <div className="mt-2 text-xs text-text-muted flex justify-between">
+                          <span>{c._count.checks} Checks</span>
+                          <span>{formatDateTime(c.createdAt)}</span>
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="card">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="section-title">Aktuelle Referenzprüfungen</h2>
+                <Link href="/checks" className="text-xs text-accent hover:text-accent-hover transition-colors">
+                  Alle anzeigen →
+                </Link>
               </div>
-            )}
+              {recentChecks.length === 0 ? (
+                <div className="text-center py-8 text-text-muted text-sm">Noch keine Prüfungen gestartet</div>
+              ) : (
+                <div className="space-y-3">
+                  {recentChecks.map((chk: any) => {
+                    const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
+                    return (
+                      <Link key={chk.id} href={`/checks/${chk.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium text-text-primary truncate">{chk.employerName}</div>
+                            <div className="text-xs text-text-secondary truncate">{chk.candidate.firstName} {chk.candidate.lastName}</div>
+                          </div>
+                          <span className={`badge ${st.color}`}>{st.label}</span>
+                        </div>
+                        <div className="mt-2 text-xs text-text-muted">{formatDateTime(chk.updatedAt)}</div>
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Recent checks */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title">Aktuelle Prüfungen</h2>
-              <Link href="/checks" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                Alle anzeigen →
+          <div className="space-y-6">
+            <div className="card border-accent/20 bg-accent-glow">
+              <h3 className="section-title mb-3">Schnellstart für Ihr Team</h3>
+              <ol className="space-y-3 text-sm text-text-secondary">
+                <li className="flex gap-2"><span className="text-accent font-semibold">1.</span> Kandidat anlegen und CV direkt hochladen.</li>
+                <li className="flex gap-2"><span className="text-accent font-semibold">2.</span> Referenz-Check öffnen und Arbeitgeber-Daten eintragen.</li>
+                <li className="flex gap-2"><span className="text-accent font-semibold">3.</span> Ergebnisse live verfolgen und Entscheidung treffen.</li>
+              </ol>
+              <Link href="/candidates/new" className="btn-primary mt-4 w-full text-center py-2.5 block">
+                Prozess starten
               </Link>
             </div>
-            {recentChecks.length === 0 ? (
-              <div className="text-center py-8 text-text-muted text-sm">Noch keine Prüfungen</div>
-            ) : (
-              <div className="space-y-3">
-                {recentChecks.map((chk: any) => {
-                  const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
-                  return (
-                    <Link key={chk.id} href={`/checks/${chk.id}`} className="block p-3 rounded-lg bg-bg-secondary hover:bg-bg-hover transition-colors">
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="min-w-0">
-                          <div className="text-sm font-medium text-text-primary truncate">{chk.employerName}</div>
-                          <div className="text-xs text-text-secondary truncate">{chk.candidate.firstName} {chk.candidate.lastName}</div>
-                        </div>
-                        <span className={`badge ${st.color}`}>{st.label}</span>
-                      </div>
-                      <div className="mt-2 text-xs text-text-muted">{formatDateTime(chk.updatedAt)}</div>
-                    </Link>
-                  )
-                })}
-              </div>
-            )}
+
+            <div className="card">
+              <h3 className="section-title mb-3">Was Ihr Kunde hier sieht</h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                Dieses Dashboard zeigt den kompletten Referenzprüfungs-Workflow: vom CV-Upload bis zum finalen Check-Ergebnis.
+                So versteht Ihr Kunde den Mehrwert in unter 2 Minuten.
+              </p>
+            </div>
           </div>
         </div>
       </div>
