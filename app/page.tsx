@@ -239,6 +239,137 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ——— Pricing ——— */}
+      <section className="py-32 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-20">
+            <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-4">Preise</p>
+            <h2 className="text-[clamp(32px,5vw,56px)] font-bold tracking-tighter gradient-text-white mb-6">
+              Transparent. Fair. Skalierbar.
+            </h2>
+            <p className="text-lg text-white/40 max-w-xl mx-auto leading-relaxed">
+              Starten Sie kostenlos — upgraden Sie, wenn Sie wachsen.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4 items-start">
+            {/* Free */}
+            <div className="card-glass p-8 rounded-2xl flex flex-col gap-5">
+              <div>
+                <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Trial</p>
+                <div className="flex items-end gap-1 mb-1">
+                  <span className="text-4xl font-bold tracking-tight text-white">€0</span>
+                  <span className="text-sm text-white/30 mb-1.5">/Monat</span>
+                </div>
+                <p className="text-xs text-white/35">14 Tage kostenlos testen</p>
+              </div>
+              <ul className="space-y-2.5 flex-1">
+                {[
+                  '3 Kandidaten',
+                  '5 Referenzprüfungen',
+                  'CV-Upload (PDF)',
+                  'DSGVO-Einwilligungsmanagement',
+                  'Datenexport (Art. 20)',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-white/55">
+                    <span className="text-status-success mt-0.5 flex-shrink-0">✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/register"
+                className="w-full text-center py-3 rounded-full text-sm font-medium border border-white/12 hover:border-white/25 text-white/70 hover:text-white transition-all duration-200"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                Kostenlos starten
+              </Link>
+            </div>
+
+            {/* Professional — highlighted */}
+            <div className="relative rounded-2xl p-[1px] overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, rgba(10,132,255,0.5), rgba(94,92,230,0.3), rgba(10,132,255,0.5))' }}>
+              <div className="rounded-2xl p-8 flex flex-col gap-5 h-full"
+                style={{ background: 'linear-gradient(180deg, #0d1a2d 0%, #0a0f1a 100%)' }}>
+                <div className="absolute -top-px left-1/2 -translate-x-1/2">
+                  <span className="inline-flex items-center px-3 py-1 rounded-b-full text-[10px] font-semibold uppercase tracking-widest text-white"
+                    style={{ background: 'linear-gradient(135deg, #0a84ff, #5e5ce6)' }}>
+                    Empfohlen
+                  </span>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-2">Professional</p>
+                  <div className="flex items-end gap-1 mb-1">
+                    <span className="text-4xl font-bold tracking-tight text-white">€149</span>
+                    <span className="text-sm text-white/30 mb-1.5">/Monat</span>
+                  </div>
+                  <p className="text-xs text-white/35">zzgl. MwSt. · monatlich kündbar</p>
+                </div>
+                <ul className="space-y-2.5 flex-1">
+                  {[
+                    'Unbegrenzte Kandidaten',
+                    'Unbegrenzte Referenzprüfungen',
+                    'Alle Dateitypen (PDF, DOC, Bild)',
+                    'DSGVO-Vollpaket (Art. 17 & 20)',
+                    'Audit-Log & Sicherheitsprotokoll',
+                    'Priorisierter Support',
+                  ].map((f) => (
+                    <li key={f} className="flex items-start gap-2.5 text-sm text-white/75">
+                      <span className="text-accent mt-0.5 flex-shrink-0">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/register"
+                  className="w-full text-center py-3 rounded-full text-sm font-semibold text-white transition-all duration-200"
+                  style={{ background: 'linear-gradient(135deg, #0a84ff, #0070e0)', boxShadow: '0 4px 20px rgba(10,132,255,0.35)' }}
+                >
+                  Jetzt starten
+                </Link>
+              </div>
+            </div>
+
+            {/* Enterprise */}
+            <div className="card-glass p-8 rounded-2xl flex flex-col gap-5">
+              <div>
+                <p className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Enterprise</p>
+                <div className="flex items-end gap-1 mb-1">
+                  <span className="text-4xl font-bold tracking-tight text-white">Individuell</span>
+                </div>
+                <p className="text-xs text-white/35">Auf Anfrage · Jahresvertrag</p>
+              </div>
+              <ul className="space-y-2.5 flex-1">
+                {[
+                  'Alles aus Professional',
+                  'Mehrere Benutzer / Teams',
+                  'API-Zugang',
+                  'White-Label Option',
+                  'Auftragsverarbeitungsvertrag (AVV)',
+                  'Dedizierter Account Manager',
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-sm text-white/55">
+                    <span className="text-status-success mt-0.5 flex-shrink-0">✓</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="mailto:enterprise@refcheck.de"
+                className="w-full text-center py-3 rounded-full text-sm font-medium border border-white/12 hover:border-white/25 text-white/70 hover:text-white transition-all duration-200"
+                style={{ background: 'rgba(255,255,255,0.04)' }}
+              >
+                Kontakt aufnehmen
+              </a>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-white/25 mt-8">
+            Alle Preise zzgl. gesetzlicher MwSt. · Keine Setup-Gebühr · Jederzeit kündbar
+          </p>
+        </div>
+      </section>
+
       {/* ——— DSGVO ——— */}
       <section className="py-20 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(94,92,230,0.04)' }}>
         <div className="max-w-5xl mx-auto">
