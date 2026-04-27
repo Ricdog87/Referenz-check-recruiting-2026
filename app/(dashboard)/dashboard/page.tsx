@@ -47,7 +47,7 @@ export default async function DashboardPage() {
   return (
     <div className="animate-fade-in">
       <Header
-        title={`Guten Tag, ${session.user.name.split(' ')[0]}`}
+        title={`Guten Tag, ${session.user.name?.split(' ')[0] ?? 'Recruiter'}`}
         subtitle={`${session.user.company} · Übersicht`}
         action={
           <Link href="/candidates/new" className="btn-primary">

@@ -50,7 +50,7 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="label">Name</label>
-              <input className="input-field" placeholder="Max Mustermann" value={form.name} onChange={(e) => update('name', e.target.value)} required />
+              <input className="input-field" placeholder="Max Mustermann" value={form.name} onChange={(e) => update('name', e.target.value)} required autoFocus />
             </div>
             <div>
               <label className="label">Unternehmen</label>
