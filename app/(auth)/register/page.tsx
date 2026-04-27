@@ -10,6 +10,8 @@ export default function RegisterPage() {
   const [gdprAccepted, setGdprAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const inputClass =
+    'input-field !bg-white !border-slate-300 !text-slate-900 placeholder:!text-slate-400 focus:!border-accent'
 
   function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -41,33 +43,33 @@ export default function RegisterPage() {
   return (
     <div className="animate-slide-up">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Konto erstellen</h1>
-        <p className="text-sm text-white/40 mt-2">Starten Sie Ihre kostenlose Testphase</p>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Konto erstellen</h1>
+        <p className="text-sm text-slate-600 mt-2">Starten Sie Ihre kostenlose Testphase</p>
       </div>
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="rounded-2xl overflow-hidden shadow-xl" style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid rgba(15,23,42,0.08)' }}>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Name</label>
-              <input className="input-field" placeholder="Max Mustermann" value={form.name} onChange={(e) => update('name', e.target.value)} required />
+              <label className="label !text-slate-500">Name</label>
+              <input className={inputClass} placeholder="Max Mustermann" value={form.name} onChange={(e) => update('name', e.target.value)} required />
             </div>
             <div>
-              <label className="label">Unternehmen</label>
-              <input className="input-field" placeholder="Mustermann GmbH" value={form.company} onChange={(e) => update('company', e.target.value)} required />
+              <label className="label !text-slate-500">Unternehmen</label>
+              <input className={inputClass} placeholder="Mustermann GmbH" value={form.company} onChange={(e) => update('company', e.target.value)} required />
             </div>
           </div>
           <div>
-            <label className="label">Geschäftliche E-Mail</label>
-            <input type="email" className="input-field" placeholder="max@firma.de" value={form.email} onChange={(e) => update('email', e.target.value)} required autoComplete="email" />
+            <label className="label !text-slate-500">Geschäftliche E-Mail</label>
+            <input type="email" className={inputClass} placeholder="max@firma.de" value={form.email} onChange={(e) => update('email', e.target.value)} required autoComplete="email" />
           </div>
           <div>
-            <label className="label">Passwort</label>
-            <input type="password" className="input-field" placeholder="Min. 8 Zeichen" value={form.password} onChange={(e) => update('password', e.target.value)} required autoComplete="new-password" />
+            <label className="label !text-slate-500">Passwort</label>
+            <input type="password" className={inputClass} placeholder="Min. 8 Zeichen" value={form.password} onChange={(e) => update('password', e.target.value)} required autoComplete="new-password" />
           </div>
           <div>
-            <label className="label">Passwort bestätigen</label>
-            <input type="password" className="input-field" placeholder="Passwort wiederholen" value={form.passwordConfirm} onChange={(e) => update('passwordConfirm', e.target.value)} required autoComplete="new-password" />
+            <label className="label !text-slate-500">Passwort bestätigen</label>
+            <input type="password" className={inputClass} placeholder="Passwort wiederholen" value={form.passwordConfirm} onChange={(e) => update('passwordConfirm', e.target.value)} required autoComplete="new-password" />
           </div>
 
           {/* DSGVO */}
@@ -79,7 +81,7 @@ export default function RegisterPage() {
                   {gdprAccepted && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                 </div>
               </div>
-              <span className="text-[11px] text-white/45 leading-relaxed">
+              <span className="text-[11px] text-slate-600 leading-relaxed">
                 Ich habe die{' '}
                 <Link href="/datenschutz" className="text-accent hover:underline" target="_blank">Datenschutzerklärung</Link>
                 {' '}gelesen und stimme der Verarbeitung meiner Daten gemäß DSGVO zu.
@@ -105,9 +107,9 @@ export default function RegisterPage() {
         </form>
 
         <div className="px-6 pb-5 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <p className="text-sm text-white/35 pt-4">
+          <p className="text-sm text-slate-600 pt-4">
             Bereits registriert?{' '}
-            <Link href="/login" className="text-accent hover:text-white transition-colors font-medium">Anmelden</Link>
+            <Link href="/login" className="text-accent hover:text-accent-hover transition-colors font-medium">Anmelden</Link>
           </p>
         </div>
       </div>
