@@ -52,6 +52,13 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('register_error', error)
 
+    if (error instanceof Prisma.PrismaClientInitializationError) {
+      return NextResponse.json(
+        { error: 'Datenbank-Verbindung fehlgeschlagen. Bitte Umgebungsvariablen prüfen.' },
+        { status: 503 }
+      )
+    }
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return NextResponse.json({ error: 'E-Mail bereits registriert.' }, { status: 409 })

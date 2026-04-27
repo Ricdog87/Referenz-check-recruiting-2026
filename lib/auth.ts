@@ -77,31 +77,47 @@ export const authOptions: NextAuthOptions = {
         const normalizedEmail = credentials.email.toLowerCase().trim()
 
         if (normalizedEmail === DEMO_EMAIL && credentials.password === DEMO_PASSWORD) {
-          const demoUser = await ensureDemoWorkspace()
-          return {
-            id: demoUser.id,
-            email: demoUser.email,
-            name: demoUser.name,
-            company: demoUser.company,
-            role: demoUser.role,
+          try {
+            const demoUser = await ensureDemoWorkspace()
+            return {
+              id: demoUser.id,
+              email: demoUser.email,
+              name: demoUser.name,
+              company: demoUser.company,
+              role: demoUser.role,
+            }
+          } catch (error) {
+            console.error('demo_workspace_error', error)
+            return {
+              id: 'demo-offline',
+              email: DEMO_EMAIL,
+              name: 'Demo Benutzer',
+              company: 'Demo Workspace (Offline)',
+              role: 'CLIENT',
+            }
           }
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: normalizedEmail },
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: normalizedEmail },
+          })
 
-        if (!user) return null
+          if (!user) return null
 
-        const isValid = await bcrypt.compare(credentials.password, user.password)
-        if (!isValid) return null
+          const isValid = await bcrypt.compare(credentials.password, user.password)
+          if (!isValid) return null
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          company: user.company,
-          role: user.role,
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            company: user.company,
+            role: user.role,
+          }
+        } catch (error) {
+          console.error('credential_login_error', error)
+          return null
         }
       },
     }),

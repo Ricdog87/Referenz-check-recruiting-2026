@@ -9,6 +9,55 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
+  if (session.user.id === 'demo-offline') {
+    return (
+      <div className="animate-fade-in">
+        <Header
+          title={`Guten Tag, ${session.user.name.split(' ')[0]}`}
+          subtitle={`${session.user.company} · Demo-Modus`}
+          action={
+            <Link href="/checks/new" className="btn-primary">
+              Demo-Prüfung starten
+            </Link>
+          }
+        />
+
+        <div className="p-6 space-y-6">
+          <div className="card border-status-warning/20 bg-status-warningBg">
+            <div className="text-sm font-medium text-status-warning mb-1">Demo-Offline-Modus aktiv</div>
+            <p className="text-sm text-text-secondary">
+              Die Datenbank ist aktuell nicht erreichbar. Sie können das Dashboard mit Beispieldaten testen.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: 'Kandidaten gesamt', value: 1, sub: 'Beispieldaten', color: 'text-text-primary' },
+              { label: 'In Prüfung', value: 1, sub: 'aktiv', color: 'text-status-info' },
+              { label: 'Abgeschlossen', value: 0, sub: 'Prüfungen', color: 'text-status-success' },
+              { label: 'Unstimmigkeiten', value: 0, sub: 'gefunden', color: 'text-status-error' },
+            ].map((s) => (
+              <div key={s.label} className="card">
+                <div className="text-xs text-text-secondary mb-2">{s.label}</div>
+                <div className={`stat-value ${s.color}`}>{s.value}</div>
+                <div className="text-xs text-text-muted mt-1">{s.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="card">
+            <h2 className="section-title mb-3">Nächste Schritte</h2>
+            <ul className="text-sm text-text-secondary space-y-2 list-disc pl-5">
+              <li>Prüfen Sie in Vercel die Variable <code>DATABASE_URL</code>.</li>
+              <li>Stellen Sie sicher, dass Supabase aktiv ist und Verbindungen zulässt.</li>
+              <li>Starten Sie danach ein Redeploy, damit das System Live-Daten lädt.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const [totalCandidates, activeCandidates, completedChecks, openChecks, recentCandidates, recentChecks] =
     await Promise.all([
       prisma.candidate.count({ where: { userId: session.user.id } }),
