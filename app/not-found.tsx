@@ -9,9 +9,14 @@ export default function NotFound() {
         <p className="text-text-secondary mb-8">
           Die gesuchte Seite existiert nicht oder wurde verschoben.
         </p>
-        <Link href="/dashboard" className="btn-primary">
-          Zum Dashboard
-        </Link>
+        <div className="flex gap-3 justify-center">
+          <Link href="/dashboard" className="btn-primary">
+            Zum Dashboard
+          </Link>
+          <Link href="/" className="btn-secondary">
+            Startseite
+          </Link>
+        </div>
       </div>
     </div>
   )

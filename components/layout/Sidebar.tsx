@@ -39,7 +39,7 @@ export function Sidebar() {
   const { data: session } = useSession()
 
   return (
-    <aside className="w-56 min-h-screen flex flex-col flex-shrink-0"
+    <aside className="w-56 h-full flex flex-col flex-shrink-0"
       style={{
         background: 'rgba(18,18,18,0.95)',
         backdropFilter: 'blur(20px)',

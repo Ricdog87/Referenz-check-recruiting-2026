@@ -2,23 +2,29 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { rm } from 'fs/promises'
-import { join } from 'path'
+import { list, del } from '@vercel/blob'
 
 export async function DELETE() {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
-
-  // Delete uploaded files
-  const uploadDir = join(process.cwd(), 'public', 'uploads', session.user.id)
   try {
-    await rm(uploadDir, { recursive: true, force: true })
+    const session = await getServerSession(authOptions)
+    if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
+
+    // Delete all blobs for this user from Vercel Blob storage
+    const prefix = `candidates/${session.user.id}/`
+    try {
+      const { blobs } = await list({ prefix })
+      if (blobs.length > 0) {
+        await del(blobs.map((b) => b.url))
+      }
+    } catch {
+      // Non-fatal: blob deletion failure should not block account deletion
+    }
+
+    // Prisma cascade deletes all related records (candidates, checks, documents, gdprConsents, auditLogs)
+    await prisma.user.delete({ where: { id: session.user.id } })
+
+    return NextResponse.json({ ok: true })
   } catch {
-    // Directory may not exist
+    return NextResponse.json({ error: 'Konto konnte nicht gelöscht werden.' }, { status: 500 })
   }
-
-  // Cascade deletes handle all related records via Prisma schema
-  await prisma.user.delete({ where: { id: session.user.id } })
-
-  return NextResponse.json({ ok: true })
 }
