@@ -15,6 +15,8 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const inputClass =
+    'input-field !bg-white !border-slate-300 !text-slate-900 placeholder:!text-slate-400 focus:!border-accent'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -40,8 +42,8 @@ function LoginForm() {
   return (
     <div className="animate-slide-up">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Willkommen zurück</h1>
-        <p className="text-sm text-white/40 mt-2">Melden Sie sich in Ihrem RefCheck-Konto an</p>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Willkommen zurück</h1>
+        <p className="text-sm text-slate-600 mt-2">Melden Sie sich in Ihrem RefCheck-Konto an</p>
       </div>
 
       {registered && (
@@ -51,13 +53,16 @@ function LoginForm() {
         </div>
       )}
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="rounded-2xl overflow-hidden shadow-xl" style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid rgba(15,23,42,0.08)' }}>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="px-4 py-3 rounded-xl text-xs text-slate-700 border border-slate-200 bg-slate-50">
+            Demo-Zugang (Seed): <span className="font-semibold">demo@refcheck.de</span> / <span className="font-semibold">demo1234</span>
+          </div>
           <div>
-            <label className="label">E-Mail</label>
+            <label className="label !text-slate-500">E-Mail</label>
             <input
               type="email"
-              className="input-field"
+              className={inputClass}
               placeholder="firma@beispiel.de"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -66,10 +71,10 @@ function LoginForm() {
             />
           </div>
           <div>
-            <label className="label">Passwort</label>
+            <label className="label !text-slate-500">Passwort</label>
             <input
               type="password"
-              className="input-field"
+              className={inputClass}
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -95,19 +100,19 @@ function LoginForm() {
           </button>
         </form>
 
-        <div className="px-6 pb-5 text-center" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-          <p className="text-sm text-white/35 pt-4">
+        <div className="px-6 pb-5 text-center" style={{ borderTop: '1px solid rgba(15,23,42,0.08)' }}>
+          <p className="text-sm text-slate-600 pt-4">
             Noch kein Konto?{' '}
-            <Link href="/register" className="text-accent hover:text-white transition-colors font-medium">
+            <Link href="/register" className="text-accent hover:text-accent-hover transition-colors font-medium">
               Registrieren
             </Link>
           </p>
         </div>
       </div>
 
-      <p className="text-[11px] text-white/20 text-center mt-5 leading-relaxed">
+      <p className="text-[11px] text-slate-500 text-center mt-5 leading-relaxed">
         Durch die Anmeldung stimmen Sie unserer{' '}
-        <Link href="/datenschutz" className="underline hover:text-white/40 transition-colors">Datenschutzerklärung</Link> zu.
+        <Link href="/datenschutz" className="underline hover:text-slate-700 transition-colors">Datenschutzerklärung</Link> zu.
       </p>
     </div>
   )
