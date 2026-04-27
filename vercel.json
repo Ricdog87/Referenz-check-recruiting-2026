@@ -1,5 +1,5 @@
 {
-  "buildCommand": "prisma generate && prisma db push && next build",
+  "buildCommand": "prisma generate && (prisma db push || echo 'Skipping prisma db push during build') && next build",
   "framework": "nextjs",
   "functions": {
     "app/api/upload/route.ts": {
