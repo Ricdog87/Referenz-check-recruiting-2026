@@ -3,6 +3,59 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 
+const DEMO_EMAIL = 'demo@refcheck.de'
+const DEMO_PASSWORD = 'demo1234'
+
+async function ensureDemoWorkspace() {
+  let user = await prisma.user.findUnique({ where: { email: DEMO_EMAIL } })
+  if (!user) {
+    const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 12)
+    user = await prisma.user.create({
+      data: {
+        name: 'Demo Benutzer',
+        company: 'Demo GmbH',
+        email: DEMO_EMAIL,
+        password: passwordHash,
+      },
+    })
+  }
+
+  const candidate = await prisma.candidate.upsert({
+    where: { id: 'seed-candidate-1' },
+    update: {},
+    create: {
+      id: 'seed-candidate-1',
+      firstName: 'Max',
+      lastName: 'Mustermann',
+      email: 'max.mustermann@example.de',
+      position: 'Senior Software Developer',
+      department: 'Engineering',
+      status: 'IN_REVIEW',
+      gdprConsent: true,
+      gdprConsentDate: new Date(),
+      userId: user.id,
+    },
+  })
+
+  await prisma.referenceCheck.upsert({
+    where: { id: 'seed-check-1' },
+    update: {},
+    create: {
+      id: 'seed-check-1',
+      candidateId: candidate.id,
+      employerName: 'Beispiel AG',
+      employerContact: 'Frau Schmidt, HR',
+      employerPhone: '+49 89 12345678',
+      position: 'Software Developer',
+      startDate: '03/2020',
+      endDate: '12/2023',
+      status: 'IN_PROGRESS',
+    },
+  })
+
+  return user
+}
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
@@ -21,9 +74,21 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
+        const normalizedEmail = credentials.email.toLowerCase().trim()
+
+        if (normalizedEmail === DEMO_EMAIL && credentials.password === DEMO_PASSWORD) {
+          const demoUser = await ensureDemoWorkspace()
+          return {
+            id: demoUser.id,
+            email: demoUser.email,
+            name: demoUser.name,
+            company: demoUser.company,
+            role: demoUser.role,
+          }
+        }
 
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email.toLowerCase() },
+          where: { email: normalizedEmail },
         })
 
         if (!user) return null
