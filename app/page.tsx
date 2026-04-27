@@ -72,7 +72,7 @@ export default function LandingPage() {
               style={{ background: 'linear-gradient(135deg, #0a84ff, #0070e0)', boxShadow: '0 4px 24px rgba(10,132,255,0.4), inset 0 1px 0 rgba(255,255,255,0.2)' }}>
               Jetzt kostenlos starten
             </Link>
-            <Link href="/login"
+            <Link href="/login?demo=1"
               className="text-base py-3.5 px-8 rounded-full font-medium text-white/70 hover:text-white border border-white/10 hover:border-white/20 transition-all duration-200"
               style={{ background: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(10px)' }}>
               Demo ansehen →
@@ -388,6 +388,73 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ——— FAQ ——— */}
+      <section className="py-32 px-6" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">FAQ</p>
+            <h2 className="text-[clamp(28px,4vw,48px)] font-bold tracking-tighter gradient-text-white">
+              Häufige Fragen
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: 'Ist RefCheck DSGVO-konform?',
+                a: 'Ja. Alle Daten werden ausschließlich auf deutschen Servern verarbeitet und gespeichert. Das Einwilligungsmanagement ist vollständig integriert. Auf Knopfdruck können Daten exportiert (Art. 20) oder gelöscht (Art. 17) werden.',
+              },
+              {
+                q: 'Führt RefCheck selbst Referenzprüfungen durch?',
+                a: 'Nein. RefCheck ist eine Software-Plattform, mit der Ihr Team Referenzprüfungen organisiert, dokumentiert und nachverfolgt. Die Kontaktaufnahme mit früheren Arbeitgebern erfolgt durch Ihr Team.',
+              },
+              {
+                q: 'Was passiert nach der kostenlosen Testphase?',
+                a: 'Sie können nach 14 Tagen auf den Professional-Plan upgraden oder Ihr Konto jederzeit löschen. Keine automatische Verlängerung, keine versteckten Kosten. Ihre Daten bleiben bis zur aktiven Kündigung erhalten.',
+              },
+              {
+                q: 'Wie viele Nutzer kann ich anlegen?',
+                a: 'Im Trial- und Professional-Plan ist ein Nutzerkonto inklusive. Für Teams mit mehreren Recruiter:innen steht der Enterprise-Plan mit Multi-User-Verwaltung zur Verfügung.',
+              },
+              {
+                q: 'Gibt es einen Auftragsverarbeitungsvertrag (AVV)?',
+                a: 'Ja. Für den Professional- und Enterprise-Plan stellen wir einen AVV gemäß Art. 28 DSGVO bereit. Kontaktieren Sie uns unter support@refcheck.de.',
+              },
+              {
+                q: 'Kann ich meine Daten jederzeit exportieren oder löschen?',
+                a: 'Ja. In den Einstellungen können Sie jederzeit einen vollständigen JSON-Export aller Ihrer Daten herunterladen oder Ihr Konto mit allen Daten unwiderruflich löschen.',
+              },
+            ].map((item) => (
+              <details
+                key={item.q}
+                className="group rounded-2xl border border-border overflow-hidden"
+                style={{ background: 'rgba(255,255,255,0.02)' }}
+              >
+                <summary className="flex items-center justify-between px-6 py-4 cursor-pointer list-none hover:bg-white/[0.03] transition-colors">
+                  <span className="text-sm font-medium text-white/85 pr-4">{item.q}</span>
+                  <span className="text-white/30 group-open:rotate-45 transition-transform duration-200 flex-shrink-0 text-xl leading-none">
+                    +
+                  </span>
+                </summary>
+                <div className="px-6 pb-5 pt-0">
+                  <p className="text-sm text-white/45 leading-relaxed">{item.a}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <p className="text-center text-sm text-white/30 mt-10">
+            Weitere Fragen?{' '}
+            <a
+              href="mailto:support@refcheck.de"
+              className="text-accent hover:text-white transition-colors"
+            >
+              support@refcheck.de
+            </a>
+          </p>
         </div>
       </section>
 

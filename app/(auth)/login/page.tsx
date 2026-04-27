@@ -9,9 +9,10 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const registered = searchParams.get('registered')
+  const isDemo = searchParams.get('demo') === '1'
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState(isDemo ? 'demo@refcheck.de' : '')
+  const [password, setPassword] = useState(isDemo ? 'demo1234' : '')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showForgot, setShowForgot] = useState(false)
@@ -40,8 +41,14 @@ function LoginForm() {
   return (
     <div className="animate-slide-up">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Willkommen zurück</h1>
-        <p className="text-sm text-white/40 mt-2">Melden Sie sich in Ihrem RefCheck-Konto an</p>
+        <h1 className="text-2xl font-bold text-white tracking-tight">
+          {isDemo ? 'Demo testen' : 'Willkommen zurück'}
+        </h1>
+        <p className="text-sm text-white/40 mt-2">
+          {isDemo
+            ? 'Demo-Zugangsdaten sind bereits eingetragen'
+            : 'Melden Sie sich in Ihrem RefCheck-Konto an'}
+        </p>
       </div>
 
       {registered && (
@@ -50,6 +57,25 @@ function LoginForm() {
           style={{ background: 'rgba(48,209,88,0.08)' }}
         >
           Konto erfolgreich erstellt — bitte jetzt anmelden.
+        </div>
+      )}
+
+      {isDemo && (
+        <div
+          className="mb-4 px-4 py-3 rounded-xl text-xs border"
+          style={{
+            background: 'rgba(10,132,255,0.07)',
+            borderColor: 'rgba(10,132,255,0.2)',
+          }}
+        >
+          <p className="text-accent font-medium mb-1">Demo-Konto</p>
+          <p className="text-white/50">
+            E-Mail: <span className="text-white/80 font-mono">demo@refcheck.de</span>
+            {'  '}· Passwort: <span className="text-white/80 font-mono">demo1234</span>
+          </p>
+          <p className="text-white/30 mt-1">
+            Das Demo-Konto enthält Beispieldaten zur Veranschaulichung.
+          </p>
         </div>
       )}
 
@@ -68,7 +94,7 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              autoFocus
+              autoFocus={!isDemo}
             />
           </div>
           <div>
@@ -102,12 +128,18 @@ function LoginForm() {
             </div>
           )}
 
-          <button type="submit" disabled={loading} className="btn-primary w-full py-3 rounded-xl text-sm">
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn-primary w-full py-3 rounded-xl text-sm"
+          >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                 Anmelden…
               </span>
+            ) : isDemo ? (
+              'Demo öffnen →'
             ) : (
               'Anmelden'
             )}
@@ -120,7 +152,10 @@ function LoginForm() {
         >
           <p className="text-sm text-white/35 pt-4">
             Noch kein Konto?{' '}
-            <Link href="/register" className="text-accent hover:text-white transition-colors font-medium">
+            <Link
+              href="/register"
+              className="text-accent hover:text-white transition-colors font-medium"
+            >
               Kostenlos registrieren
             </Link>
           </p>
@@ -129,7 +164,10 @@ function LoginForm() {
 
       <p className="text-[11px] text-white/20 text-center mt-5 leading-relaxed">
         Durch die Anmeldung stimmen Sie unserer{' '}
-        <Link href="/datenschutz" className="underline hover:text-white/40 transition-colors">
+        <Link
+          href="/datenschutz"
+          className="underline hover:text-white/40 transition-colors"
+        >
           Datenschutzerklärung
         </Link>{' '}
         zu.
@@ -166,10 +204,13 @@ function LoginForm() {
 
             <div
               className="rounded-xl p-4 space-y-2"
-              style={{ background: 'rgba(10,132,255,0.07)', border: '1px solid rgba(10,132,255,0.15)' }}
+              style={{
+                background: 'rgba(10,132,255,0.07)',
+                border: '1px solid rgba(10,132,255,0.15)',
+              }}
             >
               <p className="text-sm text-white/70 leading-relaxed">
-                Schreiben Sie uns einfach eine E-Mail mit Ihrer registrierten E-Mail-Adresse:
+                Schreiben Sie uns mit Ihrer registrierten E-Mail-Adresse:
               </p>
               <a
                 href="mailto:support@refcheck.de?subject=Passwort zurücksetzen"
