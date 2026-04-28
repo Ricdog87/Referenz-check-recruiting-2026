@@ -43,7 +43,7 @@ function LoginForm() {
     <div className="animate-slide-up">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Willkommen zurück</h1>
-        <p className="text-sm text-slate-600 mt-2">Melden Sie sich in Ihrem RefCheck-Konto an</p>
+        <p className="text-sm text-slate-600 mt-2">Melden Sie sich in Ihrem candiq-Konto an</p>
       </div>
 
       {registered && (
@@ -56,7 +56,7 @@ function LoginForm() {
       <div className="rounded-2xl overflow-hidden shadow-xl" style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid rgba(15,23,42,0.08)' }}>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="px-4 py-3 rounded-xl text-xs text-slate-700 border border-slate-200 bg-slate-50">
-            Demo-Zugang (Seed): <span className="font-semibold">demo@refcheck.de</span> / <span className="font-semibold">demo1234</span>
+            Demo-Zugang (Seed): <span className="font-semibold">demo@candiq.de</span> / <span className="font-semibold">demo1234</span>
           </div>
           <div>
             <label className="label !text-slate-500">E-Mail</label>

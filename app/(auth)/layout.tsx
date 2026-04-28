@@ -14,9 +14,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-7 h-7 rounded-xl bg-accent flex items-center justify-center"
             style={{ boxShadow: '0 0 16px rgba(10,132,255,0.35)' }}>
-            <span className="text-white text-xs font-bold">RC</span>
+            <span className="text-white text-xs font-bold">CQ</span>
           </div>
-          <span className="font-semibold text-slate-700 group-hover:text-slate-900 transition-colors text-sm">RefCheck</span>
+          <span className="font-semibold text-slate-700 group-hover:text-slate-900 transition-colors text-sm">candiq</span>
         </Link>
       </div>
 
