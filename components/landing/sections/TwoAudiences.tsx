@@ -57,6 +57,7 @@ export function TwoAudiences() {
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
               Egal ob Sie intern für Ihr Unternehmen einstellen oder professionell vermitteln — wir haben das passende Paket.
+              Zusätzlich können Sie neben Referenzprüfungen auch strukturierte Interviews als Service nutzen.
             </p>
           </div>
         </Reveal>
