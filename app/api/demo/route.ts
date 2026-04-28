@@ -124,39 +124,6 @@ async function handle(req: NextRequest) {
 
 // ─── Demo data ──────────────────────────────────────────────────
 
-const DEMO_PROFILES = {
-  hr_basic: {
-    creds: DEMO_CREDENTIALS.hr_basic,
-    profile: {
-      name: 'Demo HR Manager',
-      company: 'Nordstern GmbH',
-      accountType: 'HR_DEPARTMENT',
-      plan: 'PROFESSIONAL',
-    },
-    seed: HR_SEED,
-  },
-  hr_lead: {
-    creds: DEMO_CREDENTIALS.hr_lead,
-    profile: {
-      name: 'Demo Team Lead Recruiting',
-      company: 'RheinTech AG',
-      accountType: 'HR_DEPARTMENT',
-      plan: 'BUSINESS',
-    },
-    seed: HR_SEED,
-  },
-  hr_exec: {
-    creds: DEMO_CREDENTIALS.hr_exec,
-    profile: {
-      name: 'Demo Director People',
-      company: 'Hanse Holding SE',
-      accountType: 'HR_DEPARTMENT',
-      plan: 'ENTERPRISE',
-    },
-    seed: HR_SEED,
-  },
-} as const
-
 const HR_SEED = [
   {
     firstName: 'Lukas',
@@ -312,3 +279,36 @@ const HR_SEED = [
     ],
   },
 ]
+
+const DEMO_PROFILES = {
+  hr_basic: {
+    creds: DEMO_CREDENTIALS.hr_basic,
+    profile: {
+      name: 'Demo HR Manager',
+      company: 'Nordstern GmbH',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'PROFESSIONAL',
+    },
+    seed: HR_SEED,
+  },
+  hr_lead: {
+    creds: DEMO_CREDENTIALS.hr_lead,
+    profile: {
+      name: 'Demo Team Lead Recruiting',
+      company: 'RheinTech AG',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'BUSINESS',
+    },
+    seed: HR_SEED,
+  },
+  hr_exec: {
+    creds: DEMO_CREDENTIALS.hr_exec,
+    profile: {
+      name: 'Demo Director People',
+      company: 'Hanse Holding SE',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'ENTERPRISE',
+    },
+    seed: HR_SEED,
+  },
+} as const
