@@ -81,7 +81,7 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `refcheck-export-${Date.now()}.json`
+    a.download = `candiq-export-${Date.now()}.json`
     a.click()
     URL.revokeObjectURL(url)
   }

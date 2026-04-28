@@ -141,7 +141,7 @@ export function PricingClient() {
                   </ul>
 
                   <Link
-                    href={p.id === 'ENTERPRISE' ? 'mailto:sales@refcheck.de' : `/register?plan=${p.id}&type=${p.forType}`}
+                    href={p.id === 'ENTERPRISE' ? 'mailto:sales@candiq.de' : `/register?plan=${p.id}&type=${p.forType}`}
                     className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
                       p.highlight
                         ? 'bg-white text-brand-700 hover:bg-bg-secondary'
@@ -250,12 +250,12 @@ export function PricingClient() {
                 a: 'Sie zahlen das gewählte Agency-Paket. Ihren Endkunden können Sie die Reports im Rahmen Ihres Vermittlungshonorars in Rechnung stellen — wir geben Ihnen White-Label-Reports an die Hand.',
               },
               {
-                q: 'Ist RefCheck DSGVO-konform?',
+                q: 'Ist candiq DSGVO-konform?',
                 a: 'Ja, by Design. Alle Daten in deutschen Rechenzentren, Einwilligungs-Workflow für Kandidaten, Recht auf Auskunft & Löschung per Knopfdruck. AVV-Vertrag standardmäßig im Onboarding.',
               },
               {
                 q: 'Bietet ihr Enterprise-Verträge & SSO?',
-                a: 'Ja. Für 50+ Sitze, SSO-Integration (SAML, Azure AD, Okta) oder On-Premise-Deployments — bitte direkten Kontakt unter sales@refcheck.de.',
+                a: 'Ja. Für 50+ Sitze, SSO-Integration (SAML, Azure AD, Okta) oder On-Premise-Deployments — bitte direkten Kontakt unter sales@candiq.de.',
               },
             ].map((f, i) => (
               <FaqItem key={i} q={f.q} a={f.a} />
@@ -268,9 +268,9 @@ export function PricingClient() {
       <section className="py-20 px-6 text-center">
         <div className="max-w-2xl mx-auto">
           <h3 className="text-3xl font-bold tracking-tight mb-4 text-text-primary">Noch unsicher?</h3>
-          <p className="text-text-secondary mb-7">Buchen Sie ein 15-min Demo-Gespräch. Wir zeigen RefCheck live an Ihrem Use Case.</p>
+          <p className="text-text-secondary mb-7">Buchen Sie ein 15-min Demo-Gespräch. Wir zeigen candiq live an Ihrem Use Case.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="mailto:sales@refcheck.de" className="btn-primary py-3 px-7">Demo buchen</a>
+            <a href="mailto:sales@candiq.de" className="btn-primary py-3 px-7">Demo buchen</a>
             <Link href="/login?demo=1" className="btn-secondary py-3 px-7">Selbst testen</Link>
           </div>
         </div>

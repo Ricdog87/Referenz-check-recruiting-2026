@@ -77,7 +77,7 @@ function LoginForm() {
     <div className="animate-slide-up">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-2">Willkommen zurück</h1>
-        <p className="text-text-secondary">Melden Sie sich in Ihrem RefCheck-Konto an</p>
+        <p className="text-text-secondary">Melden Sie sich in Ihrem candiq-Konto an</p>
       </div>
 
       {registered && (

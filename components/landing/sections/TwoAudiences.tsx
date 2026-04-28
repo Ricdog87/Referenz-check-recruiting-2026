@@ -49,7 +49,7 @@ export function TwoAudiences() {
         <Reveal>
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 mb-4">
-              Für wen ist RefCheck?
+              Für wen ist candiq?
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
               Zwei Zielgruppen. <br className="hidden sm:block" />

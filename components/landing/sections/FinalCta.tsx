@@ -30,7 +30,7 @@ export function FinalCta() {
           </h2>
 
           <p className="text-lg text-text-secondary mb-10 max-w-xl mx-auto leading-relaxed">
-            Schließen Sie sich über 200 HR-Teams und Personaldienstleistern an, die bereits mit RefCheck ihre Hiring-Quote verbessert haben.
+            Schließen Sie sich über 200 HR-Teams und Personaldienstleistern an, die bereits mit candiq ihre Hiring-Quote verbessert haben.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
@@ -44,7 +44,7 @@ export function FinalCta() {
           </div>
 
           <div className="mt-8 text-xs text-text-muted">
-            Fragen? <a href="mailto:hello@refcheck.de" className="text-brand-700 font-semibold hover:underline">hello@refcheck.de</a>
+            Fragen? <a href="mailto:hello@candiq.de" className="text-brand-700 font-semibold hover:underline">hello@candiq.de</a>
           </div>
         </div>
       </Reveal>

@@ -4,7 +4,7 @@ import { LandingFooter } from '@/components/landing/LandingFooter'
 import { PricingClient } from './PricingClient'
 
 export const metadata: Metadata = {
-  title: 'Preise — RefCheck',
+  title: 'Preise — candiq',
   description: 'Faire Pakete für HR-Abteilungen und Personaldienstleister. Ab 79 €/Monat. DSGVO-konform.',
 }
 

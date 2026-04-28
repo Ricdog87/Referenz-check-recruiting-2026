@@ -10,9 +10,9 @@ export function LandingFooter() {
             <Link href="/" className="flex items-center gap-2.5 mb-5">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center"
                 style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)', boxShadow: '0 4px 14px rgba(79,70,229,0.35)' }}>
-                <span className="text-white text-xs font-black">RC</span>
+                <span className="text-white text-xs font-black">CQ</span>
               </div>
-              <span className="font-bold text-text-primary">RefCheck</span>
+              <span className="font-bold text-text-primary">candiq</span>
             </Link>
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm mb-5">
               DSGVO-konforme Referenzprüfung für moderne HR-Teams und Personaldienstleister im DACH-Raum.
@@ -53,11 +53,11 @@ export function LandingFooter() {
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted">
-          <div>© 2026 RefCheck Solutions GmbH · Alle Rechte vorbehalten.</div>
+          <div>© 2026 RSG Recruiting Solutions group GmbH · Alle Rechte vorbehalten.</div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
             <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>
-            <a href="mailto:hello@refcheck.de" className="hover:text-text-primary transition-colors">hello@refcheck.de</a>
+            <a href="mailto:hello@candiq.de" className="hover:text-text-primary transition-colors">hello@candiq.de</a>
           </div>
         </div>
       </div>

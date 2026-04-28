@@ -67,7 +67,7 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9"
           >
-            <span className="font-semibold text-text-primary">RefCheck</span> verifiziert Referenzen, Zeugnisse und Tätigkeiten Ihrer Kandidaten —
+            <span className="font-semibold text-text-primary">candiq</span> verifiziert Referenzen, Zeugnisse und Tätigkeiten Ihrer Kandidaten —
             DSGVO-konform, in unter <span className="font-semibold text-brand-700">48 Stunden</span>.
             Vermeiden Sie Fehlbesetzungen, die Sie <span className="font-semibold text-text-primary">€ 50.000+</span> kosten.
           </motion.p>

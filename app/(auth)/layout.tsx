@@ -20,9 +20,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)', boxShadow: '0 4px 14px rgba(79,70,229,0.35)' }}>
-            <span className="text-white text-xs font-black">RC</span>
+            <span className="text-white text-xs font-black">CQ</span>
           </div>
-          <span className="font-bold text-text-primary tracking-tight">RefCheck</span>
+          <span className="font-bold text-text-primary tracking-tight">candiq</span>
         </Link>
         <Link href="/" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
           ← Zurück zur Startseite

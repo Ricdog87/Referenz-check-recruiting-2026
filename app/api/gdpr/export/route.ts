@@ -27,7 +27,7 @@ export async function GET() {
 
   const exportData = {
     exportDate: new Date().toISOString(),
-    exportedBy: 'RefCheck DSGVO-Datenexport (Art. 20 DSGVO)',
+    exportedBy: 'candiq DSGVO-Datenexport (Art. 20 DSGVO)',
     account: user,
     gdprConsents,
     candidates: candidates.map((c) => ({
@@ -60,7 +60,7 @@ export async function GET() {
   return new NextResponse(json, {
     headers: {
       'Content-Type': 'application/json',
-      'Content-Disposition': `attachment; filename="refcheck-dsgvo-export-${Date.now()}.json"`,
+      'Content-Disposition': `attachment; filename="candiq-dsgvo-export-${Date.now()}.json"`,
       'Cache-Control': 'no-store',
     },
   })
