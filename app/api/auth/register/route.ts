@@ -3,12 +3,20 @@ import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 
+const VALID_ACCOUNT_TYPES = ['HR_DEPARTMENT', 'RECRUITMENT_AGENCY']
+const VALID_PLANS = [
+  'STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE',
+  'AGENCY_BASIC', 'AGENCY_PRO', 'AGENCY_SCALE',
+]
+
 export async function POST(req: NextRequest) {
   try {
-    const { name, company, email, password, gdprAccepted } = await req.json()
+    const { name, company, email, password, gdprAccepted, accountType, plan } = await req.json()
     const cleanName = (name ?? '').trim()
     const cleanCompany = (company ?? '').trim()
     const cleanEmail = (email ?? '').trim().toLowerCase()
+    const cleanAccountType = VALID_ACCOUNT_TYPES.includes(accountType) ? accountType : 'HR_DEPARTMENT'
+    const cleanPlan = VALID_PLANS.includes(plan) ? plan : 'STARTER'
 
     if (!cleanName || !cleanCompany || !cleanEmail || !password) {
       return NextResponse.json({ error: 'Alle Felder sind erforderlich.' }, { status: 400 })
@@ -31,12 +39,19 @@ export async function POST(req: NextRequest) {
     const hashed = await bcrypt.hash(password, 12)
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
 
+    // 14-day trial
+    const trialEndsAt = new Date()
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+
     const user = await prisma.user.create({
       data: {
         name: cleanName,
         company: cleanCompany,
         email: cleanEmail,
         password: hashed,
+        accountType: cleanAccountType,
+        plan: cleanPlan,
+        trialEndsAt,
         gdprConsents: {
           create: {
             type: 'REGISTRATION',

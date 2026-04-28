@@ -37,6 +37,8 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           company: user.company,
           role: user.role,
+          accountType: user.accountType,
+          plan: user.plan,
         }
       },
     }),
@@ -47,6 +49,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.company = (user as any).company
         token.role = (user as any).role
+        token.accountType = (user as any).accountType
+        token.plan = (user as any).plan
       }
       return token
     },
@@ -55,6 +59,8 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.company = token.company as string
         session.user.role = token.role as string
+        session.user.accountType = token.accountType as string
+        session.user.plan = token.plan as string
       }
       return session
     },
@@ -69,6 +75,8 @@ declare module 'next-auth' {
       name: string
       company: string
       role: string
+      accountType: string
+      plan: string
     }
   }
 }
@@ -78,5 +86,7 @@ declare module 'next-auth/jwt' {
     id: string
     company: string
     role: string
+    accountType: string
+    plan: string
   }
 }

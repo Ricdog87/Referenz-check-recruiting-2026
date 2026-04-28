@@ -1,76 +1,87 @@
-import Link from 'next/link'
+import { LegalShell } from '@/components/landing/LegalShell'
+
+export const metadata = {
+  title: 'Datenschutzerklärung — RefCheck',
+  description: 'Wie wir personenbezogene Daten gemäß DSGVO verarbeiten.',
+}
 
 export default function DatenschutzPage() {
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
-      <nav className="border-b border-border px-6 h-16 flex items-center justify-between max-w-4xl mx-auto">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-accent rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">RC</span>
-          </div>
-          <span className="font-semibold">RefCheck</span>
-        </Link>
-        <Link href="/" className="text-sm text-text-secondary hover:text-text-primary transition-colors">← Zurück</Link>
-      </nav>
+    <LegalShell
+      title="Datenschutzerklärung"
+      subtitle="Wie wir Ihre Daten gemäß DSGVO schützen und verarbeiten"
+    >
+      <p className="lead text-text-secondary">
+        Wir nehmen den Schutz Ihrer personenbezogenen Daten sehr ernst. Diese Datenschutzerklärung informiert
+        Sie über Art, Umfang und Zweck der Verarbeitung Ihrer Daten gemäß DSGVO.
+      </p>
 
-      <div className="max-w-3xl mx-auto px-6 py-16 space-y-8">
-        <h1 className="text-3xl font-bold">Datenschutzerklärung</h1>
+      <h2>1. Verantwortlicher</h2>
+      <p>
+        Verantwortlich im Sinne von Art. 4 Abs. 7 DSGVO ist die <strong>RefCheck Solutions GmbH</strong>,
+        vertreten durch die Geschäftsführung. Alle Kontaktdaten finden Sie im{' '}
+        <a href="/impressum">Impressum</a>.
+      </p>
 
-        <div className="text-sm text-text-secondary space-y-6 leading-relaxed">
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">1. Verantwortlicher</h2>
-            <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist das Unternehmen, das RefCheck betreibt (im Folgenden „wir" oder „uns").</p>
-          </section>
+      <h2>2. Welche Daten verarbeiten wir?</h2>
+      <ul>
+        <li><strong>Kontodaten:</strong> Name, Unternehmen, geschäftliche E-Mail-Adresse, Passwort-Hash</li>
+        <li><strong>Kandidatendaten:</strong> Vor- und Nachname, Kontaktdaten, Bewerbungsunterlagen, Zeugnisse</li>
+        <li><strong>Prüfungsdaten:</strong> Arbeitgeberkontakte, Gesprächsnotizen, Verifizierungsergebnisse</li>
+        <li><strong>Technische Daten:</strong> IP-Adresse (zur Einwilligungsdokumentation), User-Agent, Audit-Logs</li>
+      </ul>
 
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">2. Erhobene Daten</h2>
-            <p>Wir verarbeiten folgende personenbezogene Daten:</p>
-            <ul className="list-disc ml-6 mt-2 space-y-1">
-              <li>Kontodaten: Name, Unternehmensname, E-Mail-Adresse (B2B-Kunden)</li>
-              <li>Kandidatendaten: Name, E-Mail, Telefon, Bewerbungsunterlagen</li>
-              <li>Prüfungsdaten: Arbeitgeberkontakte, Prüfungsnotizen, Ergebnisse</li>
-              <li>Technische Daten: IP-Adresse (für Einwilligungsnachweise), Log-Daten</li>
-            </ul>
-          </section>
+      <h2>3. Rechtsgrundlagen</h2>
+      <ul>
+        <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> — Vertragserfüllung (Bereitstellung der RefCheck-Plattform)</li>
+        <li><strong>Art. 6 Abs. 1 lit. a DSGVO</strong> — Einwilligung (Kandidaten-Einwilligung zur Referenzprüfung)</li>
+        <li><strong>Art. 6 Abs. 1 lit. f DSGVO</strong> — Berechtigtes Interesse (Plattform-Sicherheit, Audit-Trail)</li>
+      </ul>
 
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">3. Rechtsgrundlagen</h2>
-            <p>Die Verarbeitung erfolgt auf Grundlage von:</p>
-            <ul className="list-disc ml-6 mt-2 space-y-1">
-              <li>Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)</li>
-              <li>Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)</li>
-              <li>Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse)</li>
-            </ul>
-          </section>
+      <h2>4. Auftragsverarbeitung (AVV) <span id="avv" /></h2>
+      <p>
+        Sofern Sie als Kunde personenbezogene Daten Ihrer Kandidaten in unserer Plattform verarbeiten,
+        bieten wir einen Vertrag zur Auftragsverarbeitung gemäß Art. 28 DSGVO an. Diesen erhalten Sie
+        automatisch im Onboarding-Prozess.
+      </p>
 
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">4. Datenspeicherung</h2>
-            <p>Alle Daten werden ausschließlich auf Servern in Deutschland (Hostinger DE) gespeichert. Es findet keine Übermittlung an Drittländer statt.</p>
-          </section>
+      <h2>5. Datenspeicherung & Hosting</h2>
+      <p>
+        Alle personenbezogenen Daten werden ausschließlich auf Servern in der Bundesrepublik Deutschland
+        gespeichert (Hetzner / Strato Rechenzentren mit ISO 27001-Zertifizierung). Es findet keine
+        Übermittlung in Drittländer statt.
+      </p>
 
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">5. Ihre Rechte</h2>
-            <p>Sie haben folgende Rechte gemäß DSGVO:</p>
-            <ul className="list-disc ml-6 mt-2 space-y-1">
-              <li>Auskunftsrecht (Art. 15)</li>
-              <li>Berichtigungsrecht (Art. 16)</li>
-              <li>Löschungsrecht (Art. 17) — im Dashboard unter Einstellungen</li>
-              <li>Datenportabilität (Art. 20) — JSON-Export im Dashboard</li>
-              <li>Widerspruchsrecht (Art. 21)</li>
-            </ul>
-          </section>
+      <h2>6. Verschlüsselung</h2>
+      <p>
+        Datenübertragung erfolgt ausschließlich verschlüsselt (TLS 1.3). Passwörter werden mittels bcrypt
+        gehasht; Dokumente werden im Vercel Blob Storage AES-256-verschlüsselt abgelegt.
+      </p>
 
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">6. Cookies</h2>
-            <p>Wir verwenden ausschließlich einen Session-Cookie für die Anmeldung. Es werden keine Tracking- oder Marketing-Cookies eingesetzt.</p>
-          </section>
+      <h2>7. Ihre Rechte</h2>
+      <ul>
+        <li><strong>Art. 15 DSGVO</strong> — Auskunftsrecht</li>
+        <li><strong>Art. 16 DSGVO</strong> — Berichtigung</li>
+        <li><strong>Art. 17 DSGVO</strong> — Löschung (im Dashboard unter Einstellungen)</li>
+        <li><strong>Art. 20 DSGVO</strong> — Datenportabilität (JSON-Export im Dashboard)</li>
+        <li><strong>Art. 21 DSGVO</strong> — Widerspruchsrecht</li>
+        <li><strong>Art. 77 DSGVO</strong> — Beschwerderecht bei der Aufsichtsbehörde</li>
+      </ul>
 
-          <section>
-            <h2 className="text-lg font-semibold text-text-primary mb-2">7. Aufbewahrungsfristen</h2>
-            <p>Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr erforderlich sind, spätestens jedoch nach Beendigung des Vertragsverhältnisses.</p>
-          </section>
-        </div>
-      </div>
-    </div>
+      <h2>8. Cookies</h2>
+      <p>
+        Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
+        Es findet kein Tracking, keine Marketing-Pixel und keine Analyse-Cookies statt.
+      </p>
+
+      <h2>9. Aufbewahrungsfristen</h2>
+      <p>
+        Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
+        erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
+      </p>
+
+      <h2>10. Stand</h2>
+      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: April 2026.</p>
+    </LegalShell>
   )
 }

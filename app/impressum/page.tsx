@@ -1,45 +1,53 @@
-import Link from 'next/link'
+import { LegalShell } from '@/components/landing/LegalShell'
+
+export const metadata = {
+  title: 'Impressum — RefCheck',
+}
 
 export default function ImpressumPage() {
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
-      <nav className="border-b border-border px-6 h-16 flex items-center justify-between max-w-4xl mx-auto">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-accent rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">RC</span>
-          </div>
-          <span className="font-semibold">RefCheck</span>
-        </Link>
-        <Link href="/" className="text-sm text-text-secondary hover:text-text-primary transition-colors">← Zurück</Link>
-      </nav>
+    <LegalShell title="Impressum" subtitle="Angaben gemäß § 5 TMG / § 55 Abs. 2 RStV">
+      <h2>RefCheck Solutions GmbH</h2>
+      <p>
+        [Straße und Hausnummer]<br />
+        [PLZ Ort]<br />
+        Deutschland
+      </p>
 
-      <div className="max-w-3xl mx-auto px-6 py-16 space-y-6">
-        <h1 className="text-3xl font-bold">Impressum</h1>
-        <div className="text-sm text-text-secondary space-y-4 leading-relaxed">
-          <div>
-            <p className="text-text-primary font-medium">[Ihr Unternehmen]</p>
-            <p>[Straße und Hausnummer]</p>
-            <p>[PLZ Ort]</p>
-            <p>Deutschland</p>
-          </div>
-          <div>
-            <p>Telefon: [+49 ...]</p>
-            <p>E-Mail: info@[ihre-domain].de</p>
-          </div>
-          <div>
-            <p>Handelsregister: [HRB ...]</p>
-            <p>Registergericht: Amtsgericht [Ort]</p>
-            <p>USt-IdNr.: DE [...]</p>
-          </div>
-          <div>
-            <p className="font-medium text-text-primary">Verantwortlich für den Inhalt (§ 55 RStV):</p>
-            <p>[Name der verantwortlichen Person]</p>
-          </div>
-          <p className="text-text-muted text-xs mt-8">
-            Bitte ersetzen Sie die Platzhalter mit Ihren tatsächlichen Unternehmensdaten.
-          </p>
-        </div>
-      </div>
-    </div>
+      <h3>Kontakt</h3>
+      <p>
+        Telefon: [+49 …]<br />
+        E-Mail: <a href="mailto:hello@refcheck.de">hello@refcheck.de</a>
+      </p>
+
+      <h3>Registereintrag</h3>
+      <p>
+        Eintragung im Handelsregister<br />
+        Registergericht: Amtsgericht [Ort]<br />
+        Registernummer: HRB [...]
+      </p>
+
+      <h3>Umsatzsteuer-ID</h3>
+      <p>USt-IdNr. nach § 27 a UStG: DE [...]</p>
+
+      <h3>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h3>
+      <p>
+        [Name der verantwortlichen Person]<br />
+        [Anschrift wie oben]
+      </p>
+
+      <h3>Streitschlichtung</h3>
+      <p>
+        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
+          https://ec.europa.eu/consumers/odr
+        </a>. Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
+        Verbraucherschlichtungsstelle teilzunehmen.
+      </p>
+
+      <p className="text-text-muted text-xs mt-12">
+        Bitte ersetzen Sie die Platzhalter mit Ihren tatsächlichen Unternehmensdaten vor dem Live-Gang.
+      </p>
+    </LegalShell>
   )
 }

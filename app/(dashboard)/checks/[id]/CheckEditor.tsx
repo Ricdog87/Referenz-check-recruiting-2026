@@ -59,7 +59,7 @@ export function CheckEditor({ check }: { check: Check }) {
   }
 
   return (
-    <div className="card space-y-5">
+    <div className="card-md space-y-5">
       <div className="flex items-center justify-between">
         <h2 className="section-title">Prüfungsprotokoll</h2>
         <button onClick={save} disabled={saving} className="btn-primary text-sm py-2">
@@ -105,7 +105,7 @@ export function CheckEditor({ check }: { check: Check }) {
               type="button"
               onClick={() => setRating(rating === star ? 0 : star)}
               className={`text-2xl transition-transform hover:scale-110 ${
-                star <= rating ? 'text-status-warning' : 'text-text-muted'
+                star <= rating ? 'text-amber-500' : 'text-text-disabled'
               }`}
             >
               ★
@@ -128,7 +128,7 @@ export function CheckEditor({ check }: { check: Check }) {
       <div>
         <label className="label">Festgestellte Unstimmigkeiten</label>
         <textarea
-          className="input-field resize-none border-status-warning/30"
+          className="input-field resize-none !border-amber-200 focus:!border-amber-400"
           rows={3}
           value={discrepancies}
           onChange={(e) => setDiscrepancies(e.target.value)}

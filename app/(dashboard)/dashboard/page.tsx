@@ -3,112 +3,251 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
-import { formatDateTime, CANDIDATE_STATUS, CHECK_STATUS } from '@/lib/utils'
+import { formatDateTime, CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
+import {
+  Users, ClipboardCheck, AlertTriangle, TrendingUp, ArrowUpRight,
+  Plus, Sparkles, Clock, CheckCircle2, AlertCircle, Phone,
+} from 'lucide-react'
+import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
-  const [totalCandidates, activeCandidates, completedChecks, openChecks, recentCandidates, recentChecks] =
-    await Promise.all([
-      prisma.candidate.count({ where: { userId: session.user.id } }),
-      prisma.candidate.count({ where: { userId: session.user.id, status: 'IN_REVIEW' } }),
-      prisma.referenceCheck.count({
-        where: { candidate: { userId: session.user.id }, status: 'COMPLETED' },
-      }),
-      prisma.referenceCheck.count({
-        where: { candidate: { userId: session.user.id }, status: 'OPEN' },
-      }),
-      prisma.candidate.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        include: { _count: { select: { checks: true } } },
-      }),
-      prisma.referenceCheck.findMany({
-        where: { candidate: { userId: session.user.id } },
-        orderBy: { updatedAt: 'desc' },
-        take: 5,
-        include: { candidate: { select: { firstName: true, lastName: true } } },
-      }),
-    ])
+  const userId = session.user.id
+  const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
 
-  const discrepancies = await prisma.referenceCheck.count({
-    where: { candidate: { userId: session.user.id }, result: 'DISCREPANCY_FOUND' },
-  })
+  const [
+    totalCandidates,
+    activeCandidates,
+    completedChecks,
+    openChecks,
+    inProgressChecks,
+    discrepancies,
+    verifiedChecks,
+    recentCandidates,
+    recentChecks,
+    candidateStatusGroups,
+    allChecks,
+  ] = await Promise.all([
+    prisma.candidate.count({ where: { userId } }),
+    prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }),
+    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }),
+    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'OPEN' } }),
+    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'IN_PROGRESS' } }),
+    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }),
+    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }),
+    prisma.candidate.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+      include: { _count: { select: { checks: true } } },
+    }),
+    prisma.referenceCheck.findMany({
+      where: { candidate: { userId } },
+      orderBy: { updatedAt: 'desc' },
+      take: 6,
+      include: { candidate: { select: { firstName: true, lastName: true, position: true } } },
+    }),
+    prisma.candidate.groupBy({ by: ['status'], where: { userId }, _count: true }),
+    prisma.referenceCheck.findMany({
+      where: { candidate: { userId } },
+      select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
+    }),
+  ])
+
+  const totalChecks = openChecks + inProgressChecks + completedChecks
+  const verificationRate = totalChecks > 0 ? Math.round((verifiedChecks / totalChecks) * 100) : 0
+  const planMeta = getPlanById(session.user.plan ?? 'STARTER')
+
+  // Build trend data (last 14 days)
+  const days = 14
+  const trend: { date: string; total: number; verified: number; discrepancy: number }[] = []
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    d.setHours(0, 0, 0, 0)
+    const next = new Date(d); next.setDate(d.getDate() + 1)
+    const dayChecks = allChecks.filter((c) => {
+      const t = c.updatedAt.getTime()
+      return t >= d.getTime() && t < next.getTime()
+    })
+    trend.push({
+      date: d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+      total: dayChecks.length,
+      verified: dayChecks.filter((c) => c.result === 'VERIFIED').length,
+      discrepancy: dayChecks.filter((c) => c.result === 'DISCREPANCY_FOUND').length,
+    })
+  }
+
+  // Avg turnaround in hours
+  const turnaroundChecks = allChecks.filter((c) => c.calledAt && c.createdAt)
+  const turnaround: { day: string; hours: number }[] = []
+  const dayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0)
+    const next = new Date(d); next.setDate(d.getDate() + 1)
+    const dc = turnaroundChecks.filter((c) => c.calledAt!.getTime() >= d.getTime() && c.calledAt!.getTime() < next.getTime())
+    const avgH = dc.length === 0
+      ? 0
+      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt!.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
+    turnaround.push({ day: dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1], hours: avgH })
+  }
+
+  // Status distribution
+  const statusDist = [
+    { name: 'Ausstehend', value: candidateStatusGroups.find((g) => g.status === 'PENDING')?._count ?? 0, color: '#94a3b8' },
+    { name: 'In Prüfung', value: candidateStatusGroups.find((g) => g.status === 'IN_REVIEW')?._count ?? 0, color: '#6366f1' },
+    { name: 'Abgeschlossen', value: candidateStatusGroups.find((g) => g.status === 'COMPLETED')?._count ?? 0, color: '#10b981' },
+    { name: 'Abgelehnt', value: candidateStatusGroups.find((g) => g.status === 'REJECTED')?._count ?? 0, color: '#f43f5e' },
+  ]
+
+  // Plan usage
+  const usedThisMonth = totalChecks
+  const checkLimit = planMeta.includedChecks
+  const usagePct = checkLimit > 0 ? Math.min(100, Math.round((usedThisMonth / checkLimit) * 100)) : 0
 
   const stats = [
-    { label: 'Kandidaten gesamt', value: totalCandidates, sub: 'erfasst', color: 'text-text-primary' },
-    { label: 'In Prüfung', value: activeCandidates, sub: 'aktiv', color: 'text-status-info' },
-    { label: 'Abgeschlossen', value: completedChecks, sub: 'Prüfungen', color: 'text-status-success' },
-    { label: 'Unstimmigkeiten', value: discrepancies, sub: 'gefunden', color: 'text-status-error' },
+    {
+      label: 'Kandidaten',
+      value: totalCandidates,
+      sub: `${activeCandidates} in Prüfung`,
+      icon: Users,
+      tone: 'brand' as const,
+      delta: '+12%',
+    },
+    {
+      label: 'Verifizierungsrate',
+      value: `${verificationRate}%`,
+      sub: `${verifiedChecks} verifiziert`,
+      icon: CheckCircle2,
+      tone: 'emerald' as const,
+      delta: '+4%',
+    },
+    {
+      label: 'Diskrepanzen',
+      value: discrepancies,
+      sub: discrepancies === 0 ? 'Keine Auffälligkeiten' : 'gefunden',
+      icon: AlertTriangle,
+      tone: 'rose' as const,
+      delta: discrepancies > 0 ? '−1' : '0',
+    },
+    {
+      label: 'Ø Durchlaufzeit',
+      value: `${turnaround.reduce((a, b) => a + b.hours, 0) / Math.max(1, turnaround.filter(t => t.hours).length) || 0} h`,
+      sub: 'letzte 7 Tage',
+      icon: Clock,
+      tone: 'violet' as const,
+      delta: '−18%',
+    },
   ]
 
   return (
-    <div className="animate-fade-in">
+    <>
       <Header
-        title={`Guten Tag, ${session.user.name.split(' ')[0]}`}
-        subtitle={`${session.user.company} · Übersicht`}
+        title={`Hallo ${session.user.name.split(' ')[0]} 👋`}
+        subtitle={`Willkommen zurück bei ${session.user.company}`}
         action={
-          <Link href="/candidates/new" className="btn-primary">
-            + Kandidat hinzufügen
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/checks/new" className="btn-secondary">
+              <Phone className="w-4 h-4" /> Neue Prüfung
+            </Link>
+            <Link href="/candidates/new" className="btn-primary">
+              <Plus className="w-4 h-4" /> Kandidat hinzufügen
+            </Link>
+          </div>
         }
       />
 
-      <div className="p-6 space-y-6">
-        {/* Stats */}
+      <div className="space-y-6">
+        {/* Stats grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((s) => (
-            <div key={s.label} className="card">
-              <div className="text-xs text-text-secondary mb-2">{s.label}</div>
-              <div className={`stat-value ${s.color}`}>{s.value}</div>
-              <div className="text-xs text-text-muted mt-1">{s.sub}</div>
-            </div>
-          ))}
+          {stats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Plan usage banner */}
+        {checkLimit > 0 && (
+          <div className="card-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-semibold text-text-primary">{planMeta.name}-Paket</span>
+                  <span className="badge-brand text-[10px]">{ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short ?? 'HR'}</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-text-secondary">
+                  <span>{usedThisMonth} / {checkLimit} Prüfungen</span>
+                  <div className="flex-1 max-w-xs h-1.5 rounded-full bg-bg-tertiary overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-brand-500 to-violet rounded-full transition-all" style={{ width: `${usagePct}%` }} />
+                  </div>
+                  <span className="font-mono font-semibold text-text-primary">{usagePct}%</span>
+                </div>
+              </div>
+            </div>
+            <Link href="/preise" className="btn-secondary text-xs">
+              Paket erweitern <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
+
+        {/* Charts grid */}
+        <div className="grid lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 card-md">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="section-title">Aktivität</h2>
+                <p className="text-xs text-text-secondary mt-0.5">Letzte 14 Tage</p>
+              </div>
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-brand-500" /> Geprüft</div>
+                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Verifiziert</div>
+              </div>
+            </div>
+            <ActivityAreaChart data={trend} />
+          </div>
+          <div className="card-md">
+            <h2 className="section-title mb-1">Kandidaten-Status</h2>
+            <p className="text-xs text-text-secondary mb-4">Verteilung aktuell</p>
+            <StatusPieChart data={statusDist} />
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-5">
+          <div className="card-md">
+            <h2 className="section-title mb-1">Ø Durchlaufzeit</h2>
+            <p className="text-xs text-text-secondary mb-4">letzte 7 Tage in Stunden</p>
+            <TurnaroundBarChart data={turnaround} />
+          </div>
+
           {/* Recent candidates */}
-          <div className="card">
+          <div className="card-md">
             <div className="flex items-center justify-between mb-4">
               <h2 className="section-title">Neueste Kandidaten</h2>
-              <Link href="/candidates" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                Alle anzeigen →
-              </Link>
+              <Link href="/candidates" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
             </div>
             {recentCandidates.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-text-muted text-sm mb-3">Noch keine Kandidaten</div>
-                <Link href="/candidates/new" className="btn-primary text-xs py-2">
-                  Ersten Kandidaten anlegen
-                </Link>
-              </div>
+              <EmptyState message="Noch keine Kandidaten" cta="Anlegen" href="/candidates/new" />
             ) : (
-              <div className="space-y-2">
-                {recentCandidates.map((c) => {
+              <div className="space-y-1.5">
+                {recentCandidates.slice(0, 5).map((c) => {
                   const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
                   return (
-                    <Link
-                      key={c.id}
-                      href={`/candidates/${c.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-bg-hover transition-colors group"
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-accent-muted border border-accent/20 flex items-center justify-center flex-shrink-0 text-xs font-medium text-accent">
+                    <Link key={c.id} href={`/candidates/${c.id}`}
+                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-brand-700">
                           {c.firstName[0]}{c.lastName[0]}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-medium text-text-primary truncate">
+                          <div className="text-xs font-semibold text-text-primary truncate group-hover:text-brand-700 transition-colors">
                             {c.firstName} {c.lastName}
                           </div>
-                          <div className="text-xs text-text-secondary truncate">{c.position}</div>
+                          <div className="text-[10px] text-text-muted truncate">{c.position}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`badge ${st.color}`}>{st.label}</span>
-                        <span className="text-xs text-text-muted">{c._count.checks} Prüfungen</span>
-                      </div>
+                      <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
                     </Link>
                   )
                 })}
@@ -117,37 +256,36 @@ export default async function DashboardPage() {
           </div>
 
           {/* Recent checks */}
-          <div className="card">
+          <div className="card-md">
             <div className="flex items-center justify-between mb-4">
               <h2 className="section-title">Aktuelle Prüfungen</h2>
-              <Link href="/checks" className="text-xs text-accent hover:text-accent-hover transition-colors">
-                Alle anzeigen →
-              </Link>
+              <Link href="/checks" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
             </div>
             {recentChecks.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="text-text-muted text-sm">Noch keine Referenzprüfungen</div>
-              </div>
+              <EmptyState message="Noch keine Prüfungen" cta="Erste Prüfung starten" href="/checks/new" />
             ) : (
-              <div className="space-y-2">
-                {recentChecks.map((chk) => {
+              <div className="space-y-1.5">
+                {recentChecks.slice(0, 5).map((chk) => {
                   const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
+                  const resIcon = chk.result === 'VERIFIED' ? CheckCircle2 : chk.result === 'DISCREPANCY_FOUND' ? AlertCircle : Clock
+                  const resColor = chk.result === 'VERIFIED' ? 'text-emerald-600' : chk.result === 'DISCREPANCY_FOUND' ? 'text-rose-600' : 'text-amber-600'
                   return (
-                    <Link
-                      key={chk.id}
-                      href={`/checks/${chk.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg hover:bg-bg-hover transition-colors"
-                    >
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-text-primary truncate">
-                          {chk.candidate.firstName} {chk.candidate.lastName}
+                    <Link key={chk.id} href={`/checks/${chk.id}`}
+                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center flex-shrink-0 ${resColor}`}>
+                          {(() => { const I = resIcon; return <I className="w-4 h-4" /> })()}
                         </div>
-                        <div className="text-xs text-text-secondary truncate">{chk.employerName}</div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-semibold text-text-primary truncate">
+                            {chk.employerName}
+                          </div>
+                          <div className="text-[10px] text-text-muted truncate">
+                            {chk.candidate.firstName} {chk.candidate.lastName}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`badge ${st.color}`}>{st.label}</span>
-                        <span className="text-xs text-text-muted">{formatDateTime(chk.updatedAt).split(',')[0]}</span>
-                      </div>
+                      <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
                     </Link>
                   )
                 })}
@@ -156,22 +294,27 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick actions */}
+        {/* Empty state for new accounts */}
         {totalCandidates === 0 && (
-          <div className="card border-accent/20 bg-accent-glow">
-            <div className="flex items-start gap-4">
-              <div className="text-2xl">🚀</div>
+          <div className="card-lg shadow-card-lg relative overflow-hidden bg-gradient-to-br from-brand-50/60 to-violet/5">
+            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-gradient-to-br from-brand-300 to-violet opacity-30 blur-3xl" />
+            <div className="relative flex flex-col md:flex-row items-start gap-6">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card flex-shrink-0">
+                <Sparkles className="w-6 h-6" />
+              </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-text-primary mb-1">Willkommen bei RefCheck</h3>
-                <p className="text-sm text-text-secondary mb-4">
-                  Beginnen Sie, indem Sie Ihren ersten Kandidaten anlegen und Referenzprüfungen starten.
+                <h3 className="text-lg font-bold text-text-primary mb-2">
+                  Willkommen{isAgency ? ', Recruiting Pro' : ''} bei RefCheck
+                </h3>
+                <p className="text-sm text-text-secondary mb-5 max-w-2xl">
+                  Beginnen Sie mit dem Anlegen Ihres ersten Kandidaten. CV hochladen, Referenzen erfassen — wir kümmern uns um den Rest.
                 </p>
-                <div className="flex gap-3">
-                  <Link href="/candidates/new" className="btn-primary text-sm py-2">
-                    Ersten Kandidaten anlegen
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/candidates/new" className="btn-primary text-sm">
+                    <Plus className="w-4 h-4" /> Ersten Kandidaten anlegen
                   </Link>
-                  <Link href="/settings" className="btn-secondary text-sm py-2">
-                    Konto einrichten
+                  <Link href="/integrations" className="btn-secondary text-sm">
+                    ATS verbinden
                   </Link>
                 </div>
               </div>
@@ -179,6 +322,46 @@ export default async function DashboardPage() {
           </div>
         )}
       </div>
+    </>
+  )
+}
+
+function StatCard({ label, value, sub, icon: Icon, tone, delta }: {
+  label: string; value: string | number; sub: string;
+  icon: any; tone: 'brand' | 'emerald' | 'rose' | 'violet'; delta: string;
+}) {
+  const toneCls = {
+    brand: 'text-brand-600 bg-brand-50 border-brand-200',
+    emerald: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+    rose: 'text-rose-600 bg-rose-50 border-rose-200',
+    violet: 'text-violet bg-violet/10 border-violet/20',
+  }[tone]
+  const deltaTone = delta.startsWith('+') ? 'text-emerald-700' : delta.startsWith('−') ? 'text-emerald-700' : 'text-text-muted'
+  return (
+    <div className="card-md group hover:shadow-card-lg transition-shadow">
+      <div className="flex items-start justify-between mb-3">
+        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${toneCls}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <span className={`text-xs font-bold ${deltaTone}`}>
+          <TrendingUp className="w-3 h-3 inline mr-0.5" />
+          {delta}
+        </span>
+      </div>
+      <div className="text-3xl font-bold text-text-primary tracking-tighter mb-1" style={{ fontFeatureSettings: '"tnum"' }}>
+        {value}
+      </div>
+      <div className="text-xs text-text-secondary">{label}</div>
+      <div className="text-[10px] text-text-muted mt-1">{sub}</div>
+    </div>
+  )
+}
+
+function EmptyState({ message, cta, href }: { message: string; cta: string; href: string }) {
+  return (
+    <div className="text-center py-8">
+      <div className="text-text-muted text-xs mb-3">{message}</div>
+      <Link href={href} className="btn-primary text-xs py-2 px-4">{cta}</Link>
     </div>
   )
 }

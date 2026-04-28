@@ -22,25 +22,20 @@ export default async function CheckDetailPage({ params }: { params: { id: string
   const res = check.result ? (CHECK_RESULT[check.result as keyof typeof CHECK_RESULT] ?? null) : null
 
   return (
-    <div className="animate-fade-in">
+    <>
       <Header
         title={check.employerName}
         subtitle={`${check.candidate.firstName} ${check.candidate.lastName} · ${check.candidate.position}`}
         action={
-          <div className="flex gap-2">
-            <Link
-              href={`/candidates/${check.candidate.id}`}
-              className="btn-secondary text-sm py-2"
-            >
-              ← Zum Kandidaten
-            </Link>
-          </div>
+          <Link href={`/candidates/${check.candidate.id}`} className="btn-secondary">
+            ← Zum Kandidaten
+          </Link>
         }
       />
 
-      <div className="p-6 space-y-6 max-w-3xl">
+      <div className="space-y-5 max-w-3xl">
         {/* Status bar */}
-        <div className="card flex items-center justify-between gap-4">
+        <div className="card-md flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className={`badge ${st.color} text-sm py-1 px-3`}>{st.label}</span>
             {res && <span className={`badge ${res.color} text-sm py-1 px-3`}>{res.label}</span>}
@@ -53,7 +48,7 @@ export default async function CheckDetailPage({ params }: { params: { id: string
         </div>
 
         {/* Contact info */}
-        <div className="card">
+        <div className="card-md">
           <h2 className="section-title mb-4">Kontaktdaten</h2>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -71,7 +66,7 @@ export default async function CheckDetailPage({ params }: { params: { id: string
                 <div className="label">Telefon</div>
                 <a
                   href={`tel:${check.employerPhone}`}
-                  className="text-accent hover:text-accent-hover transition-colors"
+                  className="text-brand-700 hover:text-brand-800 transition-colors"
                 >
                   {check.employerPhone}
                 </a>
@@ -82,7 +77,7 @@ export default async function CheckDetailPage({ params }: { params: { id: string
                 <div className="label">E-Mail</div>
                 <a
                   href={`mailto:${check.employerEmail}`}
-                  className="text-accent hover:text-accent-hover transition-colors"
+                  className="text-brand-700 hover:text-brand-800 transition-colors"
                 >
                   {check.employerEmail}
                 </a>
@@ -108,6 +103,6 @@ export default async function CheckDetailPage({ params }: { params: { id: string
         {/* Editor for status, notes, result */}
         <CheckEditor check={check} />
       </div>
-    </div>
+    </>
   )
 }
