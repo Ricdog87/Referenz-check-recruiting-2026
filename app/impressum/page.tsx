@@ -6,9 +6,9 @@ export default function ImpressumPage() {
       <nav className="border-b border-border px-6 h-16 flex items-center justify-between max-w-4xl mx-auto">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-7 h-7 bg-accent rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">RC</span>
+            <span className="text-white text-xs font-bold">CQ</span>
           </div>
-          <span className="font-semibold">RefCheck</span>
+          <span className="font-semibold">candiq</span>
         </Link>
         <Link href="/" className="text-sm text-text-secondary hover:text-text-primary transition-colors">← Zurück</Link>
       </nav>
@@ -17,27 +17,20 @@ export default function ImpressumPage() {
         <h1 className="text-3xl font-bold">Impressum</h1>
         <div className="text-sm text-text-secondary space-y-4 leading-relaxed">
           <div>
-            <p className="text-text-primary font-medium">[Ihr Unternehmen]</p>
-            <p>[Straße und Hausnummer]</p>
-            <p>[PLZ Ort]</p>
+            <p className="text-text-primary font-medium">RSG Recruiting Solutions Group GmbH</p>
+            <p>Am heiligenahus 9</p>
+            <p>65207 Wiesbaden</p>
             <p>Deutschland</p>
           </div>
+
           <div>
-            <p>Telefon: [+49 ...]</p>
-            <p>E-Mail: info@[ihre-domain].de</p>
+            <p className="text-text-primary">candiq ist eine Marke der RSG Recruiting Solutions Group GmbH.</p>
           </div>
+
           <div>
-            <p>Handelsregister: [HRB ...]</p>
-            <p>Registergericht: Amtsgericht [Ort]</p>
-            <p>USt-IdNr.: DE [...]</p>
+            <p>Geschäftsführer: Ricardo Serrano</p>
+            <p>Telefon: +49 176 60772556</p>
           </div>
-          <div>
-            <p className="font-medium text-text-primary">Verantwortlich für den Inhalt (§ 55 RStV):</p>
-            <p>[Name der verantwortlichen Person]</p>
-          </div>
-          <p className="text-text-muted text-xs mt-8">
-            Bitte ersetzen Sie die Platzhalter mit Ihren tatsächlichen Unternehmensdaten.
-          </p>
         </div>
       </div>
     </div>

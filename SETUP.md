@@ -1,11 +1,11 @@
-# RefCheck — Setup & Deploy
+# candiq — Setup & Deploy
 
 ## Vercel (empfohlen für Demo & Produktion)
 
 ### Schritt 1: Neon Datenbank (kostenlos)
 
 1. https://neon.tech → Account erstellen (kostenlos)
-2. **New Project** → Name: `refcheck`
+2. **New Project** → Name: `candiq`
 3. Region: **EU Central (Frankfurt)** wählen
 4. Nach Erstellung: **Connection Details** öffnen
    - "Connection string" kopieren → das ist `DATABASE_URL`
@@ -14,7 +14,7 @@
 ### Schritt 2: Vercel Blob (Datei-Uploads)
 
 1. https://vercel.com → Dashboard → **Storage** Tab
-2. **Create Database** → **Blob** → Name: `refcheck-uploads`
+2. **Create Database** → **Blob** → Name: `candiq-uploads`
 3. Nach Erstellung: **Environments** → `.env.local` anzeigen
    - `BLOB_READ_WRITE_TOKEN` kopieren
 

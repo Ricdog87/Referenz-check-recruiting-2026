@@ -162,7 +162,7 @@ export default async function DashboardPage() {
             <div className="flex items-start gap-4">
               <div className="text-2xl">🚀</div>
               <div className="flex-1">
-                <h3 className="font-semibold text-text-primary mb-1">Willkommen bei RefCheck</h3>
+                <h3 className="font-semibold text-text-primary mb-1">Willkommen bei candiq</h3>
                 <p className="text-sm text-text-secondary mb-4">
                   Beginnen Sie, indem Sie Ihren ersten Kandidaten anlegen und Referenzprüfungen starten.
                 </p>

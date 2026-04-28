@@ -6,9 +6,9 @@ export default function DatenschutzPage() {
       <nav className="border-b border-border px-6 h-16 flex items-center justify-between max-w-4xl mx-auto">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-7 h-7 bg-accent rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">RC</span>
+            <span className="text-white text-xs font-bold">CQ</span>
           </div>
-          <span className="font-semibold">RefCheck</span>
+          <span className="font-semibold">candiq</span>
         </Link>
         <Link href="/" className="text-sm text-text-secondary hover:text-text-primary transition-colors">← Zurück</Link>
       </nav>
@@ -19,7 +19,7 @@ export default function DatenschutzPage() {
         <div className="text-sm text-text-secondary space-y-6 leading-relaxed">
           <section>
             <h2 className="text-lg font-semibold text-text-primary mb-2">1. Verantwortlicher</h2>
-            <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist das Unternehmen, das RefCheck betreibt (im Folgenden „wir" oder „uns").</p>
+            <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist das Unternehmen, das candiq betreibt (im Folgenden „wir" oder „uns").</p>
           </section>
 
           <section>

@@ -52,10 +52,10 @@ export function Sidebar() {
         <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-6 h-6 rounded-lg bg-accent flex items-center justify-center flex-shrink-0"
             style={{ boxShadow: '0 0 10px rgba(10,132,255,0.3)' }}>
-            <span className="text-white text-[10px] font-bold">RC</span>
+            <span className="text-white text-[10px] font-bold">CQ</span>
           </div>
           <div>
-            <div className="text-sm font-semibold text-white/90">RefCheck</div>
+            <div className="text-sm font-semibold text-white/90">candiq</div>
             {session?.user?.company && (
               <div className="text-[10px] text-white/30 truncate max-w-[120px]">{session.user.company}</div>
             )}
