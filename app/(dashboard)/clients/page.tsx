@@ -43,7 +43,7 @@ export default async function ClientsPage() {
             <div className="text-sm font-semibold text-text-primary mb-1">Multi-Mandanten-Workflow</div>
             <p className="text-xs text-text-secondary leading-relaxed max-w-2xl">
               Verwalten Sie Endkunden mit eigenen Workflows, Branding und Reports. Verfügbar ab Agency Pro.
-              Beta — schreibt uns an <a href="mailto:hello@refcheck.de" className="text-brand-700 font-semibold">hello@refcheck.de</a> für Frühzugang.
+              Beta — schreibt uns an <a href="mailto:hello@candiq.de" className="text-brand-700 font-semibold">hello@candiq.de</a> für Frühzugang.
             </p>
           </div>
         </div>

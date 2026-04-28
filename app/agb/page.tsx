@@ -1,7 +1,7 @@
 import { LegalShell } from '@/components/landing/LegalShell'
 
 export const metadata = {
-  title: 'AGB — RefCheck',
+  title: 'AGB — candiq',
 }
 
 export default function AgbPage() {
@@ -12,8 +12,8 @@ export default function AgbPage() {
     >
       <h2>1. Geltungsbereich</h2>
       <p>
-        Diese AGB gelten für alle Verträge zwischen der RefCheck Solutions GmbH („Anbieter") und
-        Unternehmenskunden („Kunde") über die Nutzung der RefCheck-Plattform. Die Leistungen richten sich
+        Diese AGB gelten für alle Verträge zwischen der RSG Recruiting Solutions group GmbH („Anbieter") und
+        Unternehmenskunden („Kunde") über die Nutzung der candiq-Plattform. Die Leistungen richten sich
         ausschließlich an Unternehmer im Sinne von § 14 BGB.
       </p>
 
@@ -43,7 +43,7 @@ export default function AgbPage() {
       <p>
         Monatliche Pakete sind monatlich zum Monatsende kündbar. Jährliche Pakete sind mit einer Frist
         von 30 Tagen zum Ende der Vertragslaufzeit kündbar. Die Kündigung ist im Dashboard oder per
-        E-Mail an <a href="mailto:billing@refcheck.de">billing@refcheck.de</a> möglich.
+        E-Mail an <a href="mailto:billing@candiq.de">billing@candiq.de</a> möglich.
       </p>
 
       <h2>6. Pflichten des Kunden</h2>

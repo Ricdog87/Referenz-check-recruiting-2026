@@ -1,7 +1,7 @@
 import { LegalShell } from '@/components/landing/LegalShell'
 
 export const metadata = {
-  title: 'Datenschutzerklärung — RefCheck',
+  title: 'Datenschutzerklärung — candiq',
   description: 'Wie wir personenbezogene Daten gemäß DSGVO verarbeiten.',
 }
 
@@ -18,7 +18,7 @@ export default function DatenschutzPage() {
 
       <h2>1. Verantwortlicher</h2>
       <p>
-        Verantwortlich im Sinne von Art. 4 Abs. 7 DSGVO ist die <strong>RefCheck Solutions GmbH</strong>,
+        Verantwortlich im Sinne von Art. 4 Abs. 7 DSGVO ist die <strong>RSG Recruiting Solutions group GmbH</strong>,
         vertreten durch die Geschäftsführung. Alle Kontaktdaten finden Sie im{' '}
         <a href="/impressum">Impressum</a>.
       </p>
@@ -33,7 +33,7 @@ export default function DatenschutzPage() {
 
       <h2>3. Rechtsgrundlagen</h2>
       <ul>
-        <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> — Vertragserfüllung (Bereitstellung der RefCheck-Plattform)</li>
+        <li><strong>Art. 6 Abs. 1 lit. b DSGVO</strong> — Vertragserfüllung (Bereitstellung der candiq-Plattform)</li>
         <li><strong>Art. 6 Abs. 1 lit. a DSGVO</strong> — Einwilligung (Kandidaten-Einwilligung zur Referenzprüfung)</li>
         <li><strong>Art. 6 Abs. 1 lit. f DSGVO</strong> — Berechtigtes Interesse (Plattform-Sicherheit, Audit-Trail)</li>
       </ul>

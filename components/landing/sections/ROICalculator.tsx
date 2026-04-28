@@ -12,7 +12,7 @@ export function ROICalculator() {
 
   const misHires = (hires * misHireRate) / 100
   const misHireCost = misHires * avgSalary * 1.5
-  // RefCheck reduces mishire rate by ~60% based on industry data
+  // candiq reduces mishire rate by ~60% based on industry data
   const newMisHires = misHires * 0.4
   const savedCost = (misHires - newMisHires) * avgSalary * 1.5
   const refCheckCost = hires * 39 * 12 // assume Pro plan ~ avg
@@ -37,7 +37,7 @@ export function ROICalculator() {
               Was kostet Sie eine <span className="text-gradient-brand">Fehlbesetzung?</span>
             </h2>
             <p className="text-base text-text-secondary leading-relaxed">
-              Bewegen Sie die Regler — wir zeigen Ihnen, wie viel RefCheck Ihnen jährlich spart.
+              Bewegen Sie die Regler — wir zeigen Ihnen, wie viel candiq Ihnen jährlich spart.
             </p>
           </div>
         </Reveal>
@@ -101,7 +101,7 @@ export function ROICalculator() {
                 <div className="text-5xl md:text-6xl font-black tracking-tighter mb-1">
                   {netRoi > 0 ? `${Math.round(netRoi).toLocaleString('de-DE')} €` : '—'}
                 </div>
-                <div className="text-sm text-white/80 mb-8">netto pro Jahr (nach Abzug der RefCheck-Kosten)</div>
+                <div className="text-sm text-white/80 mb-8">netto pro Jahr (nach Abzug der candiq-Kosten)</div>
 
                 <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/15">
                   <div>
@@ -110,7 +110,7 @@ export function ROICalculator() {
                     <div className="text-xs text-white/60 mt-1">{misHires.toFixed(1)} Fehlbesetzungen</div>
                   </div>
                   <div>
-                    <div className="text-[11px] uppercase tracking-widest text-white/60 font-semibold mb-1">Mit RefCheck</div>
+                    <div className="text-[11px] uppercase tracking-widest text-white/60 font-semibold mb-1">Mit candiq</div>
                     <div className="text-2xl font-bold">{Math.round(misHireCost * 0.4).toLocaleString('de-DE')} €</div>
                     <div className="text-xs text-white/60 mt-1">{newMisHires.toFixed(1)} Fehlbesetzungen (−60 %)</div>
                   </div>

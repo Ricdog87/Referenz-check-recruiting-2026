@@ -304,7 +304,7 @@ export default async function DashboardPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-text-primary mb-2">
-                  Willkommen{isAgency ? ', Recruiting Pro' : ''} bei RefCheck
+                  Willkommen{isAgency ? ', Recruiting Pro' : ''} bei candiq
                 </h3>
                 <p className="text-sm text-text-secondary mb-5 max-w-2xl">
                   Beginnen Sie mit dem Anlegen Ihres ersten Kandidaten. CV hochladen, Referenzen erfassen — wir kümmern uns um den Rest.

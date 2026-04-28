@@ -3,7 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'RefCheck — Referenzprüfung für Recruiting',
+  title: 'candiq — Referenzprüfung für Recruiting',
   description: 'DSGVO-konforme Referenzprüfung für B2B-Kunden im Recruiting. Kandidaten schnell und sicher verifizieren.',
   keywords: 'Referenzprüfung, Recruiting, B2B, DSGVO, Kandidatenprüfung, HR',
 }

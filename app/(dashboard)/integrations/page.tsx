@@ -25,7 +25,7 @@ const STATUS = {
 export default function IntegrationsPage() {
   return (
     <>
-      <Header title="Integrationen" subtitle="Verbinden Sie RefCheck mit Ihrem Tech-Stack" />
+      <Header title="Integrationen" subtitle="Verbinden Sie candiq mit Ihrem Tech-Stack" />
       <div className="space-y-8">
         <Section title="ATS & HRIS" items={ATS} />
         <Section title="Collaboration" items={COLLAB} />
@@ -40,7 +40,7 @@ export default function IntegrationsPage() {
               <div className="text-xs text-text-secondary">REST-API, Webhooks und OpenAPI-Spec verfügbar.</div>
             </div>
           </div>
-          <a href="mailto:integrations@refcheck.de" className="btn-secondary text-xs">
+          <a href="mailto:integrations@candiq.de" className="btn-secondary text-xs">
             <Mail className="w-3.5 h-3.5" /> API-Zugang anfragen
           </a>
         </div>

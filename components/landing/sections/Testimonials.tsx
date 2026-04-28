@@ -14,7 +14,7 @@ const testimonials = [
     accent: 'from-brand-500 to-violet',
   },
   {
-    quote: 'Als Personaldienstleister liefern wir jetzt jeden Kandidaten mit Audit-Report. Unsere Endkunden zahlen 15% Premium dafür — RefCheck refinanziert sich um Faktor 7.',
+    quote: 'Als Personaldienstleister liefern wir jetzt jeden Kandidaten mit Audit-Report. Unsere Endkunden zahlen 15% Premium dafür — candiq refinanziert sich um Faktor 7.',
     name: 'Marius Hoffmann',
     role: 'Geschäftsführer',
     company: 'Hoffmann Executive Search',

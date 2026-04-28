@@ -42,10 +42,10 @@ export function Sidebar() {
         <Link href="/dashboard" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)', boxShadow: '0 4px 14px rgba(79,70,229,0.3)' }}>
-            <span className="text-white text-xs font-black">RC</span>
+            <span className="text-white text-xs font-black">CQ</span>
           </div>
           <div className="min-w-0">
-            <div className="text-sm font-bold text-text-primary tracking-tight">RefCheck</div>
+            <div className="text-sm font-bold text-text-primary tracking-tight">candiq</div>
             <div className="text-[10px] text-text-muted truncate">
               {session?.user?.accountType ? ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short : ''}
             </div>

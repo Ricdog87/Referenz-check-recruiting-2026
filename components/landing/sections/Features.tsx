@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import {
   ShieldCheck, Phone, FileText, Activity, Users, Lock,
-  Globe, Zap, BarChart3,
+  Globe, Zap, BarChart3, Mic,
 } from 'lucide-react'
 import { Reveal, StaggerChildren, StaggerItem } from '../Reveal'
 
@@ -39,7 +39,7 @@ const features = [
   {
     icon: Users,
     title: 'Multi-Mandanten',
-    desc: 'Personaldienstleister verwalten Endkunden mit eigenen Workflows, Branding & Reports.',
+    desc: 'Für Personaldienstleister in der Closed Beta: Endkunden mit eigenen Workflows, Branding & Reports verwalten.',
     color: 'from-amber-500 to-rose-500',
     glow: 'rgba(245,158,11,0.3)',
   },
@@ -70,6 +70,14 @@ const features = [
     desc: 'Jeder Datenzugriff geloggt. Export für DSGVO Art. 30 oder Wirtschaftsprüfer.',
     color: 'from-slate-700 to-slate-900',
     glow: 'rgba(15,23,42,0.3)',
+  },
+  {
+    icon: Mic,
+    title: 'candiq Interview (in Vorbereitung)',
+    desc: 'Strukturierte Kompetenz- und Cultural-Fit-Interviews als Service – inkl. Scorecards und Audit-Reports. Ideal kombinierbar mit unseren Referenzprüfungen.',
+    color: 'from-violet to-cyan',
+    glow: 'rgba(99,102,241,0.28)',
+    badge: 'In Vorbereitung',
   },
 ]
 
@@ -110,6 +118,11 @@ export function Features() {
                   <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-5 shadow-card`}>
                     <f.icon className="w-6 h-6 text-white" strokeWidth={2} />
                   </div>
+                  {'badge' in f && (
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-violet/10 text-violet border border-violet/20 mb-2">
+                      {f.badge}
+                    </div>
+                  )}
                   <h3 className="text-base font-semibold text-text-primary mb-2 tracking-tight">{f.title}</h3>
                   <p className="text-sm text-text-secondary leading-relaxed">{f.desc}</p>
                 </div>

@@ -24,20 +24,20 @@ async function handle(req: NextRequest) {
     const url = new URL(req.url)
     const type = (url.searchParams.get('type') ?? 'hr').toLowerCase() as 'hr' | 'agency'
 
-    const creds = type === 'agency' ? DEMO_CREDENTIALS.agency : DEMO_CREDENTIALS.hr
-    const profile = type === 'agency'
-      ? {
-          name: 'Maria Recruiter',
-          company: 'Demo Recruiting GmbH',
-          accountType: 'RECRUITMENT_AGENCY',
-          plan: 'AGENCY_PRO',
-        }
-      : {
-          name: 'Demo HR Manager',
-          company: 'Demo Holding GmbH',
-          accountType: 'HR_DEPARTMENT',
-          plan: 'PROFESSIONAL',
-        }
+    if (type === 'agency') {
+      return NextResponse.json(
+        { error: 'Die Agentur-Demo ist aktuell in der Closed Beta. Bitte über /waitlist-agency vormerken.' },
+        { status: 403 }
+      )
+    }
+
+    const creds = DEMO_CREDENTIALS.hr
+    const profile = {
+      name: 'Demo HR Manager',
+      company: 'Demo Holding GmbH',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'PROFESSIONAL',
+    }
 
     // 1. Upsert demo user (always reset password so demo always works)
     const hashed = await bcrypt.hash(creds.password, 10)
@@ -70,7 +70,7 @@ async function handle(req: NextRequest) {
     const candidateCount = await prisma.candidate.count({ where: { userId: user.id } })
 
     if (candidateCount === 0) {
-      const seedCandidates = type === 'agency' ? AGENCY_SEED : HR_SEED
+      const seedCandidates = HR_SEED
       for (const c of seedCandidates) {
         await prisma.candidate.create({
           data: {

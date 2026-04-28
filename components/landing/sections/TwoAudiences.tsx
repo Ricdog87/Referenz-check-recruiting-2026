@@ -26,17 +26,17 @@ const audiences = [
   {
     icon: Users2,
     badge: 'Personaldienstleister',
-    title: 'Recruiter & PSA',
+    title: 'Personaldienstleister (bald verfügbar)',
     description:
-      'Sie vermitteln Kandidaten an Endkunden — und Ihre Reputation hängt an jedem Match. Liefern Sie Referenzberichte als Premium-Service.',
+      'Spezielle Multi-Mandanten-Workflows, White-Label-Reports und API-Zugänge für PDLer — aktuell in der finalen Testphase. Melden Sie sich für den frühen Zugang an.',
     bullets: [
-      'Mandanten-Verwaltung mit eigenen Workflows',
-      'White-Label inkl. Logo, Domain & Reports',
-      'Bulk-Upload bis 500 Kandidaten (CSV)',
-      'API + Webhook-Integration in Ihre Systeme',
+      'Geplant: Mandanten-Verwaltung mit eigenen Workflows',
+      'Kommt bald: White-Label inkl. Logo, Domain & Reports',
+      'Geplant: Bulk-Upload bis 500 Kandidaten (CSV)',
+      'Kommt bald: API + Webhook-Integration in Ihre Systeme',
     ],
-    cta: 'Pakete für Personaldienstleister',
-    href: '/preise#agency',
+    cta: 'Frühen Zugang anfragen',
+    href: '/waitlist-agency',
     gradient: 'from-violet via-violet to-cyan',
     bg: 'from-violet/10 to-white',
   },
@@ -49,14 +49,15 @@ export function TwoAudiences() {
         <Reveal>
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 mb-4">
-              Für wen ist RefCheck?
+              Für wen ist candiq?
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
               Zwei Zielgruppen. <br className="hidden sm:block" />
               <span className="text-gradient-brand">Eine Plattform.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Egal ob Sie intern für Ihr Unternehmen einstellen oder professionell vermitteln — wir haben das passende Paket.
+              Egal ob Sie intern für Ihr Unternehmen einstellen oder professionell vermitteln — wir haben den passenden Rollout.
+              HR-Pakete sind heute vollständig verfügbar; PDL-Pakete folgen nach der Closed-Beta-Phase.
             </p>
           </div>
         </Reveal>
