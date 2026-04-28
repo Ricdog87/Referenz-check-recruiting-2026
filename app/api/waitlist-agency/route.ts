@@ -33,15 +33,18 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
+  if (!['ADMIN', 'OWNER'].includes(session.user.role)) {
+    return NextResponse.json({ error: 'Zugriff nur für Admin/Owner.' }, { status: 403 })
+  }
 
   try {
     const rows = await prisma.auditLog.findMany({
       where: { entity: 'AgencyWaitlist', action: 'WAITLIST_SIGNUP' },
       orderBy: { createdAt: 'desc' },
-      take: 100,
+      take: 500,
       select: { id: true, details: true, createdAt: true },
     })
 
@@ -52,6 +55,30 @@ export async function GET() {
         return { id: r.id, createdAt: r.createdAt }
       }
     })
+
+    const format = new URL(req.url).searchParams.get('format')
+    if (format === 'csv') {
+      const header = ['Zeitpunkt', 'Firma', 'Name', 'E-Mail', 'Website/LinkedIn', 'Placements/Jahr']
+      const rowsCsv = items.map((i: any) => [
+        new Date(i.createdAt).toISOString(),
+        i.company ?? '',
+        i.name ?? '',
+        i.email ?? '',
+        i.website ?? '',
+        i.placementsPerYear ?? '',
+      ])
+      const csv = [header, ...rowsCsv]
+        .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+        .join('\n')
+
+      return new NextResponse(csv, {
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="candiq-waitlist-${Date.now()}.csv"`,
+          'Cache-Control': 'no-store',
+        },
+      })
+    }
 
     return NextResponse.json({ items })
   } catch {

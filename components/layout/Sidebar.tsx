@@ -23,6 +23,8 @@ const NAV_AGENCY_ONLY = [
 const NAV_INTEGRATIONS = [
   { href: '/integrations', label: 'Integrationen', icon: Plug },
   { href: '/addons', label: 'Add-on Marketplace', icon: Store },
+]
+const NAV_ADMIN_ONLY = [
   { href: '/waitlist', label: 'PDL-Warteliste', icon: Briefcase },
 ]
 
@@ -65,6 +67,9 @@ export function Sidebar() {
 
         <NavSection label="Konto">
           {NAV_INTEGRATIONS.map((item) => (
+            <NavItem key={item.href} {...item} pathname={pathname} />
+          ))}
+          {(session?.user?.role === 'ADMIN' || session?.user?.role === 'OWNER') && NAV_ADMIN_ONLY.map((item) => (
             <NavItem key={item.href} {...item} pathname={pathname} />
           ))}
           <NavItem href="/settings" label="Einstellungen" icon={Settings} pathname={pathname} />
