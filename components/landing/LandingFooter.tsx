@@ -36,7 +36,7 @@ export function LandingFooter() {
             title="Für wen"
             links={[
               { label: 'HR-Abteilungen', href: '/preise#hr' },
-              { label: 'Personaldienstleister', href: '/preise#agency' },
+              { label: 'Personaldienstleister (bald verfügbar)', href: '/waitlist-agency' },
               { label: 'Enterprise', href: '/preise#enterprise' },
             ]}
           />
@@ -54,6 +54,9 @@ export function LandingFooter() {
 
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted">
           <div>© 2026 RSG Recruiting Solutions group GmbH · Alle Rechte vorbehalten.</div>
+          <div className="hidden md:block text-[11px] text-text-muted">
+            PDL-Pakete befinden sich in Vorbereitung. Jetzt für frühen Zugang vormerken.
+          </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
             <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>

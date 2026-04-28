@@ -5,7 +5,7 @@ import { PricingClient } from './PricingClient'
 
 export const metadata: Metadata = {
   title: 'Preise — candiq',
-  description: 'Faire Pakete für HR-Abteilungen und Personaldienstleister. Ab 79 €/Monat. DSGVO-konform.',
+  description: 'Faire Pakete für HR-Abteilungen. PDL-Pakete sind bald verfügbar — jetzt für frühen Zugang vormerken.',
 }
 
 export default function PricingPage() {

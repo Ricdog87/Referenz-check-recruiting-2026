@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Check, X, ArrowRight, Building2, Users2, Sparkles, ChevronDown } from 'lucide-react'
-import { HR_PLANS, AGENCY_PLANS } from '@/lib/utils'
+import { Check, X, ArrowRight, Building2, Users2, Sparkles, ChevronDown, Clock3 } from 'lucide-react'
+import { HR_PLANS } from '@/lib/utils'
 import { Reveal } from '@/components/landing/Reveal'
 
 export function PricingClient() {
   const [tab, setTab] = useState<'hr' | 'agency'>('hr')
   const [annual, setAnnual] = useState(true)
 
-  const plans = tab === 'hr' ? HR_PLANS : AGENCY_PLANS
+  const plans = HR_PLANS
 
   return (
     <>
@@ -59,7 +59,8 @@ export function PricingClient() {
               </button>
             </div>
 
-            <div className="flex items-center gap-3">
+            {tab === 'hr' && (
+              <div className="flex items-center gap-3">
               <span className={`text-sm font-medium ${!annual ? 'text-text-primary' : 'text-text-muted'}`}>Monatlich</span>
               <button onClick={() => setAnnual(!annual)} className="relative w-12 h-6 rounded-full bg-brand-500 transition-colors">
                 <motion.div
@@ -71,7 +72,8 @@ export function PricingClient() {
               <span className={`text-sm font-medium ${annual ? 'text-text-primary' : 'text-text-muted'}`}>
                 Jährlich <span className="text-emerald-600 font-bold">−20 %</span>
               </span>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -79,82 +81,121 @@ export function PricingClient() {
       {/* Plans */}
       <section className="px-6 pb-20">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            key={tab}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className={`grid gap-5 ${plans.length === 4 ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-3'}`}
-          >
-            {plans.map((p) => {
-              const price = annual ? p.priceAnnual : p.priceMonthly
-              return (
-                <motion.div
-                  key={p.id}
-                  whileHover={{ y: -6 }}
-                  transition={{ duration: 0.3 }}
-                  className={`relative rounded-3xl p-7 transition-all ${
-                    p.highlight
-                      ? 'bg-gradient-to-br from-brand-600 via-brand-700 to-violet text-white shadow-float'
-                      : 'bg-white border border-border shadow-card-md hover:shadow-card-xl'
-                  }`}
-                >
-                  {p.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-white text-brand-700 shadow-card">
-                      {p.badge}
-                    </div>
-                  )}
-
-                  <div className={`text-xs font-bold uppercase tracking-widest mb-2 ${p.highlight ? 'text-white/70' : 'text-brand-600'}`}>
-                    {p.name}
-                  </div>
-                  <div className={`text-sm mb-5 ${p.highlight ? 'text-white/80' : 'text-text-secondary'}`}>{p.tagline}</div>
-
-                  <div className="mb-5">
-                    {price === 0 ? (
-                      <div className="text-4xl font-black tracking-tighter">Auf Anfrage</div>
-                    ) : (
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-5xl font-black tracking-tighter" style={{ fontFeatureSettings: '"tnum"' }}>
-                          {price}
-                        </span>
-                        <span className={`text-base font-medium ${p.highlight ? 'text-white/70' : 'text-text-muted'}`}>€/Mo.</span>
-                      </div>
-                    )}
-                    {p.pricePerCheck !== null && p.pricePerCheck > 0 && (
-                      <div className={`text-xs mt-1 ${p.highlight ? 'text-white/60' : 'text-text-muted'}`}>
-                        Inkl. {p.includedChecks} Prüfungen · danach {p.pricePerCheck} €/Stück
-                      </div>
-                    )}
-                    <div className={`text-xs mt-1 ${p.highlight ? 'text-white/60' : 'text-text-muted'}`}>
-                      {typeof p.seats === 'number' ? `${p.seats} ${p.seats === 1 ? 'Sitz' : 'Sitze'}` : p.seats} inklusive
-                    </div>
-                  </div>
-
-                  <ul className="space-y-2.5 mb-7">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm">
-                        <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${p.highlight ? 'text-white' : 'text-brand-600'}`} />
-                        <span className={p.highlight ? 'text-white/95' : 'text-text-primary'}>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    href={p.id === 'ENTERPRISE' ? 'mailto:sales@candiq.de' : `/register?plan=${p.id}&type=${p.forType}`}
-                    className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
+          {tab === 'hr' ? (
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="grid gap-5 md:grid-cols-3"
+            >
+              {plans.map((p) => {
+                const price = annual ? p.priceAnnual : p.priceMonthly
+                return (
+                  <motion.div
+                    key={p.id}
+                    whileHover={{ y: -6 }}
+                    transition={{ duration: 0.3 }}
+                    className={`relative rounded-3xl p-7 transition-all ${
                       p.highlight
-                        ? 'bg-white text-brand-700 hover:bg-bg-secondary'
-                        : 'btn-primary'
+                        ? 'bg-gradient-to-br from-brand-600 via-brand-700 to-violet text-white shadow-float'
+                        : 'bg-white border border-border shadow-card-md hover:shadow-card-xl'
                     }`}
                   >
-                    {p.ctaLabel}
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </motion.div>
-              )
-            })}
-          </motion.div>
+                    {p.badge && (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-white text-brand-700 shadow-card">
+                        {p.badge}
+                      </div>
+                    )}
+
+                    <div className={`text-xs font-bold uppercase tracking-widest mb-2 ${p.highlight ? 'text-white/70' : 'text-brand-600'}`}>
+                      {p.name}
+                    </div>
+                    <div className={`text-sm mb-5 ${p.highlight ? 'text-white/80' : 'text-text-secondary'}`}>{p.tagline}</div>
+
+                    <div className="mb-5">
+                      {price === 0 ? (
+                        <div className="text-4xl font-black tracking-tighter">Auf Anfrage</div>
+                      ) : (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-5xl font-black tracking-tighter" style={{ fontFeatureSettings: '"tnum"' }}>
+                            {price}
+                          </span>
+                          <span className={`text-base font-medium ${p.highlight ? 'text-white/70' : 'text-text-muted'}`}>€/Mo.</span>
+                        </div>
+                      )}
+                      {p.pricePerCheck !== null && p.pricePerCheck > 0 && (
+                        <div className={`text-xs mt-1 ${p.highlight ? 'text-white/60' : 'text-text-muted'}`}>
+                          Inkl. {p.includedChecks} Prüfungen · danach {p.pricePerCheck} €/Stück
+                        </div>
+                      )}
+                      <div className={`text-xs mt-1 ${p.highlight ? 'text-white/60' : 'text-text-muted'}`}>
+                        {typeof p.seats === 'number' ? `${p.seats} ${p.seats === 1 ? 'Sitz' : 'Sitze'}` : p.seats} inklusive
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2.5 mb-7">
+                      {p.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2 text-sm">
+                          <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${p.highlight ? 'text-white' : 'text-brand-600'}`} />
+                          <span className={p.highlight ? 'text-white/95' : 'text-text-primary'}>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <Link
+                      href={p.id === 'ENTERPRISE' ? 'mailto:sales@candiq.de' : `/register?plan=${p.id}&type=${p.forType}`}
+                      className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
+                        p.highlight
+                          ? 'bg-white text-brand-700 hover:bg-bg-secondary'
+                          : 'btn-primary'
+                      }`}
+                    >
+                      {p.ctaLabel}
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </motion.div>
+                )
+              })}
+            </motion.div>
+          ) : (
+            <motion.div
+              key={tab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-6"
+            >
+              <div className="card-lg bg-violet/5 border-violet/20">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-white text-violet border border-violet/20 mb-3">
+                  <Clock3 className="w-3.5 h-3.5" /> Bald verfügbar
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-text-primary mb-2">PDL-Pakete in Vorbereitung</h2>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Spezielle PDL-Pakete mit Multi-Mandanten, White-Label und API befinden sich aktuell in Entwicklung.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                {['Agency Starter (in Planung)', 'Agency Professional (in Planung)', 'Agency Enterprise (in Planung)'].map((name) => (
+                  <div key={name} className="rounded-2xl border border-border bg-white p-6 shadow-card">
+                    <div className="text-xs font-bold uppercase tracking-widest text-violet mb-2">In Planung</div>
+                    <div className="text-base font-semibold text-text-primary">{name}</div>
+                    <div className="text-xs text-text-muted mt-2">Preis- und Feature-Details folgen mit dem Launch.</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="card-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="text-sm text-text-secondary">
+                  Geplanter Launch: Q4 2026. Tragen Sie sich ein, um als Erste informiert zu werden.
+                </div>
+                <Link href="/waitlist-agency" className="btn-primary whitespace-nowrap">
+                  Auf PDL-Warteliste setzen <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </motion.div>
+          )}
         </div>
       </section>
 
@@ -175,25 +216,24 @@ export function PricingClient() {
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left p-5 font-semibold text-text-primary">Feature</th>
-                      {plans.slice(0, 4).map((p) => (
+                      {plans.slice(0, 3).map((p) => (
                         <th key={p.id} className="text-center p-5 font-semibold text-text-primary">{p.name}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { l: 'Inkludierte Prüfungen / Monat', vs: plans.slice(0, 4).map((p) => p.includedChecks > 0 ? `${p.includedChecks}` : 'Custom') },
-                      { l: 'Zusatz-Prüfung', vs: plans.slice(0, 4).map((p) => p.pricePerCheck ? `${p.pricePerCheck} €` : 'Verhandelt') },
-                      { l: 'Nutzer-Sitze', vs: plans.slice(0, 4).map((p) => `${p.seats}`) },
-                      { l: 'CV- & Zeugnis-Upload', vs: plans.slice(0, 4).map(() => true) },
-                      { l: 'White-Label PDF-Reports', vs: plans.slice(0, 4).map((_, i) => i >= 1) },
-                      { l: 'ATS-Integration', vs: plans.slice(0, 4).map((_, i) => i >= 2) },
-                      { l: 'Multi-Mandanten / Workspaces', vs: plans.slice(0, 4).map((_, i) => tab === 'agency' || i >= 2) },
-                      { l: 'API + Webhooks', vs: plans.slice(0, 4).map((_, i) => i >= 2 || (tab === 'agency' && i >= 1)) },
-                      { l: 'SSO (SAML / Azure AD)', vs: plans.slice(0, 4).map((_, i) => i === 3) },
-                      { l: 'Dediziertes Onboarding', vs: plans.slice(0, 4).map((_, i) => i >= 2) },
-                      { l: 'Priority Support', vs: plans.slice(0, 4).map((_, i) => i >= 1) },
-                      { l: 'Audit-Trail Export (DSGVO Art. 30)', vs: plans.slice(0, 4).map((_, i) => i >= 2) },
+                      { l: 'Inkludierte Prüfungen / Monat', vs: plans.slice(0, 3).map((p) => p.includedChecks > 0 ? `${p.includedChecks}` : 'Custom') },
+                      { l: 'Zusatz-Prüfung', vs: plans.slice(0, 3).map((p) => p.pricePerCheck ? `${p.pricePerCheck} €` : 'Verhandelt') },
+                      { l: 'Nutzer-Sitze', vs: plans.slice(0, 3).map((p) => `${p.seats}`) },
+                      { l: 'CV- & Zeugnis-Upload', vs: plans.slice(0, 3).map(() => true) },
+                      { l: 'White-Label PDF-Reports', vs: plans.slice(0, 3).map((_, i) => i >= 1) },
+                      { l: 'ATS-Integration', vs: plans.slice(0, 3).map((_, i) => i >= 2) },
+                      { l: 'Multi-Mandanten / Workspaces', vs: plans.slice(0, 3).map((_, i) => i >= 2) },
+                      { l: 'API + Webhooks', vs: plans.slice(0, 3).map((_, i) => i >= 2) },
+                      { l: 'Dediziertes Onboarding', vs: plans.slice(0, 3).map((_, i) => i >= 2) },
+                      { l: 'Priority Support', vs: plans.slice(0, 3).map((_, i) => i >= 1) },
+                      { l: 'Audit-Trail Export (DSGVO Art. 30)', vs: plans.slice(0, 3).map((_, i) => i >= 2) },
                     ].map((row, ri) => (
                       <tr key={ri} className="border-b border-border last:border-0 hover:bg-bg-secondary/50">
                         <td className="p-4 text-text-primary font-medium">{row.l}</td>
@@ -247,7 +287,7 @@ export function PricingClient() {
               },
               {
                 q: 'Wie funktioniert die Abrechnung für Personaldienstleister?',
-                a: 'Sie zahlen das gewählte Agency-Paket. Ihren Endkunden können Sie die Reports im Rahmen Ihres Vermittlungshonorars in Rechnung stellen — wir geben Ihnen White-Label-Reports an die Hand.',
+                a: 'PDL-Pakete sind aktuell in Vorbereitung. Tragen Sie sich auf die Warteliste ein, um zuerst informiert zu werden und den Rollout mitzugestalten.',
               },
               {
                 q: 'Ist candiq DSGVO-konform?',

@@ -45,6 +45,11 @@ export function Hero() {
             <span className="text-text-primary">Neu: Multi-Mandanten-Workflow für Personaldienstleister</span>
             <ArrowRight className="w-3 h-3 text-brand-600" />
           </motion.div>
+          <div className="mb-6">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-violet/10 text-violet border border-violet/20">
+              Closed Beta für Personaldienstleister – PDL-Pakete bald verfügbar.
+            </span>
+          </div>
 
           {/* Headline */}
           <motion.h1
@@ -89,6 +94,11 @@ export function Hero() {
               Live-Demo ansehen
             </Link>
           </motion.div>
+          <div className="mb-10">
+            <Link href="/waitlist-agency" className="text-sm text-text-secondary hover:text-text-primary underline decoration-dotted underline-offset-4">
+              Sie sind Personaldienstleister? PDL-Features sind bald verfügbar – jetzt für frühen Zugang vormerken.
+            </Link>
+          </div>
 
           {/* Trust line */}
           <motion.div

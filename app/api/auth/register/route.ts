@@ -3,11 +3,8 @@ import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 
-const VALID_ACCOUNT_TYPES = ['HR_DEPARTMENT', 'RECRUITMENT_AGENCY']
-const VALID_PLANS = [
-  'STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE',
-  'AGENCY_BASIC', 'AGENCY_PRO', 'AGENCY_SCALE',
-]
+const VALID_ACCOUNT_TYPES = ['HR_DEPARTMENT']
+const VALID_PLANS = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE']
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,6 +12,13 @@ export async function POST(req: NextRequest) {
     const cleanName = (name ?? '').trim()
     const cleanCompany = (company ?? '').trim()
     const cleanEmail = (email ?? '').trim().toLowerCase()
+    if (accountType === 'RECRUITMENT_AGENCY') {
+      return NextResponse.json(
+        { error: 'PDL-Konten sind aktuell in der Closed Beta. Bitte nutzen Sie die Warteliste unter /waitlist-agency.' },
+        { status: 403 }
+      )
+    }
+
     const cleanAccountType = VALID_ACCOUNT_TYPES.includes(accountType) ? accountType : 'HR_DEPARTMENT'
     const cleanPlan = VALID_PLANS.includes(plan) ? plan : 'STARTER'
 

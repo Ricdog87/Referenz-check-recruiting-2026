@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Sparkles, Building2, Users2, Loader2 } from 'lucide-react'
+import { Sparkles, Building2, Users2, Loader2, Clock3 } from 'lucide-react'
 
 function LoginForm() {
   const router = useRouter()
@@ -108,18 +108,17 @@ function LoginForm() {
               <Loader2 className="absolute top-3 right-3 w-4 h-4 text-brand-600 animate-spin" />
             )}
           </button>
-          <button
-            onClick={() => runDemo('agency')}
-            disabled={demoLoading !== null}
-            className="group relative rounded-xl p-3.5 border border-border hover:border-violet/60 bg-white hover:bg-violet/5 transition-all disabled:opacity-50"
+          <Link
+            href="/waitlist-agency"
+            className="group relative rounded-xl p-3.5 border border-violet/30 bg-violet/5 hover:bg-violet/10 transition-all"
           >
             <Users2 className="w-5 h-5 text-violet mb-2" />
-            <div className="text-sm font-semibold text-text-primary text-left">Agentur-Demo</div>
-            <div className="text-[10px] text-text-muted text-left">Personaldienstleister</div>
-            {demoLoading === 'agency' && (
-              <Loader2 className="absolute top-3 right-3 w-4 h-4 text-violet animate-spin" />
-            )}
-          </button>
+            <div className="text-sm font-semibold text-text-primary text-left">PDL-Warteliste</div>
+            <div className="text-[10px] text-text-muted text-left">Closed Beta · bald verfügbar</div>
+            <span className="absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] font-semibold text-violet">
+              <Clock3 className="w-3.5 h-3.5" /> Soon
+            </span>
+          </Link>
         </div>
       </div>
 
