@@ -5,10 +5,11 @@ import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDateTime, CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
 import {
-  Users, ClipboardCheck, AlertTriangle, TrendingUp, ArrowUpRight,
+  Users, AlertTriangle, TrendingUp, ArrowUpRight,
   Plus, Sparkles, Clock, CheckCircle2, AlertCircle, Phone,
 } from 'lucide-react'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
+import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -55,6 +56,18 @@ export default async function DashboardPage() {
       select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
     }),
   ])
+
+  let activeAddonOrders = 0
+  let addonStoreReady = true
+  try {
+    activeAddonOrders = await prisma.addonOrder.count({
+      where: { userId, status: { in: ['ACTIVE', 'TRIAL'] } },
+    })
+  } catch {
+    // AddonOrder table may not be migrated yet; keep dashboard resilient.
+    activeAddonOrders = 0
+    addonStoreReady = false
+  }
 
   const totalChecks = openChecks + inProgressChecks + completedChecks
   const verificationRate = totalChecks > 0 ? Math.round((verifiedChecks / totalChecks) * 100) : 0
@@ -160,10 +173,48 @@ export default async function DashboardPage() {
       />
 
       <div className="space-y-6">
+        <WelcomeBar name={session.user.name} company={session.user.company} />
+
         {/* Stats grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
+
+        <div className="grid lg:grid-cols-3 gap-5">
+          <div className="card-md lg:col-span-2">
+            <h2 className="section-title mb-3">Quick Actions</h2>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <Link href="/candidates/new" className="btn-primary justify-center text-sm">
+                <Plus className="w-4 h-4" /> Kandidat anlegen
+              </Link>
+              <Link href="/checks/new" className="btn-secondary justify-center text-sm">
+                <Phone className="w-4 h-4" /> Prüfung starten
+              </Link>
+              <Link href="/addons" className="btn-secondary justify-center text-sm">
+                <Sparkles className="w-4 h-4" /> Add-ons ansehen
+              </Link>
+            </div>
+          </div>
+
+          <div className="card-md">
+            <h2 className="section-title mb-1">Add-on Status</h2>
+            <p className="text-xs text-text-secondary mb-4">Modulare Erweiterungen in Ihrem Workspace</p>
+            <div className="text-3xl font-black tracking-tighter text-text-primary mb-1">{activeAddonOrders}</div>
+            <div className="text-xs text-text-muted mb-4">aktive Add-ons (inkl. Trial)</div>
+            <Link href="/addons" className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 hover:text-brand-800">
+              Zum Marketplace <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        {!addonStoreReady && (
+          <div className="card-md border-amber-200 bg-amber-50/60">
+            <div className="text-sm font-semibold text-amber-800 mb-1">Hinweis: Add-on Store noch nicht vollständig aktiv</div>
+            <p className="text-xs text-amber-700">
+              Die Add-on-Tabelle ist in dieser Umgebung noch nicht migriert. Bitte führen Sie die Prisma-Migration aus, um Aktivierungen zu speichern.
+            </p>
+          </div>
+        )}
 
         {/* Plan usage banner */}
         {checkLimit > 0 && (
@@ -304,7 +355,7 @@ export default async function DashboardPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-text-primary mb-2">
-                  Willkommen{isAgency ? ', Recruiting Pro' : ''} bei RefCheck
+                  Willkommen{isAgency ? ', Recruiting Pro' : ''} bei candiq
                 </h3>
                 <p className="text-sm text-text-secondary mb-5 max-w-2xl">
                   Beginnen Sie mit dem Anlegen Ihres ersten Kandidaten. CV hochladen, Referenzen erfassen — wir kümmern uns um den Rest.

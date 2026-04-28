@@ -4,7 +4,9 @@ import { Suspense, useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Sparkles, Building2, Users2, Loader2 } from 'lucide-react'
+import { Sparkles, Building2, Loader2, ShieldCheck, Users2 } from 'lucide-react'
+
+type DemoProfile = 'hr_basic' | 'hr_lead' | 'hr_exec'
 
 function LoginForm() {
   const router = useRouter()
@@ -16,15 +18,22 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [demoLoading, setDemoLoading] = useState<'hr' | 'agency' | null>(null)
+  const [demoLoading, setDemoLoading] = useState<DemoProfile | null>(null)
+  const [demoHealthy, setDemoHealthy] = useState<boolean | null>(null)
 
   // Auto-trigger HR demo when ?demo=1 in URL
   useEffect(() => {
     if (demo === '1' && !demoLoading) {
-      runDemo('hr')
+      runDemo('hr_basic')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [demo])
+
+  useEffect(() => {
+    fetch('/api/demo')
+      .then((r) => setDemoHealthy(r.ok))
+      .catch(() => setDemoHealthy(false))
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -47,12 +56,12 @@ function LoginForm() {
     }
   }
 
-  async function runDemo(type: 'hr' | 'agency') {
+  async function runDemo(profile: DemoProfile) {
     setError('')
-    setDemoLoading(type)
+    setDemoLoading(profile)
     try {
       // Seed/refresh demo account, get credentials
-      const seed = await fetch(`/api/demo?type=${type}`, { method: 'POST' })
+      const seed = await fetch(`/api/demo?profile=${profile}`, { method: 'POST' })
       const data = await seed.json()
       if (!seed.ok) throw new Error(data.error || 'Demo konnte nicht geladen werden.')
 
@@ -77,7 +86,7 @@ function LoginForm() {
     <div className="animate-slide-up">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-2">Willkommen zurück</h1>
-        <p className="text-text-secondary">Melden Sie sich in Ihrem RefCheck-Konto an</p>
+        <p className="text-text-secondary">Melden Sie sich in Ihrem candiq-Konto an</p>
       </div>
 
       {registered && (
@@ -95,29 +104,51 @@ function LoginForm() {
         <p className="text-xs text-text-secondary mb-4 leading-relaxed">
           Direkt einsteigen — Demo-Account wird automatisch befüllt mit Beispiel-Kandidaten.
         </p>
-        <div className="grid grid-cols-2 gap-2.5">
+        <div className="mb-3">
+          <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
+            demoHealthy ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+          }`}>
+            <ShieldCheck className="w-3.5 h-3.5" />
+            {demoHealthy ? 'Demo-Service bereit' : 'Demo-Service wird geprüft'}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-2.5">
           <button
-            onClick={() => runDemo('hr')}
+            onClick={() => runDemo('hr_basic')}
             disabled={demoLoading !== null}
             className="group relative rounded-xl p-3.5 border border-border hover:border-brand-300 bg-white hover:bg-brand-50/40 transition-all disabled:opacity-50"
           >
             <Building2 className="w-5 h-5 text-brand-600 mb-2" />
-            <div className="text-sm font-semibold text-text-primary text-left">HR-Demo</div>
-            <div className="text-[10px] text-text-muted text-left">Interne HR-Abteilung</div>
-            {demoLoading === 'hr' && (
+            <div className="text-sm font-semibold text-text-primary text-left">HR</div>
+            <div className="text-[10px] text-text-muted text-left">Manager</div>
+            {demoLoading === 'hr_basic' && (
               <Loader2 className="absolute top-3 right-3 w-4 h-4 text-brand-600 animate-spin" />
             )}
           </button>
+
           <button
-            onClick={() => runDemo('agency')}
+            onClick={() => runDemo('hr_lead')}
             disabled={demoLoading !== null}
-            className="group relative rounded-xl p-3.5 border border-border hover:border-violet/60 bg-white hover:bg-violet/5 transition-all disabled:opacity-50"
+            className="group relative rounded-xl p-3.5 border border-border hover:border-brand-300 bg-white hover:bg-brand-50/40 transition-all disabled:opacity-50"
           >
-            <Users2 className="w-5 h-5 text-violet mb-2" />
-            <div className="text-sm font-semibold text-text-primary text-left">Agentur-Demo</div>
-            <div className="text-[10px] text-text-muted text-left">Personaldienstleister</div>
-            {demoLoading === 'agency' && (
-              <Loader2 className="absolute top-3 right-3 w-4 h-4 text-violet animate-spin" />
+            <Users2 className="w-5 h-5 text-brand-600 mb-2" />
+            <div className="text-sm font-semibold text-text-primary text-left">Lead</div>
+            <div className="text-[10px] text-text-muted text-left">Teamleitung</div>
+            {demoLoading === 'hr_lead' && (
+              <Loader2 className="absolute top-3 right-3 w-4 h-4 text-brand-600 animate-spin" />
+            )}
+          </button>
+
+          <button
+            onClick={() => runDemo('hr_exec')}
+            disabled={demoLoading !== null}
+            className="group relative rounded-xl p-3.5 border border-border hover:border-brand-300 bg-white hover:bg-brand-50/40 transition-all disabled:opacity-50"
+          >
+            <Users2 className="w-5 h-5 text-brand-600 mb-2" />
+            <div className="text-sm font-semibold text-text-primary text-left">Exec</div>
+            <div className="text-[10px] text-text-muted text-left">Direktion</div>
+            {demoLoading === 'hr_exec' && (
+              <Loader2 className="absolute top-3 right-3 w-4 h-4 text-brand-600 animate-spin" />
             )}
           </button>
         </div>

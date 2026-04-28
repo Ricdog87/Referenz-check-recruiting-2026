@@ -261,6 +261,7 @@ export function getPlanById(id: string) {
 
 // Demo seed credentials
 export const DEMO_CREDENTIALS = {
-  hr: { email: 'demo@refcheck.de', password: 'demo1234' },
-  agency: { email: 'agency@refcheck.de', password: 'demo1234' },
+  hr_basic: { email: 'demo.hr@candiq.de', password: 'demo1234' },
+  hr_lead: { email: 'demo.lead@candiq.de', password: 'demo1234' },
+  hr_exec: { email: 'demo.exec@candiq.de', password: 'demo1234' },
 }

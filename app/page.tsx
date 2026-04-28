@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { LandingNav } from '@/components/landing/LandingNav'
 import { Hero } from '@/components/landing/sections/Hero'
 import { TrustBar } from '@/components/landing/sections/TrustBar'

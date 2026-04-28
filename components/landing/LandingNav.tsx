@@ -28,10 +28,10 @@ export function LandingNav() {
               background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
               boxShadow: '0 6px 20px rgba(79,70,229,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
             }}>
-            <span className="text-white text-sm font-black tracking-tighter">RC</span>
+            <span className="text-white text-sm font-black tracking-tighter">CQ</span>
             <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
           </div>
-          <span className="text-base font-bold text-text-primary tracking-tight">RefCheck</span>
+          <span className="text-base font-bold text-text-primary tracking-tight">candiq</span>
           <span className="hidden sm:inline-block text-[10px] font-semibold uppercase tracking-widest text-brand-600 px-1.5 py-0.5 rounded-md bg-brand-50 border border-brand-100 ml-1">Pro</span>
         </Link>
 
@@ -40,6 +40,7 @@ export function LandingNav() {
           <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">So funktioniert's</Link>
           <Link href="#zielgruppen" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Für wen</Link>
           <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Features</Link>
+          <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
           <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Preise</Link>
         </div>
 
@@ -67,6 +68,7 @@ export function LandingNav() {
           <Link href="#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert's</Link>
           <Link href="#zielgruppen" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für wen</Link>
           <Link href="#features" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Features</Link>
+          <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">PDL-Warteliste</Link>
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Preise</Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>

@@ -24,6 +24,7 @@ model User {
   candidates    Candidate[]
   gdprConsents  GdprConsent[]
   auditLogs     AuditLog[]
+  addonOrders   AddonOrder[]
 }
 
 model Candidate {
@@ -112,4 +113,20 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+model AddonOrder {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addonKey  String
+  addonName String
+  status    String   @default("ACTIVE") // ACTIVE | TRIAL | CANCELED
+  seats     Int      @default(1)
+  price     Int      @default(0) // cent-based to avoid floating point
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@unique([userId, addonKey])
 }

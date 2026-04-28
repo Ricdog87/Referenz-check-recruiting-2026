@@ -6,9 +6,11 @@ import { DEMO_CREDENTIALS } from '@/lib/utils'
 
 /**
  * One-click demo seed.
- * GET/POST /api/demo?type=hr|agency
+ * GET /api/demo
+ * POST /api/demo?profile=hr_basic|hr_lead|hr_exec
  *
- * - Creates the demo user if missing.
+ * - GET returns DB health + available demo profiles.
+ * - POST creates/refreshes demo profile account and seed data.
  * - Idempotently re-seeds a small set of demo candidates + checks so the dashboard never looks empty.
  * - Returns the credentials so the login page can auto-fill and sign in.
  */
@@ -22,22 +24,21 @@ export async function GET(req: NextRequest) {
 async function handle(req: NextRequest) {
   try {
     const url = new URL(req.url)
-    const type = (url.searchParams.get('type') ?? 'hr').toLowerCase() as 'hr' | 'agency'
+    const profileKey = (url.searchParams.get('profile') ?? 'hr_basic') as keyof typeof DEMO_PROFILES
 
-    const creds = type === 'agency' ? DEMO_CREDENTIALS.agency : DEMO_CREDENTIALS.hr
-    const profile = type === 'agency'
-      ? {
-          name: 'Maria Recruiter',
-          company: 'Demo Recruiting GmbH',
-          accountType: 'RECRUITMENT_AGENCY',
-          plan: 'AGENCY_PRO',
-        }
-      : {
-          name: 'Demo HR Manager',
-          company: 'Demo Holding GmbH',
-          accountType: 'HR_DEPARTMENT',
-          plan: 'PROFESSIONAL',
-        }
+    if (req.method === 'GET') {
+      // lightweight DB health-check so UI can display meaningful state
+      await prisma.$queryRaw`SELECT 1`
+      return NextResponse.json({
+        ok: true,
+        db: 'up',
+        profiles: Object.keys(DEMO_PROFILES),
+      })
+    }
+
+    const selected = DEMO_PROFILES[profileKey] ?? DEMO_PROFILES.hr_basic
+    const creds = selected.creds
+    const profile = selected.profile
 
     // 1. Upsert demo user (always reset password so demo always works)
     const hashed = await bcrypt.hash(creds.password, 10)
@@ -70,7 +71,7 @@ async function handle(req: NextRequest) {
     const candidateCount = await prisma.candidate.count({ where: { userId: user.id } })
 
     if (candidateCount === 0) {
-      const seedCandidates = type === 'agency' ? AGENCY_SEED : HR_SEED
+      const seedCandidates = selected.seed
       for (const c of seedCandidates) {
         await prisma.candidate.create({
           data: {
@@ -98,7 +99,7 @@ async function handle(req: NextRequest) {
       ok: true,
       email: creds.email,
       password: creds.password,
-      type,
+      profile: profileKey,
       user: { id: user.id, name: user.name, company: user.company },
     })
   } catch (error) {
@@ -106,7 +107,7 @@ async function handle(req: NextRequest) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P1001' || error.code === 'P1002') {
         return NextResponse.json(
-          { error: 'Datenbank aktuell nicht erreichbar.' },
+          { error: 'Datenbank aktuell nicht erreichbar.', db: 'down' },
           { status: 503 }
         )
       }
@@ -117,11 +118,44 @@ async function handle(req: NextRequest) {
         )
       }
     }
-    return NextResponse.json({ error: 'Demo-Seed fehlgeschlagen.' }, { status: 500 })
+    return NextResponse.json({ error: 'Demo-Seed fehlgeschlagen.', db: 'unknown' }, { status: 500 })
   }
 }
 
 // ─── Demo data ──────────────────────────────────────────────────
+
+const DEMO_PROFILES = {
+  hr_basic: {
+    creds: DEMO_CREDENTIALS.hr_basic,
+    profile: {
+      name: 'Demo HR Manager',
+      company: 'Nordstern GmbH',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'PROFESSIONAL',
+    },
+    seed: HR_SEED,
+  },
+  hr_lead: {
+    creds: DEMO_CREDENTIALS.hr_lead,
+    profile: {
+      name: 'Demo Team Lead Recruiting',
+      company: 'RheinTech AG',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'BUSINESS',
+    },
+    seed: HR_SEED,
+  },
+  hr_exec: {
+    creds: DEMO_CREDENTIALS.hr_exec,
+    profile: {
+      name: 'Demo Director People',
+      company: 'Hanse Holding SE',
+      accountType: 'HR_DEPARTMENT',
+      plan: 'ENTERPRISE',
+    },
+    seed: HR_SEED,
+  },
+} as const
 
 const HR_SEED = [
   {
@@ -273,59 +307,6 @@ const HR_SEED = [
         startDate: '2013-01',
         endDate: '2016-01',
         status: 'OPEN',
-        result: null,
-      },
-    ],
-  },
-]
-
-const AGENCY_SEED = [
-  ...HR_SEED,
-  {
-    firstName: 'Hannah',
-    lastName: 'Wolf',
-    email: 'hannah.wolf@example.com',
-    phone: '+49 69 998822',
-    position: 'Interim CFO',
-    department: 'Finance',
-    notes: 'Vermittelt an: Allianz Tochter (anonymisiert).',
-    status: 'COMPLETED',
-    gdprConsent: true,
-    checks: [
-      {
-        employerName: 'Deutsche Bank AG',
-        employerContact: 'Robert Klein',
-        employerPhone: '+49 69 9100',
-        position: 'CFO Asia Pacific',
-        startDate: '2018-06',
-        endDate: '2024-01',
-        status: 'COMPLETED',
-        result: 'VERIFIED',
-        callNotes: 'Ehemaliger CEO bestätigt: Top-Performance, Stress-resistent, würde sofort wieder einstellen.',
-        rating: 5,
-        calledAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
-      },
-    ],
-  },
-  {
-    firstName: 'Pavel',
-    lastName: 'Novak',
-    email: 'pavel.novak@example.com',
-    phone: '+420 222 444',
-    position: 'Senior DevOps',
-    department: 'Engineering',
-    notes: 'Vermittelt an: Tech-Scale-up (Berlin)',
-    status: 'IN_REVIEW',
-    gdprConsent: true,
-    checks: [
-      {
-        employerName: 'Avast Software',
-        employerContact: 'Jan Novotný',
-        employerPhone: '+420 274 005 666',
-        position: 'DevOps Engineer',
-        startDate: '2020-01',
-        endDate: '2024-02',
-        status: 'IN_PROGRESS',
         result: null,
       },
     ],

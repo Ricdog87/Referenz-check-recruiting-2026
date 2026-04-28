@@ -7,12 +7,12 @@ async function main() {
   const password = await bcrypt.hash('demo1234', 12)
 
   const user = await prisma.user.upsert({
-    where: { email: 'demo@refcheck.de' },
+    where: { email: 'demo.hr@candiq.de' },
     update: {},
     create: {
       name: 'Demo Benutzer',
       company: 'Demo GmbH',
-      email: 'demo@refcheck.de',
+      email: 'demo.hr@candiq.de',
       password,
     },
   })
@@ -50,6 +50,20 @@ async function main() {
       startDate: '03/2020',
       endDate: '12/2023',
       status: 'IN_PROGRESS',
+    },
+  })
+
+  await prisma.addonOrder.upsert({
+    where: { id: 'seed-addon-1' },
+    update: {},
+    create: {
+      id: 'seed-addon-1',
+      userId: user.id,
+      addonKey: 'EXPRESS_VERIFY',
+      addonName: 'Express Verify',
+      status: 'TRIAL',
+      seats: 3,
+      price: 0,
     },
   })
 
