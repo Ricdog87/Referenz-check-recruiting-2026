@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ADDONS, ADDON_CATEGORIES, formatEuro, type Addon, type AddonSku } from '@/lib/addons'
+import { useToast } from '@/components/Toaster'
 import {
   ShoppingBag, Sparkles, CheckCircle2, Loader2, ArrowRight,
   BadgeCheck, Zap, Package, Mic, Phone, Layers, Upload,
@@ -60,10 +61,10 @@ const COLOR_CLASSES = {
 }
 
 export default function AddonsPage() {
+  const { toast } = useToast()
   const [activeCategory, setActiveCategory] = useState<string>('ALL')
   const [loading, setLoading] = useState<AddonSku | null>(null)
   const [success, setSuccess] = useState<AddonSku | null>(null)
-  const [error, setError] = useState<string | null>(null)
 
   const categories = ['ALL', ...Object.keys(ADDON_CATEGORIES)] as const
   const filtered = activeCategory === 'ALL'
@@ -73,7 +74,6 @@ export default function AddonsPage() {
   async function bookAddon(addon: Addon) {
     if (loading) return
     setLoading(addon.sku)
-    setError(null)
     try {
       const res = await fetch('/api/addons', {
         method: 'POST',
@@ -83,9 +83,18 @@ export default function AddonsPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Fehler beim Buchen')
       setSuccess(addon.sku)
+      toast({
+        variant: 'success',
+        title: `${addon.name} gebucht`,
+        description: `${formatEuro(addon.price * addon.quantity)} · Wir aktivieren das Add-on innerhalb von 24h.`,
+      })
       setTimeout(() => setSuccess(null), 4000)
     } catch (e: any) {
-      setError(e.message)
+      toast({
+        variant: 'error',
+        title: 'Buchung fehlgeschlagen',
+        description: e.message,
+      })
     } finally {
       setLoading(null)
     }
@@ -133,13 +142,6 @@ export default function AddonsPage() {
           )
         })}
       </div>
-
-      {/* Error banner */}
-      {error && (
-        <div className="px-4 py-3 rounded-xl text-sm text-rose-700 bg-rose-50 border border-rose-200">
-          {error}
-        </div>
-      )}
 
       {/* Add-on cards */}
       <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">

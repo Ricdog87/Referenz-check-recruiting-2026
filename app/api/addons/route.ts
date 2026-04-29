@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getAddon } from '@/lib/addons'
+import { rateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +11,15 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Nicht angemeldet' }, { status: 401 })
+  }
+
+  // Rate limit: max 20 addon bookings per user per hour
+  const rl = rateLimit(`addon:${session.user.id}`, 20, 60 * 60 * 1000)
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: 'Zu viele Buchungen. Bitte später erneut versuchen.' },
+      { status: 429 }
+    )
   }
 
   let body: { sku?: string }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 /**
  * One-click demo provisioning.
@@ -78,6 +79,16 @@ export async function GET(req: NextRequest) {
 }
 
 async function handle(req: NextRequest) {
+  // Rate limit: max 10 demo provisions per IP per 10 minutes
+  const ip = getClientIp(req)
+  const rl = rateLimit(`demo:${ip}`, 10, 10 * 60 * 1000)
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: `Zu viele Demo-Anfragen. Bitte in ${rl.retryAfter}s erneut versuchen.` },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+    )
+  }
+
   const url = new URL(req.url)
   const requested = (url.searchParams.get('type') ?? 'hr').toLowerCase()
   // PDL-Demos sind in Closed Beta — auf HR fallback (kein 403, da das den Login-Flow bricht)
