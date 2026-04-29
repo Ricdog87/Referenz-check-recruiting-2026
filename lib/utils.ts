@@ -259,8 +259,51 @@ export function getPlanById(id: string) {
   return ALL_PLANS.find((p) => p.id === id) ?? HR_PLANS[0]
 }
 
-// Demo seed credentials
+// Demo seed credentials — kept in sync with /api/demo route profiles.
 export const DEMO_CREDENTIALS = {
-  hr: { email: 'demo@candiq.de', password: 'demo1234' },
-  agency: { email: 'agency@candiq.de', password: 'demo1234' },
+  hr: {
+    email: 'demo@candiq.de',
+    password: 'demo1234',
+    label: 'HR Inhouse',
+    description: 'Mittelständische HR-Abteilung · Professional-Plan',
+  },
+  enterprise: {
+    email: 'enterprise@candiq.de',
+    password: 'demo1234',
+    label: 'Enterprise',
+    description: 'Konzern-HR · Business-Plan · Multi-Department',
+  },
+  boutique: {
+    email: 'boutique@candiq.de',
+    password: 'demo1234',
+    label: 'Startup',
+    description: 'Boutique-Recruiting · Starter-Plan',
+  },
+} as const
+
+// Helpers for greeting & company branding
+export function getGreeting(now = new Date()) {
+  const h = now.getHours()
+  if (h < 5) return 'Guten Morgen'
+  if (h < 11) return 'Guten Morgen'
+  if (h < 14) return 'Guten Mittag'
+  if (h < 18) return 'Guten Tag'
+  if (h < 22) return 'Guten Abend'
+  return 'Gute Nacht'
+}
+
+export function initialsOf(value: string) {
+  if (!value) return '?'
+  const parts = value.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '?'
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase()
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase()
+}
+
+export function trialDaysLeft(trialEndsAt: Date | string | null | undefined) {
+  if (!trialEndsAt) return null
+  const end = new Date(trialEndsAt).getTime()
+  const now = Date.now()
+  if (end <= now) return 0
+  return Math.ceil((end - now) / (1000 * 60 * 60 * 24))
 }

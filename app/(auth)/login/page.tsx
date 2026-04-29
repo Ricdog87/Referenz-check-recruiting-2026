@@ -4,27 +4,54 @@ import { Suspense, useEffect, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Sparkles, Building2, Users2, Loader2, Clock3 } from 'lucide-react'
+import { Sparkles, Building2, Briefcase, Loader2, Clock3, Rocket, ShieldCheck } from 'lucide-react'
+
+type DemoKey = 'hr' | 'enterprise' | 'boutique'
+
+const DEMO_FLAVORS: { key: DemoKey; label: string; sub: string; icon: typeof Building2; tone: string }[] = [
+  {
+    key: 'hr',
+    label: 'HR Inhouse',
+    sub: 'Mittelstand · Professional',
+    icon: Building2,
+    tone: 'brand',
+  },
+  {
+    key: 'enterprise',
+    label: 'Enterprise',
+    sub: 'Konzern · Business-Plan',
+    icon: Briefcase,
+    tone: 'violet',
+  },
+  {
+    key: 'boutique',
+    label: 'Startup',
+    sub: 'Boutique · Starter',
+    icon: Rocket,
+    tone: 'emerald',
+  },
+]
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const registered = searchParams.get('registered')
-  const demo = searchParams.get('demo')
+  const demoQuery = searchParams.get('demo')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [demoLoading, setDemoLoading] = useState<'hr' | 'agency' | null>(null)
+  const [demoLoading, setDemoLoading] = useState<DemoKey | null>(null)
 
   // Auto-trigger HR demo when ?demo=1 in URL
   useEffect(() => {
-    if (demo === '1' && !demoLoading) {
-      runDemo('hr')
+    if (demoQuery && !demoLoading) {
+      const key = (['hr', 'enterprise', 'boutique'].includes(demoQuery) ? demoQuery : 'hr') as DemoKey
+      runDemo(key)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [demo])
+  }, [demoQuery])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -47,12 +74,14 @@ function LoginForm() {
     }
   }
 
-  async function runDemo(type: 'hr' | 'agency') {
+  async function runDemo(type: DemoKey) {
     setError('')
     setDemoLoading(type)
     try {
-      // Seed/refresh demo account, get credentials
-      const seed = await fetch(`/api/demo?type=${type}`, { method: 'POST' })
+      const seed = await fetch(`/api/demo?type=${type}`, {
+        method: 'POST',
+        cache: 'no-store',
+      })
       const data = await seed.json()
       if (!seed.ok) throw new Error(data.error || 'Demo konnte nicht geladen werden.')
 
@@ -62,7 +91,7 @@ function LoginForm() {
         redirect: false,
       })
 
-      if (res?.error) throw new Error('Demo-Login fehlgeschlagen.')
+      if (res?.error) throw new Error('Demo-Login fehlgeschlagen. Bitte erneut versuchen.')
 
       router.push('/dashboard')
       router.refresh()
@@ -88,38 +117,55 @@ function LoginForm() {
 
       {/* One-click demo cards */}
       <div className="card-lg shadow-card-md mb-5 p-5">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2">
           <Sparkles className="w-4 h-4 text-amber-500" />
           <span className="text-xs font-bold uppercase tracking-widest text-text-primary">Live-Demo (1 Klick)</span>
         </div>
         <p className="text-xs text-text-secondary mb-4 leading-relaxed">
-          Direkt einsteigen — Demo-Account wird automatisch befüllt mit Beispiel-Kandidaten.
+          Ein Klick — wir öffnen ein vorbefülltes Demo-Konto, damit Sie das Dashboard sofort erleben können.
         </p>
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            onClick={() => runDemo('hr')}
-            disabled={demoLoading !== null}
-            className="group relative rounded-xl p-3.5 border border-border hover:border-brand-300 bg-white hover:bg-brand-50/40 transition-all disabled:opacity-50"
-          >
-            <Building2 className="w-5 h-5 text-brand-600 mb-2" />
-            <div className="text-sm font-semibold text-text-primary text-left">HR-Demo</div>
-            <div className="text-[10px] text-text-muted text-left">Interne HR-Abteilung</div>
-            {demoLoading === 'hr' && (
-              <Loader2 className="absolute top-3 right-3 w-4 h-4 text-brand-600 animate-spin" />
-            )}
-          </button>
-          <Link
-            href="/waitlist-agency"
-            className="group relative rounded-xl p-3.5 border border-violet/30 bg-violet/5 hover:bg-violet/10 transition-all"
-          >
-            <Users2 className="w-5 h-5 text-violet mb-2" />
-            <div className="text-sm font-semibold text-text-primary text-left">PDL-Warteliste</div>
-            <div className="text-[10px] text-text-muted text-left">Closed Beta · bald verfügbar</div>
-            <span className="absolute top-3 right-3 inline-flex items-center gap-1 text-[10px] font-semibold text-violet">
-              <Clock3 className="w-3.5 h-3.5" /> Soon
-            </span>
-          </Link>
+        <div className="grid grid-cols-3 gap-2">
+          {DEMO_FLAVORS.map((d) => {
+            const Icon = d.icon
+            const tone = {
+              brand: 'border-border hover:border-brand-300 hover:bg-brand-50/40',
+              violet: 'border-border hover:border-violet/40 hover:bg-violet/5',
+              emerald: 'border-border hover:border-emerald-300 hover:bg-emerald-50/40',
+            }[d.tone] ?? 'border-border'
+            const iconTone = {
+              brand: 'text-brand-600',
+              violet: 'text-violet',
+              emerald: 'text-emerald-600',
+            }[d.tone] ?? 'text-brand-600'
+            return (
+              <button
+                key={d.key}
+                onClick={() => runDemo(d.key)}
+                disabled={demoLoading !== null}
+                className={`group relative rounded-xl p-3 border bg-white transition-all disabled:opacity-50 ${tone}`}
+              >
+                <Icon className={`w-5 h-5 mb-2 ${iconTone}`} />
+                <div className="text-[13px] font-semibold text-text-primary text-left">{d.label}</div>
+                <div className="text-[10px] text-text-muted text-left leading-tight">{d.sub}</div>
+                {demoLoading === d.key && (
+                  <Loader2 className="absolute top-2 right-2 w-3.5 h-3.5 text-brand-600 animate-spin" />
+                )}
+              </button>
+            )
+          })}
         </div>
+        <Link
+          href="/waitlist-agency"
+          className="mt-3 flex items-center justify-between rounded-xl px-3 py-2 border border-violet/30 bg-violet/5 hover:bg-violet/10 transition-all"
+        >
+          <div>
+            <div className="text-[13px] font-semibold text-text-primary">Personaldienstleister-Demo</div>
+            <div className="text-[10px] text-text-muted">Closed Beta · auf Warteliste</div>
+          </div>
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-violet">
+            <Clock3 className="w-3.5 h-3.5" /> Bald
+          </span>
+        </Link>
       </div>
 
       <div className="card-lg shadow-card-md p-6">
@@ -178,9 +224,10 @@ function LoginForm() {
         </div>
       </div>
 
-      <p className="text-[11px] text-text-muted text-center mt-5 leading-relaxed">
-        Durch die Anmeldung stimmen Sie unserer{' '}
-        <Link href="/datenschutz" className="underline hover:text-text-secondary">Datenschutzerklärung</Link> zu.
+      <p className="text-[11px] text-text-muted text-center mt-5 leading-relaxed flex items-center justify-center gap-1.5">
+        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+        DSGVO-konform · Server in Deutschland · {' '}
+        <Link href="/datenschutz" className="underline hover:text-text-secondary">Datenschutz</Link>
       </p>
     </div>
   )

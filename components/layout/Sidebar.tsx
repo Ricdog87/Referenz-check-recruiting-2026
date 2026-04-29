@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
-  Plug, LogOut, ChevronUp, Sparkles, Briefcase,
+  Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
 
@@ -14,6 +14,7 @@ const NAV_BASE = [
   { href: '/candidates', label: 'Kandidaten', icon: Users },
   { href: '/checks', label: 'Referenzprüfungen', icon: ClipboardList },
   { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/addons', label: 'Add-ons', icon: ShoppingBag },
 ]
 
 const NAV_AGENCY_ONLY = [

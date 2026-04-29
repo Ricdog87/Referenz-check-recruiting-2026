@@ -1,12 +1,12 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { Header } from '@/components/layout/Header'
+import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
-import { formatDateTime, CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
+import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES, trialDaysLeft } from '@/lib/utils'
 import {
-  Users, ClipboardCheck, AlertTriangle, TrendingUp, ArrowUpRight,
-  Plus, Sparkles, Clock, CheckCircle2, AlertCircle, Phone,
+  Users, AlertTriangle, TrendingUp, ArrowUpRight,
+  Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
 } from 'lucide-react'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
 
@@ -142,21 +142,19 @@ export default async function DashboardPage() {
     },
   ]
 
+  const firstName = session.user.name.split(' ')[0] ?? session.user.name
+  const trialLeft = trialDaysLeft(session.user.trialEndsAt)
+  const isTrialing = trialLeft !== null && trialLeft > 0
+
   return (
     <>
-      <Header
-        title={`Hallo ${session.user.name.split(' ')[0]} 👋`}
-        subtitle={`Willkommen zurück bei ${session.user.company}`}
-        action={
-          <div className="flex gap-2">
-            <Link href="/checks/new" className="btn-secondary">
-              <Phone className="w-4 h-4" /> Neue Prüfung
-            </Link>
-            <Link href="/candidates/new" className="btn-primary">
-              <Plus className="w-4 h-4" /> Kandidat hinzufügen
-            </Link>
-          </div>
-        }
+      <WelcomeBar
+        firstName={firstName}
+        fullName={session.user.name}
+        company={session.user.company}
+        planName={planMeta.name}
+        trialDaysLeft={trialLeft}
+        isTrialing={isTrialing}
       />
 
       <div className="space-y-6">

@@ -39,6 +39,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           accountType: user.accountType,
           plan: user.plan,
+          trialEndsAt: user.trialEndsAt?.toISOString() ?? null,
         }
       },
     }),
@@ -51,6 +52,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role
         token.accountType = (user as any).accountType
         token.plan = (user as any).plan
+        token.trialEndsAt = (user as any).trialEndsAt ?? null
       }
       return token
     },
@@ -61,6 +63,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string
         session.user.accountType = token.accountType as string
         session.user.plan = token.plan as string
+        session.user.trialEndsAt = (token.trialEndsAt as string | null) ?? null
       }
       return session
     },
@@ -77,6 +80,7 @@ declare module 'next-auth' {
       role: string
       accountType: string
       plan: string
+      trialEndsAt: string | null
     }
   }
 }
@@ -88,5 +92,6 @@ declare module 'next-auth/jwt' {
     role: string
     accountType: string
     plan: string
+    trialEndsAt: string | null
   }
 }
