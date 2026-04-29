@@ -3,122 +3,129 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
+import {
+  LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
+  Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag,
+} from 'lucide-react'
+import { ACCOUNT_TYPES } from '@/lib/utils'
 
-const nav = [
-  {
-    href: '/dashboard',
-    label: 'Dashboard',
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
-  },
-  {
-    href: '/candidates',
-    label: 'Kandidaten',
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-    ),
-  },
-  {
-    href: '/checks',
-    label: 'Referenzprüfungen',
-    icon: (
-      <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-      </svg>
-    ),
-  },
+const NAV_BASE = [
+  { href: '/dashboard', label: 'Übersicht', icon: LayoutDashboard },
+  { href: '/candidates', label: 'Kandidaten', icon: Users },
+  { href: '/checks', label: 'Referenzprüfungen', icon: ClipboardList },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/addons', label: 'Add-ons', icon: ShoppingBag },
+]
+
+const NAV_AGENCY_ONLY = [
+  { href: '/clients', label: 'Mandanten', icon: Briefcase },
+]
+
+const NAV_INTEGRATIONS = [
+  { href: '/integrations', label: 'Integrationen', icon: Plug },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const isAgency = session?.user?.accountType === 'RECRUITMENT_AGENCY'
+
+  const nav = [
+    ...NAV_BASE,
+    ...(isAgency ? NAV_AGENCY_ONLY : []),
+  ]
 
   return (
-    <aside className="w-56 min-h-screen flex flex-col flex-shrink-0"
-      style={{
-        background: 'rgba(18,18,18,0.95)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderRight: '1px solid rgba(255,255,255,0.06)',
-      }}>
+    <aside className="w-60 min-h-screen flex flex-col flex-shrink-0 bg-white border-r border-border sticky top-0 h-screen">
 
       {/* Logo */}
-      <div className="h-14 flex items-center px-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-lg bg-accent flex items-center justify-center flex-shrink-0"
-            style={{ boxShadow: '0 0 10px rgba(10,132,255,0.3)' }}>
-            <span className="text-white text-[10px] font-bold">CQ</span>
+      <div className="h-16 flex items-center px-5 border-b border-border">
+        <Link href="/dashboard" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)', boxShadow: '0 4px 14px rgba(79,70,229,0.3)' }}>
+            <span className="text-white text-xs font-black">CQ</span>
           </div>
-          <div>
-            <div className="text-sm font-semibold text-white/90">candiq</div>
-            {session?.user?.company && (
-              <div className="text-[10px] text-white/30 truncate max-w-[120px]">{session.user.company}</div>
-            )}
+          <div className="min-w-0">
+            <div className="text-sm font-bold text-text-primary tracking-tight">candiq</div>
+            <div className="text-[10px] text-text-muted truncate">
+              {session?.user?.accountType ? ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short : ''}
+            </div>
           </div>
         </Link>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 p-2.5 space-y-0.5">
-        <div className="px-3 pb-1.5 pt-2">
-          <span className="text-[10px] font-semibold text-white/20 uppercase tracking-widest">Übersicht</span>
-        </div>
-        {nav.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + '/')
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={active ? 'nav-item-active' : 'nav-item'}
-            >
-              <span className={active ? 'text-accent' : 'text-white/40'}>{item.icon}</span>
-              <span className="text-[13px]">{item.label}</span>
-            </Link>
-          )
-        })}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <NavSection label="Workspace">
+          {nav.map((item) => (
+            <NavItem key={item.href} {...item} pathname={pathname} />
+          ))}
+        </NavSection>
 
-        <div className="px-3 pb-1.5 pt-4">
-          <span className="text-[10px] font-semibold text-white/20 uppercase tracking-widest">Konto</span>
-        </div>
-        <Link
-          href="/settings"
-          className={pathname === '/settings' ? 'nav-item-active' : 'nav-item'}
-        >
-          <span className={pathname === '/settings' ? 'text-accent' : 'text-white/40'}>
-            <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-          </span>
-          <span className="text-[13px]">Einstellungen</span>
-        </Link>
+        <NavSection label="Konto">
+          {NAV_INTEGRATIONS.map((item) => (
+            <NavItem key={item.href} {...item} pathname={pathname} />
+          ))}
+          <NavItem href="/settings" label="Einstellungen" icon={Settings} pathname={pathname} />
+        </NavSection>
+
+        {/* Upgrade card */}
+        {session?.user?.plan && (session.user.plan === 'STARTER' || session.user.plan === 'AGENCY_BASIC') && (
+          <div className="mt-6 px-3">
+            <div className="rounded-2xl p-4 text-white relative overflow-hidden"
+              style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%)' }}>
+              <Sparkles className="w-5 h-5 mb-2 text-amber-300" />
+              <div className="text-xs font-bold mb-1">Upgrade verfügbar</div>
+              <p className="text-[11px] text-white/80 leading-relaxed mb-3">
+                Mehr Prüfungen, ATS-Integration, Multi-Workspaces.
+              </p>
+              <Link href="/preise" className="block w-full text-center text-xs font-semibold py-1.5 rounded-full bg-white text-brand-700 hover:bg-bg-secondary transition-colors">
+                Upgraden
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* User */}
-      <div className="p-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] transition-colors group cursor-default">
-          <div className="w-7 h-7 rounded-full bg-accent/15 border border-accent/20 flex items-center justify-center flex-shrink-0 text-xs font-semibold text-accent">
-            {session?.user?.name?.[0] ?? '?'}
+      <div className="border-t border-border p-3">
+        <div className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-bg-secondary transition-colors group cursor-default">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center flex-shrink-0 text-xs font-bold text-white shadow-card">
+            {session?.user?.name?.[0]?.toUpperCase() ?? '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium text-white/80 truncate">{session?.user?.name}</div>
-            <div className="text-[10px] text-white/30 truncate">{session?.user?.email}</div>
+            <div className="text-xs font-semibold text-text-primary truncate">{session?.user?.name}</div>
+            <div className="text-[10px] text-text-muted truncate">{session?.user?.email}</div>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
-            className="opacity-0 group-hover:opacity-100 transition-opacity text-white/30 hover:text-status-error"
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg text-text-muted hover:text-rose-600 hover:bg-rose-50"
             title="Abmelden">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>
     </aside>
+  )
+}
+
+function NavSection({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-1">
+      <div className="px-3 pb-1.5 pt-3">
+        <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{label}</span>
+      </div>
+      <div className="space-y-0.5">{children}</div>
+    </div>
+  )
+}
+
+function NavItem({ href, label, icon: Icon, pathname }: { href: string; label: string; icon: any; pathname: string }) {
+  const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href + '/'))
+  return (
+    <Link href={href} className={active ? 'nav-item-active' : 'nav-item'}>
+      <Icon className={`w-4 h-4 ${active ? 'text-brand-600' : 'text-text-muted'}`} />
+      <span>{label}</span>
+    </Link>
   )
 }

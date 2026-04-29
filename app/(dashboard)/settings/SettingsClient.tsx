@@ -107,7 +107,7 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
   return (
     <>
       {/* Account info */}
-      <div className="card space-y-4">
+      <div className="card-md space-y-4">
         <h2 className="section-title">Profil</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -124,15 +124,15 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
           <input className="input-field" value={user.email} disabled />
           <p className="text-xs text-text-muted mt-1">E-Mail kann nicht geändert werden.</p>
         </div>
-        {msg && <div className="text-sm text-status-success bg-status-successBg border border-status-success/20 rounded-lg px-3 py-2">{msg}</div>}
-        {error && <div className="text-sm text-status-error bg-status-errorBg border border-status-error/20 rounded-lg px-3 py-2">{error}</div>}
+        {msg && <div className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">{msg}</div>}
+        {error && <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{error}</div>}
         <button onClick={saveProfile} disabled={saving} className="btn-primary">
           Profil speichern
         </button>
       </div>
 
       {/* Password */}
-      <div className="card space-y-4">
+      <div className="card-md space-y-4">
         <h2 className="section-title">Passwort ändern</h2>
         <div>
           <label className="label">Neues Passwort</label>
@@ -148,7 +148,7 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
       </div>
 
       {/* Data overview */}
-      <div className="card">
+      <div className="card-md">
         <h2 className="section-title mb-4">Ihre gespeicherten Daten</h2>
         <div className="grid grid-cols-3 gap-4 mb-4">
           {[
@@ -156,8 +156,8 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
             { label: 'Prüfungen', value: stats.checks },
             { label: 'Dokumente', value: stats.documents },
           ].map((s) => (
-            <div key={s.label} className="bg-bg-secondary rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold font-mono text-accent">{s.value}</div>
+            <div key={s.label} className="bg-bg-secondary rounded-xl p-4 text-center border border-border">
+              <div className="text-2xl font-bold tabular-nums text-brand-700">{s.value}</div>
               <div className="text-xs text-text-secondary mt-1">{s.label}</div>
             </div>
           ))}
@@ -168,22 +168,16 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
       </div>
 
       {/* GDPR section */}
-      <div className="card border-accent/20 bg-accent-glow">
+      <div className="card-md bg-brand-50/40 border-brand-200">
         <h2 className="section-title mb-1">🛡 DSGVO-Rechte</h2>
         <p className="text-xs text-text-secondary mb-5 leading-relaxed">
           Gemäß DSGVO Art. 17 und Art. 20 haben Sie das Recht auf Löschung und Datenportabilität.
         </p>
-        <div className="space-y-3">
-          <button onClick={exportData} className="btn-secondary w-full justify-start gap-3">
-            <span>📥</span>
+        <div className="space-y-2">
+          <button onClick={exportData} className="btn-secondary w-full justify-start">
             Alle Daten exportieren (Art. 20 DSGVO)
           </button>
-          <button
-            onClick={deleteAccount}
-            disabled={deleting}
-            className="btn-danger w-full justify-start gap-3"
-          >
-            <span>{deleting ? '⏳' : '🗑'}</span>
+          <button onClick={deleteAccount} disabled={deleting} className="btn-danger w-full justify-start">
             {deleting ? 'Konto wird gelöscht…' : 'Konto & alle Daten löschen (Art. 17 DSGVO)'}
           </button>
         </div>

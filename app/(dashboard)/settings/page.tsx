@@ -22,14 +22,14 @@ export default async function SettingsPage() {
   })
 
   return (
-    <div className="animate-fade-in">
+    <>
       <Header title="Einstellungen" subtitle="Konto & DSGVO-Verwaltung" />
-      <div className="p-6 max-w-2xl space-y-6">
+      <div className="max-w-2xl space-y-5">
         <SettingsClient
           user={user!}
           stats={{ candidates: candidateCount, checks: checkCount, documents: documentCount }}
         />
       </div>
-    </div>
+    </>
   )
 }

@@ -60,16 +60,17 @@ export function NewCheckForm() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <>
       <Header
         title="Referenzprüfung anlegen"
+        subtitle="Neue Verifizierung beim früheren Arbeitgeber"
         action={<Link href="/checks" className="btn-secondary">Abbrechen</Link>}
       />
 
-      <div className="p-6 max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="max-w-3xl">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Candidate selection */}
-          <div className="card space-y-4">
+          <div className="card-md space-y-4">
             <h2 className="section-title">Kandidat</h2>
             <div>
               <label className="label">Kandidat *</label>
@@ -90,7 +91,7 @@ export function NewCheckForm() {
           </div>
 
           {/* Employer */}
-          <div className="card space-y-4">
+          <div className="card-md space-y-4">
             <h2 className="section-title">Früherer Arbeitgeber</h2>
             <div>
               <label className="label">Unternehmensname *</label>
@@ -136,7 +137,7 @@ export function NewCheckForm() {
           </div>
 
           {/* Position & dates */}
-          <div className="card space-y-4">
+          <div className="card-md space-y-4">
             <h2 className="section-title">Zu prüfende Tätigkeit</h2>
             <div>
               <label className="label">Position laut Lebenslauf</label>
@@ -170,7 +171,7 @@ export function NewCheckForm() {
           </div>
 
           {error && (
-            <div className="bg-status-errorBg border border-status-error/20 rounded-lg px-4 py-3 text-sm text-status-error">
+            <div className="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 text-sm text-rose-700">
               {error}
             </div>
           )}
@@ -190,6 +191,6 @@ export function NewCheckForm() {
           </div>
         </form>
       </div>
-    </div>
+    </>
   )
 }

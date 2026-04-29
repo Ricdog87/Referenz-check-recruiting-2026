@@ -34,17 +34,17 @@ export function CandidateActions({ candidateId }: { candidateId: string }) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 w-48 bg-bg-card border border-border rounded-xl shadow-card z-20 py-1 overflow-hidden">
+          <div className="absolute right-0 top-full mt-1 w-52 bg-white border border-border rounded-2xl shadow-card-lg z-20 py-1 overflow-hidden">
             {[
-              { label: 'Als "In Prüfung"', status: 'IN_REVIEW' },
-              { label: 'Als "Abgeschlossen"', status: 'COMPLETED' },
-              { label: 'Als "Ausstehend"', status: 'PENDING' },
+              { label: 'Als „In Prüfung“', status: 'IN_REVIEW' },
+              { label: 'Als „Abgeschlossen“', status: 'COMPLETED' },
+              { label: 'Als „Ausstehend“', status: 'PENDING' },
               { label: 'Abgelehnt', status: 'REJECTED' },
             ].map((s) => (
               <button
                 key={s.status}
                 onClick={() => updateStatus(s.status)}
-                className="w-full text-left px-4 py-2 text-sm text-text-secondary hover:bg-bg-hover hover:text-text-primary transition-colors"
+                className="w-full text-left px-4 py-2 text-sm text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors"
               >
                 {s.label}
               </button>
@@ -53,7 +53,7 @@ export function CandidateActions({ candidateId }: { candidateId: string }) {
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="w-full text-left px-4 py-2 text-sm text-status-error hover:bg-status-errorBg transition-colors"
+              className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 transition-colors"
             >
               {deleting ? 'Wird gelöscht…' : 'Kandidat löschen'}
             </button>

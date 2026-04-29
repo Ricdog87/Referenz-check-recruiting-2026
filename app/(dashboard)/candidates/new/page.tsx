@@ -76,9 +76,10 @@ export default function NewCandidatePage() {
   }
 
   return (
-    <div className="animate-fade-in">
+    <>
       <Header
         title="Kandidat anlegen"
+        subtitle="Neuen Kandidaten für Referenzprüfung erfassen"
         action={
           <Link href="/candidates" className="btn-secondary">
             Abbrechen
@@ -86,10 +87,10 @@ export default function NewCandidatePage() {
         }
       />
 
-      <div className="p-6 max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="max-w-3xl">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Personal data */}
-          <div className="card space-y-4">
+          <div className="card-md space-y-4">
             <h2 className="section-title">Persönliche Daten</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -114,7 +115,7 @@ export default function NewCandidatePage() {
           </div>
 
           {/* Position */}
-          <div className="card space-y-4">
+          <div className="card-md space-y-4">
             <h2 className="section-title">Bewerbung</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -139,17 +140,19 @@ export default function NewCandidatePage() {
           </div>
 
           {/* File upload */}
-          <div className="card space-y-4">
+          <div className="card-md space-y-4">
             <h2 className="section-title">Dokumente</h2>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                dragOver ? 'border-accent bg-accent-glow' : 'border-border hover:border-border-strong'
+              className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${
+                dragOver ? 'border-brand-500 bg-brand-50/50' : 'border-border hover:border-brand-300 bg-bg-secondary/50'
               }`}
             >
-              <div className="text-3xl mb-3">📎</div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white mx-auto mb-3 shadow-card">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
               <p className="text-sm text-text-secondary mb-2">
                 CV, Zeugnisse und weitere Unterlagen hier ablegen
               </p>
@@ -170,7 +173,7 @@ export default function NewCandidatePage() {
                       <button
                         type="button"
                         onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
-                        className="text-text-secondary hover:text-status-error transition-colors"
+                        className="text-text-secondary hover:text-rose-600 transition-colors"
                       >
                         ✕
                       </button>
@@ -182,8 +185,11 @@ export default function NewCandidatePage() {
           </div>
 
           {/* GDPR consent */}
-          <div className="card border-accent/20 bg-accent-glow space-y-3">
-            <h2 className="section-title">🛡 DSGVO-Einwilligung</h2>
+          <div className="card-md bg-brand-50/40 border-brand-200 space-y-3">
+            <h2 className="section-title flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              DSGVO-Einwilligung
+            </h2>
             <p className="text-xs text-text-secondary leading-relaxed">
               Gemäß Art. 6 DSGVO ist eine Rechtsgrundlage für die Verarbeitung personenbezogener Daten erforderlich.
               Bestätigen Sie, dass der Kandidat über die Referenzprüfung informiert wurde und seine Einwilligung erteilt hat.
@@ -193,7 +199,7 @@ export default function NewCandidatePage() {
                 type="checkbox"
                 checked={gdprConsent}
                 onChange={(e) => setGdprConsent(e.target.checked)}
-                className="mt-0.5 accent-accent"
+                className="mt-0.5 accent-brand-600"
               />
               <span className="text-sm text-text-primary">
                 Der Kandidat wurde über die Verarbeitung seiner personenbezogenen Daten informiert und hat
@@ -203,7 +209,7 @@ export default function NewCandidatePage() {
           </div>
 
           {error && (
-            <div className="bg-status-errorBg border border-status-error/20 rounded-lg px-4 py-3 text-sm text-status-error">
+            <div className="bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 text-sm text-rose-700">
               {error}
             </div>
           )}
@@ -225,6 +231,6 @@ export default function NewCandidatePage() {
           </div>
         </form>
       </div>
-    </div>
+    </>
   )
 }

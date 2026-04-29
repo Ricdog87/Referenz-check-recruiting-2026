@@ -14,11 +14,17 @@ model User {
   company       String
   password      String
   role          String        @default("CLIENT")
+  // HR_DEPARTMENT (interne HR-Abteilung im Unternehmen) | RECRUITMENT_AGENCY (Personaldienstleister/Headhunter)
+  accountType   String        @default("HR_DEPARTMENT")
+  // STARTER | PROFESSIONAL | BUSINESS | ENTERPRISE | AGENCY_BASIC | AGENCY_PRO | AGENCY_SCALE
+  plan          String        @default("STARTER")
+  trialEndsAt   DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   candidates    Candidate[]
   gdprConsents  GdprConsent[]
   auditLogs     AuditLog[]
+  addonOrders   AddonOrder[]
 }
 
 model Candidate {
@@ -105,6 +111,23 @@ model AuditLog {
   details   String?
   ip        String?
   createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AddonOrder {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // SINGLE_CHECK | CHECK_PACK_5 | CHECK_PACK_10 | INTERVIEW | EXPRESS_24H | BULK_CV
+  sku         String
+  quantity    Int      @default(1)
+  unitPrice   Int      // in cents
+  totalAmount Int      // in cents
+  status      String   @default("CONFIRMED") // CONFIRMED | DELIVERED | CANCELED | REFUNDED
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@index([userId])
 }

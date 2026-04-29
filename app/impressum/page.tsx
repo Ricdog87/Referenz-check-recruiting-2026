@@ -1,38 +1,45 @@
-import Link from 'next/link'
+import { LegalShell } from '@/components/landing/LegalShell'
+
+export const metadata = {
+  title: 'Impressum — candiq',
+}
 
 export default function ImpressumPage() {
   return (
-    <div className="min-h-screen bg-bg-primary text-text-primary">
-      <nav className="border-b border-border px-6 h-16 flex items-center justify-between max-w-4xl mx-auto">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 bg-accent rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">CQ</span>
-          </div>
-          <span className="font-semibold">candiq</span>
-        </Link>
-        <Link href="/" className="text-sm text-text-secondary hover:text-text-primary transition-colors">← Zurück</Link>
-      </nav>
+    <LegalShell title="Impressum" subtitle="Angaben gemäß § 5 TMG / § 55 Abs. 2 RStV">
+      <p>
+        <strong>candiq</strong> ist eine Marke der <strong>RSG Recruiting Solutions group GmbH</strong>.
+      </p>
 
-      <div className="max-w-3xl mx-auto px-6 py-16 space-y-6">
-        <h1 className="text-3xl font-bold">Impressum</h1>
-        <div className="text-sm text-text-secondary space-y-4 leading-relaxed">
-          <div>
-            <p className="text-text-primary font-medium">RSG Recruiting Solutions Group GmbH</p>
-            <p>Am heiligenahus 9</p>
-            <p>65207 Wiesbaden</p>
-            <p>Deutschland</p>
-          </div>
+      <h2>RSG Recruiting Solutions group GmbH</h2>
+      <p>
+        Geschäftsführer: Ricardo Serrano<br />
+        Am Heiligenhaus 9<br />
+        65207 Wiesbaden<br />
+        Deutschland
+      </p>
 
-          <div>
-            <p className="text-text-primary">candiq ist eine Marke der RSG Recruiting Solutions Group GmbH.</p>
-          </div>
+      <h3>Kontakt</h3>
+      <p>
+        Telefon: +49 176 60772556<br />
+        E-Mail: <a href="mailto:hello@candiq.de">hello@candiq.de</a>
+      </p>
 
-          <div>
-            <p>Geschäftsführer: Ricardo Serrano</p>
-            <p>Telefon: +49 176 60772556</p>
-          </div>
-        </div>
-      </div>
-    </div>
+      <h3>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h3>
+      <p>
+        Ricardo Serrano<br />
+        Am Heiligenhaus 9<br />
+        65207 Wiesbaden
+      </p>
+
+      <h3>Streitschlichtung</h3>
+      <p>
+        Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung bereit:{' '}
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
+          https://ec.europa.eu/consumers/odr
+        </a>. Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
+        Verbraucherschlichtungsstelle teilzunehmen.
+      </p>
+    </LegalShell>
   )
 }

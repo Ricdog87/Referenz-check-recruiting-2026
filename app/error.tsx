@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
+import { AlertTriangle } from 'lucide-react'
 
 export default function Error({
   error,
@@ -14,16 +16,19 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen bg-bg-primary flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <div className="text-5xl mb-4">⚠️</div>
-        <h1 className="text-2xl font-bold text-text-primary mb-3">Etwas ist schiefgelaufen</h1>
+        <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto mb-5 text-rose-600">
+          <AlertTriangle className="w-8 h-8" />
+        </div>
+        <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-3">Etwas ist schiefgelaufen</h1>
         <p className="text-text-secondary mb-8">
-          Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.
+          Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.
         </p>
-        <button onClick={reset} className="btn-primary">
-          Erneut versuchen
-        </button>
+        <div className="flex gap-2 justify-center">
+          <button onClick={reset} className="btn-primary">Erneut versuchen</button>
+          <Link href="/" className="btn-secondary">Zur Startseite</Link>
+        </div>
       </div>
     </div>
   )

@@ -1,5 +1,3 @@
-'use client'
-
 interface HeaderProps {
   title: string
   subtitle?: string
@@ -8,10 +6,10 @@ interface HeaderProps {
 
 export function Header({ title, subtitle, action }: HeaderProps) {
   return (
-    <div className="h-16 border-b border-border flex items-center justify-between px-6">
+    <div className="flex items-center justify-between py-7">
       <div>
-        <h1 className="text-lg font-semibold text-text-primary">{title}</h1>
-        {subtitle && <p className="text-xs text-text-secondary">{subtitle}</p>}
+        <h1 className="text-2xl lg:text-3xl font-bold text-text-primary tracking-tighter">{title}</h1>
+        {subtitle && <p className="text-sm text-text-secondary mt-1">{subtitle}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
