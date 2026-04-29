@@ -27,11 +27,18 @@ async function handle(req: NextRequest) {
     const profileKey = (url.searchParams.get('profile') ?? 'hr_basic') as keyof typeof DEMO_PROFILES
 
     if (req.method === 'GET') {
-      // lightweight DB health-check so UI can display meaningful state
-      await prisma.$queryRaw`SELECT 1`
+      // Lightweight DB health-check for UI status.
+      // Keep response non-failing so public pages don't render hard errors.
+      let db: 'up' | 'down' = 'up'
+      try {
+        await prisma.$queryRaw`SELECT 1`
+      } catch {
+        db = 'down'
+      }
+
       return NextResponse.json({
-        ok: true,
-        db: 'up',
+        ok: db === 'up',
+        db,
         profiles: Object.keys(DEMO_PROFILES),
       })
     }
