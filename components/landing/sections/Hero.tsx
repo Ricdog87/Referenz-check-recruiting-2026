@@ -89,7 +89,7 @@ export function Hero() {
               14 Tage kostenlos testen
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/login?demo=1" className="btn-secondary text-base py-3.5 px-7">
+            <Link href="/demo" className="btn-secondary text-base py-3.5 px-7">
               <Zap className="w-4 h-4 text-brand-600" />
               Live-Demo ansehen
             </Link>

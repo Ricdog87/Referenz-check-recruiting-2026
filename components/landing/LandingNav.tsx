@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Zap } from 'lucide-react'
 
 export function LandingNav() {
   const { scrollY } = useScroll()
@@ -45,6 +45,10 @@ export function LandingNav() {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          <Link href="/demo" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-800 px-3 py-2 rounded-full transition-colors hover:bg-brand-50">
+            <Zap className="w-3.5 h-3.5" />
+            Live-Demo
+          </Link>
           <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-text-primary px-4 py-2 rounded-full transition-colors">
             Anmelden
           </Link>
@@ -71,6 +75,9 @@ export function LandingNav() {
           <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">PDL-Warteliste</Link>
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Preise</Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">
+            <Link href="/demo" onClick={() => setOpen(false)} className="btn-secondary w-full flex items-center justify-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-brand-600" />Live-Demo
+            </Link>
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>
             <Link href="/register" onClick={() => setOpen(false)} className="btn-primary w-full">Kostenlos starten</Link>
           </div>
