@@ -2,11 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 const VALID_ACCOUNT_TYPES = ['HR_DEPARTMENT']
 const VALID_PLANS = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE']
 
 export async function POST(req: NextRequest) {
+  // Rate limit: max 5 registrations per IP per hour
+  const ip = getClientIp(req)
+  const rl = rateLimit(`register:${ip}`, 5, 60 * 60 * 1000)
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: `Zu viele Registrierungsversuche. Bitte in ${Math.ceil(rl.retryAfter / 60)} Minuten erneut versuchen.` },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+    )
+  }
+
   try {
     const { name, company, email, password, gdprAccepted, accountType, plan } = await req.json()
     const cleanName = (name ?? '').trim()
@@ -42,8 +53,6 @@ export async function POST(req: NextRequest) {
     }
 
     const hashed = await bcrypt.hash(password, 12)
-    const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown'
-
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + 14)
 

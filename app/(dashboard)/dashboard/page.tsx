@@ -9,6 +9,7 @@ import {
   Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
 } from 'lucide-react'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -29,6 +30,8 @@ export default async function DashboardPage() {
     recentChecks,
     candidateStatusGroups,
     allChecks,
+    consentedCandidates,
+    addonOrders,
   ] = await Promise.all([
     prisma.candidate.count({ where: { userId } }),
     prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }),
@@ -54,6 +57,8 @@ export default async function DashboardPage() {
       where: { candidate: { userId } },
       select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
     }),
+    prisma.candidate.count({ where: { userId, gdprConsent: true } }),
+    prisma.addonOrder.count({ where: { userId } }),
   ])
 
   const totalChecks = openChecks + inProgressChecks + completedChecks
@@ -158,6 +163,14 @@ export default async function DashboardPage() {
       />
 
       <div className="space-y-6">
+        {/* Onboarding checklist (auto-hides when complete) */}
+        <OnboardingChecklist
+          candidateCount={totalCandidates}
+          checkCount={totalChecks}
+          hasGdprConsent={consentedCandidates > 0}
+          hasAddon={addonOrders > 0}
+        />
+
         {/* Stats grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s) => <StatCard key={s.label} {...s} />)}
