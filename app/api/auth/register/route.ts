@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     const cleanName = (name ?? '').trim()
     const cleanCompany = (company ?? '').trim()
     const cleanEmail = (email ?? '').trim().toLowerCase()
+
     if (accountType === 'RECRUITMENT_AGENCY') {
       return NextResponse.json(
         { error: 'PDL-Konten sind aktuell in der Closed Beta. Bitte nutzen Sie die Warteliste unter /waitlist-agency.' },
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'DSGVO-Einwilligung erforderlich.' }, { status: 400 })
     }
     if (password.length < 8) {
-      return NextResponse.json({ error: 'Passwort zu kurz.' }, { status: 400 })
+      return NextResponse.json({ error: 'Passwort muss mindestens 8 Zeichen haben.' }, { status: 400 })
     }
 
     const existing = await prisma.user.findFirst({
@@ -37,13 +38,12 @@ export async function POST(req: NextRequest) {
       select: { id: true },
     })
     if (existing) {
-      return NextResponse.json({ error: 'E-Mail bereits registriert.' }, { status: 409 })
+      return NextResponse.json({ error: 'Diese E-Mail-Adresse ist bereits registriert.' }, { status: 409 })
     }
 
     const hashed = await bcrypt.hash(password, 12)
-    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
+    const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown'
 
-    // 14-day trial
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + 14)
 
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
             type: 'REGISTRATION',
             granted: true,
             ip,
-            userAgent: req.headers.get('user-agent') || '',
+            userAgent: req.headers.get('user-agent') ?? '',
           },
         },
       },
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
-        return NextResponse.json({ error: 'E-Mail bereits registriert.' }, { status: 409 })
+        return NextResponse.json({ error: 'Diese E-Mail-Adresse ist bereits registriert.' }, { status: 409 })
       }
       if (error.code === 'P1001' || error.code === 'P1002') {
         return NextResponse.json(
@@ -83,12 +83,35 @@ export async function POST(req: NextRequest) {
       }
       if (error.code === 'P2021') {
         return NextResponse.json(
-          { error: 'Datenbank noch nicht initialisiert. Bitte Support kontaktieren.' },
+          { error: 'Datenbank-Setup noch nicht abgeschlossen. Bitte support@candiq.de kontaktieren.' },
+          { status: 503 }
+        )
+      }
+      if (error.code === 'P2022') {
+        return NextResponse.json(
+          { error: 'Datenbank-Schema veraltet. Bitte support@candiq.de kontaktieren.' },
           { status: 503 }
         )
       }
     }
 
-    return NextResponse.json({ error: 'Interner Fehler.' }, { status: 500 })
+    if (error instanceof Prisma.PrismaClientInitializationError) {
+      return NextResponse.json(
+        { error: 'Datenbankverbindung konnte nicht hergestellt werden. Bitte später erneut versuchen.' },
+        { status: 503 }
+      )
+    }
+
+    if (error instanceof Prisma.PrismaClientUnknownRequestError) {
+      return NextResponse.json(
+        { error: 'Unbekannter Datenbankfehler. Bitte support@candiq.de kontaktieren.' },
+        { status: 503 }
+      )
+    }
+
+    return NextResponse.json(
+      { error: 'Registrierung fehlgeschlagen. Bitte support@candiq.de kontaktieren.' },
+      { status: 500 }
+    )
   }
 }
