@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { Building2, Users2, ShieldCheck, Loader2, ArrowRight, Check } from 'lucide-react'
 import { ACCOUNT_TYPES, type AccountType, getPlanById } from '@/lib/utils'
@@ -48,10 +49,29 @@ function RegisterForm() {
     })
 
     const data = await res.json()
+
+    if (!res.ok) {
+      setError(data.error || 'Registrierung fehlgeschlagen.')
+      setLoading(false)
+      return
+    }
+
+    // Auto sign-in so the user lands directly on the dashboard
+    const signInRes = await signIn('credentials', {
+      email: form.email.trim().toLowerCase(),
+      password: form.password,
+      redirect: false,
+    })
+
     setLoading(false)
 
-    if (!res.ok) { setError(data.error || 'Registrierung fehlgeschlagen.'); return }
-    router.push('/login?registered=1')
+    if (signInRes?.error) {
+      // Account created but auto-login failed — fall back to login screen
+      router.push('/login?registered=1')
+    } else {
+      router.push('/dashboard')
+      router.refresh()
+    }
   }
 
   return (

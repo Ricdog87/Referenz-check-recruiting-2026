@@ -315,34 +315,6 @@ export default async function DashboardPage() {
 
         {/* Activity feed (audit trail summary) */}
         <ActivityFeed events={recentEvents} />
-
-        {/* Empty state for new accounts */}
-        {totalCandidates === 0 && (
-          <div className="card-lg shadow-card-lg relative overflow-hidden bg-gradient-to-br from-brand-50/60 to-violet/5">
-            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-gradient-to-br from-brand-300 to-violet opacity-30 blur-3xl" />
-            <div className="relative flex flex-col md:flex-row items-start gap-6">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card flex-shrink-0">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-text-primary mb-2">
-                  Willkommen{isAgency ? ', Recruiting Pro' : ''} bei candiq
-                </h3>
-                <p className="text-sm text-text-secondary mb-5 max-w-2xl">
-                  Beginnen Sie mit dem Anlegen Ihres ersten Kandidaten. CV hochladen, Referenzen erfassen — wir kümmern uns um den Rest.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Link href="/candidates/new" className="btn-primary text-sm">
-                    <Plus className="w-4 h-4" /> Ersten Kandidaten anlegen
-                  </Link>
-                  <Link href="/integrations" className="btn-secondary text-sm">
-                    ATS verbinden
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   )
