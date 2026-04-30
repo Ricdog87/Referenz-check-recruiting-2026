@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
+import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -32,6 +33,7 @@ export default async function DashboardPage() {
     allChecks,
     consentedCandidates,
     addonOrders,
+    recentEvents,
   ] = await Promise.all([
     prisma.candidate.count({ where: { userId } }),
     prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }),
@@ -59,6 +61,12 @@ export default async function DashboardPage() {
     }),
     prisma.candidate.count({ where: { userId, gdprConsent: true } }),
     prisma.addonOrder.count({ where: { userId } }),
+    prisma.auditLog.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+      select: { id: true, action: true, entity: true, details: true, createdAt: true },
+    }),
   ])
 
   const totalChecks = openChecks + inProgressChecks + completedChecks
@@ -304,6 +312,9 @@ export default async function DashboardPage() {
             )}
           </div>
         </div>
+
+        {/* Activity feed (audit trail summary) */}
+        <ActivityFeed events={recentEvents} />
 
         {/* Empty state for new accounts */}
         {totalCandidates === 0 && (

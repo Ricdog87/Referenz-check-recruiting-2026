@@ -76,6 +76,17 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    await prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'REGISTRATION',
+        entity: 'User',
+        entityId: user.id,
+        details: `Konto erstellt · Plan: ${cleanPlan} · Trial bis ${trialEndsAt.toISOString().slice(0, 10)}`,
+        ip,
+      },
+    })
+
     return NextResponse.json({ id: user.id }, { status: 201 })
   } catch (error) {
     console.error('register_error', error)

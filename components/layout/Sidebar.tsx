@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
-  Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag,
+  Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag, ScrollText,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
 
@@ -23,6 +23,7 @@ const NAV_AGENCY_ONLY = [
 
 const NAV_INTEGRATIONS = [
   { href: '/integrations', label: 'Integrationen', icon: Plug },
+  { href: '/audit', label: 'Audit-Trail', icon: ScrollText },
 ]
 
 export function Sidebar() {
