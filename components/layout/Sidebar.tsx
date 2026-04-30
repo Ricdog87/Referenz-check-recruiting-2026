@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
-  Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag, ScrollText,
+  Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag, ScrollText, X,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
+import { useMobileSidebar } from './MobileSidebarContext'
 
 const NAV_BASE = [
   { href: '/dashboard', label: 'Übersicht', icon: LayoutDashboard },
@@ -29,6 +30,7 @@ const NAV_INTEGRATIONS = [
 export function Sidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const { open, setOpen } = useMobileSidebar()
   const isAgency = session?.user?.accountType === 'RECRUITMENT_AGENCY'
 
   const nav = [
@@ -37,10 +39,24 @@ export function Sidebar() {
   ]
 
   return (
-    <aside className="w-60 min-h-screen flex flex-col flex-shrink-0 bg-white border-r border-border sticky top-0 h-screen">
+    <>
+      {/* Mobile overlay */}
+      <div
+        onClick={() => setOpen(false)}
+        className={`lg:hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm transition-opacity ${
+          open ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden="true"
+      />
+
+      <aside
+        className={`fixed lg:sticky top-0 left-0 z-50 w-60 h-screen flex flex-col flex-shrink-0 bg-white border-r border-border transition-transform duration-300 ease-out ${
+          open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+      >
 
       {/* Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-border">
+      <div className="h-16 flex items-center px-5 border-b border-border justify-between">
         <Link href="/dashboard" className="flex items-center gap-2.5 group">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center"
             style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)', boxShadow: '0 4px 14px rgba(79,70,229,0.3)' }}>
@@ -53,6 +69,13 @@ export function Sidebar() {
             </div>
           </div>
         </Link>
+        <button
+          onClick={() => setOpen(false)}
+          className="lg:hidden p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-secondary"
+          aria-label="Menü schließen"
+        >
+          <X className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Nav */}
@@ -100,13 +123,14 @@ export function Sidebar() {
           </div>
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
-            className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg text-text-muted hover:text-rose-600 hover:bg-rose-50"
+            className="lg:opacity-0 lg:group-hover:opacity-100 transition-opacity p-1.5 rounded-lg text-text-muted hover:text-rose-600 hover:bg-rose-50"
             title="Abmelden">
             <LogOut className="w-4 h-4" />
           </button>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   )
 }
 
