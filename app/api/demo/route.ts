@@ -182,6 +182,17 @@ async function handle(req: NextRequest) {
       }
     }
 
+    await prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        action: 'LOGIN',
+        entity: 'User',
+        entityId: user.id,
+        details: `Demo-Login (${profileKey})`,
+        ip,
+      },
+    })
+
     return NextResponse.json({
       ok: true,
       email: profile.email,
