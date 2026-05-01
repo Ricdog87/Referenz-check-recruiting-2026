@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { ensureSchema, withDbRecovery } from '@/lib/db-init'
 
 const VALID_ACCOUNT_TYPES = ['HR_DEPARTMENT']
 const VALID_PLANS = ['STARTER', 'PROFESSIONAL', 'BUSINESS', 'ENTERPRISE']
@@ -19,6 +20,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    await ensureSchema()
+
     const { name, company, email, password, gdprAccepted, accountType, plan } = await req.json()
     const cleanName = (name ?? '').trim()
     const cleanCompany = (company ?? '').trim()
@@ -44,10 +47,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Passwort muss mindestens 8 Zeichen haben.' }, { status: 400 })
     }
 
-    const existing = await prisma.user.findFirst({
-      where: { email: { equals: cleanEmail, mode: 'insensitive' } },
-      select: { id: true },
-    })
+    const existing = await withDbRecovery(() =>
+      prisma.user.findFirst({
+        where: { email: { equals: cleanEmail, mode: 'insensitive' } },
+        select: { id: true },
+      }),
+    )
     if (existing) {
       return NextResponse.json({ error: 'Diese E-Mail-Adresse ist bereits registriert.' }, { status: 409 })
     }
@@ -56,36 +61,40 @@ export async function POST(req: NextRequest) {
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + 14)
 
-    const user = await prisma.user.create({
-      data: {
-        name: cleanName,
-        company: cleanCompany,
-        email: cleanEmail,
-        password: hashed,
-        accountType: cleanAccountType,
-        plan: cleanPlan,
-        trialEndsAt,
-        gdprConsents: {
-          create: {
-            type: 'REGISTRATION',
-            granted: true,
-            ip,
-            userAgent: req.headers.get('user-agent') ?? '',
+    const user = await withDbRecovery(() =>
+      prisma.user.create({
+        data: {
+          name: cleanName,
+          company: cleanCompany,
+          email: cleanEmail,
+          password: hashed,
+          accountType: cleanAccountType,
+          plan: cleanPlan,
+          trialEndsAt,
+          gdprConsents: {
+            create: {
+              type: 'REGISTRATION',
+              granted: true,
+              ip,
+              userAgent: req.headers.get('user-agent') ?? '',
+            },
           },
         },
-      },
-    })
+      }),
+    )
 
-    await prisma.auditLog.create({
-      data: {
-        userId: user.id,
-        action: 'REGISTRATION',
-        entity: 'User',
-        entityId: user.id,
-        details: `Konto erstellt · Plan: ${cleanPlan} · Trial bis ${trialEndsAt.toISOString().slice(0, 10)}`,
-        ip,
-      },
-    })
+    await withDbRecovery(() =>
+      prisma.auditLog.create({
+        data: {
+          userId: user.id,
+          action: 'REGISTRATION',
+          entity: 'User',
+          entityId: user.id,
+          details: `Konto erstellt · Plan: ${cleanPlan} · Trial bis ${trialEndsAt.toISOString().slice(0, 10)}`,
+          ip,
+        },
+      }),
+    )
 
     return NextResponse.json({ id: user.id }, { status: 201 })
   } catch (error) {
