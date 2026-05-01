@@ -37,7 +37,7 @@ export function ROICalculator() {
               Was kostet Sie eine <span className="text-gradient-brand">Fehlbesetzung?</span>
             </h2>
             <p className="text-base text-text-secondary leading-relaxed">
-              Bewegen Sie die Regler — wir zeigen Ihnen, wie viel candiq Ihnen jährlich spart.
+              Bewegen Sie die Regler — und sehen Sie, wie groß Ihr Einsparpotenzial mit candiq plausibel sein kann (Modellrechnung, basierend auf SHRM- &amp; Bain-Daten zu Fehlbesetzungskosten).
             </p>
           </div>
         </Reveal>
@@ -96,7 +96,7 @@ export function ROICalculator() {
               <div className="relative">
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/70 mb-2">
                   <TrendingUp className="w-4 h-4" />
-                  Ihr potenzielles Einsparungs-Potenzial
+                  Ihr potenzielles Einsparpotenzial
                 </div>
                 <div className="text-5xl md:text-6xl font-black tracking-tighter mb-1">
                   {netRoi > 0 ? `${Math.round(netRoi).toLocaleString('de-DE')} €` : '—'}

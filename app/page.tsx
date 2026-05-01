@@ -3,12 +3,12 @@ import { Hero } from '@/components/landing/sections/Hero'
 import { TrustBar } from '@/components/landing/sections/TrustBar'
 import { Problem } from '@/components/landing/sections/Problem'
 import { HowItWorks } from '@/components/landing/sections/HowItWorks'
-import { TwoAudiences } from '@/components/landing/sections/TwoAudiences'
 import { Features } from '@/components/landing/sections/Features'
-import { ROICalculator } from '@/components/landing/sections/ROICalculator'
-import { PricingPreview } from '@/components/landing/sections/PricingPreview'
+import { TwoAudiences } from '@/components/landing/sections/TwoAudiences'
 import { Testimonials } from '@/components/landing/sections/Testimonials'
+import { ROICalculator } from '@/components/landing/sections/ROICalculator'
 import { CompliancePromise } from '@/components/landing/sections/CompliancePromise'
+import { PricingPreview } from '@/components/landing/sections/PricingPreview'
 import { FinalCta } from '@/components/landing/sections/FinalCta'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 
@@ -20,12 +20,12 @@ export default function LandingPage() {
       <TrustBar />
       <Problem />
       <HowItWorks />
-      <TwoAudiences />
       <Features />
-      <ROICalculator />
-      <PricingPreview />
+      <TwoAudiences />
       <Testimonials />
+      <ROICalculator />
       <CompliancePromise />
+      <PricingPreview />
       <FinalCta />
       <LandingFooter />
     </div>

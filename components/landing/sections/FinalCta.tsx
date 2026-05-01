@@ -26,20 +26,20 @@ export function FinalCta() {
 
           <h2 className="text-[clamp(40px,6vw,72px)] font-black tracking-tightest mb-6 leading-[1.05]">
             Heute starten. <br />
-            <span className="text-gradient-brand">Morgen sicherer einstellen.</span>
+            <span className="text-gradient-brand">Morgen sauberer einstellen.</span>
           </h2>
 
           <p className="text-lg text-text-secondary mb-10 max-w-xl mx-auto leading-relaxed">
-            Schließen Sie sich über 200 HR-Teams und Personaldienstleistern an, die bereits mit candiq ihre Hiring-Quote verbessert haben.
+            14 Tage kostenlos testen — ohne Kreditkarte. Konto in 60 Sekunden eingerichtet, jederzeit kündbar.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link href="/register" className="btn-primary text-base py-4 px-8 group">
-              Konto erstellen
+              Kostenlos starten
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/login?demo=1" className="btn-secondary text-base py-4 px-8">
-              Live-Demo testen
+            <Link href="/demo" className="btn-secondary text-base py-4 px-8">
+              Live-Demo öffnen
             </Link>
           </div>
 

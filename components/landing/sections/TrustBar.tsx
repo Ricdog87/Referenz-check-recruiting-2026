@@ -9,7 +9,7 @@ export function TrustBar() {
       <div className="max-w-7xl mx-auto px-6">
         <Reveal>
           <div className="text-center text-xs font-semibold text-text-muted uppercase tracking-widest mb-5">
-            Vertraut von HR-Teams & Personaldienstleistern in DACH
+            Gebaut für HR-Teams und Personaldienstleister im DACH-Raum
           </div>
           <Marquee />
         </Reveal>

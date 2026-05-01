@@ -11,14 +11,14 @@ const audiences = [
     badge: 'Inhouse Recruiting',
     title: 'HR-Abteilungen',
     description:
-      'Ihr internes Recruiting-Team verifiziert Kandidaten für Festanstellungen. Sie wollen Fehlbesetzungen vermeiden, ohne sich in Telefonate zu verlieren.',
+      'Sie stellen für Ihr eigenes Unternehmen ein. Sie wollen Bewerber sauber vorqualifizieren, ohne dass das Team in Reference-Calls versinkt.',
     bullets: [
-      'Strukturierte Reference-Workflows pro Abteilung',
-      'ATS-Integration (Personio, SAP SF, Workday)',
+      'Strukturierte Reference-Workflows pro Rolle',
+      'Verifizierte Stationen vor dem Erstgespräch',
       'Audit-Trail für Compliance & Wirtschaftsprüfer',
-      'White-Label-Reports für Hiring Manager',
+      'Berichte direkt teilbar mit Hiring Manager',
     ],
-    cta: 'Pakete für HR-Teams',
+    cta: 'Pakete für HR-Teams ansehen',
     href: '/preise#hr',
     gradient: 'from-brand-500 via-brand-600 to-violet',
     bg: 'from-brand-50/60 to-white',
@@ -26,14 +26,14 @@ const audiences = [
   {
     icon: Users2,
     badge: 'Personaldienstleister',
-    title: 'Personaldienstleister (bald verfügbar)',
+    title: 'Personaldienstleister (Closed Beta)',
     description:
-      'Spezielle Multi-Mandanten-Workflows, White-Label-Reports und API-Zugänge für PDLer — aktuell in der finalen Testphase. Melden Sie sich für den frühen Zugang an.',
+      'Sie liefern Kandidaten an Endkunden — und Ihr Wert hängt davon ab, dass die Vorqualifizierung wirklich stimmt. PDL-Pakete mit Multi-Mandanten und White-Label sind aktuell in Closed Beta.',
     bullets: [
       'Geplant: Mandanten-Verwaltung mit eigenen Workflows',
-      'Kommt bald: White-Label inkl. Logo, Domain & Reports',
-      'Geplant: Bulk-Upload bis 500 Kandidaten (CSV)',
-      'Kommt bald: API + Webhook-Integration in Ihre Systeme',
+      'Geplant: White-Label inkl. Logo & Reports',
+      'Geplant: Bulk-Upload für ganze Pipelines',
+      'Geplant: API & Webhooks für Ihre Systeme',
     ],
     cta: 'Frühen Zugang anfragen',
     href: '/waitlist-agency',
@@ -52,12 +52,11 @@ export function TwoAudiences() {
               Für wen ist candiq?
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
-              Zwei Zielgruppen. <br className="hidden sm:block" />
-              <span className="text-gradient-brand">Eine Plattform.</span>
+              Für interne HR-Teams <br className="hidden sm:block" />
+              und <span className="text-gradient-brand">Personaldienstleister.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Egal ob Sie intern für Ihr Unternehmen einstellen oder professionell vermitteln — wir haben den passenden Rollout.
-              HR-Pakete sind heute vollständig verfügbar; PDL-Pakete folgen nach der Closed-Beta-Phase.
+              HR-Pakete sind heute live und produktiv nutzbar. Pakete für Personaldienstleister mit Multi-Mandanten und White-Label folgen nach der Closed-Beta-Phase — frühen Zugang können Sie heute anfragen.
             </p>
           </div>
         </Reveal>

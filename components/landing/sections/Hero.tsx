@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { ArrowRight, ShieldCheck, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, ShieldCheck, Sparkles, Play, Clock3, FileCheck2, BadgeCheck } from 'lucide-react'
 import { Hero3D } from '../Hero3D'
-import { AnimatedCounter } from '../AnimatedCounter'
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null)
@@ -42,27 +41,19 @@ export function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600" />
             </span>
-            <span className="text-text-primary">Neu: Multi-Mandanten-Workflow für Personaldienstleister</span>
-            <ArrowRight className="w-3 h-3 text-brand-600" />
+            <span className="text-text-primary">Für HR-Teams · DSGVO-konform · Server in Deutschland</span>
           </motion.div>
-          <div className="mb-6">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-violet/10 text-violet border border-violet/20">
-              Closed Beta für Personaldienstleister – PDL-Pakete bald verfügbar.
-            </span>
-          </div>
 
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-[clamp(40px,6.5vw,76px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary"
+            className="text-[clamp(40px,6.5vw,72px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary"
           >
-            <span className="block">Schluss mit</span>
-            <span className="block">
-              <span className="text-gradient-brand">KI-Bewerbungen</span>
-            </span>
-            <span className="block">die nicht stimmen.</span>
+            <span className="block">Bewerber, die auf dem Papier</span>
+            <span className="block">perfekt aussehen —</span>
+            <span className="block"><span className="text-gradient-brand">aber sind sie es auch?</span></span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -72,9 +63,9 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9"
           >
-            <span className="font-semibold text-text-primary">candiq</span> verifiziert Referenzen, Zeugnisse und Tätigkeiten Ihrer Kandidaten —
-            DSGVO-konform, in unter <span className="font-semibold text-brand-700">48 Stunden</span>.
-            Vermeiden Sie Fehlbesetzungen, die Sie <span className="font-semibold text-text-primary">€ 50.000+</span> kosten.
+            ChatGPT schreibt jeden Lebenslauf passend zur Stelle. <span className="font-semibold text-text-primary">candiq</span> verifiziert,
+            was wirklich stimmt — Referenzen, Stationen, Tätigkeiten — bevor Sie Ihr nächstes Interview verschwenden.
+            Strukturierter Report in unter 48 Stunden.
           </motion.p>
 
           {/* CTAs */}
@@ -82,7 +73,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-3 mb-10"
+            className="flex flex-col sm:flex-row gap-3 mb-6"
           >
             <Link href="/register" className="btn-primary text-base py-3.5 px-7 group">
               <Sparkles className="w-4 h-4" />
@@ -90,50 +81,36 @@ export function Hero() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link href="/demo" className="btn-secondary text-base py-3.5 px-7">
-              <Zap className="w-4 h-4 text-brand-600" />
-              Live-Demo ansehen
+              <Play className="w-4 h-4 text-brand-600" />
+              Live-Demo öffnen
             </Link>
           </motion.div>
-          <div className="mb-10">
-            <Link href="/waitlist-agency" className="text-sm text-text-secondary hover:text-text-primary underline decoration-dotted underline-offset-4">
-              Sie sind Personaldienstleister? PDL-Features sind bald verfügbar – jetzt für frühen Zugang vormerken.
-            </Link>
+
+          {/* Microcopy under CTAs */}
+          <div className="text-xs text-text-muted mb-10">
+            Keine Kreditkarte · in 60 Sekunden eingerichtet · jederzeit kündbar
           </div>
 
-          {/* Trust line */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex items-center gap-5 text-xs text-text-muted"
-          >
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" /> DSGVO-konform
-            </div>
-            <span className="w-1 h-1 rounded-full bg-text-muted/50" />
-            <div>Server in Deutschland</div>
-            <span className="w-1 h-1 rounded-full bg-text-muted/50" />
-            <div>Keine Kreditkarte nötig</div>
-          </motion.div>
-
-          {/* Stats row */}
+          {/* Value pills (concrete, no fabricated numbers) */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7 }}
-            className="grid grid-cols-3 gap-6 mt-12 pt-8 border-t border-border"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-10 pt-8 border-t border-border"
           >
             {[
-              { v: 94, suffix: ' %', l: 'Verifiziert' },
-              { v: 48, suffix: ' h', l: 'Durchlaufzeit' },
-              { v: 1200, prefix: '+', l: 'Geprüfte Kandidaten' },
-            ].map((s) => (
-              <div key={s.l}>
-                <div className="text-3xl font-bold text-text-primary">
-                  {s.prefix && <span>{s.prefix}</span>}
-                  <AnimatedCounter value={s.v} suffix={s.suffix ?? ''} />
+              { icon: Clock3, k: 'Unter 48 h', v: 'Vom Auftrag bis zum Report' },
+              { icon: FileCheck2, k: 'Strukturierter Report', v: 'Verifiziert · Diskrepanz · Notizen' },
+              { icon: BadgeCheck, k: 'Echte Telefonate', v: 'Geschulte Reviewer, keine Bots' },
+            ].map(({ icon: Icon, k, v }) => (
+              <div key={k} className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-brand-600" />
                 </div>
-                <div className="text-xs text-text-muted uppercase tracking-wider mt-1 font-medium">{s.l}</div>
+                <div>
+                  <div className="text-sm font-semibold text-text-primary">{k}</div>
+                  <div className="text-xs text-text-muted leading-snug">{v}</div>
+                </div>
               </div>
             ))}
           </motion.div>
