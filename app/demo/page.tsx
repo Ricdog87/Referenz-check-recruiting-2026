@@ -245,22 +245,36 @@ function DemoCard({ demo, onStart, isLoading, isDisabled }: {
 export default function DemoPage() {
   const router = useRouter()
   const [loading, setLoading] = useState<DemoKey | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<{ message: string; retryable: boolean; key: DemoKey } | null>(null)
 
-  async function startDemo(key: DemoKey) {
+  async function startDemo(key: DemoKey, attempt = 0): Promise<void> {
     if (loading) return
     setError(null)
     setLoading(key)
     try {
       const res = await fetch(`/api/demo?type=${key}`, { method: 'POST', cache: 'no-store' })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Demo konnte nicht geladen werden.')
+      if (!res.ok) {
+        // One automatic silent retry for retryable failures (cold start / transient DB).
+        if (data.retryable && attempt === 0) {
+          await new Promise((r) => setTimeout(r, 1200))
+          return startDemo(key, 1)
+        }
+        throw Object.assign(
+          new Error(data.error ?? 'Demo konnte nicht geladen werden.'),
+          { retryable: !!data.retryable },
+        )
+      }
       const result = await signIn('credentials', { email: data.email, password: data.password, redirect: false })
-      if (result?.error) throw new Error('Anmeldung fehlgeschlagen — bitte erneut versuchen.')
+      if (result?.error) throw Object.assign(new Error('Anmeldung fehlgeschlagen — bitte erneut versuchen.'), { retryable: true })
       router.push('/dashboard')
       router.refresh()
     } catch (e: any) {
-      setError(e.message ?? 'Demo nicht verfügbar.')
+      setError({
+        message: e.message ?? 'Demo gerade nicht verfügbar.',
+        retryable: e.retryable ?? true,
+        key,
+      })
       setLoading(null)
     }
   }
@@ -380,11 +394,39 @@ export default function DemoPage() {
       <section className="px-6 pb-10 max-w-6xl mx-auto">
         {error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-6 px-4 py-3 rounded-2xl text-sm text-rose-700 bg-rose-50 border border-rose-200 text-center max-w-lg mx-auto"
+            initial={{ opacity: 0, scale: 0.95, y: -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="mb-6 mx-auto max-w-xl rounded-2xl border border-amber-200 bg-amber-50/80 backdrop-blur-sm px-5 py-4 shadow-card"
           >
-            {error}
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-4 h-4 text-amber-700" />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-amber-900 mb-0.5">
+                  {error.retryable ? 'Demo wird gerade vorbereitet' : 'Demo aktuell nicht verfügbar'}
+                </div>
+                <p className="text-xs text-amber-800/90 leading-relaxed mb-3">
+                  {error.message}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {error.retryable && (
+                    <button
+                      onClick={() => startDemo(error.key)}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-amber-600 text-white hover:bg-amber-700 transition-colors"
+                    >
+                      <Loader2 className="w-3 h-3" /> Erneut versuchen
+                    </button>
+                  )}
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
+                  >
+                    Stattdessen kostenloses Konto erstellen <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
 
