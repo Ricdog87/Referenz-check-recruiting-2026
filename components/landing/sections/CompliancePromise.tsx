@@ -35,14 +35,14 @@ export function CompliancePromise() {
                   <span className="bg-gradient-to-r from-cyan-300 via-violet-300 to-brand-300 bg-clip-text text-transparent">kein Add-on.</span>
                 </h2>
                 <p className="text-base text-white/70 leading-relaxed mb-6 max-w-md">
-                  Wir verarbeiten sensible Personaldaten — und behandeln sie auch so. Unsere gesamte Plattform wurde nach Privacy-by-Design-Prinzipien gebaut.
+                  Wir verarbeiten sensible Personaldaten — und behandeln sie auch so. Die Plattform ist nach Privacy-by-Design-Prinzipien gebaut, AVV-fähig ab Tag 1.
                 </p>
                 <div className="flex flex-wrap items-center gap-3 text-xs text-white/60">
-                  <span>🇩🇪 Made in Germany</span>
+                  <span>Made in Germany</span>
                   <span className="w-1 h-1 rounded-full bg-white/30" />
-                  <span>BAFA-gefördert</span>
+                  <span>Hosting in deutschen Rechenzentren</span>
                   <span className="w-1 h-1 rounded-full bg-white/30" />
-                  <span>SOC 2 Type II in Vorbereitung</span>
+                  <span>AVV nach Art. 28 DSGVO</span>
                 </div>
               </div>
 

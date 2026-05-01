@@ -77,8 +77,8 @@ function RegisterForm() {
   return (
     <div className="animate-slide-up">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-2">Konto erstellen</h1>
-        <p className="text-text-secondary">14 Tage kostenlos · keine Kreditkarte nötig</p>
+        <h1 className="text-3xl font-bold text-text-primary tracking-tight mb-2">In 60 Sekunden startklar</h1>
+        <p className="text-text-secondary">14 Tage kostenlos testen · keine Kreditkarte · jederzeit kündbar</p>
       </div>
 
       {/* Step indicator */}

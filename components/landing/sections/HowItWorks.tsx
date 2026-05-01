@@ -9,22 +9,22 @@ const steps = [
   {
     n: '01',
     icon: Upload,
-    title: 'Kandidat anlegen',
-    body: 'CV hochladen, frühere Arbeitgeber & Referenzpersonen erfassen. DSGVO-Einwilligung wird automatisch dokumentiert.',
+    title: 'Kandidat & Stationen erfassen',
+    body: 'CV hochladen, frühere Arbeitgeber und Referenzpersonen ergänzen. Die DSGVO-Einwilligung wird automatisch eingeholt und dokumentiert.',
     accent: 'from-brand-500 to-brand-600',
   },
   {
     n: '02',
     icon: Phone,
-    title: 'Referenzen werden geprüft',
-    body: 'Unsere geschulten Mitarbeiter nehmen telefonisch Kontakt auf, verifizieren Position, Zeitraum, Tätigkeiten und Performance.',
+    title: 'Referenzen werden verifiziert',
+    body: 'Geschulte Reviewer prüfen telefonisch Position, Zeitraum, Verantwortung und Stärken. Keine Bots, keine generischen E-Mail-Tickets.',
     accent: 'from-brand-600 to-violet',
   },
   {
     n: '03',
     icon: FileCheck,
-    title: 'Audit-Report erhalten',
-    body: 'Strukturierter PDF-Report mit Ergebnis (verifiziert / Diskrepanz), Gesprächsnotizen und vollständigem Audit-Trail.',
+    title: 'Strukturierter Report',
+    body: 'PDF-Report mit klarer Bewertung (verifiziert / Diskrepanz), Gesprächsnotizen und vollständigem Audit-Trail — direkt teilbar mit Hiring Manager und Compliance.',
     accent: 'from-violet to-cyan',
   },
 ]
@@ -43,10 +43,10 @@ export function HowItWorks() {
               So funktioniert's
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
-              In 3 Schritten zur <span className="text-gradient-brand">verlässlichen Einstellung.</span>
+              Drei Schritte. <span className="text-gradient-brand">Verlässliches Signal.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Von der Kandidatenanlage bis zum Audit-Report — typischerweise unter 48 Stunden.
+              Vom Kandidaten-Upload bis zum strukturierten Report — typischerweise in unter 48 Stunden.
             </p>
           </div>
         </Reveal>

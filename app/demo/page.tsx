@@ -327,7 +327,7 @@ export default function DemoPage() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600" />
             </span>
-            Live-Demo · Kein Konto · Sofort einsatzbereit
+            Live · Kein Konto · Echte Produktdaten
           </motion.div>
 
           {/* Headline */}
@@ -337,9 +337,9 @@ export default function DemoPage() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-[clamp(36px,6vw,68px)] font-black tracking-tightest leading-[1.02] mb-6 text-text-primary"
           >
-            Erleben Sie{' '}
+            Sehen Sie sich{' '}
             <span className="text-gradient-brand">candiq</span>
-            <br />in Echtzeit
+            <br />in 10 Sekunden an
           </motion.h1>
 
           {/* Explanation */}
@@ -350,8 +350,8 @@ export default function DemoPage() {
             className="max-w-2xl mx-auto mb-10"
           >
             <p className="text-lg text-text-secondary leading-relaxed mb-6">
-              Wählen Sie ein Demo-Profil — wir bereiten ein vollständig vorbefülltes Konto vor.{' '}
-              <span className="font-semibold text-text-primary">Ein Klick, sofort drin.</span>
+              Drei vorbefüllte Demo-Konten. Wählen Sie das Profil, das Ihrer Situation am nächsten kommt — und sehen Sie das echte Dashboard.{' '}
+              <span className="font-semibold text-text-primary">Ein Klick, kein Formular.</span>
             </p>
 
             {/* What you can test — explanation grid */}
@@ -416,9 +416,9 @@ export default function DemoPage() {
           className="grid sm:grid-cols-3 gap-4"
         >
           {[
-            { icon: Clock3, title: 'Bereit in Sekunden', desc: 'Kein Formular, keine E-Mail. Das Demo-Konto ist in unter 3 Sekunden live.' },
-            { icon: ShieldCheck, title: 'Synthetische Daten', desc: 'Alle Kandidaten und Checks sind Beispieldaten. DSGVO-konform, kein echtes Risiko.' },
-            { icon: Star, title: 'Echtes Produkt', desc: 'Sie sehen genau das Dashboard, das echte Kunden täglich nutzen — ohne Kompromisse.' },
+            { icon: Clock3, title: 'Bereit in Sekunden', desc: 'Kein Formular, keine E-Mail-Bestätigung. Das Demo-Konto ist in unter drei Sekunden live.' },
+            { icon: ShieldCheck, title: 'Synthetische Daten', desc: 'Alle Kandidaten und Checks sind Beispieldaten — DSGVO-konform, ohne echtes Risiko.' },
+            { icon: Star, title: 'Echtes Produkt', desc: 'Sie sehen genau das Dashboard, das produktiv genutzt wird — keine Mockups, keine Schönrechnung.' },
           ].map(({ icon: TIcon, title, desc }, i) => (
             <motion.div
               key={title}

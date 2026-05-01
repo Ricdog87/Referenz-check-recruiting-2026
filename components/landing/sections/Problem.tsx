@@ -2,29 +2,29 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { TrendingUp, Clock, Banknote } from 'lucide-react'
+import { Bot, Hourglass, Banknote } from 'lucide-react'
 import { Reveal, StaggerChildren, StaggerItem } from '../Reveal'
 
 const cards = [
   {
-    icon: TrendingUp,
-    headline: '+ 400 %',
-    title: 'Mehr Bewerbungen seit ChatGPT',
-    body: 'Generierte Lebensläufe, perfekt formulierte Anschreiben — die Spreu vom Weizen zu trennen ist Sisyphos-Arbeit. Ohne Verifizierung bewerten Sie Fiktion.',
+    icon: Bot,
+    headline: 'KI-Lebenslauf',
+    title: 'Auf jede Stelle wie maßgeschneidert',
+    body: 'ChatGPT formuliert Tätigkeiten und Anschreiben perfekt zur Stelle um. Was im CV steht, sagt heute wenig darüber aus, was der Kandidat wirklich kann.',
     color: 'bg-rose-50 text-rose-600 border-rose-200',
   },
   {
-    icon: Clock,
-    headline: '< 2 min',
-    title: 'pro Referenz im Durchschnitt',
-    body: '90 % der Recruiter prüfen Referenzen oberflächlich oder gar nicht. Telefonische Verifizierung ist zeitintensiv — und meist die erste Aufgabe, die wegfällt.',
+    icon: Hourglass,
+    headline: 'Bewerber­flut',
+    title: 'Mehr Bewerbungen, weniger Signal',
+    body: 'Pro Stelle landen Dutzende Bewerbungen mit auswechselbaren Buzzwords im Postfach. Jeder zweite Kandidat verbraucht ein Erstgespräch — die meisten ohne Mehrwert.',
     color: 'bg-amber-50 text-amber-600 border-amber-200',
   },
   {
     icon: Banknote,
-    headline: '€ 50.000+',
-    title: 'Kosten einer Fehlbesetzung',
-    body: 'Bain & Company beziffert die Kosten einer einzigen Fehleinstellung auf das 1,5-fache des Jahresgehalts — bei Schlüsselpositionen geht es in die Hunderttausende.',
+    headline: 'Fehl­besetzung',
+    title: '1,5× Jahresgehalt im Schnitt',
+    body: 'SHRM und Bain beziffern die Kosten einer einzigen Fehleinstellung auf das 1,5-fache des Jahresgehalts — bei Schlüsselrollen geht es schnell in den sechsstelligen Bereich.',
     color: 'bg-brand-50 text-brand-600 border-brand-200',
   },
 ]
@@ -48,11 +48,11 @@ export function Problem() {
               Das Problem
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
-              Der KI-Tsunami trifft <br className="hidden sm:block"/>
-              <span className="text-gradient-brand">jedes HR-Team.</span>
+              Schöner Lebenslauf <br className="hidden sm:block"/>
+              ist heute <span className="text-gradient-brand">kein Signal mehr.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Bewerbungen sehen besser aus als je zuvor. Nur — was davon stimmt eigentlich noch?
+              HR-Teams und Personaldienstleister bewerten zunehmend Texte, die eine KI geschrieben hat. Echte Eignung lässt sich daraus nicht ablesen.
             </p>
           </div>
         </Reveal>
@@ -67,8 +67,7 @@ export function Problem() {
                 <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mb-5 ${c.color}`}>
                   <c.icon className="w-6 h-6" />
                 </div>
-                <div className="text-4xl font-bold text-text-primary tracking-tighter mb-2"
-                  style={{ fontFeatureSettings: '"tnum"' }}>
+                <div className="text-2xl font-bold text-text-primary tracking-tight mb-2">
                   {c.headline}
                 </div>
                 <div className="text-sm font-semibold text-text-primary mb-3">{c.title}</div>

@@ -27,11 +27,11 @@ export function PricingClient() {
             <Sparkles className="w-3.5 h-3.5" /> 14 Tage kostenlos · jederzeit kündbar
           </div>
           <h1 className="text-[clamp(40px,6vw,68px)] font-black tracking-tightest mb-5 leading-[1.05]">
-            Faire Preise. <br />
-            <span className="text-gradient-brand">Klare Pakete.</span>
+            Klare Preise. <br />
+            <span className="text-gradient-brand">Bezahlt sich ab dem ersten Hire.</span>
           </h1>
           <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            Je nach Volumen das passende Paket. Wechseln Sie jederzeit, ohne Vertragslaufzeit.
+            Wählen Sie das Paket, das zu Ihrem Hiring-Volumen passt. Monatlich kündbar, kein Mindestvertrag, jederzeit upgradebar.
           </p>
         </div>
       </section>
@@ -308,10 +308,10 @@ export function PricingClient() {
       <section className="py-20 px-6 text-center">
         <div className="max-w-2xl mx-auto">
           <h3 className="text-3xl font-bold tracking-tight mb-4 text-text-primary">Noch unsicher?</h3>
-          <p className="text-text-secondary mb-7">Buchen Sie ein 15-min Demo-Gespräch. Wir zeigen candiq live an Ihrem Use Case.</p>
+          <p className="text-text-secondary mb-7">Schauen Sie sich candiq in der Live-Demo an — voll funktionsfähig, ohne Anmeldung. Oder vereinbaren Sie ein 15-Minuten-Gespräch an Ihrem konkreten Use Case.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="mailto:sales@candiq.de" className="btn-primary py-3 px-7">Demo buchen</a>
-            <Link href="/login?demo=1" className="btn-secondary py-3 px-7">Selbst testen</Link>
+            <Link href="/demo" className="btn-primary py-3 px-7">Live-Demo öffnen</Link>
+            <a href="mailto:sales@candiq.de" className="btn-secondary py-3 px-7">15-Min-Gespräch buchen</a>
           </div>
         </div>
       </section>
