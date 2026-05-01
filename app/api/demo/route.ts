@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
+import { ensureSchema, withDbRecovery } from '@/lib/db-init'
 
 /**
  * One-click demo provisioning.
@@ -100,98 +101,120 @@ async function handle(req: NextRequest) {
   const profile = PROFILES[profileKey]
 
   try {
+    // Best-effort schema sync — no-op if everything is already in place.
+    // Catches the case where `prisma db push` was skipped or partially failed.
+    try {
+      await ensureSchema()
+    } catch (syncErr) {
+      console.error('demo_schema_sync_warn', syncErr)
+      // Continue — withDbRecovery below will retry on schema-related failures.
+    }
+
     const hashed = await bcrypt.hash(profile.password, 10)
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + profile.trialDays)
 
-    const user = await prisma.user.upsert({
-      where: { email: profile.email },
-      update: {
-        password: hashed,
-        accountType: 'HR_DEPARTMENT',
-        plan: profile.plan,
-        name: profile.name,
-        company: profile.company,
-        trialEndsAt,
-      },
-      create: {
-        email: profile.email,
-        password: hashed,
-        name: profile.name,
-        company: profile.company,
-        accountType: 'HR_DEPARTMENT',
-        plan: profile.plan,
-        trialEndsAt,
-        gdprConsents: {
-          create: {
-            type: 'REGISTRATION_DEMO',
-            granted: true,
-            ip: 'demo-seed',
-            userAgent: 'demo-seed',
+    const user = await withDbRecovery(() =>
+      prisma.user.upsert({
+        where: { email: profile.email },
+        update: {
+          password: hashed,
+          accountType: 'HR_DEPARTMENT',
+          plan: profile.plan,
+          name: profile.name,
+          company: profile.company,
+          trialEndsAt,
+        },
+        create: {
+          email: profile.email,
+          password: hashed,
+          name: profile.name,
+          company: profile.company,
+          accountType: 'HR_DEPARTMENT',
+          plan: profile.plan,
+          trialEndsAt,
+          gdprConsents: {
+            create: {
+              type: 'REGISTRATION_DEMO',
+              granted: true,
+              ip: 'demo-seed',
+              userAgent: 'demo-seed',
+            },
           },
         },
-      },
-    })
+      }),
+    )
 
     // Seed only when empty (idempotent, fast on repeat logins)
-    const candidateCount = await prisma.candidate.count({ where: { userId: user.id } })
+    const candidateCount = await withDbRecovery(() =>
+      prisma.candidate.count({ where: { userId: user.id } }),
+    )
     if (candidateCount === 0) {
       const seedRows: SeedCandidate[] = profile.seed()
       for (const c of seedRows) {
-        await prisma.candidate.create({
-          data: {
-            userId: user.id,
-            firstName: c.firstName,
-            lastName: c.lastName,
-            email: c.email,
-            phone: c.phone,
-            position: c.position,
-            department: c.department,
-            notes: c.notes,
-            status: c.status,
-            gdprConsent: c.gdprConsent,
-            gdprConsentDate: c.gdprConsent ? new Date() : null,
-            gdprConsentIp: c.gdprConsent ? 'demo-seed' : null,
-            createdAt: c.createdAtOffsetDays
-              ? new Date(Date.now() - c.createdAtOffsetDays * 24 * 60 * 60 * 1000)
-              : undefined,
-            checks: {
-              create: c.checks.map((chk) => ({
-                ...chk,
-                createdAt: chk.createdAtOffsetDays
-                  ? new Date(Date.now() - chk.createdAtOffsetDays * 24 * 60 * 60 * 1000)
-                  : undefined,
-              })),
+        await withDbRecovery(() =>
+          prisma.candidate.create({
+            data: {
+              userId: user.id,
+              firstName: c.firstName,
+              lastName: c.lastName,
+              email: c.email,
+              phone: c.phone,
+              position: c.position,
+              department: c.department,
+              notes: c.notes,
+              status: c.status,
+              gdprConsent: c.gdprConsent,
+              gdprConsentDate: c.gdprConsent ? new Date() : null,
+              gdprConsentIp: c.gdprConsent ? 'demo-seed' : null,
+              createdAt: c.createdAtOffsetDays
+                ? new Date(Date.now() - c.createdAtOffsetDays * 24 * 60 * 60 * 1000)
+                : undefined,
+              checks: {
+                create: c.checks.map((chk) => ({
+                  ...chk,
+                  createdAt: chk.createdAtOffsetDays
+                    ? new Date(Date.now() - chk.createdAtOffsetDays * 24 * 60 * 60 * 1000)
+                    : undefined,
+                })),
+              },
             },
-          },
-        })
+          }),
+        )
       }
 
       // Seed addon orders
       for (const a of profile.addons) {
-        await prisma.addonOrder.create({
-          data: {
-            userId: user.id,
-            sku: a.sku,
-            quantity: a.quantity,
-            unitPrice: a.unitPrice,
-            totalAmount: a.unitPrice * a.quantity,
-            status: 'CONFIRMED',
-          },
-        })
+        await withDbRecovery(() =>
+          prisma.addonOrder.create({
+            data: {
+              userId: user.id,
+              sku: a.sku,
+              quantity: a.quantity,
+              unitPrice: a.unitPrice,
+              totalAmount: a.unitPrice * a.quantity,
+              status: 'CONFIRMED',
+            },
+          }),
+        )
       }
     }
 
-    await prisma.auditLog.create({
-      data: {
-        userId: user.id,
-        action: 'LOGIN',
-        entity: 'User',
-        entityId: user.id,
-        details: `Demo-Login (${profileKey})`,
-        ip,
-      },
-    })
+    // Audit log is non-critical — don't fail the demo if it errors.
+    try {
+      await prisma.auditLog.create({
+        data: {
+          userId: user.id,
+          action: 'LOGIN',
+          entity: 'User',
+          entityId: user.id,
+          details: `Demo-Login (${profileKey})`,
+          ip,
+        },
+      })
+    } catch (auditErr) {
+      console.error('demo_audit_warn', auditErr)
+    }
 
     return NextResponse.json({
       ok: true,
@@ -201,29 +224,40 @@ async function handle(req: NextRequest) {
       user: { id: user.id, name: user.name, company: user.company },
     })
   } catch (error) {
-    console.error('demo_seed_error', { profileKey, error })
+    // Detailed log on the server, friendly message to the user.
+    console.error('demo_seed_error', {
+      profileKey,
+      code: (error as any)?.code,
+      name: (error as any)?.name,
+      message: (error as any)?.message,
+    })
+
+    // Customer-facing copy — never leak DATABASE_URL hints or admin paths.
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P1001' || error.code === 'P1002') {
+      if (error.code === 'P1001' || error.code === 'P1002' || error.code === 'P1017') {
         return NextResponse.json(
-          { error: 'Datenbank aktuell nicht erreichbar. Bitte in 1–2 Minuten erneut versuchen.' },
-          { status: 503 },
-        )
-      }
-      if (error.code === 'P2021') {
-        return NextResponse.json(
-          { error: 'Datenbank ist noch nicht initialisiert. Setup unter /api/admin/init aufrufen.' },
+          {
+            error: 'Demo wird gerade vorbereitet. Bitte in einem Moment erneut versuchen.',
+            retryable: true,
+          },
           { status: 503 },
         )
       }
     }
     if (error instanceof Prisma.PrismaClientInitializationError) {
       return NextResponse.json(
-        { error: 'Datenbank-Verbindung schlägt fehl. Bitte DATABASE_URL prüfen.' },
+        {
+          error: 'Demo wird gerade vorbereitet. Bitte in einem Moment erneut versuchen.',
+          retryable: true,
+        },
         { status: 503 },
       )
     }
     return NextResponse.json(
-      { error: 'Demo-Provisioning fehlgeschlagen. Bitte später erneut versuchen.' },
+      {
+        error: 'Demo gerade nicht verfügbar. Bitte später erneut versuchen — oder direkt ein kostenloses Konto erstellen.',
+        retryable: false,
+      },
       { status: 500 },
     )
   }
