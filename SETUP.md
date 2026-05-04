@@ -5,9 +5,18 @@
 1. **One-Click-Demo** auf `/login` → vorbefülltes Konto mit Daten und Charts
 2. **Eigenes Konto registrieren** auf `/register` → 14 Tage Trial, Welcome-Mail (wenn Resend konfiguriert)
 3. **Beispiel-Daten laden** auf dem Dashboard (für leere Konten) → 4 Demo-Kandidaten + 6 Prüfungen mit einem Klick
-4. **Kandidat anlegen → Referenz prüfen → Report als PDF exportieren** (Druck-Dialog des Browsers, „Als PDF speichern")
-5. **Passwort-Reset** über `/forgot-password` (Token + Mail bei Resend / Audit-Log im Dev-Modus)
-6. **DSGVO-Funktionen**: Datenexport (JSON) und Konto-Löschung in `/settings`
+4. **Kandidat anlegen mit CV-Auto-Parsing**: PDF/JPG hochladen → Claude liest Name, Position, Kontakt + 5 letzte Arbeitgeber raus → Felder werden vorausgefüllt, Referenz-Checks gleich vorgeschlagen (siehe unten)
+5. **Referenz-Check dokumentieren → Report als PDF exportieren** (Druck-Dialog des Browsers, „Als PDF speichern")
+6. **Passwort-Reset** über `/forgot-password` (Token + Mail bei Resend / Audit-Log im Dev-Modus)
+7. **DSGVO-Funktionen**: Datenexport (JSON) und Konto-Löschung in `/settings`
+
+### CV-Auto-Parsing einrichten (optional)
+
+1. https://console.anthropic.com/settings/keys → API-Key erstellen
+2. In Vercel → Settings → Environment Variables → `ANTHROPIC_API_KEY` setzen → Redeploy
+3. Auf `/candidates/new` PDF-CV hochladen → in 5-10s sind alle Felder gefüllt
+
+Ohne API-Key funktioniert das Formular weiterhin manuell (graceful degradation). Kosten pro CV: ca. 1-3 Cent (claude-opus-4-7). Für größere Volumina kann auf `claude-haiku-4-5` umgestellt werden — Datei `app/api/candidates/parse/route.ts`.
 
 ---
 

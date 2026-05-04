@@ -16,16 +16,16 @@ interface WelcomeBarProps {
 
 const TIPS = [
   {
-    title: 'Schon gewusst?',
-    text: 'candiq Interview ist jetzt verfügbar — strukturierte Kompetenz-Interviews mit Scorecard, ab €199 pro Kandidat.',
-    cta: 'Interview buchen',
-    href: '/addons',
+    title: 'Neu',
+    text: 'CV hochladen — Felder werden automatisch ausgefüllt, frühere Arbeitgeber als Referenz-Checks vorgeschlagen. Spart pro Kandidat ca. 5 Minuten.',
+    cta: 'Kandidat mit CV anlegen',
+    href: '/candidates/new',
   },
   {
-    title: 'Tipp',
-    text: 'Sie können bis zu 3 frühere Arbeitgeber pro Kandidat anlegen. Mehr Datenpunkte = aussagekräftigerer Report.',
-    cta: 'Kandidat anlegen',
-    href: '/candidates/new',
+    title: 'Schon gewusst?',
+    text: 'candiq Interview ist verfügbar — strukturierte Kompetenz-Interviews mit Scorecard, ab €199 pro Kandidat.',
+    cta: 'Interview buchen',
+    href: '/addons',
   },
   {
     title: 'Express',
@@ -37,7 +37,7 @@ const TIPS = [
     title: 'Compliance',
     text: 'Alle Reports werden auf deutschen Servern gespeichert und nach DSGVO Art. 32 verschlüsselt — auditierbar auf Knopfdruck.',
     cta: 'Audit-Trail ansehen',
-    href: '/settings',
+    href: '/audit',
   },
 ]
 
