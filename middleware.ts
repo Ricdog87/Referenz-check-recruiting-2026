@@ -9,5 +9,8 @@ export const config = {
     '/integrations/:path*',
     '/analytics/:path*',
     '/settings/:path*',
+    '/audit/:path*',
+    '/addons/:path*',
+    '/report/:path*',
   ],
 }

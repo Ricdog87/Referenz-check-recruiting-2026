@@ -1,5 +1,16 @@
 # candiq — Setup & Deploy
 
+## Was Tester sofort ausprobieren können
+
+1. **One-Click-Demo** auf `/login` → vorbefülltes Konto mit Daten und Charts
+2. **Eigenes Konto registrieren** auf `/register` → 14 Tage Trial, Welcome-Mail (wenn Resend konfiguriert)
+3. **Beispiel-Daten laden** auf dem Dashboard (für leere Konten) → 4 Demo-Kandidaten + 6 Prüfungen mit einem Klick
+4. **Kandidat anlegen → Referenz prüfen → Report als PDF exportieren** (Druck-Dialog des Browsers, „Als PDF speichern")
+5. **Passwort-Reset** über `/forgot-password` (Token + Mail bei Resend / Audit-Log im Dev-Modus)
+6. **DSGVO-Funktionen**: Datenexport (JSON) und Konto-Löschung in `/settings`
+
+---
+
 ## Test-Zugang (Demo) — sofort nutzbar
 
 Drei vorbefüllte Demo-Profile, kein Formular, keine E-Mail-Bestätigung:
@@ -50,6 +61,8 @@ Die Demo-Daten werden beim ersten Login per `/api/demo` lazy seedet (idempotent 
 | `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | `https://IHRE-APP.vercel.app` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token |
+| `RESEND_API_KEY` *(optional)* | https://resend.com → API Keys (Free 3 000/mo) |
+| `EMAIL_FROM` *(optional)* | z. B. `candiq <hello@deine-domain.de>` |
 
 4. **Deploy** klicken
 
@@ -132,4 +145,5 @@ curl -X POST 'http://localhost:3000/api/demo?type=hr'
 - HTTPS ist auf Vercel automatisch aktiv; Cookies sind in Production `__Secure-…` + `httpOnly` + `sameSite=lax`
 - Alle Dashboard-Routen sind über `middleware.ts` geschützt; alle API-Routen prüfen `getServerSession`
 - Rate-Limits: Registrierung 5/h pro IP, Demo 10/10min pro IP, Forgot-Password 5/h pro IP
-- Forgot-Password: Stub-Endpoint, antwortet generisch (kein User-Enumeration); Mail-Versand erst nach Anbindung eines Email-Providers (Resend empfohlen)
+- Forgot-Password: Generische Antwort (kein User-Enumeration); Token-Hash in DB gespeichert (32-Byte Random, SHA-256), 60 Min. TTL, one-shot
+- E-Mails: Optional über Resend (ohne `RESEND_API_KEY` werden Mails nur in `AuditLog` protokolliert — bequem für Dev/Test)

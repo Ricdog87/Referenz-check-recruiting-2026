@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Loader2, ShieldCheck, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { Loader2, ShieldCheck, ArrowLeft, CheckCircle2 } from 'lucide-react'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -48,18 +48,15 @@ export default function ForgotPasswordPage() {
           <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mb-4">
             <CheckCircle2 className="w-6 h-6 text-emerald-600" />
           </div>
-          <h1 className="text-2xl font-bold text-text-primary mb-2">Anfrage erhalten</h1>
+          <h1 className="text-2xl font-bold text-text-primary mb-2">E-Mail unterwegs</h1>
           <p className="text-sm text-text-secondary leading-relaxed mb-5">
-            Falls für <span className="font-semibold text-text-primary">{email}</span> ein Konto besteht, kümmern wir uns
-            um die Wiederherstellung. Aktuell läuft der Reset über unseren Support, damit Ihre Daten optimal geschützt
-            bleiben — Sie hören innerhalb eines Werktages von uns.
+            Falls für <span className="font-semibold text-text-primary">{email}</span> ein Konto besteht, haben wir
+            soeben einen Reset-Link verschickt. Der Link ist <strong>60 Minuten</strong> gültig.
           </p>
-          <a
-            href={`mailto:support@candiq.de?subject=Passwort-Reset%20Anfrage&body=Hallo%20Team%2C%0A%0Abitte%20setzen%20Sie%20mein%20Passwort%20zur%C3%BCck.%0AE-Mail%3A%20${encodeURIComponent(email)}%0A%0ADanke%21`}
-            className="btn-primary inline-flex w-full py-3 mb-3"
-          >
-            <Mail className="w-4 h-4" /> Direkt an Support schreiben
-          </a>
+          <p className="text-xs text-text-muted mb-5">
+            Keine E-Mail erhalten? Schauen Sie kurz im Spam-Ordner — oder schreiben Sie uns an{' '}
+            <a href="mailto:support@candiq.de" className="text-brand-700 hover:underline">support@candiq.de</a>.
+          </p>
           <Link href="/login" className="text-sm text-text-secondary hover:text-text-primary inline-flex items-center gap-1.5">
             <ArrowLeft className="w-3.5 h-3.5" /> Zurück zur Anmeldung
           </Link>

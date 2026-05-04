@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { ensureSchema, withDbRecovery } from '@/lib/db-init'
+import { sendEmail, welcomeEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -123,6 +124,12 @@ export async function POST(req: NextRequest) {
     } catch (auditErr) {
       console.error('register_audit_warn', auditErr)
     }
+
+    // Welcome-Mail (graceful: scheitert nicht den Request, wenn Provider fehlt).
+    const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
+    const tpl = welcomeEmail({ name: cleanName, email: user.email, loginUrl: `${baseUrl}/login` })
+    sendEmail({ to: user.email, subject: tpl.subject, html: tpl.html, text: tpl.text, userId: user.id, category: 'welcome' })
+      .catch((err) => console.error('welcome_email_warn', err))
 
     return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })
   } catch (error) {
