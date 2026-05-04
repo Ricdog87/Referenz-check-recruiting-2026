@@ -242,9 +242,9 @@ export default function NewCandidatePage() {
                       <Sparkles className="w-2.5 h-2.5 text-amber-900" />
                     </div>
                   </div>
-                  <div className="text-sm font-bold text-text-primary">CV wird ausgewertet…</div>
+                  <div className="text-sm font-bold text-text-primary">candiq AI analysiert gerade Ihren CV…</div>
                   <div className="text-xs text-text-secondary max-w-md">
-                    Claude liest Name, Position, Kontaktdaten und Berufsstationen aus.
+                    Wir lesen Name, Position, Kontaktdaten und Berufsstationen aus.
                     <br />Dauert in der Regel 5-10 Sekunden.
                   </div>
                 </div>
