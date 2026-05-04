@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   CheckCircle2, Circle, Sparkles, ArrowRight, X,
-  UserPlus, Phone, ShieldCheck, ShoppingBag,
+  UserPlus, Phone, ShieldCheck, ShoppingBag, Wand2, Loader2,
 } from 'lucide-react'
 
 type Step = {
@@ -26,7 +27,29 @@ interface Props {
 }
 
 export function OnboardingChecklist({ candidateCount, checkCount, hasGdprConsent, hasAddon }: Props) {
+  const router = useRouter()
   const [dismissed, setDismissed] = useState(false)
+  const [seeding, setSeeding] = useState(false)
+  const [seedError, setSeedError] = useState('')
+
+  async function loadSampleData() {
+    if (seeding) return
+    setSeedError('')
+    setSeeding(true)
+    try {
+      const res = await fetch('/api/sample-data', { method: 'POST' })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setSeedError(data?.error || 'Beispiel-Daten konnten nicht geladen werden.')
+        setSeeding(false)
+        return
+      }
+      router.refresh()
+    } catch {
+      setSeedError('Verbindung fehlgeschlagen. Bitte erneut versuchen.')
+      setSeeding(false)
+    }
+  }
 
   const steps: Step[] = [
     {
@@ -121,6 +144,39 @@ export function OnboardingChecklist({ candidateCount, checkCount, hasGdprConsent
               </div>
             </div>
           </div>
+
+          {/* Sample-Daten-CTA — nur für komplett leere Konten */}
+          {candidateCount === 0 && (
+            <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-violet/10 via-brand-50 to-white border border-violet/20">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet to-brand-500 flex items-center justify-center text-white shadow-card flex-shrink-0">
+                  <Wand2 className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-bold text-text-primary mb-0.5">Schnell-Test mit Beispiel-Daten</div>
+                  <p className="text-[11px] text-text-secondary leading-relaxed mb-2">
+                    Mit einem Klick laden wir 4 Beispiel-Kandidaten und 6 Prüfungen in Ihr Konto — Sie sehen sofort
+                    das volle Dashboard. Wird nicht abgerechnet, kann jederzeit gelöscht werden.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={loadSampleData}
+                    disabled={seeding}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full bg-white border border-violet/30 text-violet hover:bg-violet/5 hover:border-violet transition-all disabled:opacity-60"
+                  >
+                    {seeding ? (
+                      <><Loader2 className="w-3 h-3 animate-spin" /> Wird geladen…</>
+                    ) : (
+                      <><Sparkles className="w-3 h-3" /> Beispiel-Daten laden</>
+                    )}
+                  </button>
+                  {seedError && (
+                    <div className="text-[11px] text-rose-600 mt-2">{seedError}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Next-action highlight */}
           {nextStep && (

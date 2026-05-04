@@ -25,6 +25,7 @@ model User {
   gdprConsents  GdprConsent[]
   auditLogs     AuditLog[]
   addonOrders   AddonOrder[]
+  resetTokens   PasswordResetToken[]
 }
 
 model Candidate {
@@ -113,6 +114,20 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model AddonOrder {

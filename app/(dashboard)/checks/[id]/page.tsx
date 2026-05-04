@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import { CheckEditor } from './CheckEditor'
+import { Printer } from 'lucide-react'
 
 export default async function CheckDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
@@ -27,9 +28,14 @@ export default async function CheckDetailPage({ params }: { params: { id: string
         title={check.employerName}
         subtitle={`${check.candidate.firstName} ${check.candidate.lastName} · ${check.candidate.position}`}
         action={
-          <Link href={`/candidates/${check.candidate.id}`} className="btn-secondary">
-            ← Zum Kandidaten
-          </Link>
+          <div className="flex gap-2">
+            <Link href={`/report/check/${check.id}`} className="btn-secondary" target="_blank" rel="noopener">
+              <Printer className="w-4 h-4" /> Report (PDF)
+            </Link>
+            <Link href={`/candidates/${check.candidate.id}`} className="btn-secondary">
+              ← Zum Kandidaten
+            </Link>
+          </div>
         }
       />
 
