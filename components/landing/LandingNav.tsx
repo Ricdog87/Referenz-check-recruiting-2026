@@ -1,14 +1,15 @@
 'use client'
 
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, Zap } from 'lucide-react'
 
 export function LandingNav() {
-  const { scrollY } = useScroll()
+  const { scrollY, scrollYProgress } = useScroll()
   const blurOpacity = useTransform(scrollY, [0, 100], [0.5, 0.95])
   const borderOpacity = useTransform(scrollY, [0, 100], [0, 0.08])
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.3 })
   const [open, setOpen] = useState(false)
 
   return (
@@ -21,6 +22,14 @@ export function LandingNav() {
         WebkitBackdropFilter: 'saturate(180%) blur(20px)',
       }}
     >
+      {/* Scroll-Progress-Bar */}
+      <motion.div
+        aria-hidden
+        style={{ scaleX: progress, transformOrigin: '0% 50%' }}
+        className="absolute bottom-0 left-0 right-0 h-[2px]"
+      >
+        <div className="w-full h-full" style={{ background: 'linear-gradient(90deg, #4f46e5, #8b5cf6, #06b6d4)' }} />
+      </motion.div>
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2.5 group">
           <div className="relative w-9 h-9 rounded-2xl overflow-hidden flex items-center justify-center"
@@ -37,11 +46,14 @@ export function LandingNav() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">So funktioniert's</Link>
-          <Link href="#zielgruppen" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Für wen</Link>
-          <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Features</Link>
-          <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
+          <Link href="/#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">So funktioniert's</Link>
+          <Link href="/#features" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Features</Link>
+          <Link href="/#zielgruppen" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Für wen</Link>
           <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Preise</Link>
+          <Link href="/waitlist-agency" className="inline-flex items-center gap-1.5 text-sm font-medium text-violet hover:text-violet/80 px-3 py-2 rounded-lg transition-colors">
+            PDL-Beta
+            <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-violet/10 border border-violet/20">soon</span>
+          </Link>
         </div>
 
         <div className="hidden md:flex items-center gap-2">
@@ -69,11 +81,14 @@ export function LandingNav() {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden border-t border-border bg-white px-6 py-4 space-y-2"
         >
-          <Link href="#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert's</Link>
-          <Link href="#zielgruppen" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für wen</Link>
-          <Link href="#features" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Features</Link>
-          <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">PDL-Warteliste</Link>
+          <Link href="/#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert's</Link>
+          <Link href="/#features" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Features</Link>
+          <Link href="/#zielgruppen" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für wen</Link>
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Preise</Link>
+          <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="flex items-center justify-between py-2 text-sm font-medium text-violet">
+            PDL-Beta
+            <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-violet/10 border border-violet/20">bald</span>
+          </Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">
             <Link href="/demo" onClick={() => setOpen(false)} className="btn-secondary w-full flex items-center justify-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-brand-600" />Live-Demo

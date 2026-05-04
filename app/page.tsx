@@ -3,6 +3,7 @@ import { Hero } from '@/components/landing/sections/Hero'
 import { TrustBar } from '@/components/landing/sections/TrustBar'
 import { Problem } from '@/components/landing/sections/Problem'
 import { HowItWorks } from '@/components/landing/sections/HowItWorks'
+import { ScrollShowcase } from '@/components/landing/sections/ScrollShowcase'
 import { Features } from '@/components/landing/sections/Features'
 import { TwoAudiences } from '@/components/landing/sections/TwoAudiences'
 import { Testimonials } from '@/components/landing/sections/Testimonials'
@@ -20,6 +21,7 @@ export default function LandingPage() {
       <TrustBar />
       <Problem />
       <HowItWorks />
+      <ScrollShowcase />
       <Features />
       <TwoAudiences />
       <Testimonials />

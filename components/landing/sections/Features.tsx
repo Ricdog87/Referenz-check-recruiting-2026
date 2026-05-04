@@ -1,13 +1,23 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 import {
   ShieldCheck, Phone, FileText, Activity, Users, Lock,
   Zap, BarChart3, Mic,
 } from 'lucide-react'
 import { Reveal, StaggerChildren, StaggerItem } from '../Reveal'
 
-const features = [
+type Feature = {
+  icon: any
+  title: string
+  desc: string
+  color: string
+  glow: string
+  badge?: string
+}
+
+const features: Feature[] = [
   {
     icon: Phone,
     title: 'Telefonische Verifizierung',
@@ -59,7 +69,7 @@ const features = [
   },
   {
     icon: Users,
-    title: 'Multi-Mandanten (Closed Beta)',
+    title: 'Multi-Mandanten',
     desc: 'Für Personaldienstleister: Endkunden mit eigenem Branding und getrennten Workflows verwalten — derzeit in Closed Beta.',
     color: 'from-amber-500 to-rose-500',
     glow: 'rgba(245,158,11,0.3)',
@@ -76,8 +86,27 @@ const features = [
 ]
 
 export function Features() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] })
+  // sanftes Parallax für Hintergrund-Blobs
+  const blob1Y = useTransform(scrollYProgress, [0, 1], [-80, 80])
+  const blob2Y = useTransform(scrollYProgress, [0, 1], [60, -60])
+
   return (
-    <section id="features" className="py-28 px-6 bg-bg-secondary relative overflow-hidden">
+    <section ref={sectionRef} id="features" className="py-28 px-6 bg-bg-secondary relative overflow-hidden">
+      <motion.div
+        style={{ y: blob1Y }}
+        className="absolute -top-40 -left-20 w-[480px] h-[480px] rounded-full opacity-30 blur-3xl pointer-events-none"
+      >
+        <div className="w-full h-full" style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.5), transparent 60%)' }} />
+      </motion.div>
+      <motion.div
+        style={{ y: blob2Y }}
+        className="absolute -bottom-40 -right-20 w-[520px] h-[520px] rounded-full opacity-30 blur-3xl pointer-events-none"
+      >
+        <div className="w-full h-full" style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.45), transparent 60%)' }} />
+      </motion.div>
+
       <div className="absolute inset-0 grid-bg grid-bg-mask opacity-50 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative">
@@ -96,35 +125,70 @@ export function Features() {
           </div>
         </Reveal>
 
-        <StaggerChildren className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <StaggerChildren className="grid md:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.06}>
           {features.map((f) => (
             <StaggerItem key={f.title}>
-              <motion.div
-                whileHover={{ y: -6, scale: 1.02 }}
-                transition={{ duration: 0.3 }}
-                className="group relative card-md hover:shadow-card-xl transition-all overflow-hidden h-full"
-              >
-                {/* Hover glow */}
-                <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-0 group-hover:opacity-50 transition-opacity duration-500 blur-3xl"
-                  style={{ background: f.glow }} />
-
-                <div className="relative">
-                  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-5 shadow-card`}>
-                    <f.icon className="w-6 h-6 text-white" strokeWidth={2} />
-                  </div>
-                  {'badge' in f && (
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-violet/10 text-violet border border-violet/20 mb-2">
-                      {f.badge}
-                    </div>
-                  )}
-                  <h3 className="text-base font-semibold text-text-primary mb-2 tracking-tight">{f.title}</h3>
-                  <p className="text-sm text-text-secondary leading-relaxed">{f.desc}</p>
-                </div>
-              </motion.div>
+              <FeatureCard f={f} />
             </StaggerItem>
           ))}
         </StaggerChildren>
       </div>
     </section>
+  )
+}
+
+function FeatureCard({ f }: { f: Feature }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const rotateY = useSpring(useTransform(mx, [-1, 1], [-7, 7]), { stiffness: 200, damping: 22 })
+  const rotateX = useSpring(useTransform(my, [-1, 1], [7, -7]), { stiffness: 200, damping: 22 })
+  const glowX = useTransform(mx, [-1, 1], ['0%', '100%'])
+  const glowY = useTransform(my, [-1, 1], ['0%', '100%'])
+  const gradientFollow = useTransform(
+    [glowX, glowY],
+    ([x, y]) => `radial-gradient(420px circle at ${x} ${y}, ${f.glow}, transparent 50%)`,
+  )
+
+  function onMove(e: React.MouseEvent) {
+    if (!ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    mx.set(((e.clientX - r.left) / r.width - 0.5) * 2)
+    my.set(((e.clientY - r.top) / r.height - 0.5) * 2)
+  }
+  function onLeave() {
+    mx.set(0)
+    my.set(0)
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.3 }}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 1000 }}
+      className="group relative card-md hover:shadow-card-xl transition-all overflow-hidden h-full"
+    >
+      {/* Mouse-follow glow */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: gradientFollow as any }}
+      />
+
+      <div className="relative" style={{ transform: 'translateZ(20px)' }}>
+        <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-5 shadow-card`}>
+          <f.icon className="w-6 h-6 text-white" strokeWidth={2} />
+        </div>
+        {f.badge && (
+          <div className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-violet/10 text-violet border border-violet/20 mb-2">
+            {f.badge}
+          </div>
+        )}
+        <h3 className="text-base font-semibold text-text-primary mb-2 tracking-tight">{f.title}</h3>
+        <p className="text-sm text-text-secondary leading-relaxed">{f.desc}</p>
+      </div>
+    </motion.div>
   )
 }

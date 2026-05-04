@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Sparkles } from 'lucide-react'
 
 export function LandingFooter() {
   return (
@@ -17,6 +18,12 @@ export function LandingFooter() {
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm mb-5">
               DSGVO-konforme Referenzprüfung für moderne HR-Teams und Personaldienstleister im DACH-Raum.
             </p>
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white px-3.5 py-2 rounded-full bg-gradient-to-r from-brand-500 to-violet shadow-card hover:shadow-glow transition-shadow mb-4"
+            >
+              <Sparkles className="w-3 h-3" /> Live-Demo starten
+            </Link>
             <div className="flex items-center gap-3 text-xs text-text-muted">
               <span>🇩🇪 Made in Germany</span>
             </div>
@@ -25,10 +32,11 @@ export function LandingFooter() {
           <FooterCol
             title="Produkt"
             links={[
-              { label: 'Features', href: '#features' },
-              { label: 'So funktioniert\'s', href: '#wie-es-funktioniert' },
+              { label: 'So funktioniert\'s', href: '/#wie-es-funktioniert' },
+              { label: 'Features', href: '/#features' },
               { label: 'Preise', href: '/preise' },
-              { label: 'ROI-Rechner', href: '#roi' },
+              { label: 'ROI-Rechner', href: '/#roi' },
+              { label: 'Live-Demo', href: '/demo' },
             ]}
           />
 
@@ -36,18 +44,20 @@ export function LandingFooter() {
             title="Für wen"
             links={[
               { label: 'HR-Abteilungen', href: '/preise#hr' },
-              { label: 'Personaldienstleister (bald verfügbar)', href: '/waitlist-agency' },
               { label: 'Enterprise', href: '/preise#enterprise' },
+              { label: 'Personaldienstleister · Beta', href: '/waitlist-agency', accent: true },
             ]}
           />
 
           <FooterCol
-            title="Rechtliches"
+            title="Konto & Recht"
             links={[
+              { label: 'Anmelden', href: '/login' },
+              { label: 'Konto erstellen', href: '/register' },
+              { label: 'Passwort vergessen', href: '/forgot-password' },
               { label: 'Datenschutz', href: '/datenschutz' },
               { label: 'AGB', href: '/agb' },
               { label: 'Impressum', href: '/impressum' },
-              { label: 'AVV (Auftragsverarbeitung)', href: '/datenschutz#avv' },
             ]}
           />
         </div>
@@ -55,11 +65,9 @@ export function LandingFooter() {
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted">
           <div>© 2026 RSG Recruiting Solutions group GmbH · Alle Rechte vorbehalten.</div>
           <div className="hidden md:block text-[11px] text-text-muted">
-            PDL-Pakete befinden sich in Vorbereitung. Jetzt für frühen Zugang vormerken.
+            PDL-Pakete in Closed Beta · <Link href="/waitlist-agency" className="text-violet font-semibold hover:underline">Für frühen Zugang vormerken</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
-            <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>
             <a href="mailto:hello@candiq.de" className="hover:text-text-primary transition-colors">hello@candiq.de</a>
           </div>
         </div>
@@ -68,14 +76,24 @@ export function LandingFooter() {
   )
 }
 
-function FooterCol({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+function FooterCol({ title, links }: {
+  title: string
+  links: { label: string; href: string; accent?: boolean }[]
+}) {
   return (
     <div>
       <h4 className="text-xs font-bold text-text-primary uppercase tracking-widest mb-4">{title}</h4>
       <ul className="space-y-2.5">
         {links.map((l) => (
-          <li key={l.href}>
-            <Link href={l.href} className="text-sm text-text-secondary hover:text-text-primary transition-colors">
+          <li key={l.href + l.label}>
+            <Link
+              href={l.href}
+              className={`text-sm transition-colors ${
+                l.accent
+                  ? 'text-violet font-semibold hover:text-violet/80'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
               {l.label}
             </Link>
           </li>

@@ -32,14 +32,25 @@ Die Demo-Daten werden beim ersten Login per `/api/demo` lazy seedet (idempotent 
 
 ## Vercel (empfohlen für Demo & Produktion)
 
-### Schritt 1: Neon Datenbank (kostenlos)
+### Schritt 1: Postgres-Datenbank
 
-1. https://neon.tech → Account erstellen (kostenlos)
-2. **New Project** → Name: `candiq`
-3. Region: **EU Central (Frankfurt)** wählen
-4. Nach Erstellung: **Connection Details** öffnen
-   - "Connection string" kopieren → das ist `DATABASE_URL`
-   - Bei "Pooling" deaktivieren → zweiten String kopieren → das ist `DIRECT_URL`
+Funktioniert mit jedem Postgres ≥ 14. Beide Optionen sind kostenlos für Tests.
+
+#### Variante A: Supabase (empfohlen, Frankfurt-Region)
+
+1. https://supabase.com → **New Project** → Region `Frankfurt (eu-central-1)`
+2. Datenbank-Passwort sicher speichern
+3. Project Settings → **Database** → **Connection string**
+   - **„Transaction"** (Port 6543, mit `pgbouncer=true&connection_limit=1`)
+     → `DATABASE_URL`
+   - **„Session"** oder **„Direct"** (Port 5432) → `DIRECT_URL`
+4. Pooling ist bei Supabase Pflicht, sobald die App auf Vercel läuft
+   (sonst läufst du in Connection-Limits)
+
+#### Variante B: Neon
+
+1. https://neon.tech → New Project, Region `EU Central (Frankfurt)`
+2. Connection Details → mit Pooling = `DATABASE_URL`, ohne Pooling = `DIRECT_URL`
 
 ### Schritt 2: Vercel Blob (Datei-Uploads)
 
@@ -56,8 +67,7 @@ Die Demo-Daten werden beim ersten Login per `/api/demo` lazy seedet (idempotent 
 
 | Variable | Wert |
 |---|---|
-| `DATABASE_URL` | Neon Connection String (mit Pooling) |
-| `DIRECT_URL` | Neon Connection String (ohne Pooling) |
+| `DATABASE_URL` | Supabase **Transaction-Pooler** (Port 6543, `?pgbouncer=true&connection_limit=1`) – oder Neon mit Pooling |
 | `NEXTAUTH_SECRET` | `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | `https://IHRE-APP.vercel.app` |
 | `BLOB_READ_WRITE_TOKEN` | Vercel Blob Token |
