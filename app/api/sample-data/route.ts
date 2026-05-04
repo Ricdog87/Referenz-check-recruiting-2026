@@ -55,9 +55,9 @@ export async function POST() {
             gdprConsentIp: c.gdprConsent ? 'sample-data' : null,
             createdAt: new Date(Date.now() - c.createdAtOffsetDays * 24 * 60 * 60 * 1000),
             checks: {
-              create: c.checks.map((chk) => ({
+              create: c.checks.map(({ createdAtOffsetDays, ...chk }) => ({
                 ...chk,
-                createdAt: new Date(Date.now() - chk.createdAtOffsetDays * 24 * 60 * 60 * 1000),
+                createdAt: new Date(Date.now() - createdAtOffsetDays * 24 * 60 * 60 * 1000),
               })),
             },
           },

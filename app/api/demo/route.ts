@@ -171,10 +171,10 @@ async function handle(req: NextRequest) {
                 ? new Date(Date.now() - c.createdAtOffsetDays * 24 * 60 * 60 * 1000)
                 : undefined,
               checks: {
-                create: c.checks.map((chk) => ({
+                create: c.checks.map(({ createdAtOffsetDays, ...chk }) => ({
                   ...chk,
-                  createdAt: chk.createdAtOffsetDays
-                    ? new Date(Date.now() - chk.createdAtOffsetDays * 24 * 60 * 60 * 1000)
+                  createdAt: createdAtOffsetDays
+                    ? new Date(Date.now() - createdAtOffsetDays * 24 * 60 * 60 * 1000)
                     : undefined,
                 })),
               },
