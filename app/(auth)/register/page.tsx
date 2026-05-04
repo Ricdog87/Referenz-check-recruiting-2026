@@ -1,11 +1,33 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
-import { Building2, Users2, ShieldCheck, Loader2, ArrowRight, Check } from 'lucide-react'
+import { Building2, Users2, ShieldCheck, Loader2, ArrowRight, Check, Eye, EyeOff } from 'lucide-react'
 import { ACCOUNT_TYPES, type AccountType, getPlanById } from '@/lib/utils'
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+type Strength = { score: 0 | 1 | 2 | 3 | 4; label: string; tone: string }
+
+function passwordStrength(pw: string): Strength {
+  if (!pw) return { score: 0, label: '—', tone: 'bg-bg-tertiary' }
+  let score = 0
+  if (pw.length >= 8) score++
+  if (pw.length >= 12) score++
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++
+  const map = [
+    { label: 'Sehr schwach', tone: 'bg-rose-500' },
+    { label: 'Schwach', tone: 'bg-rose-400' },
+    { label: 'Okay', tone: 'bg-amber-500' },
+    { label: 'Gut', tone: 'bg-emerald-500' },
+    { label: 'Stark', tone: 'bg-emerald-600' },
+  ] as const
+  const cap = Math.min(score, 4) as 0 | 1 | 2 | 3 | 4
+  return { score: cap, ...map[cap] }
+}
 
 function RegisterForm() {
   const router = useRouter()
@@ -18,59 +40,80 @@ function RegisterForm() {
   const [step, setStep] = useState(1)
   const [accountType, setAccountType] = useState<AccountType>(initialType)
   const [form, setForm] = useState({ name: '', company: '', email: '', password: '', passwordConfirm: '' })
+  const [showPw, setShowPw] = useState(false)
   const [gdprAccepted, setGdprAccepted] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  function update(field: string, value: string) {
+  const strength = useMemo(() => passwordStrength(form.password), [form.password])
+  const emailValid = !form.email || EMAIL_REGEX.test(form.email.trim())
+  const passwordsMatch = !form.passwordConfirm || form.password === form.passwordConfirm
+
+  function update(field: keyof typeof form, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
+    if (error) setError('')
+  }
+
+  function validateStep2(): string | null {
+    if (!form.name.trim()) return 'Bitte geben Sie Ihren Namen ein.'
+    if (!form.company.trim()) return 'Bitte geben Sie Ihr Unternehmen ein.'
+    if (!form.email.trim()) return 'Bitte geben Sie Ihre E-Mail-Adresse ein.'
+    if (!EMAIL_REGEX.test(form.email.trim())) return 'Bitte geben Sie eine gültige E-Mail-Adresse ein.'
+    if (form.password.length < 8) return 'Passwort muss mindestens 8 Zeichen haben.'
+    if (form.password !== form.passwordConfirm) return 'Passwörter stimmen nicht überein.'
+    if (!gdprAccepted) return 'Bitte stimmen Sie der Datenschutzerklärung zu.'
+    return null
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (loading) return
+    const v = validateStep2()
+    if (v) { setError(v); return }
+
     setError('')
-
-    if (form.password !== form.passwordConfirm) { setError('Passwörter stimmen nicht überein.'); return }
-    if (form.password.length < 8) { setError('Passwort muss mindestens 8 Zeichen haben.'); return }
-    if (!gdprAccepted) { setError('Bitte akzeptieren Sie die Datenschutzerklärung.'); return }
-
     setLoading(true)
 
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          company: form.company.trim(),
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+          accountType,
+          plan: planId,
+          gdprAccepted,
+        }),
+      })
+
+      const data = await res.json().catch(() => ({}))
+
+      if (!res.ok) {
+        setError(data.error || 'Registrierung fehlgeschlagen. Bitte erneut versuchen.')
+        setLoading(false)
+        return
+      }
+
+      const signInRes = await signIn('credentials', {
         email: form.email.trim().toLowerCase(),
-        accountType,
-        plan: planId,
-        gdprAccepted,
-      }),
-    })
+        password: form.password,
+        redirect: false,
+      })
 
-    const data = await res.json()
-
-    if (!res.ok) {
-      setError(data.error || 'Registrierung fehlgeschlagen.')
+      if (signInRes?.error) {
+        // Konto angelegt, Auto-Login fehlgeschlagen — sauber zur Login-Seite leiten.
+        router.push('/login?registered=1')
+      } else {
+        router.push('/dashboard')
+        router.refresh()
+      }
+    } catch (err) {
+      console.error('register_submit_error', err)
+      setError('Verbindung fehlgeschlagen. Bitte prüfen Sie Ihre Internetverbindung.')
       setLoading(false)
-      return
-    }
-
-    // Auto sign-in so the user lands directly on the dashboard
-    const signInRes = await signIn('credentials', {
-      email: form.email.trim().toLowerCase(),
-      password: form.password,
-      redirect: false,
-    })
-
-    setLoading(false)
-
-    if (signInRes?.error) {
-      // Account created but auto-login failed — fall back to login screen
-      router.push('/login?registered=1')
-    } else {
-      router.push('/dashboard')
-      router.refresh()
     }
   }
 
@@ -179,33 +222,91 @@ function RegisterForm() {
             >
               Weiter <ArrowRight className="w-4 h-4" />
             </button>
+
+            <div className="text-center text-xs text-text-muted pt-2">
+              Lieber zuerst ansehen?{' '}
+              <Link href="/demo" className="text-brand-700 hover:text-brand-800 font-semibold">Demo ohne Konto starten →</Link>
+            </div>
           </div>
         )}
 
         {step === 2 && (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="label">Name</label>
-                <input className="input-field" placeholder="Max Mustermann" value={form.name} onChange={(e) => update('name', e.target.value)} required />
+                <input className="input-field" placeholder="Max Mustermann" value={form.name}
+                  onChange={(e) => update('name', e.target.value)} required maxLength={120} autoComplete="name" />
               </div>
               <div>
                 <label className="label">Unternehmen</label>
-                <input className="input-field" placeholder="Mustermann GmbH" value={form.company} onChange={(e) => update('company', e.target.value)} required />
+                <input className="input-field" placeholder="Mustermann GmbH" value={form.company}
+                  onChange={(e) => update('company', e.target.value)} required maxLength={160} autoComplete="organization" />
               </div>
             </div>
             <div>
               <label className="label">Geschäftliche E-Mail</label>
-              <input type="email" className="input-field" placeholder="max@firma.de" value={form.email} onChange={(e) => update('email', e.target.value)} required autoComplete="email" />
+              <input
+                type="email"
+                className={`input-field ${form.email && !emailValid ? '!border-rose-300 focus:!ring-rose-500/20' : ''}`}
+                placeholder="max@firma.de"
+                value={form.email}
+                onChange={(e) => update('email', e.target.value)}
+                required
+                maxLength={254}
+                autoComplete="email"
+                inputMode="email"
+              />
+              {form.email && !emailValid && (
+                <div className="text-[11px] text-rose-600 mt-1">Bitte eine gültige E-Mail eingeben.</div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="label">Passwort</label>
-                <input type="password" className="input-field" placeholder="Min. 8 Zeichen" value={form.password} onChange={(e) => update('password', e.target.value)} required autoComplete="new-password" />
+                <div className="relative">
+                  <input
+                    type={showPw ? 'text' : 'password'}
+                    className="input-field pr-10"
+                    placeholder="Min. 8 Zeichen"
+                    value={form.password}
+                    onChange={(e) => update('password', e.target.value)}
+                    required
+                    minLength={8}
+                    maxLength={128}
+                    autoComplete="new-password"
+                  />
+                  <button type="button" onClick={() => setShowPw((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-text-muted hover:text-text-primary"
+                    aria-label={showPw ? 'Passwort verbergen' : 'Passwort anzeigen'}>
+                    {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {form.password && (
+                  <div className="mt-1.5">
+                    <div className="h-1 rounded-full bg-bg-tertiary overflow-hidden">
+                      <div className={`h-full transition-all ${strength.tone}`} style={{ width: `${(strength.score / 4) * 100}%` }} />
+                    </div>
+                    <div className="text-[10px] text-text-muted mt-1">Stärke: {strength.label}</div>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="label">Bestätigen</label>
-                <input type="password" className="input-field" placeholder="Wiederholen" value={form.passwordConfirm} onChange={(e) => update('passwordConfirm', e.target.value)} required autoComplete="new-password" />
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  className={`input-field ${form.passwordConfirm && !passwordsMatch ? '!border-rose-300 focus:!ring-rose-500/20' : ''}`}
+                  placeholder="Wiederholen"
+                  value={form.passwordConfirm}
+                  onChange={(e) => update('passwordConfirm', e.target.value)}
+                  required
+                  minLength={8}
+                  maxLength={128}
+                  autoComplete="new-password"
+                />
+                {form.passwordConfirm && !passwordsMatch && (
+                  <div className="text-[11px] text-rose-600 mt-1">Passwörter stimmen nicht überein.</div>
+                )}
               </div>
             </div>
 
@@ -223,13 +324,13 @@ function RegisterForm() {
             </label>
 
             {error && (
-              <div className="px-4 py-3 rounded-xl text-xs text-rose-700 bg-rose-50 border border-rose-200">
+              <div role="alert" className="px-4 py-3 rounded-xl text-xs text-rose-700 bg-rose-50 border border-rose-200">
                 {error}
               </div>
             )}
 
             <div className="flex gap-2">
-              <button type="button" onClick={() => setStep(1)} className="btn-secondary flex-1 py-3">Zurück</button>
+              <button type="button" onClick={() => setStep(1)} disabled={loading} className="btn-secondary flex-1 py-3">Zurück</button>
               <button type="submit" disabled={loading || !gdprAccepted} className="btn-primary flex-[2] py-3">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">

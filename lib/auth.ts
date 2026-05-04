@@ -4,15 +4,32 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { ensureSchema, withDbRecovery } from '@/lib/db-init'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
-    maxAge: 8 * 60 * 60, // 8 hours
+    maxAge: 8 * 60 * 60, // 8h
+    updateAge: 60 * 60, // 1h — stale-while-valid Refresh
   },
   pages: {
     signIn: '/login',
     error: '/login',
   },
+  // Sichere Cookie-Konfig für Production (HTTPS) — bleibt unter Localhost frei.
+  cookies: isProd
+    ? {
+        sessionToken: {
+          name: '__Secure-next-auth.session-token',
+          options: {
+            httpOnly: true,
+            sameSite: 'lax',
+            path: '/',
+            secure: true,
+          },
+        },
+      }
+    : undefined,
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -22,19 +39,28 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
+        const email = String(credentials.email).trim().toLowerCase()
+        if (!email || email.length > 254) return null
 
-        await ensureSchema()
+        try {
+          await ensureSchema()
+        } catch (err) {
+          console.error('auth_schema_warn', err)
+        }
 
         const user = await withDbRecovery(() =>
           prisma.user.findFirst({
-            where: { email: { equals: credentials.email.toLowerCase(), mode: 'insensitive' } },
+            where: { email: { equals: email, mode: 'insensitive' } },
           }),
-        )
+        ).catch((err) => {
+          console.error('auth_lookup_error', err)
+          return null
+        })
 
         if (!user) return null
 
-        const isValid = await bcrypt.compare(credentials.password, user.password)
-        if (!isValid) return null
+        const valid = await bcrypt.compare(String(credentials.password), user.password).catch(() => false)
+        if (!valid) return null
 
         return {
           id: user.id,
@@ -50,7 +76,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id
         token.company = (user as any).company
@@ -59,20 +85,62 @@ export const authOptions: NextAuthOptions = {
         token.plan = (user as any).plan
         token.trialEndsAt = (user as any).trialEndsAt ?? null
       }
+      // Bei expliziten Updates Token aus DB nachladen — z. B. nach Plan-Upgrade.
+      if (trigger === 'update' && token.id) {
+        try {
+          const fresh = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { plan: true, accountType: true, trialEndsAt: true, company: true, role: true, name: true },
+          })
+          if (fresh) {
+            token.plan = fresh.plan
+            token.accountType = fresh.accountType
+            token.role = fresh.role
+            token.company = fresh.company
+            token.trialEndsAt = fresh.trialEndsAt?.toISOString() ?? null
+            token.name = fresh.name
+          }
+        } catch (err) {
+          console.error('jwt_refresh_warn', err)
+        }
+      }
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string
-        session.user.company = token.company as string
-        session.user.role = token.role as string
-        session.user.accountType = token.accountType as string
-        session.user.plan = token.plan as string
+        session.user.company = (token.company as string) ?? ''
+        session.user.role = (token.role as string) ?? 'CLIENT'
+        session.user.accountType = (token.accountType as string) ?? 'HR_DEPARTMENT'
+        session.user.plan = (token.plan as string) ?? 'STARTER'
         session.user.trialEndsAt = (token.trialEndsAt as string | null) ?? null
       }
       return session
     },
   },
+  events: {
+    async signIn({ user }) {
+      // Fire-and-forget Audit-Log — auth darf nie an Logging scheitern.
+      try {
+        if (!user?.id) return
+        await prisma.auditLog.create({
+          data: {
+            userId: user.id,
+            action: 'LOGIN',
+            entity: 'User',
+            entityId: user.id,
+            details: 'Erfolgreiche Anmeldung',
+          },
+        })
+      } catch (err) {
+        console.error('signin_audit_warn', err)
+      }
+    },
+  },
+  // Eigene NEXTAUTH_SECRET aus env. NextAuth erkennt das automatisch,
+  // expliziter Pfad macht die Konfig lesbarer.
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: false,
 }
 
 declare module 'next-auth' {

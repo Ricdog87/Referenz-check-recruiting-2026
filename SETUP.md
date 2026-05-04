@@ -1,5 +1,24 @@
 # candiq — Setup & Deploy
 
+## Test-Zugang (Demo) — sofort nutzbar
+
+Drei vorbefüllte Demo-Profile, kein Formular, keine E-Mail-Bestätigung:
+
+| Profil       | E-Mail                  | Passwort   | Plan         | Inhalt                          |
+|--------------|-------------------------|------------|--------------|---------------------------------|
+| HR Inhouse   | `demo@candiq.de`        | `demo1234` | Professional | 5 Kandidaten · 7 Prüfungen      |
+| Enterprise   | `enterprise@candiq.de`  | `demo1234` | Business     | 9 Kandidaten · 12 Prüfungen     |
+| Startup      | `boutique@candiq.de`    | `demo1234` | Starter      | 2 Kandidaten · 1 Prüfung        |
+
+**Drei Wege rein:**
+1. **Login-Seite** → Block „Tool sofort testen" → Profil klicken (One-Click)
+2. **`/demo`** → ausführliche Übersicht der Profile mit Highlights
+3. **Direkt anmelden** mit obigen Credentials auf `/login`
+
+Die Demo-Daten werden beim ersten Login per `/api/demo` lazy seedet (idempotent — wiederholtes Klicken setzt nichts zurück).
+
+---
+
 ## Vercel (empfohlen für Demo & Produktion)
 
 ### Schritt 1: Neon Datenbank (kostenlos)
@@ -35,12 +54,14 @@
 4. **Deploy** klicken
 
 > Die Datenbank wird beim ersten Build automatisch eingerichtet (`prisma db push`).
+> `lib/db-init.ts` enthält zusätzlich eine idempotente Schema-Sync-Recovery,
+> falls der Build den Push nicht ausgeführt hat.
 
-### Schritt 4: Demo-Zugang einrichten
+### Schritt 4: Konto anlegen oder Demo nutzen
 
-Nach dem ersten Deploy auf der Live-URL registrieren:
-- https://ihre-app.vercel.app/register
-- Unternehmenskonto anlegen
+Nach dem Deploy:
+- **Test/Sales:** `https://IHRE-APP.vercel.app/login` → One-Click-Demo
+- **Echtes Konto:** `https://IHRE-APP.vercel.app/register` (14 Tage Trial)
 
 ---
 
@@ -54,12 +75,32 @@ npm install
 cp .env.example .env
 # .env bearbeiten — DATABASE_URL, NEXTAUTH_SECRET, BLOB_READ_WRITE_TOKEN
 
-# 3. Datenbank anlegen
+# 3. Datenbank-Schema anlegen
 npm run db:push
 
-# 4. Entwicklungsserver
+# 4. (optional) Demo-User aus Seed-Script anlegen
+npx ts-node prisma/seed.ts
+# Alternativ erzeugt /api/demo die User on-the-fly bei erstem Login.
+
+# 5. Entwicklungsserver
 npm run dev
 # → http://localhost:3000
+```
+
+### Auth-Flow (lokal testen)
+
+```bash
+# Health-Check
+curl http://localhost:3000/api/health
+
+# Demo-User on-the-fly seeden
+curl -X POST 'http://localhost:3000/api/demo?type=hr'
+# → { ok: true, email: "demo@candiq.de", password: "demo1234", ... }
+
+# Im Browser
+# http://localhost:3000/login        → One-Click-Demo-Buttons
+# http://localhost:3000/register     → Eigenes Konto (14 Tage Trial)
+# http://localhost:3000/forgot-password
 ```
 
 ---
@@ -85,7 +126,10 @@ npm run dev
 ---
 
 ## Sicherheitshinweise
-- `NEXTAUTH_SECRET` niemals teilen oder ins Repository committen
-- `.env` ist in `.gitignore` — wird nie committed
-- HTTPS ist auf Vercel automatisch aktiv
-- Alle API-Routen prüfen die Session vor jedem Datenzugriff
+
+- `NEXTAUTH_SECRET` niemals teilen oder ins Repository committen — `openssl rand -base64 32`
+- `.env` ist in `.gitignore` und wird nie committed
+- HTTPS ist auf Vercel automatisch aktiv; Cookies sind in Production `__Secure-…` + `httpOnly` + `sameSite=lax`
+- Alle Dashboard-Routen sind über `middleware.ts` geschützt; alle API-Routen prüfen `getServerSession`
+- Rate-Limits: Registrierung 5/h pro IP, Demo 10/10min pro IP, Forgot-Password 5/h pro IP
+- Forgot-Password: Stub-Endpoint, antwortet generisch (kein User-Enumeration); Mail-Versand erst nach Anbindung eines Email-Providers (Resend empfohlen)
