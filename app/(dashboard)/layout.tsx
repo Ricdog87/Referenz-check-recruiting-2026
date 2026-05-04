@@ -12,9 +12,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <MobileSidebarProvider>
-      <div className="flex min-h-screen bg-bg-secondary">
+      <div className="flex min-h-screen" style={{ background: '#f6f7f9' }}>
         <Sidebar />
-        <main className="flex-1 min-w-0 overflow-x-hidden bg-bg-secondary">
+        <main className="flex-1 min-w-0 overflow-x-hidden">
           <TopBar
             name={session?.user.name ?? ''}
             company={session?.user.company ?? ''}
@@ -24,7 +24,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           {trialLeft !== null && trialLeft <= 7 && trialLeft > 0 && (
             <TrialBanner daysLeft={trialLeft} />
           )}
-          <div className="px-4 sm:px-6 lg:px-10 pb-12">
+          <div className="px-4 sm:px-6 lg:px-8 py-6 pb-16 animate-fadeIn">
             {children}
           </div>
         </main>

@@ -4,20 +4,19 @@ import { prisma } from '@/lib/db'
 import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
 import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES, trialDaysLeft } from '@/lib/utils'
-import {
-  Users, AlertTriangle, TrendingUp, ArrowUpRight,
-  Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
-} from 'lucide-react'
+import { CheckCircle2, AlertCircle, Clock, ArrowRight } from 'lucide-react'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
-import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
+import { KPIStrip } from '@/components/dashboard/KPIStrip'
+import { QuickActions } from '@/components/dashboard/QuickActions'
+import { PlanUsageCard } from '@/components/dashboard/PlanUsageCard'
+import { RecentActivity } from '@/components/dashboard/RecentActivity'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
   const userId = session.user.id
-  const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
 
   const [
     totalCandidates,
@@ -64,7 +63,7 @@ export default async function DashboardPage() {
     prisma.auditLog.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
-      take: 8,
+      take: 10,
       select: { id: true, action: true, entity: true, details: true, createdAt: true },
     }),
   ])
@@ -73,87 +72,48 @@ export default async function DashboardPage() {
   const verificationRate = totalChecks > 0 ? Math.round((verifiedChecks / totalChecks) * 100) : 0
   const planMeta = getPlanById(session.user.plan ?? 'STARTER')
 
-  // Build trend data (last 14 days)
+  // 14-day trend
   const days = 14
   const trend: { date: string; total: number; verified: number; discrepancy: number }[] = []
   for (let i = days - 1; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    d.setHours(0, 0, 0, 0)
+    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0, 0, 0, 0)
     const next = new Date(d); next.setDate(d.getDate() + 1)
-    const dayChecks = allChecks.filter((c) => {
-      const t = c.updatedAt.getTime()
-      return t >= d.getTime() && t < next.getTime()
-    })
+    const dc = allChecks.filter((c: any) => { const t = c.updatedAt.getTime(); return t >= d.getTime() && t < next.getTime() })
     trend.push({
       date: d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
-      total: dayChecks.length,
-      verified: dayChecks.filter((c) => c.result === 'VERIFIED').length,
-      discrepancy: dayChecks.filter((c) => c.result === 'DISCREPANCY_FOUND').length,
+      total: dc.length,
+      verified: dc.filter((c: any) => c.result === 'VERIFIED').length,
+      discrepancy: dc.filter((c: any) => c.result === 'DISCREPANCY_FOUND').length,
     })
   }
 
-  // Avg turnaround in hours
-  const turnaroundChecks = allChecks.filter((c) => c.calledAt && c.createdAt)
-  const turnaround: { day: string; hours: number }[] = []
+  // Avg turnaround
+  const turnaroundChecks = allChecks.filter((c: any) => c.calledAt && c.createdAt)
   const dayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+  const turnaround: { day: string; hours: number }[] = []
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0)
     const next = new Date(d); next.setDate(d.getDate() + 1)
-    const dc = turnaroundChecks.filter((c) => c.calledAt!.getTime() >= d.getTime() && c.calledAt!.getTime() < next.getTime())
-    const avgH = dc.length === 0
-      ? 0
-      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt!.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
+    const dc = turnaroundChecks.filter((c: any) => c.calledAt!.getTime() >= d.getTime() && c.calledAt!.getTime() < next.getTime())
+    const avgH = dc.length === 0 ? 0 : Math.round(dc.reduce((acc: number, c: any) => acc + (c.calledAt!.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
     turnaround.push({ day: dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1], hours: avgH })
   }
 
+  const avgTurnaround = turnaround.filter(t => t.hours > 0).length > 0
+    ? turnaround.reduce((a, b) => a + b.hours, 0) / Math.max(1, turnaround.filter(t => t.hours > 0).length)
+    : 0
+
   // Status distribution
   const statusDist = [
-    { name: 'Ausstehend', value: candidateStatusGroups.find((g) => g.status === 'PENDING')?._count ?? 0, color: '#94a3b8' },
-    { name: 'In Prüfung', value: candidateStatusGroups.find((g) => g.status === 'IN_REVIEW')?._count ?? 0, color: '#6366f1' },
-    { name: 'Abgeschlossen', value: candidateStatusGroups.find((g) => g.status === 'COMPLETED')?._count ?? 0, color: '#10b981' },
-    { name: 'Abgelehnt', value: candidateStatusGroups.find((g) => g.status === 'REJECTED')?._count ?? 0, color: '#f43f5e' },
+    { name: 'Ausstehend',     value: candidateStatusGroups.find((g: any) => g.status === 'PENDING')?._count ?? 0,   color: '#94a3b8' },
+    { name: 'In Prüfung',     value: candidateStatusGroups.find((g: any) => g.status === 'IN_REVIEW')?._count ?? 0, color: '#6366f1' },
+    { name: 'Abgeschlossen',  value: candidateStatusGroups.find((g: any) => g.status === 'COMPLETED')?._count ?? 0, color: '#10b981' },
+    { name: 'Abgelehnt',      value: candidateStatusGroups.find((g: any) => g.status === 'REJECTED')?._count ?? 0,  color: '#f43f5e' },
   ]
 
-  // Plan usage
   const usedThisMonth = totalChecks
   const checkLimit = planMeta.includedChecks
   const usagePct = checkLimit > 0 ? Math.min(100, Math.round((usedThisMonth / checkLimit) * 100)) : 0
-
-  const stats = [
-    {
-      label: 'Kandidaten',
-      value: totalCandidates,
-      sub: `${activeCandidates} in Prüfung`,
-      icon: Users,
-      tone: 'brand' as const,
-      delta: '+12%',
-    },
-    {
-      label: 'Verifizierungsrate',
-      value: `${verificationRate}%`,
-      sub: `${verifiedChecks} verifiziert`,
-      icon: CheckCircle2,
-      tone: 'emerald' as const,
-      delta: '+4%',
-    },
-    {
-      label: 'Diskrepanzen',
-      value: discrepancies,
-      sub: discrepancies === 0 ? 'Keine Auffälligkeiten' : 'gefunden',
-      icon: AlertTriangle,
-      tone: 'rose' as const,
-      delta: discrepancies > 0 ? '−1' : '0',
-    },
-    {
-      label: 'Ø Durchlaufzeit',
-      value: `${turnaround.reduce((a, b) => a + b.hours, 0) / Math.max(1, turnaround.filter(t => t.hours).length) || 0} h`,
-      sub: 'letzte 7 Tage',
-      icon: Clock,
-      tone: 'violet' as const,
-      delta: '−18%',
-    },
-  ]
 
   const firstName = session.user.name.split(' ')[0] ?? session.user.name
   const trialLeft = trialDaysLeft(session.user.trialEndsAt)
@@ -170,8 +130,8 @@ export default async function DashboardPage() {
         isTrialing={isTrialing}
       />
 
-      <div className="space-y-6">
-        {/* Onboarding checklist (auto-hides when complete) */}
+      <div className="space-y-5">
+        {/* Onboarding checklist */}
         <OnboardingChecklist
           candidateCount={totalCandidates}
           checkCount={totalChecks}
@@ -179,94 +139,101 @@ export default async function DashboardPage() {
           hasAddon={addonOrders > 0}
         />
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((s) => <StatCard key={s.label} {...s} />)}
-        </div>
+        {/* KPI strip with animated counters */}
+        <KPIStrip
+          totalCandidates={totalCandidates}
+          activeCandidates={activeCandidates}
+          verificationRate={verificationRate}
+          verifiedChecks={verifiedChecks}
+          discrepancies={discrepancies}
+          avgTurnaround={avgTurnaround}
+        />
 
-        {/* Plan usage banner */}
+        {/* Plan usage */}
         {checkLimit > 0 && (
-          <div className="card-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-text-primary">{planMeta.name}-Paket</span>
-                  <span className="badge-brand text-[10px]">{ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short ?? 'HR'}</span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-text-secondary">
-                  <span>{usedThisMonth} / {checkLimit} Prüfungen</span>
-                  <div className="flex-1 max-w-xs h-1.5 rounded-full bg-bg-tertiary overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-brand-500 to-violet rounded-full transition-all" style={{ width: `${usagePct}%` }} />
-                  </div>
-                  <span className="font-mono font-semibold text-text-primary">{usagePct}%</span>
-                </div>
-              </div>
-            </div>
-            <Link href="/preise" className="btn-secondary text-xs">
-              Paket erweitern <ArrowUpRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+          <PlanUsageCard
+            planName={planMeta.name}
+            accountTypeShort={ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short ?? 'HR'}
+            usedChecks={usedThisMonth}
+            checkLimit={checkLimit}
+            usagePct={usagePct}
+          />
         )}
 
-        {/* Charts grid */}
+        {/* Charts row */}
         <div className="grid lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 card-md">
+          {/* Activity chart */}
+          <div className="lg:col-span-2 bg-white border border-slate-100 rounded-2xl p-5" style={{ boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="section-title">Aktivität</h2>
-                <p className="text-xs text-text-secondary mt-0.5">Letzte 14 Tage</p>
+                <h2 className="text-sm font-bold text-slate-800">Aktivitäts-Trend</h2>
+                <p className="text-[11px] text-slate-400 mt-0.5">Letzte 14 Tage · Prüfungen &amp; Verifizierungen</p>
               </div>
-              <div className="flex items-center gap-3 text-xs">
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-brand-500" /> Geprüft</div>
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Verifiziert</div>
+              <div className="flex items-center gap-4 text-[11px] text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+                  Geprüft
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  Verifiziert
+                </div>
               </div>
             </div>
             <ActivityAreaChart data={trend} />
           </div>
-          <div className="card-md">
-            <h2 className="section-title mb-1">Kandidaten-Status</h2>
-            <p className="text-xs text-text-secondary mb-4">Verteilung aktuell</p>
+
+          {/* Status pie */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-5" style={{ boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
+            <h2 className="text-sm font-bold text-slate-800 mb-0.5">Kandidaten-Status</h2>
+            <p className="text-[11px] text-slate-400 mb-4">Verteilung aktuell</p>
             <StatusPieChart data={statusDist} />
           </div>
         </div>
 
+        {/* Bottom row: turnaround + recent candidates + quick actions */}
         <div className="grid lg:grid-cols-3 gap-5">
-          <div className="card-md">
-            <h2 className="section-title mb-1">Ø Durchlaufzeit</h2>
-            <p className="text-xs text-text-secondary mb-4">letzte 7 Tage in Stunden</p>
+          {/* Turnaround */}
+          <div className="bg-white border border-slate-100 rounded-2xl p-5" style={{ boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
+            <h2 className="text-sm font-bold text-slate-800 mb-0.5">Ø Durchlaufzeit</h2>
+            <p className="text-[11px] text-slate-400 mb-4">Letzte 7 Tage in Stunden</p>
             <TurnaroundBarChart data={turnaround} />
           </div>
 
           {/* Recent candidates */}
-          <div className="card-md">
+          <div className="bg-white border border-slate-100 rounded-2xl p-5" style={{ boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title">Neueste Kandidaten</h2>
-              <Link href="/candidates" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
+              <h2 className="text-sm font-bold text-slate-800">Neueste Kandidaten</h2>
+              <Link href="/candidates" className="flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+                Alle <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
             {recentCandidates.length === 0 ? (
-              <EmptyState message="Noch keine Kandidaten" cta="Anlegen" href="/candidates/new" />
+              <div className="text-center py-8">
+                <div className="text-[11px] text-slate-400 mb-3">Noch keine Kandidaten</div>
+                <Link href="/candidates/new" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors">
+                  Ersten anlegen
+                </Link>
+              </div>
             ) : (
-              <div className="space-y-1.5">
-                {recentCandidates.slice(0, 5).map((c) => {
+              <div className="space-y-1">
+                {recentCandidates.slice(0, 5).map((c: any) => {
                   const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
                   return (
                     <Link key={c.id} href={`/candidates/${c.id}`}
-                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
+                      className="flex items-center justify-between px-2.5 py-2 rounded-xl hover:bg-slate-50 transition-colors group">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-brand-700">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 border border-indigo-100 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-indigo-700">
                           {c.firstName[0]}{c.lastName[0]}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-xs font-semibold text-text-primary truncate group-hover:text-brand-700 transition-colors">
+                          <div className="text-xs font-semibold text-slate-700 truncate group-hover:text-indigo-700 transition-colors">
                             {c.firstName} {c.lastName}
                           </div>
-                          <div className="text-[10px] text-text-muted truncate">{c.position}</div>
+                          <div className="text-[10px] text-slate-400 truncate">{c.position}</div>
                         </div>
                       </div>
-                      <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${st.color}`}>{st.label}</span>
                     </Link>
                   )
                 })}
@@ -275,36 +242,44 @@ export default async function DashboardPage() {
           </div>
 
           {/* Recent checks */}
-          <div className="card-md">
+          <div className="bg-white border border-slate-100 rounded-2xl p-5" style={{ boxShadow: '0 2px 8px rgba(15,23,42,0.06)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title">Aktuelle Prüfungen</h2>
-              <Link href="/checks" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
+              <h2 className="text-sm font-bold text-slate-800">Aktuelle Prüfungen</h2>
+              <Link href="/checks" className="flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+                Alle <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
             {recentChecks.length === 0 ? (
-              <EmptyState message="Noch keine Prüfungen" cta="Erste Prüfung starten" href="/checks/new" />
+              <div className="text-center py-8">
+                <div className="text-[11px] text-slate-400 mb-3">Noch keine Prüfungen</div>
+                <Link href="/checks/new" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-50 text-violet-700 hover:bg-violet-100 transition-colors">
+                  Erste Prüfung starten
+                </Link>
+              </div>
             ) : (
-              <div className="space-y-1.5">
-                {recentChecks.slice(0, 5).map((chk) => {
+              <div className="space-y-1">
+                {recentChecks.slice(0, 5).map((chk: any) => {
                   const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
                   const resIcon = chk.result === 'VERIFIED' ? CheckCircle2 : chk.result === 'DISCREPANCY_FOUND' ? AlertCircle : Clock
-                  const resColor = chk.result === 'VERIFIED' ? 'text-emerald-600' : chk.result === 'DISCREPANCY_FOUND' ? 'text-rose-600' : 'text-amber-600'
+                  const resColor = chk.result === 'VERIFIED' ? 'text-emerald-500' : chk.result === 'DISCREPANCY_FOUND' ? 'text-rose-500' : 'text-amber-500'
+                  const ResIcon = resIcon
                   return (
                     <Link key={chk.id} href={`/checks/${chk.id}`}
-                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
+                      className="flex items-center justify-between px-2.5 py-2 rounded-xl hover:bg-slate-50 transition-colors group">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center flex-shrink-0 ${resColor}`}>
-                          {(() => { const I = resIcon; return <I className="w-4 h-4" /> })()}
+                        <div className={`w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 ${resColor}`}>
+                          <ResIcon className="w-3.5 h-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-xs font-semibold text-text-primary truncate">
+                          <div className="text-xs font-semibold text-slate-700 truncate group-hover:text-violet-700 transition-colors">
                             {chk.employerName}
                           </div>
-                          <div className="text-[10px] text-text-muted truncate">
+                          <div className="text-[10px] text-slate-400 truncate">
                             {chk.candidate.firstName} {chk.candidate.lastName}
                           </div>
                         </div>
                       </div>
-                      <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${st.color}`}>{st.label}</span>
                     </Link>
                   )
                 })}
@@ -313,49 +288,12 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Activity feed (audit trail summary) */}
-        <ActivityFeed events={recentEvents} />
+        {/* Quick Actions + Activity feed */}
+        <div className="grid lg:grid-cols-2 gap-5">
+          <QuickActions />
+          <RecentActivity events={recentEvents} />
+        </div>
       </div>
     </>
-  )
-}
-
-function StatCard({ label, value, sub, icon: Icon, tone, delta }: {
-  label: string; value: string | number; sub: string;
-  icon: any; tone: 'brand' | 'emerald' | 'rose' | 'violet'; delta: string;
-}) {
-  const toneCls = {
-    brand: 'text-brand-600 bg-brand-50 border-brand-200',
-    emerald: 'text-emerald-600 bg-emerald-50 border-emerald-200',
-    rose: 'text-rose-600 bg-rose-50 border-rose-200',
-    violet: 'text-violet bg-violet/10 border-violet/20',
-  }[tone]
-  const deltaTone = delta.startsWith('+') ? 'text-emerald-700' : delta.startsWith('−') ? 'text-emerald-700' : 'text-text-muted'
-  return (
-    <div className="card-md group hover:shadow-card-lg transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${toneCls}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        <span className={`text-xs font-bold ${deltaTone}`}>
-          <TrendingUp className="w-3 h-3 inline mr-0.5" />
-          {delta}
-        </span>
-      </div>
-      <div className="text-3xl font-bold text-text-primary tracking-tighter mb-1" style={{ fontFeatureSettings: '"tnum"' }}>
-        {value}
-      </div>
-      <div className="text-xs text-text-secondary">{label}</div>
-      <div className="text-[10px] text-text-muted mt-1">{sub}</div>
-    </div>
-  )
-}
-
-function EmptyState({ message, cta, href }: { message: string; cta: string; href: string }) {
-  return (
-    <div className="text-center py-8">
-      <div className="text-text-muted text-xs mb-3">{message}</div>
-      <Link href={href} className="btn-primary text-xs py-2 px-4">{cta}</Link>
-    </div>
   )
 }
