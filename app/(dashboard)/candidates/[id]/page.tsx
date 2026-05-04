@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, formatDateTime, formatFileSize, CANDIDATE_STATUS, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import { CandidateActions } from './CandidateActions'
+import { CvAttachPanel } from '@/components/candidates/CvAttachPanel'
 import { Phone, Plus, ShieldCheck, ShieldAlert, FileText, Download, Mail } from 'lucide-react'
 
 export default async function CandidateDetailPage({ params }: { params: { id: string } }) {
@@ -172,10 +173,8 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
           {/* Documents */}
           <div className="card-md">
             <h3 className="section-title mb-4 text-base">Dokumente</h3>
-            {candidate.documents.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-4">Keine Dokumente</p>
-            ) : (
-              <div className="space-y-2">
+            {candidate.documents.length > 0 && (
+              <div className="space-y-2 mb-4">
                 {candidate.documents.map((doc) => (
                   <a key={doc.id} href={`/api/download/${doc.id}`}
                     className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-secondary hover:bg-white border border-transparent hover:border-border transition-all group">
@@ -189,6 +188,10 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
                 ))}
               </div>
             )}
+            <CvAttachPanel
+              candidateId={candidate.id}
+              existingEmployers={candidate.checks.map((c) => c.employerName)}
+            />
           </div>
 
           {/* Quick stats */}
