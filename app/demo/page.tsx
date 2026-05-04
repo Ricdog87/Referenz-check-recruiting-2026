@@ -245,7 +245,7 @@ function DemoCard({ demo, onStart, isLoading, isDisabled }: {
 export default function DemoPage() {
   const router = useRouter()
   const [loading, setLoading] = useState<DemoKey | null>(null)
-  const [error, setError] = useState<{ message: string; retryable: boolean; key: DemoKey } | null>(null)
+  const [error, setError] = useState<{ message: string; retryable: boolean; key: DemoKey; operatorHint?: string } | null>(null)
 
   async function startDemo(key: DemoKey, attempt = 0): Promise<void> {
     if (loading) return
@@ -255,14 +255,14 @@ export default function DemoPage() {
       const res = await fetch(`/api/demo?type=${key}`, { method: 'POST', cache: 'no-store' })
       const data = await res.json()
       if (!res.ok) {
-        // One automatic silent retry for retryable failures (cold start / transient DB).
+        // Ein automatischer Silent-Retry bei „retryable" Fehlern (Cold-Start / Transient).
         if (data.retryable && attempt === 0) {
           await new Promise((r) => setTimeout(r, 1200))
           return startDemo(key, 1)
         }
         throw Object.assign(
           new Error(data.error ?? 'Demo konnte nicht geladen werden.'),
-          { retryable: !!data.retryable },
+          { retryable: !!data.retryable, operatorHint: data.operatorHint as string | undefined },
         )
       }
       const result = await signIn('credentials', { email: data.email, password: data.password, redirect: false })
@@ -274,6 +274,7 @@ export default function DemoPage() {
         message: e.message ?? 'Demo gerade nicht verfügbar.',
         retryable: e.retryable ?? true,
         key,
+        operatorHint: e.operatorHint,
       })
       setLoading(null)
     }
@@ -409,6 +410,11 @@ export default function DemoPage() {
                 <p className="text-xs text-amber-800/90 leading-relaxed mb-3">
                   {error.message}
                 </p>
+                {error.operatorHint && (
+                  <p className="text-[11px] text-amber-900/80 bg-white/60 border border-amber-200 rounded-lg px-2.5 py-1.5 mb-3 font-mono">
+                    <strong>Setup-Hinweis:</strong> {error.operatorHint}
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-2">
                   {error.retryable && (
                     <button
@@ -418,11 +424,19 @@ export default function DemoPage() {
                       <Loader2 className="w-3 h-3" /> Erneut versuchen
                     </button>
                   )}
+                  <a
+                    href="/api/health"
+                    target="_blank"
+                    rel="noopener"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
+                  >
+                    Diagnose öffnen
+                  </a>
                   <Link
                     href="/register"
                     className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
                   >
-                    Stattdessen kostenloses Konto erstellen <ArrowRight className="w-3 h-3" />
+                    Stattdessen kostenloses Konto <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>

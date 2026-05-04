@@ -28,6 +28,7 @@ function LoginForm() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [demoLoading, setDemoLoading] = useState<DemoKey | null>(null)
+  const [operatorHint, setOperatorHint] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -67,6 +68,7 @@ function LoginForm() {
   async function startDemo(key: DemoKey, attempt = 0): Promise<void> {
     if (loading || demoLoading) return
     setError('')
+    setOperatorHint(null)
     setDemoLoading(key)
     try {
       const res = await fetch(`/api/demo?type=${key}`, { method: 'POST', cache: 'no-store' })
@@ -77,6 +79,7 @@ function LoginForm() {
           return startDemo(key, 1)
         }
         setError(data?.error || 'Demo gerade nicht verfügbar. Bitte einen Moment warten.')
+        if (data?.operatorHint) setOperatorHint(data.operatorHint)
         setDemoLoading(null)
         return
       }
@@ -188,7 +191,15 @@ function LoginForm() {
 
           {error && (
             <div role="alert" className="px-4 py-3 rounded-xl text-sm text-rose-700 bg-rose-50 border border-rose-200">
-              {error}
+              <div>{error}</div>
+              {operatorHint && (
+                <div className="mt-2 text-[11px] font-mono text-rose-900/80 bg-white/60 border border-rose-200 rounded px-2 py-1">
+                  Setup: {operatorHint} ·{' '}
+                  <a href="/api/health" target="_blank" rel="noopener" className="underline font-semibold">
+                    Diagnose öffnen
+                  </a>
+                </div>
+              )}
             </div>
           )}
 

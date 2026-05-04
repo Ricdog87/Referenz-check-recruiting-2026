@@ -128,6 +128,65 @@ curl -X POST 'http://localhost:3000/api/demo?type=hr'
 
 ---
 
+## Troubleshooting
+
+### „Datenbankverbindung konnte nicht hergestellt werden" / „Demo wird vorbereitet"
+
+→ **Erste Anlaufstelle: `https://IHRE-APP.vercel.app/api/health`**
+
+Der Endpoint sagt dir genau, was kaputt ist (env vars, DB-Status, Tabellen, Hinweis-Text). Beispiel:
+
+```json
+{
+  "status": "unhealthy",
+  "env": { "DATABASE_URL": false, "NEXTAUTH_SECRET": true, ... },
+  "db": { "configured": false },
+  "hint": "DATABASE_URL ist nicht gesetzt. In Vercel → Settings → Environment Variables ergänzen…"
+}
+```
+
+### Die 5 häufigsten Supabase + Vercel Stolpersteine
+
+| # | Symptom | Lösung |
+|---|---|---|
+| 1 | `health.env.DATABASE_URL = false` | In Vercel → **Settings → Environment Variables** anlegen, dann **Redeploy** triggern (Vercel zieht neue Env-Vars nicht im laufenden Build) |
+| 2 | `db.error: prepared statement "s0" does not exist` | DATABASE_URL braucht `?pgbouncer=true&connection_limit=1` am Ende. **Wir patchen das jetzt automatisch** für `*.pooler.supabase.com` Hosts — wenn du eine andere DB nutzt, manuell ergänzen. |
+| 3 | `db.error: password authentication failed` | Falsches Passwort in der URL. In Supabase → **Database → Connection String** komplett neu kopieren (oft enthält das angezeigte Passwort einen Platzhalter `[YOUR-PASSWORD]`, der ersetzt werden muss). |
+| 4 | `db.error: ENOTFOUND` oder `P1001` | Supabase-Projekt ist pausiert (Free Tier schläft nach 1 Woche Inaktivität). In Supabase Dashboard → Restore. |
+| 5 | `tables.User: false` (alle false) | Das DB-Schema ist noch nicht angelegt. Lösung: **`POST /api/admin/init?secret=DEIN_INIT_SECRET`** aufrufen (`INIT_SECRET` in Vercel-Env setzen) — oder lokal `npx prisma db push` gegen die Vercel-DB-URL ausführen. |
+
+### Supabase Connection-String richtig kopieren
+
+In Supabase Dashboard:
+1. **Project Settings → Database**
+2. **Connection string** Tab
+3. Mode: **„Transaction"** auswählen (Port 6543, nicht „Session"!)
+4. **Display connection pooler** anhaken
+5. Den kompletten String kopieren — **Format:**
+   ```
+   postgresql://postgres.PROJECT_REF:PASSWORT@aws-0-eu-central-1.pooler.supabase.com:6543/postgres
+   ```
+6. `[YOUR-PASSWORD]` durch dein echtes Passwort ersetzen
+7. Im Vercel-Env-Feld einfügen — `?pgbouncer=true&connection_limit=1` muss **nicht** mehr manuell angehängt werden, der App-Code patcht das automatisch.
+
+### Schema initial pushen (einmalig)
+
+Nach dem ersten Deployment muss die DB einmal das Schema bekommen. Drei Wege:
+
+```bash
+# Variante A: Lokal aus dem Repo, gegen die Live-DB
+DATABASE_URL="postgresql://postgres.PROJECT_REF:PW@…pooler.supabase.com:6543/postgres" \
+  npx prisma db push
+
+# Variante B: Via Admin-Endpoint (nach erstem Deploy)
+curl -X GET "https://IHRE-APP.vercel.app/api/admin/init?secret=DEIN_INIT_SECRET"
+
+# Variante C: Lazy — die erste Registrierung / der erste Demo-Login löst
+# `lib/db-init.ts` automatisch aus, sobald eine DB-Connection steht.
+```
+
+---
+
 ## Hostinger (alternativ zu Vercel)
 
 ### Datenbank

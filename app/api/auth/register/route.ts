@@ -139,19 +139,24 @@ export async function POST(req: NextRequest) {
       message: (error as any)?.message,
     })
 
+    const dbConfigured = !!process.env.DATABASE_URL
+    const operatorHint = !dbConfigured
+      ? 'DATABASE_URL nicht konfiguriert — siehe /api/health'
+      : 'Datenbank nicht erreichbar — Diagnose unter /api/health'
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return NextResponse.json({ error: 'Diese E-Mail-Adresse ist bereits registriert.' }, { status: 409 })
       }
       if (error.code === 'P1001' || error.code === 'P1002' || error.code === 'P1017') {
         return NextResponse.json(
-          { error: 'Datenbank aktuell nicht erreichbar. Bitte in 1–2 Minuten erneut versuchen.' },
+          { error: 'Datenbank aktuell nicht erreichbar. Bitte in 1–2 Minuten erneut versuchen.', operatorHint },
           { status: 503 }
         )
       }
       if (error.code === 'P2021' || error.code === 'P2022') {
         return NextResponse.json(
-          { error: 'Datenbank-Setup wird gerade abgeschlossen. Bitte in einem Moment erneut versuchen.' },
+          { error: 'Datenbank-Setup wird gerade abgeschlossen. Bitte in einem Moment erneut versuchen.', operatorHint },
           { status: 503 }
         )
       }
@@ -159,13 +164,13 @@ export async function POST(req: NextRequest) {
 
     if (error instanceof Prisma.PrismaClientInitializationError) {
       return NextResponse.json(
-        { error: 'Datenbankverbindung konnte nicht hergestellt werden. Bitte später erneut versuchen.' },
+        { error: 'Datenbankverbindung konnte nicht hergestellt werden. Bitte später erneut versuchen.', operatorHint },
         { status: 503 }
       )
     }
 
     return NextResponse.json(
-      { error: 'Registrierung fehlgeschlagen. Bitte in einem Moment erneut versuchen oder support@candiq.de kontaktieren.' },
+      { error: 'Registrierung fehlgeschlagen. Bitte in einem Moment erneut versuchen oder support@candiq.de kontaktieren.', operatorHint },
       { status: 500 }
     )
   }

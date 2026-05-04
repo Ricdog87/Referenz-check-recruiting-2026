@@ -43,6 +43,7 @@ function RegisterForm() {
   const [showPw, setShowPw] = useState(false)
   const [gdprAccepted, setGdprAccepted] = useState(false)
   const [error, setError] = useState('')
+  const [operatorHint, setOperatorHint] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   const strength = useMemo(() => passwordStrength(form.password), [form.password])
@@ -93,9 +94,11 @@ function RegisterForm() {
 
       if (!res.ok) {
         setError(data.error || 'Registrierung fehlgeschlagen. Bitte erneut versuchen.')
+        setOperatorHint(data.operatorHint || null)
         setLoading(false)
         return
       }
+      setOperatorHint(null)
 
       const signInRes = await signIn('credentials', {
         email: form.email.trim().toLowerCase(),
@@ -325,7 +328,15 @@ function RegisterForm() {
 
             {error && (
               <div role="alert" className="px-4 py-3 rounded-xl text-xs text-rose-700 bg-rose-50 border border-rose-200">
-                {error}
+                <div>{error}</div>
+                {operatorHint && (
+                  <div className="mt-2 text-[10px] font-mono text-rose-900/80 bg-white/60 border border-rose-200 rounded px-2 py-1">
+                    Setup: {operatorHint} ·{' '}
+                    <a href="/api/health" target="_blank" rel="noopener" className="underline font-semibold">
+                      Diagnose öffnen
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 

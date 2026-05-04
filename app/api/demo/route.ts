@@ -224,7 +224,6 @@ async function handle(req: NextRequest) {
       user: { id: user.id, name: user.name, company: user.company },
     })
   } catch (error) {
-    // Detailed log on the server, friendly message to the user.
     console.error('demo_seed_error', {
       profileKey,
       code: (error as any)?.code,
@@ -232,31 +231,35 @@ async function handle(req: NextRequest) {
       message: (error as any)?.message,
     })
 
-    // Customer-facing copy — never leak DATABASE_URL hints or admin paths.
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P1001' || error.code === 'P1002' || error.code === 'P1017') {
-        return NextResponse.json(
-          {
-            error: 'Demo wird gerade vorbereitet. Bitte in einem Moment erneut versuchen.',
-            retryable: true,
-          },
-          { status: 503 },
-        )
-      }
-    }
-    if (error instanceof Prisma.PrismaClientInitializationError) {
+    const dbConfigured = !!process.env.DATABASE_URL
+    const isInitErr = error instanceof Prisma.PrismaClientInitializationError
+    const isConnErr =
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      ['P1001', 'P1002', 'P1017'].includes(error.code)
+
+    // Operator-Hinweis (für SaaS-Betreiber sichtbar — keine Secrets)
+    const operatorHint = !dbConfigured
+      ? 'DATABASE_URL nicht konfiguriert — siehe /api/health'
+      : isInitErr || isConnErr
+        ? 'Datenbank nicht erreichbar — Diagnose unter /api/health'
+        : null
+
+    if (isInitErr || isConnErr) {
       return NextResponse.json(
         {
-          error: 'Demo wird gerade vorbereitet. Bitte in einem Moment erneut versuchen.',
+          error: 'Demo wird gerade vorbereitet. Bitte in 30 Sekunden erneut versuchen.',
           retryable: true,
+          operatorHint,
         },
         { status: 503 },
       )
     }
+
     return NextResponse.json(
       {
         error: 'Demo gerade nicht verfügbar. Bitte später erneut versuchen — oder direkt ein kostenloses Konto erstellen.',
         retryable: false,
+        operatorHint,
       },
       { status: 500 },
     )
