@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, CANDIDATE_STATUS } from '@/lib/utils'
-import { Search, Plus, Users, ShieldCheck, ShieldAlert } from 'lucide-react'
+import { Search, Plus, Users, ShieldCheck, ShieldAlert, Upload } from 'lucide-react'
 
 export default async function CandidatesPage({
   searchParams,
@@ -45,9 +45,14 @@ export default async function CandidatesPage({
         title="Kandidaten"
         subtitle={`${total} insgesamt · ${candidates.length} angezeigt`}
         action={
-          <Link href="/candidates/new" className="btn-primary">
-            <Plus className="w-4 h-4" /> Kandidat hinzufügen
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/candidates/bulk" className="btn-secondary">
+              <Upload className="w-4 h-4" /> Bulk-Import
+            </Link>
+            <Link href="/candidates/new" className="btn-primary">
+              <Plus className="w-4 h-4" /> Kandidat hinzufügen
+            </Link>
+          </div>
         }
       />
 

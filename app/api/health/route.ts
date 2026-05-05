@@ -1,22 +1,25 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 /**
- * Diagnose-Endpoint. Bewusst öffentlich erreichbar, weil er
- * keinerlei Daten oder Secrets preisgibt — nur Health-Signale.
+ * Diagnose-Endpoint.
  *
- * Liefert:
- *  - status: ok / degraded / unhealthy
- *  - env:   Welche Pflicht-Env-Variablen gesetzt sind (boolesch, KEINE Werte)
- *  - db:    Hostname (ohne Credentials), Port, Pooler-Erkennung, Latenz
- *  - tables: Welche Kern-Tabellen existieren (für DB-Init-Probleme)
- *  - hint:  Klartext-Hinweis für die häufigsten Setup-Fehler
+ * Default ist öffentlich erreichbar (Vercel/Status-Monitor brauchen das).
+ * Falls `HEALTH_SECRET` env var gesetzt ist, wird `?secret=…` verlangt —
+ * dann werden auch sensible env-Felder offengelegt (DB host, etc).
+ *
+ * Ohne Secret: minimaler Output (alive ja/nein) — kein Leak von Stack/Hosts.
+ * Mit Secret-Match: voller Diagnose-Dump.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   const start = Date.now()
+  const required = process.env.HEALTH_SECRET
+  const provided = req.nextUrl.searchParams.get('secret')
+  const isAuthenticated = !required || (!!provided && provided === required)
+
   const env = {
     DATABASE_URL: !!process.env.DATABASE_URL,
     NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
@@ -28,6 +31,12 @@ export async function GET() {
   const dbInfo = parseDbUrl(process.env.DATABASE_URL)
 
   if (!process.env.DATABASE_URL) {
+    if (!isAuthenticated) {
+      return NextResponse.json(
+        { status: 'unhealthy', alive: false, timestamp: new Date().toISOString() },
+        { status: 503 },
+      )
+    }
     return NextResponse.json(
       {
         status: 'unhealthy',
@@ -81,6 +90,15 @@ export async function GET() {
   } else if (!allTablesPresent) {
     const missing = Object.entries(tables).filter(([, v]) => !v).map(([k]) => k)
     hint = `Diese Tabellen fehlen: ${missing.join(', ')}. POST auf /api/admin/init?secret=… (mit INIT_SECRET) löst den Schema-Sync aus, oder lokal "npx prisma db push" gegen die selbe DB ausführen.`
+  }
+
+  // Wenn HEALTH_SECRET gesetzt und nicht authentifiziert → minimaler Output.
+  // Status-Monitoring funktioniert weiterhin, aber kein Leak von Hosts/Tabellen.
+  if (!isAuthenticated) {
+    return NextResponse.json(
+      { status, alive: dbAlive, latencyMs, timestamp: new Date().toISOString() },
+      { status: status === 'unhealthy' ? 503 : 200 },
+    )
   }
 
   return NextResponse.json(

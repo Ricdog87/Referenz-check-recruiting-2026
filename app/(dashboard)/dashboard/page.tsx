@@ -11,6 +11,8 @@ import {
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
+import { PlanLimitBanner } from '@/components/dashboard/PlanLimitBanner'
+import { getLimitState } from '@/lib/limits'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -18,6 +20,8 @@ export default async function DashboardPage() {
 
   const userId = session.user.id
   const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
+
+  const limitState = await getLimitState(userId)
 
   const [
     totalCandidates,
@@ -171,6 +175,9 @@ export default async function DashboardPage() {
       />
 
       <div className="space-y-6">
+        {/* Plan-Limit / Trial-Expired Banner — nur sichtbar wenn relevant */}
+        <PlanLimitBanner state={limitState} />
+
         {/* Onboarding checklist (auto-hides when complete) */}
         <OnboardingChecklist
           candidateCount={totalCandidates}
