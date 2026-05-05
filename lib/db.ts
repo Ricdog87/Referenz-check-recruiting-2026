@@ -8,12 +8,19 @@ const globalForPrisma = globalThis as unknown as {
  * Normalisiert die DATABASE_URL für Supabase + pgbouncer.
  *
  * Häufiger Vercel-Stolperstein: Nutzer kopiert die Supabase „Pooled Connection"
- * (Port 6543) ohne den `?pgbouncer=true&connection_limit=1` Anhang. Prisma
- * hält dann prepared statements offen, die pgbouncer im Transaction-Mode
- * sofort verwirft → cryptische `prepared statement does not exist`.
+ * (Port 6543) ohne den `?pgbouncer=true` Anhang. Prisma hält dann prepared
+ * statements offen, die pgbouncer im Transaction-Mode sofort verwirft →
+ * cryptische `prepared statement does not exist`.
  *
- * Wir patchen das hier transparent — User merkt nichts, App läuft.
+ * Wichtig für Performance: connection_limit MUSS auf einem Wert > 1 stehen,
+ * sonst werden alle parallelen Queries (z. B. Dashboard mit 5 × Promise.all)
+ * über genau eine Connection serialisiert — was einen 5×-Slowdown verursacht.
+ * pgbouncer im Transaction-Mode multiplext mehrere Client-Connections auf
+ * wenige DB-Connections, daher ist 5 hier ein sinnvolles Default. User kann
+ * via `?connection_limit=N` in der URL überschreiben.
  */
+const DEFAULT_PGBOUNCER_CONN_LIMIT = '5'
+
 function normalizeDatabaseUrl(raw: string | undefined): string | undefined {
   if (!raw) return raw
   try {
@@ -23,7 +30,9 @@ function normalizeDatabaseUrl(raw: string | undefined): string | undefined {
 
     if (isSupabasePooler || isPgbouncerPort) {
       if (!url.searchParams.has('pgbouncer')) url.searchParams.set('pgbouncer', 'true')
-      if (!url.searchParams.has('connection_limit')) url.searchParams.set('connection_limit', '1')
+      if (!url.searchParams.has('connection_limit')) {
+        url.searchParams.set('connection_limit', DEFAULT_PGBOUNCER_CONN_LIMIT)
+      }
     }
     return url.toString()
   } catch {

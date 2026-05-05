@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { sendEmail, checkCompletedEmail } from '@/lib/email'
+import { dashboardCacheTag } from '@/lib/dashboard-stats'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +26,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   const updated = await prisma.referenceCheck.update({ where: { id: params.id }, data })
+
+  revalidateTag(dashboardCacheTag(session.user.id))
 
   // Mail-Trigger: Wechsel auf COMPLETED + Result-Wert vorhanden + nicht schon vorher COMPLETED.
   // Fire-and-forget; Mail-Versand darf den Request nicht blockieren oder zum Crash bringen.
@@ -84,5 +88,6 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
   if (!check) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 })
 
   await prisma.referenceCheck.delete({ where: { id: params.id } })
+  revalidateTag(dashboardCacheTag(session.user.id))
   return NextResponse.json({ ok: true })
 }

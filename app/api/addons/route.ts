@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getAddon } from '@/lib/addons'
 import { rateLimit } from '@/lib/rate-limit'
+import { dashboardCacheTag } from '@/lib/dashboard-stats'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,6 +63,8 @@ export async function POST(req: NextRequest) {
         details: JSON.stringify({ sku: addon.sku, price: addon.price, quantity: addon.quantity }),
       },
     })
+
+    revalidateTag(dashboardCacheTag(session.user.id))
 
     return NextResponse.json({ success: true, orderId: order.id })
   } catch (err: any) {

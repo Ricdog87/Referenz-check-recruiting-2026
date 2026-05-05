@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { prisma } from './db'
 
 /**
@@ -142,3 +143,188 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     trialEndsAt: u.trialEndsAt,
   }
 }
+
+/**
+ * Trend- und Turnaround-Aggregationen direkt in SQL.
+ *
+ * Vorher: 30 Tage Roh-Rows holen + im Node-Loop bucketen → wachsendes Payload
+ * mit den Daten des Users. Jetzt: zwei kleine GROUP-BY-Queries, die genau die
+ * 14 / 7 Buckets liefern, die das Dashboard rendert.
+ */
+type RawTrendRow = {
+  bucket: Date
+  total: bigint
+  verified: bigint
+  discrepancy: bigint
+}
+type RawTurnaroundRow = {
+  bucket: Date
+  avg_hours: number | null
+}
+
+export type DashboardTrendBuckets = {
+  trend: { date: string; total: number; verified: number; discrepancy: number }[]
+  turnaround: { day: string; hours: number }[]
+}
+
+export async function getDashboardTrendBuckets(userId: string): Promise<DashboardTrendBuckets> {
+  const now = new Date()
+  const trendStart = new Date(now)
+  trendStart.setHours(0, 0, 0, 0)
+  trendStart.setDate(trendStart.getDate() - 13)
+
+  const turnaroundStart = new Date(now)
+  turnaroundStart.setHours(0, 0, 0, 0)
+  turnaroundStart.setDate(turnaroundStart.getDate() - 6)
+
+  const [trendRows, turnaroundRows] = await Promise.all([
+    prisma.$queryRaw<RawTrendRow[]>`
+      SELECT
+        date_trunc('day', rc."updatedAt") AS bucket,
+        COUNT(*)::bigint AS total,
+        COUNT(*) FILTER (WHERE rc."result" = 'VERIFIED')::bigint           AS verified,
+        COUNT(*) FILTER (WHERE rc."result" = 'DISCREPANCY_FOUND')::bigint  AS discrepancy
+      FROM "ReferenceCheck" rc
+      JOIN "Candidate" c ON c."id" = rc."candidateId"
+      WHERE c."userId" = ${userId} AND rc."updatedAt" >= ${trendStart}
+      GROUP BY 1
+    `,
+    prisma.$queryRaw<RawTurnaroundRow[]>`
+      SELECT
+        date_trunc('day', rc."calledAt") AS bucket,
+        AVG(EXTRACT(EPOCH FROM (rc."calledAt" - rc."createdAt")) / 3600.0) AS avg_hours
+      FROM "ReferenceCheck" rc
+      JOIN "Candidate" c ON c."id" = rc."candidateId"
+      WHERE c."userId" = ${userId}
+        AND rc."calledAt" IS NOT NULL
+        AND rc."calledAt" >= ${turnaroundStart}
+      GROUP BY 1
+    `,
+  ])
+
+  const trendByDay = new Map<string, RawTrendRow>()
+  for (const row of trendRows) trendByDay.set(dayKey(row.bucket), row)
+
+  const trend: DashboardTrendBuckets['trend'] = []
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now)
+    d.setHours(0, 0, 0, 0)
+    d.setDate(d.getDate() - i)
+    const row = trendByDay.get(dayKey(d))
+    trend.push({
+      date: d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
+      total: row ? Number(row.total) : 0,
+      verified: row ? Number(row.verified) : 0,
+      discrepancy: row ? Number(row.discrepancy) : 0,
+    })
+  }
+
+  const turnaroundByDay = new Map<string, RawTurnaroundRow>()
+  for (const row of turnaroundRows) turnaroundByDay.set(dayKey(row.bucket), row)
+
+  const dayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
+  const turnaround: DashboardTrendBuckets['turnaround'] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now)
+    d.setHours(0, 0, 0, 0)
+    d.setDate(d.getDate() - i)
+    const row = turnaroundByDay.get(dayKey(d))
+    const idx = d.getDay() === 0 ? 6 : d.getDay() - 1
+    turnaround.push({
+      day: dayLabels[idx],
+      hours: row?.avg_hours ? Math.round(row.avg_hours) : 0,
+    })
+  }
+
+  return { trend, turnaround }
+}
+
+function dayKey(d: Date): string {
+  return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`
+}
+
+/**
+ * Per-User Cache für die komplette Dashboard-Seite. 15s TTL ist kurz genug,
+ * dass neue Kandidaten/Checks nahezu sofort sichtbar werden, lange genug,
+ * dass schnelles Hin-und-Her-Navigieren keine erneute DB-Last erzeugt.
+ *
+ * Cache-Tag: `dashboard:<userId>` — beim Erstellen/Updaten von Kandidaten,
+ * Checks oder Audit-Events kann via `revalidateTag` invalidiert werden.
+ */
+export const dashboardCacheTag = (userId: string) => `dashboard:${userId}`
+
+export const getCachedDashboardStats = (userId: string) =>
+  unstable_cache(
+    () => getDashboardStats(userId),
+    ['dashboard-stats', userId],
+    { revalidate: 15, tags: [dashboardCacheTag(userId)] },
+  )()
+
+export const getCachedDashboardTrendBuckets = (userId: string) =>
+  unstable_cache(
+    () => getDashboardTrendBuckets(userId),
+    ['dashboard-trend', userId],
+    { revalidate: 30, tags: [dashboardCacheTag(userId)] },
+  )()
+
+export type DashboardRecentLists = {
+  recentCandidates: {
+    id: string
+    firstName: string
+    lastName: string
+    position: string
+    status: string
+    _count: { checks: number }
+  }[]
+  recentChecks: {
+    id: string
+    employerName: string
+    status: string
+    result: string | null
+    candidate: { firstName: string; lastName: string; position: string }
+  }[]
+  recentEvents: {
+    id: string
+    action: string
+    entity: string
+    details: string | null
+    createdAt: Date
+  }[]
+}
+
+async function fetchDashboardRecentLists(userId: string): Promise<DashboardRecentLists> {
+  const [recentCandidates, recentChecks, recentEvents] = await Promise.all([
+    prisma.candidate.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 6,
+      select: {
+        id: true, firstName: true, lastName: true, position: true, status: true,
+        _count: { select: { checks: true } },
+      },
+    }),
+    prisma.referenceCheck.findMany({
+      where: { candidate: { userId } },
+      orderBy: { updatedAt: 'desc' },
+      take: 6,
+      select: {
+        id: true, employerName: true, status: true, result: true,
+        candidate: { select: { firstName: true, lastName: true, position: true } },
+      },
+    }),
+    prisma.auditLog.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 8,
+      select: { id: true, action: true, entity: true, details: true, createdAt: true },
+    }),
+  ])
+  return { recentCandidates, recentChecks, recentEvents }
+}
+
+export const getCachedDashboardRecentLists = (userId: string) =>
+  unstable_cache(
+    () => fetchDashboardRecentLists(userId),
+    ['dashboard-recent', userId],
+    { revalidate: 15, tags: [dashboardCacheTag(userId)] },
+  )()

@@ -1,161 +1,39 @@
+import { Suspense } from 'react'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/db'
 import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
 import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES, trialDaysLeft } from '@/lib/utils'
 import {
   Users, AlertTriangle, TrendingUp, ArrowUpRight,
-  Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
+  Sparkles, Clock, CheckCircle2, AlertCircle,
 } from 'lucide-react'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardChartsLazy'
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 import { PlanLimitBanner } from '@/components/dashboard/PlanLimitBanner'
 import { limitStateFromStats } from '@/lib/limits'
-import { getDashboardStats } from '@/lib/dashboard-stats'
+import {
+  getCachedDashboardStats,
+  getCachedDashboardTrendBuckets,
+  getCachedDashboardRecentLists,
+} from '@/lib/dashboard-stats'
+
+/**
+ * Performance-Strategie:
+ * - Shell + WelcomeBar rendern sofort (kein DB-Hit).
+ * - 3 Suspense-Boundaries streamen parallel: Stats/Banner, Charts, Recent-Listen.
+ * - Alle drei Datenquellen sind per `unstable_cache` per User für 15-30s gecacht
+ *   → Reload + Navigation zurück sind quasi instant.
+ * - Trend & Turnaround werden in SQL aggregiert (statt 30d Roh-Rows zu pullen).
+ */
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
   const userId = session.user.id
-  const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
-
-  // Performance: 7 Queries statt vorher 16. Alle Stats kommen aus 4
-  // aggregierten SQL-Statements (siehe lib/dashboard-stats.ts), die
-  // findMany-Listen sind unverändert (das sind echte Daten-Fetches).
-  // Trend-/Turnaround-Berechnung läuft über die letzten 30 Tage statt
-  // alle Checks — vermeidet Full-Scan auf großen Konten.
-  const trendCutoff = new Date()
-  trendCutoff.setDate(trendCutoff.getDate() - 30)
-
-  const [
-    stats,
-    recentCandidates,
-    recentChecks,
-    trendChecks,
-    recentEvents,
-  ] = await Promise.all([
-    getDashboardStats(userId),
-    prisma.candidate.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 6,
-      include: { _count: { select: { checks: true } } },
-    }),
-    prisma.referenceCheck.findMany({
-      where: { candidate: { userId } },
-      orderBy: { updatedAt: 'desc' },
-      take: 6,
-      include: { candidate: { select: { firstName: true, lastName: true, position: true } } },
-    }),
-    prisma.referenceCheck.findMany({
-      where: { candidate: { userId }, updatedAt: { gte: trendCutoff } },
-      select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
-    }),
-    prisma.auditLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 8,
-      select: { id: true, action: true, entity: true, details: true, createdAt: true },
-    }),
-  ])
-
-  const limitState = limitStateFromStats(stats)
-  const totalCandidates = stats.totalCandidates
-  const activeCandidates = stats.activeCandidates
-  const consentedCandidates = stats.consentedCandidates
-  const addonOrders = stats.addonOrders
-  const verifiedChecks = stats.verifiedChecks
-  const discrepancies = stats.discrepancies
-  const totalChecks = stats.totalChecks
-  const verificationRate = totalChecks > 0 ? Math.round((verifiedChecks / totalChecks) * 100) : 0
-  const allChecks = trendChecks
   const planMeta = getPlanById(session.user.plan ?? 'STARTER')
-
-  // Build trend data (last 14 days)
-  const days = 14
-  const trend: { date: string; total: number; verified: number; discrepancy: number }[] = []
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    d.setHours(0, 0, 0, 0)
-    const next = new Date(d); next.setDate(d.getDate() + 1)
-    const dayChecks = allChecks.filter((c) => {
-      const t = c.updatedAt.getTime()
-      return t >= d.getTime() && t < next.getTime()
-    })
-    trend.push({
-      date: d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
-      total: dayChecks.length,
-      verified: dayChecks.filter((c) => c.result === 'VERIFIED').length,
-      discrepancy: dayChecks.filter((c) => c.result === 'DISCREPANCY_FOUND').length,
-    })
-  }
-
-  // Avg turnaround in hours
-  const turnaroundChecks = allChecks.filter((c) => c.calledAt && c.createdAt)
-  const turnaround: { day: string; hours: number }[] = []
-  const dayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0)
-    const next = new Date(d); next.setDate(d.getDate() + 1)
-    const dc = turnaroundChecks.filter((c) => c.calledAt!.getTime() >= d.getTime() && c.calledAt!.getTime() < next.getTime())
-    const avgH = dc.length === 0
-      ? 0
-      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt!.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
-    turnaround.push({ day: dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1], hours: avgH })
-  }
-
-  // Status distribution (kommt direkt aus der aggregierten Query)
-  const statusDist = [
-    { name: 'Ausstehend', value: stats.candidateStatusCounts.pending, color: '#94a3b8' },
-    { name: 'In Prüfung', value: stats.candidateStatusCounts.inReview, color: '#6366f1' },
-    { name: 'Abgeschlossen', value: stats.candidateStatusCounts.completed, color: '#10b981' },
-    { name: 'Abgelehnt', value: stats.candidateStatusCounts.rejected, color: '#f43f5e' },
-  ]
-
-  // Plan usage
-  const usedThisMonth = totalChecks
-  const checkLimit = planMeta.includedChecks
-  const usagePct = checkLimit > 0 ? Math.min(100, Math.round((usedThisMonth / checkLimit) * 100)) : 0
-
-  const statCards = [
-    {
-      label: 'Kandidaten',
-      value: totalCandidates,
-      sub: `${activeCandidates} in Prüfung`,
-      icon: Users,
-      tone: 'brand' as const,
-      delta: '+12%',
-    },
-    {
-      label: 'Verifizierungsrate',
-      value: `${verificationRate}%`,
-      sub: `${verifiedChecks} verifiziert`,
-      icon: CheckCircle2,
-      tone: 'emerald' as const,
-      delta: '+4%',
-    },
-    {
-      label: 'Diskrepanzen',
-      value: discrepancies,
-      sub: discrepancies === 0 ? 'Keine Auffälligkeiten' : 'gefunden',
-      icon: AlertTriangle,
-      tone: 'rose' as const,
-      delta: discrepancies > 0 ? '−1' : '0',
-    },
-    {
-      label: 'Ø Durchlaufzeit',
-      value: `${turnaround.reduce((a, b) => a + b.hours, 0) / Math.max(1, turnaround.filter(t => t.hours).length) || 0} h`,
-      sub: 'letzte 7 Tage',
-      icon: Clock,
-      tone: 'violet' as const,
-      delta: '−18%',
-    },
-  ]
-
   const firstName = session.user.name.split(' ')[0] ?? session.user.name
   const trialLeft = trialDaysLeft(session.user.trialEndsAt)
   const isTrialing = trialLeft !== null && trialLeft > 0
@@ -172,155 +50,295 @@ export default async function DashboardPage() {
       />
 
       <div className="space-y-6">
-        {/* Plan-Limit / Trial-Expired Banner — nur sichtbar wenn relevant */}
-        <PlanLimitBanner state={limitState} />
+        <Suspense fallback={<StatsSkeleton />}>
+          <StatsSection userId={userId} accountType={session.user.accountType} />
+        </Suspense>
 
-        {/* Onboarding checklist (auto-hides when complete) */}
-        <OnboardingChecklist
-          candidateCount={totalCandidates}
-          checkCount={totalChecks}
-          hasGdprConsent={consentedCandidates > 0}
-          hasAddon={addonOrders > 0}
-        />
+        <Suspense fallback={<ChartsSkeleton />}>
+          <ChartsSection userId={userId} />
+        </Suspense>
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {statCards.map((s) => <StatCard key={s.label} {...s} />)}
-        </div>
-
-        {/* Plan usage banner */}
-        {checkLimit > 0 && (
-          <div className="card-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-semibold text-text-primary">{planMeta.name}-Paket</span>
-                  <span className="badge-brand text-[10px]">{ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short ?? 'HR'}</span>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-text-secondary">
-                  <span>{usedThisMonth} / {checkLimit} Prüfungen</span>
-                  <div className="flex-1 max-w-xs h-1.5 rounded-full bg-bg-tertiary overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-brand-500 to-violet rounded-full transition-all" style={{ width: `${usagePct}%` }} />
-                  </div>
-                  <span className="font-mono font-semibold text-text-primary">{usagePct}%</span>
-                </div>
-              </div>
-            </div>
-            <Link href="/preise" className="btn-secondary text-xs">
-              Paket erweitern <ArrowUpRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        )}
-
-        {/* Charts grid */}
-        <div className="grid lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 card-md">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="section-title">Aktivität</h2>
-                <p className="text-xs text-text-secondary mt-0.5">Letzte 14 Tage</p>
-              </div>
-              <div className="flex items-center gap-3 text-xs">
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-brand-500" /> Geprüft</div>
-                <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Verifiziert</div>
-              </div>
-            </div>
-            <ActivityAreaChart data={trend} />
-          </div>
-          <div className="card-md">
-            <h2 className="section-title mb-1">Kandidaten-Status</h2>
-            <p className="text-xs text-text-secondary mb-4">Verteilung aktuell</p>
-            <StatusPieChart data={statusDist} />
-          </div>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-5">
-          <div className="card-md">
-            <h2 className="section-title mb-1">Ø Durchlaufzeit</h2>
-            <p className="text-xs text-text-secondary mb-4">letzte 7 Tage in Stunden</p>
-            <TurnaroundBarChart data={turnaround} />
-          </div>
-
-          {/* Recent candidates */}
-          <div className="card-md">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title">Neueste Kandidaten</h2>
-              <Link href="/candidates" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
-            </div>
-            {recentCandidates.length === 0 ? (
-              <EmptyState message="Noch keine Kandidaten" cta="Anlegen" href="/candidates/new" />
-            ) : (
-              <div className="space-y-1.5">
-                {recentCandidates.slice(0, 5).map((c) => {
-                  const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
-                  return (
-                    <Link key={c.id} href={`/candidates/${c.id}`}
-                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-brand-700">
-                          {c.firstName[0]}{c.lastName[0]}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xs font-semibold text-text-primary truncate group-hover:text-brand-700 transition-colors">
-                            {c.firstName} {c.lastName}
-                          </div>
-                          <div className="text-[10px] text-text-muted truncate">{c.position}</div>
-                        </div>
-                      </div>
-                      <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
-                    </Link>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Recent checks */}
-          <div className="card-md">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="section-title">Aktuelle Prüfungen</h2>
-              <Link href="/checks" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
-            </div>
-            {recentChecks.length === 0 ? (
-              <EmptyState message="Noch keine Prüfungen" cta="Erste Prüfung starten" href="/checks/new" />
-            ) : (
-              <div className="space-y-1.5">
-                {recentChecks.slice(0, 5).map((chk) => {
-                  const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
-                  const resIcon = chk.result === 'VERIFIED' ? CheckCircle2 : chk.result === 'DISCREPANCY_FOUND' ? AlertCircle : Clock
-                  const resColor = chk.result === 'VERIFIED' ? 'text-emerald-600' : chk.result === 'DISCREPANCY_FOUND' ? 'text-rose-600' : 'text-amber-600'
-                  return (
-                    <Link key={chk.id} href={`/checks/${chk.id}`}
-                      className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center flex-shrink-0 ${resColor}`}>
-                          {(() => { const I = resIcon; return <I className="w-4 h-4" /> })()}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xs font-semibold text-text-primary truncate">
-                            {chk.employerName}
-                          </div>
-                          <div className="text-[10px] text-text-muted truncate">
-                            {chk.candidate.firstName} {chk.candidate.lastName}
-                          </div>
-                        </div>
-                      </div>
-                      <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
-                    </Link>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Activity feed (audit trail summary) */}
-        <ActivityFeed events={recentEvents} />
+        <Suspense fallback={<RecentSkeleton />}>
+          <RecentSection userId={userId} />
+        </Suspense>
       </div>
     </>
+  )
+}
+
+async function StatsSection({ userId, accountType }: { userId: string; accountType: string }) {
+  const stats = await getCachedDashboardStats(userId)
+  const limitState = limitStateFromStats(stats)
+  const planMeta = getPlanById(stats.plan)
+
+  const totalChecks = stats.totalChecks
+  const verificationRate = totalChecks > 0 ? Math.round((stats.verifiedChecks / totalChecks) * 100) : 0
+
+  const usedThisMonth = totalChecks
+  const checkLimit = planMeta.includedChecks
+  const usagePct = checkLimit > 0 ? Math.min(100, Math.round((usedThisMonth / checkLimit) * 100)) : 0
+
+  const statCards = [
+    {
+      label: 'Kandidaten',
+      value: stats.totalCandidates,
+      sub: `${stats.activeCandidates} in Prüfung`,
+      icon: Users,
+      tone: 'brand' as const,
+      delta: '+12%',
+    },
+    {
+      label: 'Verifizierungsrate',
+      value: `${verificationRate}%`,
+      sub: `${stats.verifiedChecks} verifiziert`,
+      icon: CheckCircle2,
+      tone: 'emerald' as const,
+      delta: '+4%',
+    },
+    {
+      label: 'Diskrepanzen',
+      value: stats.discrepancies,
+      sub: stats.discrepancies === 0 ? 'Keine Auffälligkeiten' : 'gefunden',
+      icon: AlertTriangle,
+      tone: 'rose' as const,
+      delta: stats.discrepancies > 0 ? '−1' : '0',
+    },
+    {
+      label: 'Ø Durchlaufzeit',
+      value: '—',
+      sub: 'letzte 7 Tage',
+      icon: Clock,
+      tone: 'violet' as const,
+      delta: '−18%',
+    },
+  ]
+
+  return (
+    <>
+      <PlanLimitBanner state={limitState} />
+
+      <OnboardingChecklist
+        candidateCount={stats.totalCandidates}
+        checkCount={stats.totalChecks}
+        hasGdprConsent={stats.consentedCandidates > 0}
+        hasAddon={stats.addonOrders > 0}
+      />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((s) => <StatCard key={s.label} {...s} />)}
+      </div>
+
+      {checkLimit > 0 && (
+        <div className="card-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-semibold text-text-primary">{planMeta.name}-Paket</span>
+                <span className="badge-brand text-[10px]">{ACCOUNT_TYPES[accountType as keyof typeof ACCOUNT_TYPES]?.short ?? 'HR'}</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-text-secondary">
+                <span>{usedThisMonth} / {checkLimit} Prüfungen</span>
+                <div className="flex-1 max-w-xs h-1.5 rounded-full bg-bg-tertiary overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-brand-500 to-violet rounded-full transition-all" style={{ width: `${usagePct}%` }} />
+                </div>
+                <span className="font-mono font-semibold text-text-primary">{usagePct}%</span>
+              </div>
+            </div>
+          </div>
+          <Link href="/preise" className="btn-secondary text-xs">
+            Paket erweitern <ArrowUpRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      )}
+    </>
+  )
+}
+
+async function ChartsSection({ userId }: { userId: string }) {
+  const [stats, buckets] = await Promise.all([
+    getCachedDashboardStats(userId),
+    getCachedDashboardTrendBuckets(userId),
+  ])
+
+  const statusDist = [
+    { name: 'Ausstehend', value: stats.candidateStatusCounts.pending, color: '#94a3b8' },
+    { name: 'In Prüfung', value: stats.candidateStatusCounts.inReview, color: '#6366f1' },
+    { name: 'Abgeschlossen', value: stats.candidateStatusCounts.completed, color: '#10b981' },
+    { name: 'Abgelehnt', value: stats.candidateStatusCounts.rejected, color: '#f43f5e' },
+  ]
+
+  return (
+    <>
+      <div className="grid lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 card-md">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="section-title">Aktivität</h2>
+              <p className="text-xs text-text-secondary mt-0.5">Letzte 14 Tage</p>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-brand-500" /> Geprüft</div>
+              <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> Verifiziert</div>
+            </div>
+          </div>
+          <ActivityAreaChart data={buckets.trend} />
+        </div>
+        <div className="card-md">
+          <h2 className="section-title mb-1">Kandidaten-Status</h2>
+          <p className="text-xs text-text-secondary mb-4">Verteilung aktuell</p>
+          <StatusPieChart data={statusDist} />
+        </div>
+      </div>
+
+      <div className="card-md">
+        <h2 className="section-title mb-1">Ø Durchlaufzeit</h2>
+        <p className="text-xs text-text-secondary mb-4">letzte 7 Tage in Stunden</p>
+        <TurnaroundBarChart data={buckets.turnaround} />
+      </div>
+    </>
+  )
+}
+
+async function RecentSection({ userId }: { userId: string }) {
+  const { recentCandidates, recentChecks, recentEvents } = await getCachedDashboardRecentLists(userId)
+
+  return (
+    <>
+      <div className="grid lg:grid-cols-2 gap-5">
+        <div className="card-md">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="section-title">Neueste Kandidaten</h2>
+            <Link href="/candidates" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
+          </div>
+          {recentCandidates.length === 0 ? (
+            <EmptyState message="Noch keine Kandidaten" cta="Anlegen" href="/candidates/new" />
+          ) : (
+            <div className="space-y-1.5">
+              {recentCandidates.slice(0, 5).map((c) => {
+                const st = CANDIDATE_STATUS[c.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
+                return (
+                  <Link key={c.id} href={`/candidates/${c.id}`}
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-brand-700">
+                        {c.firstName[0]}{c.lastName[0]}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-text-primary truncate group-hover:text-brand-700 transition-colors">
+                          {c.firstName} {c.lastName}
+                        </div>
+                        <div className="text-[10px] text-text-muted truncate">{c.position}</div>
+                      </div>
+                    </div>
+                    <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="card-md">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="section-title">Aktuelle Prüfungen</h2>
+            <Link href="/checks" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Alle →</Link>
+          </div>
+          {recentChecks.length === 0 ? (
+            <EmptyState message="Noch keine Prüfungen" cta="Erste Prüfung starten" href="/checks/new" />
+          ) : (
+            <div className="space-y-1.5">
+              {recentChecks.slice(0, 5).map((chk) => {
+                const st = CHECK_STATUS[chk.status as keyof typeof CHECK_STATUS] ?? CHECK_STATUS.OPEN
+                const resIcon = chk.result === 'VERIFIED' ? CheckCircle2 : chk.result === 'DISCREPANCY_FOUND' ? AlertCircle : Clock
+                const resColor = chk.result === 'VERIFIED' ? 'text-emerald-600' : chk.result === 'DISCREPANCY_FOUND' ? 'text-rose-600' : 'text-amber-600'
+                return (
+                  <Link key={chk.id} href={`/checks/${chk.id}`}
+                    className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`w-8 h-8 rounded-lg bg-bg-secondary flex items-center justify-center flex-shrink-0 ${resColor}`}>
+                        {(() => { const I = resIcon; return <I className="w-4 h-4" /> })()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-text-primary truncate">
+                          {chk.employerName}
+                        </div>
+                        <div className="text-[10px] text-text-muted truncate">
+                          {chk.candidate.firstName} {chk.candidate.lastName}
+                        </div>
+                      </div>
+                    </div>
+                    <span className={`badge ${st.color} text-[10px]`}>{st.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <ActivityFeed events={recentEvents} />
+    </>
+  )
+}
+
+function StatsSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="card-md h-32">
+            <div className="w-10 h-10 rounded-xl bg-bg-tertiary mb-3" />
+            <div className="h-7 bg-bg-tertiary rounded mb-2 w-16" />
+            <div className="h-3 bg-bg-tertiary rounded w-24" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ChartsSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="grid lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 card-md h-72">
+          <div className="h-4 w-24 bg-bg-tertiary rounded mb-2" />
+          <div className="h-3 w-16 bg-bg-tertiary rounded mb-6" />
+          <div className="h-48 bg-bg-tertiary/50 rounded-lg" />
+        </div>
+        <div className="card-md h-72">
+          <div className="h-4 w-32 bg-bg-tertiary rounded mb-2" />
+          <div className="h-3 w-20 bg-bg-tertiary rounded mb-6" />
+          <div className="h-48 bg-bg-tertiary/50 rounded-full mx-8" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function RecentSkeleton() {
+  return (
+    <div className="grid lg:grid-cols-2 gap-5 animate-pulse">
+      {[0, 1].map((i) => (
+        <div key={i} className="card-md h-64">
+          <div className="h-4 w-32 bg-bg-tertiary rounded mb-4" />
+          <div className="space-y-3">
+            {[0, 1, 2, 3].map((j) => (
+              <div key={j} className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-bg-tertiary flex-shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3 bg-bg-tertiary rounded w-3/4" />
+                  <div className="h-2 bg-bg-tertiary rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 

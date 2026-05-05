@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { parseCsv, rowToCandidate, type CandidateInput } from '@/lib/csv'
+import { dashboardCacheTag } from '@/lib/dashboard-stats'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
@@ -161,6 +163,8 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch { /* noop */ }
+
+  if (created > 0) revalidateTag(dashboardCacheTag(session.user.id))
 
   return NextResponse.json({
     ok: true,
