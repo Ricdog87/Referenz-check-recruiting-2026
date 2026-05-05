@@ -1,5 +1,5 @@
 {
-    "buildCommand": "prisma generate && next build",
+  "buildCommand": "prisma generate && next build",
   "framework": "nextjs",
   "functions": {
     "app/api/upload/route.ts": {
@@ -7,6 +7,18 @@
     },
     "app/api/gdpr/export/route.ts": {
       "maxDuration": 30
+    },
+    "app/api/candidates/parse/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/candidates/bulk/route.ts": {
+      "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/keep-warm",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }
