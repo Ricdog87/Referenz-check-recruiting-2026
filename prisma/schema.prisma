@@ -130,6 +130,21 @@ model PasswordResetToken {
   @@index([expiresAt])
 }
 
+model AgencyWaitlistEntry {
+  id                  String   @id @default(cuid())
+  company             String
+  name                String
+  email               String
+  website             String?
+  placementsPerYear   String?
+  ip                  String?
+  userAgent           String?
+  createdAt           DateTime @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
 model AddonOrder {
   id          String   @id @default(cuid())
   userId      String

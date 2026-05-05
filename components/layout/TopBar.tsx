@@ -100,8 +100,8 @@ export function TopBar({ name, company, accountType, plan }: TopBarProps) {
 
   return (
     <div className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-border">
-      <div className="h-16 flex items-center justify-between gap-4 px-4 lg:px-10">
-        <div className="flex items-center gap-3 min-w-0">
+      <div className="h-16 flex items-center justify-between gap-3 px-4 lg:px-10">
+        <div className="flex items-center gap-3 min-w-0 flex-shrink-0">
           <button
             onClick={toggle}
             className="lg:hidden p-2 -ml-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-bg-secondary"
@@ -109,16 +109,16 @@ export function TopBar({ name, company, accountType, plan }: TopBarProps) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <div className="text-sm text-text-secondary truncate hidden sm:block">{company}</div>
-          <span className="hidden sm:inline-flex badge-brand text-[10px]">
+          <div className="text-sm text-text-secondary truncate hidden lg:block">{company}</div>
+          <span className="hidden lg:inline-flex badge-brand text-[10px]">
             {accountMeta?.short ?? 'HR'}
           </span>
-          <span className="hidden md:inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold bg-bg-secondary border border-border text-text-secondary">
+          <span className="hidden xl:inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold bg-bg-secondary border border-border text-text-secondary">
             {planMeta.name}
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 flex-1 max-w-md mx-auto" ref={wrapRef}>
+        <div className="flex items-center gap-2 flex-1 max-w-md mx-auto" ref={wrapRef}>
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
             <input
@@ -127,7 +127,7 @@ export function TopBar({ name, company, accountType, plan }: TopBarProps) {
               value={query}
               onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
               onFocus={() => setOpen(true)}
-              placeholder="Suche Kandidaten, Prüfungen…  ⌘K"
+              placeholder="Suchen…"
               className="w-full pl-10 pr-9 py-2 text-sm rounded-full bg-bg-secondary border border-border focus:bg-white focus:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/15 transition-all"
               aria-label="Globale Suche"
             />

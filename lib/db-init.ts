@@ -93,6 +93,28 @@ export async function runSchemaSync() {
       END IF;
     END $$
   `)
+
+  // AgencyWaitlistEntry — PDL-Frühzugang-Anfragen
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "AgencyWaitlistEntry" (
+      "id" TEXT NOT NULL,
+      "company" TEXT NOT NULL,
+      "name" TEXT NOT NULL,
+      "email" TEXT NOT NULL,
+      "website" TEXT,
+      "placementsPerYear" TEXT,
+      "ip" TEXT,
+      "userAgent" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "AgencyWaitlistEntry_pkey" PRIMARY KEY ("id")
+    )
+  `)
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "AgencyWaitlistEntry_email_idx" ON "AgencyWaitlistEntry"("email")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "AgencyWaitlistEntry_createdAt_idx" ON "AgencyWaitlistEntry"("createdAt")`,
+  )
 }
 
 /**

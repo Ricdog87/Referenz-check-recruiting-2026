@@ -5,6 +5,11 @@ import { useState } from 'react'
 import { Calculator, TrendingUp, ShieldCheck } from 'lucide-react'
 import { Reveal } from '../Reveal'
 
+// Modellannahme: strukturierte Vorqualifizierung kann Fehlbesetzungs-Quote
+// um etwa 60 % senken. Das ist eine Annahme aus Studien zu strukturierten
+// Auswahlverfahren — KEIN belegtes candiq-Kundenergebnis.
+const ASSUMED_REDUCTION = 0.6
+
 export function ROICalculator() {
   const [hires, setHires] = useState(20)
   const [avgSalary, setAvgSalary] = useState(70000)
@@ -12,14 +17,13 @@ export function ROICalculator() {
 
   const misHires = (hires * misHireRate) / 100
   const misHireCost = misHires * avgSalary * 1.5
-  // candiq reduces mishire rate by ~60% based on industry data
-  const newMisHires = misHires * 0.4
+  const newMisHires = misHires * (1 - ASSUMED_REDUCTION)
   const savedCost = (misHires - newMisHires) * avgSalary * 1.5
-  const refCheckCost = hires * 39 * 12 // assume Pro plan ~ avg
+  const refCheckCost = hires * 39 * 12 // ø Professional-Plan
   const netRoi = savedCost - refCheckCost
 
   return (
-    <section className="py-28 px-6 relative overflow-hidden">
+    <section id="roi" className="py-28 px-6 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-0 w-[600px] h-[400px] -translate-y-1/2 opacity-20"
           style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.5), transparent 60%)', filter: 'blur(80px)' }} />
@@ -37,7 +41,9 @@ export function ROICalculator() {
               Was kostet Sie eine <span className="text-gradient-brand">Fehlbesetzung?</span>
             </h2>
             <p className="text-base text-text-secondary leading-relaxed">
-              Bewegen Sie die Regler — und sehen Sie, wie groß Ihr Einsparpotenzial mit candiq plausibel sein kann (Modellrechnung, basierend auf SHRM- &amp; Bain-Daten zu Fehlbesetzungskosten).
+              Bewegen Sie die Regler — und sehen Sie, wie groß Ihr Einsparpotenzial mit candiq plausibel sein kann.
+              Modellrechnung mit den Fehlbesetzungskosten-Faustformeln aus SHRM- &amp; Bain-Studien und einer
+              angenommenen 60 %-Reduktion durch strukturierte Vorqualifizierung.
             </p>
           </div>
         </Reveal>
@@ -105,19 +111,24 @@ export function ROICalculator() {
 
                 <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/15">
                   <div>
-                    <div className="text-[11px] uppercase tracking-widest text-white/60 font-semibold mb-1">Vorher</div>
+                    <div className="text-[11px] uppercase tracking-widest text-white/60 font-semibold mb-1">Heute</div>
                     <div className="text-2xl font-bold">{Math.round(misHireCost).toLocaleString('de-DE')} €</div>
                     <div className="text-xs text-white/60 mt-1">{misHires.toFixed(1)} Fehlbesetzungen</div>
                   </div>
                   <div>
-                    <div className="text-[11px] uppercase tracking-widest text-white/60 font-semibold mb-1">Mit candiq</div>
-                    <div className="text-2xl font-bold">{Math.round(misHireCost * 0.4).toLocaleString('de-DE')} €</div>
-                    <div className="text-xs text-white/60 mt-1">{newMisHires.toFixed(1)} Fehlbesetzungen (−60 %)</div>
+                    <div className="text-[11px] uppercase tracking-widest text-white/60 font-semibold mb-1">Mit Vorqualifizierung</div>
+                    <div className="text-2xl font-bold">{Math.round(misHireCost * (1 - ASSUMED_REDUCTION)).toLocaleString('de-DE')} €</div>
+                    <div className="text-xs text-white/60 mt-1">{newMisHires.toFixed(1)} Fehlbesetzungen · Annahme −60 %</div>
                   </div>
                 </div>
 
-                <div className="mt-8 flex items-center gap-2 text-xs text-white/70">
-                  <ShieldCheck className="w-4 h-4" /> Modell basiert auf SHRM- &amp; Bain-Studien zu Fehlbesetzungskosten
+                <div className="mt-8 flex items-start gap-2 text-[11px] text-white/65 leading-relaxed">
+                  <ShieldCheck className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                  <span>
+                    Modellrechnung. Fehlbesetzungskosten-Faustformel aus SHRM &amp; Bain (1,5× Jahresgehalt). Reduktion
+                    der Fehlbesetzungs-Quote durch strukturierte Vorqualifizierung als angenommener Effekt — keine
+                    candiq-Kundengarantie.
+                  </span>
                 </div>
               </div>
             </motion.div>

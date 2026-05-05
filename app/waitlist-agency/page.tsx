@@ -8,6 +8,8 @@ import { Building2, Users2, CheckCircle2, ArrowRight } from 'lucide-react'
 
 export default function AgencyWaitlistPage() {
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     company: '',
     name: '',
@@ -20,9 +22,28 @@ export default function AgencyWaitlistPage() {
     setForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setSubmitted(true)
+    if (submitting) return
+    setError('')
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/waitlist-agency', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setError(data?.error ?? 'Anfrage konnte nicht gesendet werden. Bitte erneut versuchen.')
+        setSubmitting(false)
+        return
+      }
+      setSubmitted(true)
+    } catch {
+      setError('Verbindung fehlgeschlagen. Bitte erneut versuchen.')
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -112,10 +133,16 @@ export default function AgencyWaitlistPage() {
                   />
                 </div>
 
+                {error && (
+                  <div role="alert" className="px-4 py-3 rounded-xl text-sm text-rose-700 bg-rose-50 border border-rose-200">
+                    {error}
+                  </div>
+                )}
+
                 <div className="pt-2 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
                   <p className="text-xs text-text-muted">Wir nutzen Ihre Angaben ausschließlich zur Kontaktaufnahme zum PDL-Launch.</p>
-                  <button type="submit" className="btn-primary">
-                    Frühen Zugang vormerken <ArrowRight className="w-4 h-4" />
+                  <button type="submit" disabled={submitting} className="btn-primary">
+                    {submitting ? 'Wird gesendet…' : <>Frühen Zugang vormerken <ArrowRight className="w-4 h-4" /></>}
                   </button>
                 </div>
               </form>
