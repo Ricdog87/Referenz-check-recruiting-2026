@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { Header } from '@/components/layout/Header'
-import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
+import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardChartsLazy'
 import { TrendingUp, Target, Activity, Award } from 'lucide-react'
 
 export default async function AnalyticsPage() {

@@ -115,6 +115,30 @@ export async function runSchemaSync() {
   await prisma.$executeRawUnsafe(
     `CREATE INDEX IF NOT EXISTS "AgencyWaitlistEntry_createdAt_idx" ON "AgencyWaitlistEntry"("createdAt")`,
   )
+
+  // ── Performance: Composite-Indizes für die Hot-Query-Pfade
+  // Dashboard, Listen-Seiten und Audit-Trail laufen hauptsächlich über
+  // userId + Sortierung/Filter. Composite-Indizes sparen den Re-Sort/
+  // Filter-Pass nach dem Index-Scan und reduzieren Latenz auf großen Tabellen
+  // signifikant (10× und mehr ab ~1000 Rows pro User).
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "Candidate_userId_createdAt_idx" ON "Candidate"("userId", "createdAt" DESC)`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "Candidate_userId_status_idx" ON "Candidate"("userId", "status")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ReferenceCheck_candidateId_status_idx" ON "ReferenceCheck"("candidateId", "status")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ReferenceCheck_candidateId_createdAt_idx" ON "ReferenceCheck"("candidateId", "createdAt" DESC)`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ReferenceCheck_createdAt_idx" ON "ReferenceCheck"("createdAt")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "AuditLog_userId_createdAt_idx" ON "AuditLog"("userId", "createdAt" DESC)`,
+  )
 }
 
 /**

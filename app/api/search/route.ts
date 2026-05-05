@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { memo } from '@/lib/cache'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +12,10 @@ export const dynamic = 'force-dynamic'
  * Returns up to 5 candidates + 5 checks matching the query — used by the
  * TopBar's omni-search to give recruiters a one-keystroke jump to anything
  * in their workspace.
+ *
+ * 5-Sekunden-Cache: User tippt in ~150ms-Intervallen, Frontend debounced auf
+ * 220ms. Zwei aufeinanderfolgende Tipper auf demselben Wort kosten dann nur
+ * eine DB-Query.
  */
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -22,7 +27,16 @@ export async function GET(req: NextRequest) {
   }
 
   const userId = session.user.id
+  const cacheKey = `search:${userId}:${q.toLowerCase()}`
 
+  const result = await memo(cacheKey, 5000, async () => {
+    return await runSearch(userId, q)
+  })
+
+  return NextResponse.json(result)
+}
+
+async function runSearch(userId: string, q: string) {
   const [candidates, checks] = await Promise.all([
     prisma.candidate.findMany({
       where: {
@@ -69,5 +83,5 @@ export async function GET(req: NextRequest) {
     }),
   ])
 
-  return NextResponse.json({ candidates, checks })
+  return { candidates, checks }
 }

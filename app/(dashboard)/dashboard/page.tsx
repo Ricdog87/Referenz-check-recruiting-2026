@@ -8,11 +8,12 @@ import {
   Users, AlertTriangle, TrendingUp, ArrowUpRight,
   Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
 } from 'lucide-react'
-import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
+import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardChartsLazy'
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 import { PlanLimitBanner } from '@/components/dashboard/PlanLimitBanner'
-import { getLimitState } from '@/lib/limits'
+import { limitStateFromStats } from '@/lib/limits'
+import { getDashboardStats } from '@/lib/dashboard-stats'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -21,31 +22,22 @@ export default async function DashboardPage() {
   const userId = session.user.id
   const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
 
-  const limitState = await getLimitState(userId)
+  // Performance: 7 Queries statt vorher 16. Alle Stats kommen aus 4
+  // aggregierten SQL-Statements (siehe lib/dashboard-stats.ts), die
+  // findMany-Listen sind unverändert (das sind echte Daten-Fetches).
+  // Trend-/Turnaround-Berechnung läuft über die letzten 30 Tage statt
+  // alle Checks — vermeidet Full-Scan auf großen Konten.
+  const trendCutoff = new Date()
+  trendCutoff.setDate(trendCutoff.getDate() - 30)
 
   const [
-    totalCandidates,
-    activeCandidates,
-    completedChecks,
-    openChecks,
-    inProgressChecks,
-    discrepancies,
-    verifiedChecks,
+    stats,
     recentCandidates,
     recentChecks,
-    candidateStatusGroups,
-    allChecks,
-    consentedCandidates,
-    addonOrders,
+    trendChecks,
     recentEvents,
   ] = await Promise.all([
-    prisma.candidate.count({ where: { userId } }),
-    prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'OPEN' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'IN_PROGRESS' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }),
+    getDashboardStats(userId),
     prisma.candidate.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
@@ -58,13 +50,10 @@ export default async function DashboardPage() {
       take: 6,
       include: { candidate: { select: { firstName: true, lastName: true, position: true } } },
     }),
-    prisma.candidate.groupBy({ by: ['status'], where: { userId }, _count: true }),
     prisma.referenceCheck.findMany({
-      where: { candidate: { userId } },
+      where: { candidate: { userId }, updatedAt: { gte: trendCutoff } },
       select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
     }),
-    prisma.candidate.count({ where: { userId, gdprConsent: true } }),
-    prisma.addonOrder.count({ where: { userId } }),
     prisma.auditLog.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
@@ -73,8 +62,16 @@ export default async function DashboardPage() {
     }),
   ])
 
-  const totalChecks = openChecks + inProgressChecks + completedChecks
+  const limitState = limitStateFromStats(stats)
+  const totalCandidates = stats.totalCandidates
+  const activeCandidates = stats.activeCandidates
+  const consentedCandidates = stats.consentedCandidates
+  const addonOrders = stats.addonOrders
+  const verifiedChecks = stats.verifiedChecks
+  const discrepancies = stats.discrepancies
+  const totalChecks = stats.totalChecks
   const verificationRate = totalChecks > 0 ? Math.round((verifiedChecks / totalChecks) * 100) : 0
+  const allChecks = trendChecks
   const planMeta = getPlanById(session.user.plan ?? 'STARTER')
 
   // Build trend data (last 14 days)
@@ -111,12 +108,12 @@ export default async function DashboardPage() {
     turnaround.push({ day: dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1], hours: avgH })
   }
 
-  // Status distribution
+  // Status distribution (kommt direkt aus der aggregierten Query)
   const statusDist = [
-    { name: 'Ausstehend', value: candidateStatusGroups.find((g) => g.status === 'PENDING')?._count ?? 0, color: '#94a3b8' },
-    { name: 'In Prüfung', value: candidateStatusGroups.find((g) => g.status === 'IN_REVIEW')?._count ?? 0, color: '#6366f1' },
-    { name: 'Abgeschlossen', value: candidateStatusGroups.find((g) => g.status === 'COMPLETED')?._count ?? 0, color: '#10b981' },
-    { name: 'Abgelehnt', value: candidateStatusGroups.find((g) => g.status === 'REJECTED')?._count ?? 0, color: '#f43f5e' },
+    { name: 'Ausstehend', value: stats.candidateStatusCounts.pending, color: '#94a3b8' },
+    { name: 'In Prüfung', value: stats.candidateStatusCounts.inReview, color: '#6366f1' },
+    { name: 'Abgeschlossen', value: stats.candidateStatusCounts.completed, color: '#10b981' },
+    { name: 'Abgelehnt', value: stats.candidateStatusCounts.rejected, color: '#f43f5e' },
   ]
 
   // Plan usage
@@ -124,7 +121,7 @@ export default async function DashboardPage() {
   const checkLimit = planMeta.includedChecks
   const usagePct = checkLimit > 0 ? Math.min(100, Math.round((usedThisMonth / checkLimit) * 100)) : 0
 
-  const stats = [
+  const statCards = [
     {
       label: 'Kandidaten',
       value: totalCandidates,
@@ -188,7 +185,7 @@ export default async function DashboardPage() {
 
         {/* Stats grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((s) => <StatCard key={s.label} {...s} />)}
+          {statCards.map((s) => <StatCard key={s.label} {...s} />)}
         </div>
 
         {/* Plan usage banner */}

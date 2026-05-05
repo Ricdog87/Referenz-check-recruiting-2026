@@ -1,5 +1,6 @@
 import { prisma } from './db'
 import { getPlanById, trialDaysLeft } from './utils'
+import type { DashboardStats } from './dashboard-stats'
 
 /**
  * Plan- und Trial-Enforcement-Helfer.
@@ -41,42 +42,67 @@ export type LimitState = {
   isTrialExpired: boolean
 }
 
+/**
+ * Standalone-Variante: lädt Plan + Trial + Monthly-Usage in 2 Queries.
+ * Wenn der Aufrufer bereits DashboardStats geladen hat, lieber `limitStateFromStats()`
+ * benutzen und die Doppel-Roundtrips sparen.
+ */
 export async function getLimitState(userId: string): Promise<LimitState> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { plan: true, trialEndsAt: true },
-  })
+  const [user, monthlyChecksUsed] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true, trialEndsAt: true },
+    }),
+    (() => {
+      const startOfMonth = new Date()
+      startOfMonth.setDate(1)
+      startOfMonth.setHours(0, 0, 0, 0)
+      return prisma.referenceCheck.count({
+        where: { candidate: { userId }, createdAt: { gte: startOfMonth } },
+      })
+    })(),
+  ])
 
-  const plan = user?.plan ?? 'STARTER'
-  const planMeta = getPlanById(plan)
+  return computeLimitState({
+    plan: user?.plan ?? 'STARTER',
+    trialEndsAt: user?.trialEndsAt ?? null,
+    monthlyChecksUsed,
+  })
+}
+
+/**
+ * Schnelle Variante: nutzt das, was DashboardStats bereits geladen hat.
+ * Keine zusätzliche DB-Roundtrip — der Banner ist Teil derselben Page-Render.
+ */
+export function limitStateFromStats(stats: DashboardStats): LimitState {
+  return computeLimitState({
+    plan: stats.plan,
+    trialEndsAt: stats.trialEndsAt,
+    monthlyChecksUsed: stats.monthlyChecksUsed,
+  })
+}
+
+function computeLimitState(input: {
+  plan: string
+  trialEndsAt: Date | null
+  monthlyChecksUsed: number
+}): LimitState {
+  const planMeta = getPlanById(input.plan)
   const monthlyCheckLimit = planMeta.includedChecks
-  const trialLeft = trialDaysLeft(user?.trialEndsAt)
+  const trialLeft = trialDaysLeft(input.trialEndsAt)
   const isTrialing = trialLeft !== null && trialLeft > 0
   const isTrialExpired = trialLeft !== null && trialLeft === 0
-
-  // Checks im aktuellen Kalendermonat
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const monthlyChecksUsed = await prisma.referenceCheck.count({
-    where: {
-      candidate: { userId },
-      createdAt: { gte: startOfMonth },
-    },
-  })
-
-  const usageRatio = monthlyCheckLimit > 0 ? monthlyChecksUsed / monthlyCheckLimit : 0
-
-  // Trial federt alle Limits ab
-  const isOverLimit = !isTrialing && monthlyCheckLimit > 0 && monthlyChecksUsed >= monthlyCheckLimit
-  const isApproachingLimit = !isTrialing && monthlyCheckLimit > 0 && usageRatio >= 0.8 && !isOverLimit
+  const usageRatio = monthlyCheckLimit > 0 ? input.monthlyChecksUsed / monthlyCheckLimit : 0
+  const isOverLimit =
+    !isTrialing && monthlyCheckLimit > 0 && input.monthlyChecksUsed >= monthlyCheckLimit
+  const isApproachingLimit =
+    !isTrialing && monthlyCheckLimit > 0 && usageRatio >= 0.8 && !isOverLimit
 
   return {
-    plan,
+    plan: input.plan,
     planName: planMeta.name,
     monthlyCheckLimit,
-    monthlyChecksUsed,
+    monthlyChecksUsed: input.monthlyChecksUsed,
     usageRatio,
     isTrialing,
     trialDaysLeft: trialLeft,

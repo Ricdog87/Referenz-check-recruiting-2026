@@ -49,6 +49,8 @@ model Candidate {
   checks           ReferenceCheck[]
 
   @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, status])
 }
 
 model Document {
@@ -87,6 +89,9 @@ model ReferenceCheck {
   candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
   @@index([candidateId])
+  @@index([candidateId, status])
+  @@index([candidateId, createdAt(sort: Desc)])
+  @@index([createdAt])
 }
 
 model GdprConsent {
@@ -114,6 +119,7 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 model PasswordResetToken {
