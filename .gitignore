@@ -39,7 +39,6 @@ next-env.d.ts
 # Prisma
 *.db
 *.db-journal
-prisma/migrations/
 
 # Uploads (user data - never commit)
 /public/uploads/*

@@ -23,9 +23,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: true })
   } catch (error: any) {
     console.error('init_error', error)
-    return NextResponse.json(
-      { error: error?.message ?? 'init failed' },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: 'init failed' }, { status: 500 })
   }
 }
