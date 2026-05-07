@@ -3,13 +3,15 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { ensureSchema, withDbRecovery } from '@/lib/db-init'
+import { logger } from '@/lib/logger'
+import '@/lib/env'
 
 const isProd = process.env.NODE_ENV === 'production'
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: 'jwt',
-    maxAge: 8 * 60 * 60, // 8h
+    maxAge: 24 * 60 * 60, // 24h — keeps mobile users signed in for a workday
     updateAge: 60 * 60, // 1h — stale-while-valid Refresh
   },
   pages: {
@@ -45,7 +47,7 @@ export const authOptions: NextAuthOptions = {
         try {
           await ensureSchema()
         } catch (err) {
-          console.error('auth_schema_warn', err)
+          logger.warn('auth_schema_warn', err)
         }
 
         const user = await withDbRecovery(() =>
@@ -53,7 +55,7 @@ export const authOptions: NextAuthOptions = {
             where: { email: { equals: email, mode: 'insensitive' } },
           }),
         ).catch((err) => {
-          console.error('auth_lookup_error', err)
+          logger.error('auth_lookup_error', err)
           return null
         })
 
@@ -101,7 +103,7 @@ export const authOptions: NextAuthOptions = {
             token.name = fresh.name
           }
         } catch (err) {
-          console.error('jwt_refresh_warn', err)
+          logger.warn('jwt_refresh_warn', err)
         }
       }
       return token
@@ -133,7 +135,7 @@ export const authOptions: NextAuthOptions = {
           },
         })
       } catch (err) {
-        console.error('signin_audit_warn', err)
+        logger.warn('signin_audit_warn', err)
       }
     },
   },

@@ -1,4 +1,5 @@
 import { prisma } from './db'
+import { logger } from './logger'
 
 /**
  * Idempotent schema sync — applied at runtime as a recovery path when
@@ -117,7 +118,7 @@ export async function withDbRecovery<T>(
           await ensureSchema()
           continue
         } catch (syncErr) {
-          console.error('schema_sync_failed', syncErr)
+          logger.error('schema_sync_failed', syncErr)
           throw err
         }
       }

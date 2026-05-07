@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db'
+import { logger } from '@/lib/logger'
 
 /**
  * Lightweight transactional-email service mit graceful Fallback.
@@ -53,7 +54,7 @@ export async function sendEmail(msg: EmailMessage): Promise<SendResult> {
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         const errMsg = data?.message ?? `HTTP ${res.status}`
-        console.error('email_resend_error', errMsg)
+        logger.error('email_resend_error', { message: errMsg, status: res.status })
         await logEmailEvent(msg, `FAILED_RESEND: ${errMsg}`).catch(() => {})
         return { ok: false, error: errMsg }
       }
@@ -61,16 +62,17 @@ export async function sendEmail(msg: EmailMessage): Promise<SendResult> {
       await logEmailEvent(msg, `SENT_RESEND id=${data?.id ?? 'unknown'}`).catch(() => {})
       return { ok: true, provider: 'resend', id: data?.id ?? 'unknown' }
     } catch (err: any) {
-      console.error('email_resend_exception', err?.message ?? err)
+      logger.error('email_resend_exception', err)
       await logEmailEvent(msg, `FAILED_RESEND_EXCEPTION: ${err?.message ?? 'unknown'}`).catch(() => {})
       return { ok: false, error: err?.message ?? 'unknown' }
     }
   }
 
   // ── 2. Kein Provider → in AuditLog vermerken ───────────────────
-  console.warn(
-    `[email:no-provider] An: ${Array.isArray(msg.to) ? msg.to.join(', ') : msg.to} · Betreff: ${msg.subject}`,
-  )
+  logger.warn('email_no_provider', {
+    to: Array.isArray(msg.to) ? msg.to.join(', ') : msg.to,
+    subject: msg.subject,
+  })
   await logEmailEvent(msg, 'LOG_ONLY (kein RESEND_API_KEY gesetzt)').catch(() => {})
   return { ok: true, provider: 'log', id: null }
 }
@@ -92,7 +94,7 @@ async function logEmailEvent(msg: EmailMessage, status: string) {
       },
     })
   } catch (err) {
-    console.error('email_audit_warn', err)
+    logger.warn('email_audit_warn', err)
   }
 }
 
