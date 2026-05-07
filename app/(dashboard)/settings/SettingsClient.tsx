@@ -23,6 +23,7 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
   const router = useRouter()
   const [name, setName] = useState(user.name)
   const [company, setCompany] = useState(user.company)
+  const [currentPassword, setCurrentPassword] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
   const [saving, setSaving] = useState(false)
@@ -51,6 +52,7 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
   }
 
   async function changePassword() {
+    if (!currentPassword) { setError('Bitte aktuelles Passwort eingeben.'); return }
     if (password !== passwordConfirm) { setError('Passwörter stimmen nicht überein.'); return }
     if (password.length < 8) { setError('Min. 8 Zeichen.'); return }
 
@@ -61,16 +63,18 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
     const res = await fetch('/api/auth/profile', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ currentPassword, password }),
     })
 
     setSaving(false)
     if (res.ok) {
       setMsg('Passwort geändert.')
+      setCurrentPassword('')
       setPassword('')
       setPasswordConfirm('')
     } else {
-      setError('Fehler beim Ändern des Passworts.')
+      const data = await res.json().catch(() => ({}))
+      setError(data?.error || 'Fehler beim Ändern des Passworts.')
     }
   }
 
@@ -135,14 +139,18 @@ export function SettingsClient({ user, stats }: { user: User; stats: Stats }) {
       <div className="card-md space-y-4">
         <h2 className="section-title">Passwort ändern</h2>
         <div>
+          <label className="label">Aktuelles Passwort</label>
+          <input type="password" className="input-field" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} autoComplete="current-password" />
+        </div>
+        <div>
           <label className="label">Neues Passwort</label>
-          <input type="password" className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 Zeichen" />
+          <input type="password" className="input-field" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 8 Zeichen" autoComplete="new-password" />
         </div>
         <div>
           <label className="label">Passwort bestätigen</label>
-          <input type="password" className="input-field" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} />
+          <input type="password" className="input-field" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} autoComplete="new-password" />
         </div>
-        <button onClick={changePassword} disabled={saving || !password} className="btn-secondary">
+        <button onClick={changePassword} disabled={saving || !password || !currentPassword} className="btn-secondary">
           Passwort ändern
         </button>
       </div>
