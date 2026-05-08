@@ -1,8 +1,14 @@
 'use client'
 
-const LOGOS = [
-  'TÜV Rheinland', 'Deutsche Telekom', 'Allianz', 'Siemens', 'BMW Group',
-  'Lufthansa', 'SAP', 'Bayer', 'Bosch', 'DHL', 'Adidas', 'Continental',
+// Generische Zielgruppen-Labels — bewusst KEINE echten Firmennamen.
+// candiq verwendet nur Logos, mit denen eine bestätigte Kundenbeziehung
+// und schriftliche Freigabe für die Logo-Nutzung besteht.
+const LABELS = [
+  'DAX-Konzerne', 'Mittelstand 200+ MA', 'Personaldienstleister',
+  'HR-Boutiquen', 'Banken & Finance', 'Versicherungen',
+  'Industrie & Maschinenbau', 'Healthcare & Pharma',
+  'Tech & SaaS', 'Logistik & Mobility', 'Beratung & Consulting',
+  'Öffentlicher Sektor',
 ]
 
 export function Marquee() {
@@ -14,8 +20,8 @@ export function Marquee() {
         style={{ background: 'linear-gradient(to left, #ffffff, transparent)' }} />
       <div className="marquee">
         <div className="marquee-track">
-          {[...LOGOS, ...LOGOS].map((l, i) => (
-            <span key={i} className="text-text-muted font-semibold text-lg whitespace-nowrap tracking-tight">
+          {[...LABELS, ...LABELS].map((l, i) => (
+            <span key={i} className="text-text-muted font-semibold text-base whitespace-nowrap tracking-tight">
               {l}
             </span>
           ))}
