@@ -74,6 +74,7 @@ const organizationJsonLd = {
   telephone: '+49 176 60772556',
   vatID: 'DE458027073',
   taxID: 'HRB 35951',
+  sameAs: ['https://www.linkedin.com/in/ricardoserrano-rsgai/'],
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Am Heiligenhaus 9',
