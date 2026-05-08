@@ -12,8 +12,8 @@ export default function AgbPage() {
     >
       <h2>1. Geltungsbereich</h2>
       <p>
-        Diese AGB gelten für alle Verträge zwischen der RSG Recruiting Solutions group GmbH („Anbieter") und
-        Unternehmenskunden („Kunde") über die Nutzung der candiq-Plattform. Die Leistungen richten sich
+        Diese AGB gelten für alle Verträge zwischen der RSG Recruiting Solutions group GmbH („Anbieter&ldquo;) und
+        Unternehmenskunden („Kunde&ldquo;) über die Nutzung der candiq-Plattform. Die Leistungen richten sich
         ausschließlich an Unternehmer im Sinne von § 14 BGB.
       </p>
 
@@ -24,11 +24,12 @@ export default function AgbPage() {
         Paket (siehe <a href="/preise">Preisseite</a>).
       </p>
 
-      <h2>3. Vertragsabschluss & Testphase</h2>
+      <h2>3. Vertragsabschluss & Testzugang</h2>
       <p>
-        Mit Registrierung kommt ein Vertrag über die kostenlose 14-tägige Testphase zustande. Eine
-        kostenpflichtige Buchung erfordert die separate Auswahl eines Pakets und die Eingabe gültiger
-        Zahlungsdaten. Vor Ablauf der Testphase werden keine Kosten berechnet.
+        Ein kostenpflichtiger Vertrag kommt erst mit ausdrücklicher Buchung eines Pakets durch den Kunden
+        zustande. Vor der Buchung kann nach individueller Vereinbarung ein unverbindlicher, von uns
+        bereitgestellter Testzugang genutzt werden; dieser ist kein Vertragsverhältnis im Sinne eines
+        kostenpflichtigen Pakets. Während des Testzugangs entstehen für den Kunden keine Kosten.
       </p>
 
       <h2>4. Preise & Zahlungsbedingungen</h2>
@@ -43,7 +44,7 @@ export default function AgbPage() {
       <p>
         Monatliche Pakete sind monatlich zum Monatsende kündbar. Jährliche Pakete sind mit einer Frist
         von 30 Tagen zum Ende der Vertragslaufzeit kündbar. Die Kündigung ist im Dashboard oder per
-        E-Mail an <a href="mailto:billing@candiq.de">billing@candiq.de</a> möglich.
+        E-Mail an <a href="mailto:hello@candiq.de">hello@candiq.de</a> möglich.
       </p>
 
       <h2>6. Pflichten des Kunden</h2>

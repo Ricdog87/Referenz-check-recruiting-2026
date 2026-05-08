@@ -110,7 +110,7 @@ async function handle(req: NextRequest) {
       // Continue — withDbRecovery below will retry on schema-related failures.
     }
 
-    const hashed = await bcrypt.hash(profile.password, 10)
+    const hashed = await bcrypt.hash(profile.password, 12)
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + profile.trialDays)
 
@@ -255,7 +255,7 @@ async function handle(req: NextRequest) {
     }
     return NextResponse.json(
       {
-        error: 'Demo gerade nicht verfügbar. Bitte später erneut versuchen — oder direkt ein kostenloses Konto erstellen.',
+        error: 'Demo gerade nicht verfügbar. Bitte später erneut versuchen — oder direkt einen Termin für einen Testzugang vereinbaren.',
         retryable: false,
       },
       { status: 500 },

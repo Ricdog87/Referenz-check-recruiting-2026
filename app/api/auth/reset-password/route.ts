@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('reset_password_error', err)
     return NextResponse.json(
-      { error: 'Reset fehlgeschlagen. Bitte erneut versuchen oder support@candiq.de kontaktieren.' },
+      { error: 'Reset fehlgeschlagen. Bitte erneut versuchen oder hello@candiq.de kontaktieren.' },
       { status: 500 },
     )
   }

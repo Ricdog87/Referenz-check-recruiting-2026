@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Phone, Sparkles, Clock3, ChevronRight } from 'lucide-react'
+import { Plus, Phone, Sparkles, ChevronRight } from 'lucide-react'
 import { initialsOf } from '@/lib/utils'
 
 interface WelcomeBarProps {
@@ -10,8 +10,6 @@ interface WelcomeBarProps {
   fullName: string
   company: string
   planName: string
-  trialDaysLeft: number | null
-  isTrialing: boolean
 }
 
 const TIPS = [
@@ -41,7 +39,7 @@ const TIPS = [
   },
 ]
 
-export function WelcomeBar({ firstName, fullName, company, planName, trialDaysLeft, isTrialing }: WelcomeBarProps) {
+export function WelcomeBar({ firstName, fullName, company, planName }: WelcomeBarProps) {
   const [greeting, setGreeting] = useState('Guten Tag')
   const [tip, setTip] = useState(TIPS[0])
 
@@ -55,9 +53,6 @@ export function WelcomeBar({ firstName, fullName, company, planName, trialDaysLe
     // Pick a random tip on first paint, stable per session
     setTip(TIPS[Math.floor(Math.random() * TIPS.length)])
   }, [])
-
-  const showTrial = isTrialing && trialDaysLeft !== null && trialDaysLeft > 0
-  const trialUrgent = showTrial && (trialDaysLeft as number) <= 3
 
   return (
     <section className="relative overflow-hidden rounded-3xl mb-6 p-6 lg:p-8 bg-gradient-to-br from-brand-600 via-brand-700 to-violet text-white shadow-card-xl">
@@ -76,15 +71,6 @@ export function WelcomeBar({ firstName, fullName, company, planName, trialDaysLe
               <div className="text-xs font-bold uppercase tracking-widest text-white/70">{company}</div>
               <div className="text-[11px] text-white/60 flex items-center gap-2">
                 <span>{planName} Plan</span>
-                {showTrial && (
-                  <>
-                    <span className="w-1 h-1 rounded-full bg-white/40" />
-                    <span className={trialUrgent ? 'font-bold text-amber-200' : 'text-white/70'}>
-                      <Clock3 className="w-3 h-3 inline mr-0.5" />
-                      {trialDaysLeft} Tage Trial
-                    </span>
-                  </>
-                )}
               </div>
             </div>
           </div>

@@ -25,6 +25,19 @@ export default function ImpressumPage() {
         E-Mail: <a href="mailto:hello@candiq.de">hello@candiq.de</a>
       </p>
 
+      <h3>Registereintrag</h3>
+      <p>
+        Eintragung im Handelsregister.<br />
+        Registergericht: Amtsgericht Wiesbaden<br />
+        Registernummer: HRB 35951
+      </p>
+
+      <h3>Umsatzsteuer-ID</h3>
+      <p>
+        Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br />
+        DE458027073
+      </p>
+
       <h3>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h3>
       <p>
         Ricardo Serrano<br />

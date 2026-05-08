@@ -165,7 +165,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Registrierung fehlgeschlagen. Bitte in einem Moment erneut versuchen oder support@candiq.de kontaktieren.' },
+      { error: 'Registrierung fehlgeschlagen. Bitte in einem Moment erneut versuchen oder hello@candiq.de kontaktieren.' },
       { status: 500 }
     )
   }

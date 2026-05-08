@@ -40,7 +40,7 @@ export function HowItWorks() {
         <Reveal>
           <div className="text-center max-w-3xl mx-auto mb-20">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mb-4">
-              So funktioniert's
+              So funktioniert&rsquo;s
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
               Drei Schritte. <span className="text-gradient-brand">Verlässliches Signal.</span>

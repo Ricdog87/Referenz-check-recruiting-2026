@@ -6,8 +6,8 @@ import { Reveal } from '../Reveal'
 
 const items = [
   { icon: ShieldCheck, label: 'DSGVO-konform', sub: 'by Design' },
-  { icon: Server, label: 'Server in Deutschland', sub: 'ISO 27001 RZ' },
-  { icon: Lock, label: 'TLS 1.3 + AES-256', sub: 'End-to-End verschlüsselt' },
+  { icon: Server, label: 'Server in Deutschland', sub: 'Hosting in DE' },
+  { icon: Lock, label: 'Verschlüsselte Übertragung', sub: 'HTTPS überall' },
   { icon: FileText, label: 'Auftragsverarbeitungsvertrag', sub: 'Standard inklusive' },
 ]
 

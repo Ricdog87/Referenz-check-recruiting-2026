@@ -3,7 +3,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, Zap } from 'lucide-react'
+import { Menu, X, Zap, CalendarCheck } from 'lucide-react'
+import { BOOKING_URL } from '@/lib/site'
 
 export function LandingNav() {
   const { scrollY } = useScroll()
@@ -22,22 +23,21 @@ export function LandingNav() {
       }}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="relative w-9 h-9 rounded-2xl overflow-hidden flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
-              boxShadow: '0 6px 20px rgba(79,70,229,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
-            }}>
-            <span className="text-white text-sm font-black tracking-tighter">CQ</span>
-            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-          </div>
-          <span className="text-base font-bold text-text-primary tracking-tight">candiq</span>
+        <Link href="/" className="flex items-center gap-2 group" aria-label="candiq Startseite">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="candiq"
+            width={120}
+            height={32}
+            className="h-8 w-auto"
+          />
           <span className="hidden sm:inline-block text-[10px] font-semibold uppercase tracking-widest text-brand-600 px-1.5 py-0.5 rounded-md bg-brand-50 border border-brand-100 ml-1">Pro</span>
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
-          <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">So funktioniert's</Link>
+          <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">So funktioniert&rsquo;s</Link>
           <Link href="#zielgruppen" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Für wen</Link>
           <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Features</Link>
           <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
@@ -52,8 +52,14 @@ export function LandingNav() {
           <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-text-primary px-4 py-2 rounded-full transition-colors">
             Anmelden
           </Link>
-          <Link href="/register" className="btn-primary text-xs py-2 px-4">
-            Kostenlos starten
+          <Link
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5"
+          >
+            <CalendarCheck className="w-3.5 h-3.5" />
+            Termin buchen
           </Link>
         </div>
 
@@ -69,7 +75,7 @@ export function LandingNav() {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden border-t border-border bg-white px-6 py-4 space-y-2"
         >
-          <Link href="#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert's</Link>
+          <Link href="#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert&rsquo;s</Link>
           <Link href="#zielgruppen" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für wen</Link>
           <Link href="#features" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Features</Link>
           <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">PDL-Warteliste</Link>
@@ -79,7 +85,16 @@ export function LandingNav() {
               <Zap className="w-3.5 h-3.5 text-brand-600" />Live-Demo
             </Link>
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>
-            <Link href="/register" onClick={() => setOpen(false)} className="btn-primary w-full">Kostenlos starten</Link>
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="btn-primary w-full flex items-center justify-center gap-1.5"
+            >
+              <CalendarCheck className="w-3.5 h-3.5" />
+              Termin buchen
+            </Link>
           </div>
         </motion.div>
       )}

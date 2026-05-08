@@ -4,7 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { LandingNav } from '@/components/landing/LandingNav'
 import { LandingFooter } from '@/components/landing/LandingFooter'
-import { Building2, Users2, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Building2, Users2, CheckCircle2, ArrowRight, CalendarCheck } from 'lucide-react'
+import { BOOKING_URL } from '@/lib/site'
 
 export default function AgencyWaitlistPage() {
   const [submitted, setSubmitted] = useState(false)
@@ -126,11 +127,16 @@ export default function AgencyWaitlistPage() {
                   <div>
                     <div className="font-semibold text-emerald-800 mb-1">Danke! Wir melden uns, sobald die PDL-Pakete live gehen.</div>
                     <p className="text-sm text-emerald-700">
-                      Bis dahin können Sie candiq intern mit HR-Paketen testen.
+                      Bis dahin können Sie candiq mit unseren HR-Paketen einsetzen — wir richten Ihren Testzugang im persönlichen Termin ein.
                     </p>
                     <div className="mt-3">
-                      <Link href="/register" className="text-sm font-semibold text-emerald-800 hover:underline inline-flex items-center gap-1">
-                        HR-Paket jetzt testen <Building2 className="w-4 h-4" />
+                      <Link
+                        href={BOOKING_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-semibold text-emerald-800 hover:underline inline-flex items-center gap-1"
+                      >
+                        Termin für Testzugang buchen <CalendarCheck className="w-4 h-4" />
                       </Link>
                     </div>
                   </div>

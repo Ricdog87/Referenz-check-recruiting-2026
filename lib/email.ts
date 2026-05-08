@@ -21,8 +21,8 @@ export type EmailMessage = {
   category?: string
 }
 
-const FROM_DEFAULT = process.env.EMAIL_FROM ?? 'candiq <onboarding@resend.dev>'
-const REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'support@candiq.de'
+const FROM_DEFAULT = process.env.EMAIL_FROM ?? 'candiq <hello@candiq.de>'
+const REPLY_TO = process.env.EMAIL_REPLY_TO ?? 'hello@candiq.de'
 
 export type SendResult =
   | { ok: true; provider: 'resend'; id: string }
@@ -129,14 +129,14 @@ export function welcomeEmail(opts: { name: string; email: string; loginUrl: stri
   const firstName = opts.name.split(' ')[0] ?? opts.name
   const html = shell(`
     <h1>Willkommen bei candiq, ${escapeHtml(firstName)} 👋</h1>
-    <p>Ihr 14-tägiger Test-Account ist bereit. Sie können jetzt Kandidaten anlegen, Referenzen prüfen und das gesamte DSGVO-konforme Recruiting-Workflow ausprobieren — ohne Kreditkarte.</p>
+    <p>Ihr candiq-Account ist bereit. Sie können jetzt Kandidaten anlegen, Referenzprüfungen starten und das gesamte DSGVO-konforme Recruiting-Workflow nutzen.</p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.loginUrl}">Zum Dashboard</a></p>
     <p><strong>Erste Schritte:</strong></p>
     <p>1. Ersten Kandidaten anlegen<br>2. Referenzprüfung starten<br>3. PDF-Report exportieren</p>
     <p>Fragen? Antworten Sie einfach auf diese E-Mail — wir helfen gern.</p>
   `)
-  const text = `Willkommen bei candiq, ${firstName}!\n\nIhr 14-tägiger Test-Account ist bereit: ${opts.loginUrl}\n\nFragen? Antworten Sie einfach auf diese E-Mail.`
-  return { subject: 'Willkommen bei candiq — Ihr Test-Account ist bereit', html, text }
+  const text = `Willkommen bei candiq, ${firstName}!\n\nIhr candiq-Account ist bereit: ${opts.loginUrl}\n\nFragen? Antworten Sie einfach auf diese E-Mail.`
+  return { subject: 'Willkommen bei candiq — Ihr Account ist bereit', html, text }
 }
 
 export function passwordResetEmail(opts: { name: string; resetUrl: string; expiresInMinutes: number }): { subject: string; html: string; text: string } {
