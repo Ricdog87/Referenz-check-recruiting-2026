@@ -47,15 +47,18 @@ export default function DatenschutzPage() {
 
       <h2>5. Datenspeicherung & Hosting</h2>
       <p>
-        Alle personenbezogenen Daten werden ausschließlich auf Servern in der Bundesrepublik Deutschland
-        gespeichert (Hetzner / Strato Rechenzentren mit ISO 27001-Zertifizierung). Es findet keine
-        Übermittlung in Drittländer statt.
+        Personenbezogene Daten werden in Rechenzentren innerhalb der Europäischen Union, vorrangig in
+        Deutschland, verarbeitet. Eine Übermittlung in Drittländer findet nicht statt; Ausnahme sind die
+        unter „Reichweitenanalyse&ldquo; genannten Vercel-Dienste, die auf Basis der EU-Standardvertragsklauseln
+        eingebunden sind.
       </p>
 
       <h2>6. Verschlüsselung</h2>
       <p>
-        Datenübertragung erfolgt ausschließlich verschlüsselt (TLS 1.3). Passwörter werden mittels bcrypt
-        gehasht; Dokumente werden im Vercel Blob Storage AES-256-verschlüsselt abgelegt.
+        Die Datenübertragung zwischen Ihrem Endgerät und unseren Servern erfolgt ausschließlich
+        verschlüsselt (HTTPS). Passwörter werden ausschließlich als gehashter Wert gespeichert, nicht im
+        Klartext. Hochgeladene Dokumente werden verschlüsselt abgelegt und sind nur für autorisierte
+        Nutzer Ihres Workspaces zugänglich.
       </p>
 
       <h2>7. Ihre Rechte</h2>
@@ -71,16 +74,27 @@ export default function DatenschutzPage() {
       <h2>8. Cookies</h2>
       <p>
         Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
-        Es findet kein Tracking, keine Marketing-Pixel und keine Analyse-Cookies statt.
+        Es findet kein Marketing-Tracking und es werden keine Werbe-Pixel gesetzt.
       </p>
 
-      <h2>9. Aufbewahrungsfristen</h2>
+      <h2>9. Reichweitenanalyse (Vercel Web Analytics &amp; Speed Insights)</h2>
+      <p>
+        Wir nutzen Vercel Web Analytics und Vercel Speed Insights zur Messung der
+        Reichweite und Performance unserer Website. Es werden keine Cookies gesetzt
+        und keine personenbezogenen Daten dauerhaft gespeichert. IP-Adressen werden
+        vor der Verarbeitung pseudonymisiert (gehasht). Rechtsgrundlage ist Art. 6
+        Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
+        Reichweitenanalyse). Anbieter: Vercel Inc., 340 S Lemon Ave #4133, Walnut,
+        CA 91789, USA. Verarbeitung gemäß Standardvertragsklauseln.
+      </p>
+
+      <h2>10. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
         erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
       </p>
 
-      <h2>10. Stand</h2>
+      <h2>11. Stand</h2>
       <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: April 2026.</p>
     </LegalShell>
   )

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="candiq">
+  <title>candiq</title>
+  <!-- C / magnifier ring (open at the right) -->
+  <path d="M 47.5 16.5 A 22 22 0 1 0 47.5 47.5"
+        fill="none" stroke="#7c3aed" stroke-width="10" stroke-linecap="round"/>
+  <!-- Inner eye / pupil -->
+  <circle cx="42" cy="22" r="4.5" fill="#0f172a"/>
+  <!-- Magnifier handle -->
+  <line x1="44" y1="44" x2="58" y2="58"
+        stroke="#0f172a" stroke-width="8" stroke-linecap="round"/>
+</svg>

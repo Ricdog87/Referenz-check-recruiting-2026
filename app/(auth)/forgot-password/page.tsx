@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
           </p>
           <p className="text-xs text-text-muted mb-5">
             Keine E-Mail erhalten? Schauen Sie kurz im Spam-Ordner — oder schreiben Sie uns an{' '}
-            <a href="mailto:support@candiq.de" className="text-brand-700 hover:underline">support@candiq.de</a>.
+            <a href="mailto:hello@candiq.de" className="text-brand-700 hover:underline">hello@candiq.de</a>.
           </p>
           <Link href="/login" className="text-sm text-text-secondary hover:text-text-primary inline-flex items-center gap-1.5">
             <ArrowLeft className="w-3.5 h-3.5" /> Zurück zur Anmeldung

@@ -57,11 +57,15 @@ export function Sidebar() {
 
       {/* Logo */}
       <div className="h-16 flex items-center px-5 border-b border-border justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)', boxShadow: '0 4px 14px rgba(79,70,229,0.3)' }}>
-            <span className="text-white text-xs font-black">CQ</span>
-          </div>
+        <Link href="/dashboard" className="flex items-center gap-2.5 group" aria-label="candiq Dashboard">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-mark.svg"
+            alt=""
+            width={32}
+            height={32}
+            className="w-8 h-8"
+          />
           <div className="min-w-0">
             <div className="text-sm font-bold text-text-primary tracking-tight">candiq</div>
             <div className="text-[10px] text-text-muted truncate">

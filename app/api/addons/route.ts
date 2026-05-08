@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('[api/addons] Error:', err)
     return NextResponse.json(
-      { error: 'Buchung konnte nicht gespeichert werden. Bitte kontaktieren Sie support@candiq.de.' },
+      { error: 'Buchung konnte nicht gespeichert werden. Bitte kontaktieren Sie hello@candiq.de.' },
       { status: 500 }
     )
   }

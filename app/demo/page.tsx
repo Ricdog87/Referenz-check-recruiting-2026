@@ -1,16 +1,14 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import {
-  Building2, Briefcase, Rocket, Loader2, ArrowRight,
-  CheckCircle2, ShieldCheck, Users, ClipboardList, ShoppingBag,
-  Sparkles, BarChart3, Clock3, Play, Star,
-  TrendingUp, AlertTriangle, Zap,
+  Building2, Briefcase, Rocket, ArrowRight,
+  ShieldCheck, Users, ClipboardList, ShoppingBag,
+  Sparkles, BarChart3, Clock3, Star,
+  TrendingUp, AlertTriangle, Zap, CalendarCheck,
 } from 'lucide-react'
+import { BOOKING_URL } from '@/lib/site'
 
 type DemoKey = 'hr' | 'enterprise' | 'boutique'
 
@@ -76,8 +74,8 @@ const DEMOS = [
     addons: ['1× Einzel-Check'],
     highlights: [
       { icon: Rocket, text: 'Starter-Dashboard (kleines Team)' },
-      { icon: Clock3, text: 'Trial-Countdown (14 Tage)' },
       { icon: Zap, text: 'Onboarding-Flow & Upgrade-CTA' },
+      { icon: Clock3, text: 'Activity-Verlauf & KPI-Pulse' },
       { icon: ShieldCheck, text: 'DSGVO-Einwilligungs-Flow' },
     ],
   },
@@ -109,12 +107,7 @@ function useTilt(intensity = 10) {
   return { rotateX, rotateY, glowX, glowY, onMove, onLeave }
 }
 
-function DemoCard({ demo, onStart, isLoading, isDisabled }: {
-  demo: typeof DEMOS[0]
-  onStart: () => void
-  isLoading: boolean
-  isDisabled: boolean
-}) {
+function DemoCard({ demo }: { demo: typeof DEMOS[0] }) {
   const tilt = useTilt(8)
   const Icon = demo.icon
 
@@ -220,83 +213,44 @@ function DemoCard({ demo, onStart, isLoading, isDisabled }: {
 
       {/* CTA */}
       <div className="px-5 pb-5">
-        <button
-          onClick={onStart}
-          disabled={isDisabled || isLoading}
-          className="w-full relative flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group/btn"
+        <Link
+          href={BOOKING_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full relative flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all overflow-hidden group/btn"
           style={{ background: demo.gradient, boxShadow: `0 8px 24px ${demo.glowColor}` }}
         >
           <div className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/10 transition-colors duration-300" />
-          {isLoading ? (
-            <><Loader2 className="w-4 h-4 animate-spin relative z-10" /><span className="relative z-10">Wird vorbereitet…</span></>
-          ) : (
-            <>
-              <Play className="w-4 h-4 relative z-10" />
-              <span className="relative z-10">Als {demo.label} einloggen</span>
-              <ArrowRight className="w-4 h-4 relative z-10 group-hover/btn:translate-x-0.5 transition-transform" />
-            </>
-          )}
-        </button>
+          <CalendarCheck className="w-4 h-4 relative z-10" />
+          <span className="relative z-10">{demo.label}-Demo per Termin</span>
+          <ArrowRight className="w-4 h-4 relative z-10 group-hover/btn:translate-x-0.5 transition-transform" />
+        </Link>
       </div>
     </motion.div>
   )
 }
 
 export default function DemoPage() {
-  const router = useRouter()
-  const [loading, setLoading] = useState<DemoKey | null>(null)
-  const [error, setError] = useState<{ message: string; retryable: boolean; key: DemoKey } | null>(null)
-
-  async function startDemo(key: DemoKey, attempt = 0): Promise<void> {
-    if (loading) return
-    setError(null)
-    setLoading(key)
-    try {
-      const res = await fetch(`/api/demo?type=${key}`, { method: 'POST', cache: 'no-store' })
-      const data = await res.json()
-      if (!res.ok) {
-        // One automatic silent retry for retryable failures (cold start / transient DB).
-        if (data.retryable && attempt === 0) {
-          await new Promise((r) => setTimeout(r, 1200))
-          return startDemo(key, 1)
-        }
-        throw Object.assign(
-          new Error(data.error ?? 'Demo konnte nicht geladen werden.'),
-          { retryable: !!data.retryable },
-        )
-      }
-      const result = await signIn('credentials', { email: data.email, password: data.password, redirect: false })
-      if (result?.error) throw Object.assign(new Error('Anmeldung fehlgeschlagen — bitte erneut versuchen.'), { retryable: true })
-      router.push('/dashboard')
-      router.refresh()
-    } catch (e: any) {
-      setError({
-        message: e.message ?? 'Demo gerade nicht verfügbar.',
-        retryable: e.retryable ?? true,
-        key,
-      })
-      setLoading(null)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-[#fafafa] overflow-x-hidden">
 
       {/* ── Sticky nav ── */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border/60">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-7 h-7 rounded-xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 12px rgba(79,70,229,.3)' }}>
-              <span className="text-white text-[10px] font-black">CQ</span>
-            </div>
-            <span className="text-sm font-bold text-text-primary">candiq</span>
+          <Link href="/" className="flex items-center group" aria-label="candiq Startseite">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="candiq" width={108} height={28} className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-xs font-medium text-text-secondary hover:text-text-primary transition-colors">Anmelden</Link>
-            <Link href="/register" className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full text-white transition-all"
-              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 14px rgba(79,70,229,.3)' }}>
-              <Sparkles className="w-3.5 h-3.5" />Kostenlos testen
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full text-white transition-all"
+              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 14px rgba(79,70,229,.3)' }}
+            >
+              <CalendarCheck className="w-3.5 h-3.5" />Termin buchen
             </Link>
           </div>
         </div>
@@ -337,11 +291,8 @@ export default function DemoPage() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full bg-white border border-brand-200 shadow-card text-xs font-semibold text-text-primary"
           >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600" />
-            </span>
-            Live · Kein Konto · Echte Produktdaten
+            <CalendarCheck className="w-3.5 h-3.5 text-brand-600" />
+            Live-Showcase · Demo-Zugang nach 15-Min-Termin
           </motion.div>
 
           {/* Headline */}
@@ -364,9 +315,21 @@ export default function DemoPage() {
             className="max-w-2xl mx-auto mb-10"
           >
             <p className="text-lg text-text-secondary leading-relaxed mb-6">
-              Drei vorbefüllte Demo-Konten. Wählen Sie das Profil, das Ihrer Situation am nächsten kommt — und sehen Sie das echte Dashboard.{' '}
-              <span className="font-semibold text-text-primary">Ein Klick, kein Formular.</span>
+              Reference Checks brauchen aktive Begleitung — kein Self-Service-Trial. Buchen Sie einen
+              15-Minuten-Termin: wir schauen gemeinsam ins echte Dashboard und richten Ihren persönlichen
+              Testzugang ein. Unten sehen Sie drei typische Profile, die wir Ihnen zeigen.
             </p>
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-base font-bold px-7 py-3.5 rounded-full text-white transition-all hover:scale-[1.02] mb-10"
+              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 8px 30px rgba(79,70,229,.35)' }}
+            >
+              <CalendarCheck className="w-4 h-4" />
+              Termin für Demo-Zugang buchen
+              <ArrowRight className="w-4 h-4" />
+            </Link>
 
             {/* What you can test — explanation grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
@@ -390,46 +353,8 @@ export default function DemoPage() {
         </div>
       </section>
 
-      {/* ── Demo cards ── */}
+      {/* ── Demo cards (Showcase) ── */}
       <section className="px-6 pb-10 max-w-6xl mx-auto">
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="mb-6 mx-auto max-w-xl rounded-2xl border border-amber-200 bg-amber-50/80 backdrop-blur-sm px-5 py-4 shadow-card"
-          >
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="w-4 h-4 text-amber-700" />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-amber-900 mb-0.5">
-                  {error.retryable ? 'Demo wird gerade vorbereitet' : 'Demo aktuell nicht verfügbar'}
-                </div>
-                <p className="text-xs text-amber-800/90 leading-relaxed mb-3">
-                  {error.message}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {error.retryable && (
-                    <button
-                      onClick={() => startDemo(error.key)}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-amber-600 text-white hover:bg-amber-700 transition-colors"
-                    >
-                      <Loader2 className="w-3 h-3" /> Erneut versuchen
-                    </button>
-                  )}
-                  <Link
-                    href="/register"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
-                  >
-                    Stattdessen kostenloses Konto erstellen <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
         <div className="grid md:grid-cols-3 gap-5" style={{ perspective: 1200 }}>
           {DEMOS.map((demo, i) => (
             <motion.div
@@ -438,12 +363,7 @@ export default function DemoPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
             >
-              <DemoCard
-                demo={demo}
-                onStart={() => startDemo(demo.key)}
-                isLoading={loading === demo.key}
-                isDisabled={loading !== null && loading !== demo.key}
-              />
+              <DemoCard demo={demo} />
             </motion.div>
           ))}
         </div>
@@ -487,17 +407,19 @@ export default function DemoPage() {
           transition={{ duration: 0.6, delay: 0.9 }}
           className="mt-10 text-center"
         >
-          <p className="text-sm text-text-secondary mb-4">Überzeugt? Starten Sie mit Ihrem eigenen Workspace.</p>
+          <p className="text-sm text-text-secondary mb-4">Überzeugt? Wir richten Ihren persönlichen Testzugang im 15-Min-Call ein.</p>
           <Link
-            href="/register"
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-base font-bold px-8 py-3.5 rounded-full text-white transition-all hover:scale-105"
             style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 8px 30px rgba(79,70,229,.35)' }}
           >
-            <Sparkles className="w-4 h-4" />
-            14 Tage kostenlos & unverbindlich
+            <CalendarCheck className="w-4 h-4" />
+            Termin für Testzugang buchen
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <p className="text-xs text-text-muted mt-3">Keine Kreditkarte · Kündigung jederzeit</p>
+          <p className="text-xs text-text-muted mt-3">15 Minuten · individueller Testzugang · monatlich kündbar</p>
         </motion.div>
       </section>
     </div>

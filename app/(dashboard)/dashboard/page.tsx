@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
-import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES, trialDaysLeft } from '@/lib/utils'
+import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
 import {
   Users, AlertTriangle, TrendingUp, ArrowUpRight,
   Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
@@ -156,8 +156,6 @@ export default async function DashboardPage() {
   ]
 
   const firstName = session.user.name.split(' ')[0] ?? session.user.name
-  const trialLeft = trialDaysLeft(session.user.trialEndsAt)
-  const isTrialing = trialLeft !== null && trialLeft > 0
 
   return (
     <>
@@ -166,8 +164,6 @@ export default async function DashboardPage() {
         fullName={session.user.name}
         company={session.user.company}
         planName={planMeta.name}
-        trialDaysLeft={trialLeft}
-        isTrialing={isTrialing}
       />
 
       <div className="space-y-6">

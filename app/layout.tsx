@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 import { Providers } from './providers'
 
@@ -61,6 +63,27 @@ export const viewport: Viewport = {
   ],
 }
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'candiq',
+  legalName: 'RSG Recruiting Solutions group GmbH',
+  url: BASE_URL,
+  logo: `${BASE_URL}/logo-mark.svg`,
+  email: 'hello@candiq.de',
+  telephone: '+49 176 60772556',
+  vatID: 'DE458027073',
+  taxID: 'HRB 35951',
+  sameAs: ['https://www.linkedin.com/in/ricardoserrano-rsgai/'],
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Am Heiligenhaus 9',
+    postalCode: '65207',
+    addressLocality: 'Wiesbaden',
+    addressCountry: 'DE',
+  },
+}
+
 export default function RootLayout({
   children,
 }: {
@@ -71,9 +94,15 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
       </head>
       <body>
         <Providers>{children}</Providers>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

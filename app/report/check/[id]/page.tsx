@@ -38,7 +38,8 @@ export default async function CheckReportPage({ params }: { params: { id: string
         {/* Header */}
         <header className="report-header">
           <div className="report-brand">
-            <div className="report-logo">CQ</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo-mark.svg" alt="" className="report-logo" width={48} height={48} />
             <div>
               <div className="report-brand-name">candiq</div>
               <div className="report-brand-sub">Referenzprüfungs-Report</div>
@@ -177,7 +178,7 @@ const REPORT_CSS = `
 .report-doc { max-width: 820px; margin: 0 auto; background: #fff; padding: 56px 56px 48px; border-radius: 12px; box-shadow: 0 4px 24px rgba(15,23,42,.06); border: 1px solid #e2e8f0; }
 .report-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 28px; border-bottom: 2px solid #e2e8f0; margin-bottom: 32px; gap: 24px; flex-wrap: wrap; }
 .report-brand { display: flex; align-items: center; gap: 14px; }
-.report-logo { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #4f46e5, #8b5cf6); color: #fff; font-weight: 900; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(79,70,229,.3); }
+.report-logo { width: 48px; height: 48px; flex-shrink: 0; }
 .report-brand-name { font-weight: 900; font-size: 22px; letter-spacing: -0.5px; }
 .report-brand-sub { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 .report-meta { display: grid; grid-template-columns: auto auto; gap: 4px 18px; font-size: 11px; color: #475569; }
