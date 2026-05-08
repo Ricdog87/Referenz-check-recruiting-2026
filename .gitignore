@@ -51,3 +51,7 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Python bytecode (uipro skill scripts)
+__pycache__/
+*.pyc
