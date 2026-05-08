@@ -110,7 +110,7 @@ async function handle(req: NextRequest) {
       // Continue — withDbRecovery below will retry on schema-related failures.
     }
 
-    const hashed = await bcrypt.hash(profile.password, 10)
+    const hashed = await bcrypt.hash(profile.password, 12)
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + profile.trialDays)
 
