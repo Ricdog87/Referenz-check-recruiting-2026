@@ -71,16 +71,27 @@ export default function DatenschutzPage() {
       <h2>8. Cookies</h2>
       <p>
         Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
-        Es findet kein Tracking, keine Marketing-Pixel und keine Analyse-Cookies statt.
+        Es findet kein Marketing-Tracking und es werden keine Werbe-Pixel gesetzt.
       </p>
 
-      <h2>9. Aufbewahrungsfristen</h2>
+      <h2>9. Reichweitenanalyse (Vercel Web Analytics &amp; Speed Insights)</h2>
+      <p>
+        Wir nutzen Vercel Web Analytics und Vercel Speed Insights zur Messung der
+        Reichweite und Performance unserer Website. Es werden keine Cookies gesetzt
+        und keine personenbezogenen Daten dauerhaft gespeichert. IP-Adressen werden
+        vor der Verarbeitung pseudonymisiert (gehasht). Rechtsgrundlage ist Art. 6
+        Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
+        Reichweitenanalyse). Anbieter: Vercel Inc., 340 S Lemon Ave #4133, Walnut,
+        CA 91789, USA. Verarbeitung gemäß Standardvertragsklauseln.
+      </p>
+
+      <h2>10. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
         erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
       </p>
 
-      <h2>10. Stand</h2>
+      <h2>11. Stand</h2>
       <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: April 2026.</p>
     </LegalShell>
   )

@@ -12,8 +12,8 @@ export default function AgbPage() {
     >
       <h2>1. Geltungsbereich</h2>
       <p>
-        Diese AGB gelten für alle Verträge zwischen der RSG Recruiting Solutions group GmbH („Anbieter") und
-        Unternehmenskunden („Kunde") über die Nutzung der candiq-Plattform. Die Leistungen richten sich
+        Diese AGB gelten für alle Verträge zwischen der RSG Recruiting Solutions group GmbH („Anbieter&ldquo;) und
+        Unternehmenskunden („Kunde&ldquo;) über die Nutzung der candiq-Plattform. Die Leistungen richten sich
         ausschließlich an Unternehmer im Sinne von § 14 BGB.
       </p>
 

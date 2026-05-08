@@ -25,6 +25,9 @@ export default function ImpressumPage() {
         E-Mail: <a href="mailto:hello@candiq.de">hello@candiq.de</a>
       </p>
 
+      {/* TODO: USt-IdNr (Format DE + 9 Ziffern) ergänzen, sobald vom Finanzamt erteilt. */}
+      {/* TODO: Handelsregister-Nummer und Registergericht ergänzen (z. B. Amtsgericht Wiesbaden HRB ...). */}
+
       <h3>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h3>
       <p>
         Ricardo Serrano<br />
