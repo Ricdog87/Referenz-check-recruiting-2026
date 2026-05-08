@@ -113,7 +113,7 @@ export function Hero3D() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm text-text-primary">Telekom AG</span>
+                <span className="font-semibold text-sm text-text-primary">Demo Holding GmbH</span>
                 <span className="badge-warning text-[10px]">Live-Call</span>
               </div>
               <div className="text-xs text-text-muted mb-2">M. Schmidt · Senior Engineer · 2021–2024</div>
@@ -146,7 +146,7 @@ export function Hero3D() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-semibold text-sm text-text-primary">Referenz verifiziert</span>
-                <span className="badge-success text-[10px]">SAP SE</span>
+                <span className="badge-success text-[10px]">Beispiel AG</span>
               </div>
               <div className="text-xs text-text-secondary leading-relaxed">
                 Position, Zeitraum & Tätigkeiten bestätigt. Ehemaliger Vorgesetzter empfiehlt Kandidat ausdrücklich.
