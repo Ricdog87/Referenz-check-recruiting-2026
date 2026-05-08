@@ -44,7 +44,7 @@ export default function AgbPage() {
       <p>
         Monatliche Pakete sind monatlich zum Monatsende kündbar. Jährliche Pakete sind mit einer Frist
         von 30 Tagen zum Ende der Vertragslaufzeit kündbar. Die Kündigung ist im Dashboard oder per
-        E-Mail an <a href="mailto:billing@candiq.de">billing@candiq.de</a> möglich.
+        E-Mail an <a href="mailto:hello@candiq.de">hello@candiq.de</a> möglich.
       </p>
 
       <h2>6. Pflichten des Kunden</h2>

@@ -21,6 +21,12 @@ export function LandingFooter() {
             <p className="text-sm text-text-secondary leading-relaxed max-w-sm mb-5">
               DSGVO-konforme Referenzprüfung für moderne HR-Teams und Personaldienstleister im DACH-Raum.
             </p>
+            <div className="text-sm text-text-secondary mb-3">
+              <span className="text-text-muted">Support &amp; Kontakt:</span>{' '}
+              <a href="mailto:hello@candiq.de" className="font-semibold text-brand-700 hover:text-brand-800 transition-colors">
+                hello@candiq.de
+              </a>
+            </div>
             <div className="flex items-center gap-3 text-xs text-text-muted">
               <span>🇩🇪 Made in Germany</span>
             </div>

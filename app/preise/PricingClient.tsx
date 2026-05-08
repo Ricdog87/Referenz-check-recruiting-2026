@@ -145,7 +145,7 @@ export function PricingClient() {
                     </ul>
 
                     <Link
-                      href={p.id === 'ENTERPRISE' ? 'mailto:sales@candiq.de' : BOOKING_URL}
+                      href={p.id === 'ENTERPRISE' ? 'mailto:hello@candiq.de?subject=Enterprise-Anfrage' : BOOKING_URL}
                       target={p.id === 'ENTERPRISE' ? undefined : '_blank'}
                       rel={p.id === 'ENTERPRISE' ? undefined : 'noopener noreferrer'}
                       className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
@@ -298,7 +298,7 @@ export function PricingClient() {
               },
               {
                 q: 'Bietet ihr Enterprise-Verträge & SSO?',
-                a: 'Ja. Für 50+ Sitze, SSO-Integration (SAML, Azure AD, Okta) oder On-Premise-Deployments — bitte direkten Kontakt unter sales@candiq.de.',
+                a: 'Ja. Für 50+ Sitze, SSO-Integration (SAML, Azure AD, Okta) oder On-Premise-Deployments — bitte direkten Kontakt unter hello@candiq.de.',
               },
             ].map((f, i) => (
               <FaqItem key={i} q={f.q} a={f.a} />

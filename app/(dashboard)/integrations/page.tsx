@@ -40,7 +40,7 @@ export default function IntegrationsPage() {
               <div className="text-xs text-text-secondary">REST-API, Webhooks und OpenAPI-Spec verfügbar.</div>
             </div>
           </div>
-          <a href="mailto:integrations@candiq.de" className="btn-secondary text-xs">
+          <a href="mailto:hello@candiq.de?subject=API-Zugang%20anfragen" className="btn-secondary text-xs">
             <Mail className="w-3.5 h-3.5" /> API-Zugang anfragen
           </a>
         </div>
