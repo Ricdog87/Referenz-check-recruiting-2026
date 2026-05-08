@@ -43,3 +43,15 @@ next-env.d.ts
 # Uploads (user data - never commit)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Python bytecode (uipro skill scripts)
+__pycache__/
+*.pyc
