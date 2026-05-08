@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { ArrowRight, ShieldCheck, Sparkles, Play, Clock3, FileCheck2, BadgeCheck } from 'lucide-react'
+import { ArrowRight, ShieldCheck, Sparkles, Play, Clock3, FileCheck2, BadgeCheck, CalendarCheck } from 'lucide-react'
 import { Hero3D } from '../Hero3D'
+import { BOOKING_URL } from '@/lib/site'
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null)
@@ -75,9 +76,14 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-3 mb-6"
           >
-            <Link href="/register" className="btn-primary text-base py-3.5 px-7 group">
-              <Sparkles className="w-4 h-4" />
-              14 Tage kostenlos testen
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary text-base py-3.5 px-7 group"
+            >
+              <CalendarCheck className="w-4 h-4" />
+              Termin für Testzugang buchen
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link href="/demo" className="btn-secondary text-base py-3.5 px-7">
@@ -88,7 +94,7 @@ export function Hero() {
 
           {/* Microcopy under CTAs */}
           <div className="text-xs text-text-muted mb-10">
-            Keine Kreditkarte · in 60 Sekunden eingerichtet · jederzeit kündbar
+            15-Min-Termin · individueller Testzugang · DSGVO-konform · Server in Deutschland
           </div>
 
           {/* Value pills (concrete, no fabricated numbers) */}

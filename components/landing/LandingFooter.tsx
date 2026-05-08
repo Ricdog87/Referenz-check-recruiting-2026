@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BOOKING_URL } from '@/lib/site'
 
 export function LandingFooter() {
   return (
@@ -28,7 +29,8 @@ export function LandingFooter() {
               { label: 'Features', href: '#features' },
               { label: 'So funktioniert\'s', href: '#wie-es-funktioniert' },
               { label: 'Preise', href: '/preise' },
-              { label: 'ROI-Rechner', href: '#roi' },
+              { label: 'Live-Demo', href: '/demo' },
+              { label: 'Termin buchen', href: BOOKING_URL, external: true },
             ]}
           />
 
@@ -68,14 +70,24 @@ export function LandingFooter() {
   )
 }
 
-function FooterCol({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string
+  links: { label: string; href: string; external?: boolean }[]
+}) {
   return (
     <div>
       <h4 className="text-xs font-bold text-text-primary uppercase tracking-widest mb-4">{title}</h4>
       <ul className="space-y-2.5">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="text-sm text-text-secondary hover:text-text-primary transition-colors">
+            <Link
+              href={l.href}
+              {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+            >
               {l.label}
             </Link>
           </li>

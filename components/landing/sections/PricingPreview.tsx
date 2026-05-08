@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { Check, ArrowRight, Building2, Users2, Clock3 } from 'lucide-react'
 import { HR_PLANS } from '@/lib/utils'
 import { Reveal } from '../Reveal'
+import { BOOKING_URL } from '@/lib/site'
 
 export function PricingPreview() {
   const [tab, setTab] = useState<'hr' | 'agency'>('hr')
@@ -134,14 +135,16 @@ export function PricingPreview() {
                   </ul>
 
                   <Link
-                    href={`/register?plan=${p.id}`}
+                    href={BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
                       p.highlight
                         ? 'bg-white text-brand-700 hover:bg-bg-secondary'
                         : 'btn-primary'
                     }`}
                   >
-                    {p.ctaLabel}
+                    Termin buchen
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </motion.div>

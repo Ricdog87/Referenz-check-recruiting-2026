@@ -9,8 +9,9 @@ import {
   Building2, Briefcase, Rocket, Loader2, ArrowRight,
   CheckCircle2, ShieldCheck, Users, ClipboardList, ShoppingBag,
   Sparkles, BarChart3, Clock3, Play, Star,
-  TrendingUp, AlertTriangle, Zap,
+  TrendingUp, AlertTriangle, Zap, CalendarCheck,
 } from 'lucide-react'
+import { BOOKING_URL } from '@/lib/site'
 
 type DemoKey = 'hr' | 'enterprise' | 'boutique'
 
@@ -76,8 +77,8 @@ const DEMOS = [
     addons: ['1× Einzel-Check'],
     highlights: [
       { icon: Rocket, text: 'Starter-Dashboard (kleines Team)' },
-      { icon: Clock3, text: 'Trial-Countdown (14 Tage)' },
       { icon: Zap, text: 'Onboarding-Flow & Upgrade-CTA' },
+      { icon: Clock3, text: 'Activity-Verlauf & KPI-Pulse' },
       { icon: ShieldCheck, text: 'DSGVO-Einwilligungs-Flow' },
     ],
   },
@@ -294,9 +295,14 @@ export default function DemoPage() {
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-xs font-medium text-text-secondary hover:text-text-primary transition-colors">Anmelden</Link>
-            <Link href="/register" className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full text-white transition-all"
-              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 14px rgba(79,70,229,.3)' }}>
-              <Sparkles className="w-3.5 h-3.5" />Kostenlos testen
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full text-white transition-all"
+              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 14px rgba(79,70,229,.3)' }}
+            >
+              <CalendarCheck className="w-3.5 h-3.5" />Termin buchen
             </Link>
           </div>
         </div>
@@ -419,10 +425,12 @@ export default function DemoPage() {
                     </button>
                   )}
                   <Link
-                    href="/register"
+                    href={BOOKING_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-white border border-amber-200 text-amber-900 hover:bg-amber-100 transition-colors"
                   >
-                    Stattdessen kostenloses Konto erstellen <ArrowRight className="w-3 h-3" />
+                    Stattdessen 15-Min-Termin vereinbaren <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
@@ -487,17 +495,19 @@ export default function DemoPage() {
           transition={{ duration: 0.6, delay: 0.9 }}
           className="mt-10 text-center"
         >
-          <p className="text-sm text-text-secondary mb-4">Überzeugt? Starten Sie mit Ihrem eigenen Workspace.</p>
+          <p className="text-sm text-text-secondary mb-4">Überzeugt? Wir richten Ihren persönlichen Testzugang im 15-Min-Call ein.</p>
           <Link
-            href="/register"
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-base font-bold px-8 py-3.5 rounded-full text-white transition-all hover:scale-105"
             style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 8px 30px rgba(79,70,229,.35)' }}
           >
-            <Sparkles className="w-4 h-4" />
-            14 Tage kostenlos & unverbindlich
+            <CalendarCheck className="w-4 h-4" />
+            Termin für Testzugang buchen
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <p className="text-xs text-text-muted mt-3">Keine Kreditkarte · Kündigung jederzeit</p>
+          <p className="text-xs text-text-muted mt-3">15 Minuten · individueller Testzugang · monatlich kündbar</p>
         </motion.div>
       </section>
     </div>

@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Check, X, ArrowRight, Building2, Users2, Sparkles, ChevronDown, Clock3 } from 'lucide-react'
+import { Check, X, ArrowRight, Building2, Users2, ChevronDown, Clock3, CalendarCheck } from 'lucide-react'
 import { HR_PLANS } from '@/lib/utils'
 import { Reveal } from '@/components/landing/Reveal'
+import { BOOKING_URL } from '@/lib/site'
 
 export function PricingClient() {
   const [tab, setTab] = useState<'hr' | 'agency'>('hr')
@@ -23,8 +24,8 @@ export function PricingClient() {
         </div>
 
         <div className="max-w-5xl mx-auto text-center relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 mb-5">
-            <Sparkles className="w-3.5 h-3.5" /> 14 Tage kostenlos · jederzeit kündbar
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 mb-5">
+            <CalendarCheck className="w-3.5 h-3.5" /> Testzugang nach 15-Min-Termin · monatlich kündbar
           </div>
           <h1 className="text-[clamp(40px,6vw,68px)] font-black tracking-tightest mb-5 leading-[1.05]">
             Klare Preise. <br />
@@ -144,14 +145,16 @@ export function PricingClient() {
                     </ul>
 
                     <Link
-                      href={p.id === 'ENTERPRISE' ? 'mailto:sales@candiq.de' : `/register?plan=${p.id}&type=${p.forType}`}
+                      href={p.id === 'ENTERPRISE' ? 'mailto:sales@candiq.de' : BOOKING_URL}
+                      target={p.id === 'ENTERPRISE' ? undefined : '_blank'}
+                      rel={p.id === 'ENTERPRISE' ? undefined : 'noopener noreferrer'}
                       className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
                         p.highlight
                           ? 'bg-white text-brand-700 hover:bg-bg-secondary'
                           : 'btn-primary'
                       }`}
                     >
-                      {p.ctaLabel}
+                      {p.id === 'ENTERPRISE' ? p.ctaLabel : 'Termin buchen'}
                       <ArrowRight className="w-4 h-4" />
                     </Link>
                   </motion.div>
@@ -270,12 +273,12 @@ export function PricingClient() {
           <div className="space-y-3">
             {[
               {
-                q: 'Was ist im 14-tägigen Test enthalten?',
-                a: 'Voller Funktionsumfang Ihres gewählten Pakets, inklusive 3 kostenlosen Referenzprüfungen. Keine Kreditkarte nötig — Sie müssen nur ein Konto erstellen.',
+                q: 'Wie bekomme ich einen Testzugang?',
+                a: 'Über einen 15-Minuten-Termin. Reference Checks brauchen aktive Begleitung — wir richten Ihren Testzugang persönlich ein, klären Use Case und Datenfluss und führen Sie durch den Report. Kein Self-Service-Trial, keine 14-Tage-Frist.',
               },
               {
-                q: 'Was passiert nach dem Test?',
-                a: 'Sie können das Abonnement aktivieren oder Ihr Konto verfällt automatisch. Wir buchen niemals etwas ohne Ihre ausdrückliche Bestätigung.',
+                q: 'Wie lange habe ich Zeit, candiq zu evaluieren?',
+                a: 'So lange Sie brauchen. Der Testzugang ist nicht zeitbefristet — Sie entscheiden gemeinsam mit uns, wann der produktive Start sinnvoll ist. Erst dann beginnt die Abrechnung.',
               },
               {
                 q: 'Kann ich jederzeit das Paket wechseln?',
@@ -308,10 +311,18 @@ export function PricingClient() {
       <section className="py-20 px-6 text-center">
         <div className="max-w-2xl mx-auto">
           <h3 className="text-3xl font-bold tracking-tight mb-4 text-text-primary">Noch unsicher?</h3>
-          <p className="text-text-secondary mb-7">Schauen Sie sich candiq in der Live-Demo an — voll funktionsfähig, ohne Anmeldung. Oder vereinbaren Sie ein 15-Minuten-Gespräch an Ihrem konkreten Use Case.</p>
+          <p className="text-text-secondary mb-7">Schauen Sie sich candiq in der Live-Demo an — voll funktionsfähig, ohne Anmeldung. Oder vereinbaren Sie ein 15-Minuten-Gespräch an Ihrem konkreten Use Case und erhalten direkt einen Testzugang.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/demo" className="btn-primary py-3 px-7">Live-Demo öffnen</Link>
-            <a href="mailto:sales@candiq.de" className="btn-secondary py-3 px-7">15-Min-Gespräch buchen</a>
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary py-3 px-7 inline-flex items-center gap-2"
+            >
+              <CalendarCheck className="w-4 h-4" />
+              15-Min-Termin buchen
+            </Link>
+            <Link href="/demo" className="btn-secondary py-3 px-7">Live-Demo öffnen</Link>
           </div>
         </div>
       </section>

@@ -24,11 +24,12 @@ export default function AgbPage() {
         Paket (siehe <a href="/preise">Preisseite</a>).
       </p>
 
-      <h2>3. Vertragsabschluss & Testphase</h2>
+      <h2>3. Vertragsabschluss & Testzugang</h2>
       <p>
-        Mit Registrierung kommt ein Vertrag über die kostenlose 14-tägige Testphase zustande. Eine
-        kostenpflichtige Buchung erfordert die separate Auswahl eines Pakets und die Eingabe gültiger
-        Zahlungsdaten. Vor Ablauf der Testphase werden keine Kosten berechnet.
+        Ein kostenpflichtiger Vertrag kommt erst mit ausdrücklicher Buchung eines Pakets durch den Kunden
+        zustande. Vor der Buchung kann nach individueller Vereinbarung ein unverbindlicher, von uns
+        bereitgestellter Testzugang genutzt werden; dieser ist kein Vertragsverhältnis im Sinne eines
+        kostenpflichtigen Pakets. Während des Testzugangs entstehen für den Kunden keine Kosten.
       </p>
 
       <h2>4. Preise & Zahlungsbedingungen</h2>

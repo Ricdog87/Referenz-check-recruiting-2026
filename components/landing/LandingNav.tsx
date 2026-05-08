@@ -3,7 +3,8 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, Zap } from 'lucide-react'
+import { Menu, X, Zap, CalendarCheck } from 'lucide-react'
+import { BOOKING_URL } from '@/lib/site'
 
 export function LandingNav() {
   const { scrollY } = useScroll()
@@ -52,8 +53,14 @@ export function LandingNav() {
           <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-text-primary px-4 py-2 rounded-full transition-colors">
             Anmelden
           </Link>
-          <Link href="/register" className="btn-primary text-xs py-2 px-4">
-            Kostenlos starten
+          <Link
+            href={BOOKING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5"
+          >
+            <CalendarCheck className="w-3.5 h-3.5" />
+            Termin buchen
           </Link>
         </div>
 
@@ -79,7 +86,16 @@ export function LandingNav() {
               <Zap className="w-3.5 h-3.5 text-brand-600" />Live-Demo
             </Link>
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>
-            <Link href="/register" onClick={() => setOpen(false)} className="btn-primary w-full">Kostenlos starten</Link>
+            <Link
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setOpen(false)}
+              className="btn-primary w-full flex items-center justify-center gap-1.5"
+            >
+              <CalendarCheck className="w-3.5 h-3.5" />
+              Termin buchen
+            </Link>
           </div>
         </motion.div>
       )}
