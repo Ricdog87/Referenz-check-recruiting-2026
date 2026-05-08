@@ -206,7 +206,7 @@ function LoginForm() {
           <p className="text-sm text-text-secondary">
             Noch kein Konto?{' '}
             <Link href="/register" className="text-brand-700 hover:text-brand-800 transition-colors font-semibold">
-              Kostenlos registrieren
+              Konto erstellen
             </Link>
           </p>
         </div>

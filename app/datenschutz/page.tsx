@@ -47,15 +47,18 @@ export default function DatenschutzPage() {
 
       <h2>5. Datenspeicherung & Hosting</h2>
       <p>
-        Alle personenbezogenen Daten werden ausschließlich auf Servern in der Bundesrepublik Deutschland
-        gespeichert (Hetzner / Strato Rechenzentren mit ISO 27001-Zertifizierung). Es findet keine
-        Übermittlung in Drittländer statt.
+        Personenbezogene Daten werden in Rechenzentren innerhalb der Europäischen Union, vorrangig in
+        Deutschland, verarbeitet. Eine Übermittlung in Drittländer findet nicht statt; Ausnahme sind die
+        unter „Reichweitenanalyse&ldquo; genannten Vercel-Dienste, die auf Basis der EU-Standardvertragsklauseln
+        eingebunden sind.
       </p>
 
       <h2>6. Verschlüsselung</h2>
       <p>
-        Datenübertragung erfolgt ausschließlich verschlüsselt (TLS 1.3). Passwörter werden mittels bcrypt
-        gehasht; Dokumente werden im Vercel Blob Storage AES-256-verschlüsselt abgelegt.
+        Die Datenübertragung zwischen Ihrem Endgerät und unseren Servern erfolgt ausschließlich
+        verschlüsselt (HTTPS). Passwörter werden ausschließlich als gehashter Wert gespeichert, nicht im
+        Klartext. Hochgeladene Dokumente werden verschlüsselt abgelegt und sind nur für autorisierte
+        Nutzer Ihres Workspaces zugänglich.
       </p>
 
       <h2>7. Ihre Rechte</h2>

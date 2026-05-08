@@ -274,7 +274,7 @@ export function PricingClient() {
             {[
               {
                 q: 'Wie bekomme ich einen Testzugang?',
-                a: 'Über einen 15-Minuten-Termin. Reference Checks brauchen aktive Begleitung — wir richten Ihren Testzugang persönlich ein, klären Use Case und Datenfluss und führen Sie durch den Report. Kein Self-Service-Trial, keine 14-Tage-Frist.',
+                a: 'Über einen 15-Minuten-Termin. Reference Checks brauchen aktive Begleitung — wir richten Ihren Testzugang persönlich ein, klären Use Case und Datenfluss und führen Sie durch den Report. Kein Self-Service-Trial, keine starre Befristung.',
               },
               {
                 q: 'Wie lange habe ich Zeit, candiq zu evaluieren?',

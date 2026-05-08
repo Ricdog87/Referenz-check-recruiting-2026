@@ -255,7 +255,7 @@ async function handle(req: NextRequest) {
     }
     return NextResponse.json(
       {
-        error: 'Demo gerade nicht verfügbar. Bitte später erneut versuchen — oder direkt ein kostenloses Konto erstellen.',
+        error: 'Demo gerade nicht verfügbar. Bitte später erneut versuchen — oder direkt einen Termin für einen Testzugang vereinbaren.',
         retryable: false,
       },
       { status: 500 },
