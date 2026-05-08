@@ -72,6 +72,8 @@ const organizationJsonLd = {
   logo: `${BASE_URL}/favicon.svg`,
   email: 'hello@candiq.de',
   telephone: '+49 176 60772556',
+  vatID: 'DE458027073',
+  taxID: 'HRB 35951',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Am Heiligenhaus 9',
