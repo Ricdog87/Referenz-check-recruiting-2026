@@ -51,6 +51,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/logo-mark.svg', type: 'image/svg+xml' }],
   },
 }
 
@@ -69,7 +70,7 @@ const organizationJsonLd = {
   name: 'candiq',
   legalName: 'RSG Recruiting Solutions group GmbH',
   url: BASE_URL,
-  logo: `${BASE_URL}/favicon.svg`,
+  logo: `${BASE_URL}/logo-mark.svg`,
   email: 'hello@candiq.de',
   telephone: '+49 176 60772556',
   vatID: 'DE458027073',

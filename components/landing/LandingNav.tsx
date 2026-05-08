@@ -23,16 +23,15 @@ export function LandingNav() {
       }}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="relative w-9 h-9 rounded-2xl overflow-hidden flex items-center justify-center"
-            style={{
-              background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #8b5cf6 100%)',
-              boxShadow: '0 6px 20px rgba(79,70,229,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
-            }}>
-            <span className="text-white text-sm font-black tracking-tighter">CQ</span>
-            <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-          </div>
-          <span className="text-base font-bold text-text-primary tracking-tight">candiq</span>
+        <Link href="/" className="flex items-center gap-2 group" aria-label="candiq Startseite">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.svg"
+            alt="candiq"
+            width={120}
+            height={32}
+            className="h-8 w-auto"
+          />
           <span className="hidden sm:inline-block text-[10px] font-semibold uppercase tracking-widest text-brand-600 px-1.5 py-0.5 rounded-md bg-brand-50 border border-brand-100 ml-1">Pro</span>
         </Link>
 

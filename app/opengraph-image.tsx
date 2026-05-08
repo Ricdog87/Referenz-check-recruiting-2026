@@ -22,28 +22,24 @@ export default async function OpengraphImage() {
           fontFamily: 'system-ui, -apple-system, "Segoe UI", sans-serif',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            width="72"
+            height="72"
+            alt=""
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(
+              `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
+                <path d='M 47.5 16.5 A 22 22 0 1 0 47.5 47.5' fill='none' stroke='#ffffff' stroke-width='10' stroke-linecap='round'/>
+                <circle cx='42' cy='22' r='4.5' fill='#ffffff'/>
+                <line x1='44' y1='44' x2='58' y2='58' stroke='#ffffff' stroke-width='8' stroke-linecap='round'/>
+              </svg>`
+            )}`}
+          />
           <div
             style={{
-              width: '72px',
-              height: '72px',
-              borderRadius: '20px',
-              background: 'rgba(255,255,255,0.18)',
-              border: '2px solid rgba(255,255,255,0.4)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '40px',
-              fontWeight: 700,
-              letterSpacing: '-0.04em',
-            }}
-          >
-            c
-          </div>
-          <div
-            style={{
-              fontSize: '48px',
-              fontWeight: 700,
+              fontSize: '52px',
+              fontWeight: 800,
               letterSpacing: '-0.03em',
             }}
           >

@@ -286,12 +286,9 @@ export default function DemoPage() {
       {/* ── Sticky nav ── */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-border/60">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-7 h-7 rounded-xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 12px rgba(79,70,229,.3)' }}>
-              <span className="text-white text-[10px] font-black">CQ</span>
-            </div>
-            <span className="text-sm font-bold text-text-primary">candiq</span>
+          <Link href="/" className="flex items-center group" aria-label="candiq Startseite">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="candiq" width={108} height={28} className="h-7 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-xs font-medium text-text-secondary hover:text-text-primary transition-colors">Anmelden</Link>
