@@ -83,7 +83,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          'Inter',
+          'var(--font-inter)',
           '-apple-system',
           'BlinkMacSystemFont',
           'SF Pro Display',
@@ -91,14 +91,14 @@ module.exports = {
           'sans-serif',
         ],
         display: [
-          'Inter',
+          'var(--font-inter)',
           '-apple-system',
           'BlinkMacSystemFont',
           'SF Pro Display',
           'system-ui',
           'sans-serif',
         ],
-        mono: ['SF Mono', 'JetBrains Mono', 'Fira Code', 'monospace'],
+        mono: ['var(--font-jetbrains-mono)', 'SF Mono', 'Fira Code', 'monospace'],
       },
       fontSize: {
         '2xs': ['0.65rem', { lineHeight: '1rem' }],

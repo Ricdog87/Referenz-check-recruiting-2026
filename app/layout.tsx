@@ -1,8 +1,22 @@
 import type { Metadata, Viewport } from 'next'
-import { Analytics } from '@vercel/analytics/next'
-import { SpeedInsights } from '@vercel/speed-insights/next'
+import { headers } from 'next/headers'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-inter',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  display: 'swap',
+  variable: '--font-jetbrains-mono',
+})
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://candiq.de'
 
@@ -89,20 +103,19 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const nonce = headers().get('x-nonce') ?? undefined
+
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang="de" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
       </head>
       <body>
         <Providers>{children}</Providers>
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   )
