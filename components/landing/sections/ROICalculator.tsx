@@ -151,27 +151,7 @@ function Slider({ label, value, onChange, min, max, step, format }: {
           background: `linear-gradient(to right, #4f46e5 0%, #8b5cf6 ${pct}%, rgb(241 245 249) ${pct}%, rgb(241 245 249) 100%)`,
         }}
       />
-      <style jsx>{`
-        input[type='range']::-webkit-slider-thumb {
-          appearance: none;
-          width: 22px;
-          height: 22px;
-          border-radius: 9999px;
-          background: white;
-          border: 2px solid #6366f1;
-          box-shadow: 0 2px 6px rgba(79,70,229,0.4);
-          cursor: grab;
-        }
-        input[type='range']::-moz-range-thumb {
-          width: 22px;
-          height: 22px;
-          border-radius: 9999px;
-          background: white;
-          border: 2px solid #6366f1;
-          box-shadow: 0 2px 6px rgba(79,70,229,0.4);
-          cursor: grab;
-        }
-      `}</style>
+      {/* Range-Slider thumb-styles: zentralisiert in app/globals.css (CSP-freundlich) */}
     </div>
   )
 }

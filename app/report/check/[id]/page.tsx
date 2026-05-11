@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { notFound, redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { formatDate, formatDateTime, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import Link from 'next/link'
 import { ReportPrintControls } from './PrintControls'
@@ -11,6 +12,8 @@ export const dynamic = 'force-dynamic'
 export default async function CheckReportPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   if (!session) redirect(`/login?callbackUrl=/report/check/${params.id}`)
+
+  const nonce = headers().get('x-nonce') ?? undefined
 
   const check = await prisma.referenceCheck.findFirst({
     where: { id: params.id, candidate: { userId: session.user.id } },
@@ -168,7 +171,7 @@ export default async function CheckReportPage({ params }: { params: { id: string
 
       <Link className="back-link no-print" href={`/checks/${check.id}`}>← Zurück zur Prüfung</Link>
 
-      <style>{REPORT_CSS}</style>
+      <style nonce={nonce}>{REPORT_CSS}</style>
     </main>
   )
 }
