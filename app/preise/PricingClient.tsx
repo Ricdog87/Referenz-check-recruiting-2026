@@ -7,6 +7,7 @@ import { Check, X, ArrowRight, Building2, Users2, ChevronDown, Clock3, CalendarC
 import { HR_PLANS } from '@/lib/utils'
 import { Reveal } from '@/components/landing/Reveal'
 import { BOOKING_URL } from '@/lib/site'
+import { PricingCTA } from '@/components/PricingCTA'
 
 export function PricingClient() {
   const [tab, setTab] = useState<'hr' | 'agency'>('hr')
@@ -144,19 +145,23 @@ export function PricingClient() {
                       ))}
                     </ul>
 
-                    <Link
-                      href={p.id === 'ENTERPRISE' ? 'mailto:hello@candiq.de?subject=Enterprise-Anfrage' : BOOKING_URL}
-                      target={p.id === 'ENTERPRISE' ? undefined : '_blank'}
-                      rel={p.id === 'ENTERPRISE' ? undefined : 'noopener noreferrer'}
-                      className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
-                        p.highlight
-                          ? 'bg-white text-brand-700 hover:bg-bg-secondary'
-                          : 'btn-primary'
-                      }`}
-                    >
-                      {p.id === 'ENTERPRISE' ? p.ctaLabel : 'Termin buchen'}
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
+                    {p.id === 'ENTERPRISE' ? (
+                      <Link
+                        href="mailto:hello@candiq.de?subject=Enterprise-Anfrage"
+                        className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
+                          p.highlight ? 'bg-white text-brand-700 hover:bg-bg-secondary' : 'btn-primary'
+                        }`}
+                      >
+                        {p.ctaLabel}
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    ) : (
+                      <PricingCTA
+                        plan={p.id.toLowerCase() as 'starter' | 'professional' | 'business'}
+                        interval={annual ? 'yearly' : 'monthly'}
+                        highlight={p.highlight}
+                      />
+                    )}
                   </motion.div>
                 )
               })}

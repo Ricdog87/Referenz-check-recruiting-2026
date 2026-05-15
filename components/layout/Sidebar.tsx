@@ -6,6 +6,7 @@ import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
   Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag, ScrollText, X,
+  CreditCard,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
 import { useMobileSidebar } from './MobileSidebarContext'
@@ -95,6 +96,7 @@ export function Sidebar() {
             <NavItem key={item.href} {...item} pathname={pathname} />
           ))}
           <NavItem href="/settings" label="Einstellungen" icon={Settings} pathname={pathname} />
+          <NavItem href="/settings/billing" label="Abrechnung" icon={CreditCard} pathname={pathname} />
         </NavSection>
 
         {/* Upgrade card */}

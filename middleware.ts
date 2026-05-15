@@ -29,6 +29,10 @@ function buildCsp(nonce: string): string {
     `'self'`,
     `'nonce-${nonce}'`,
     `'strict-dynamic'`,
+    // Stripe.js + Vercel Analytics — werden nur in Verbindung mit dem Nonce
+    // dynamisch nachgeladen (strict-dynamic propagiert Vertrauen).
+    `https://js.stripe.com`,
+    `https://va.vercel-scripts.com`,
     isDev ? `'unsafe-eval'` : null,
   ]
     .filter(Boolean)
@@ -43,7 +47,10 @@ function buildCsp(nonce: string): string {
     `style-src-attr 'unsafe-inline'`,
     `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com`,
     `font-src 'self'`,
-    `connect-src 'self'`,
+    // connect-src: Stripe REST + Vercel Analytics / Speed Insights.
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com`,
+    // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks).
+    `frame-src https://js.stripe.com https://hooks.stripe.com`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,

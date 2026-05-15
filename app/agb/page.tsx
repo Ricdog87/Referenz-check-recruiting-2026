@@ -32,19 +32,48 @@ export default function AgbPage() {
         kostenpflichtigen Pakets. Während des Testzugangs entstehen für den Kunden keine Kosten.
       </p>
 
-      <h2>4. Preise & Zahlungsbedingungen</h2>
-      <ul>
-        <li>Alle Preise verstehen sich zuzüglich der gesetzlichen Umsatzsteuer.</li>
-        <li>Monatliche Pakete werden monatlich im Voraus abgerechnet, jährliche Pakete jährlich im Voraus.</li>
-        <li>Über die Inklusiv-Prüfungen hinausgehende Reference-Checks werden zum Paketpreis nachberechnet.</li>
-        <li>Zahlung per SEPA-Lastschrift, Kreditkarte oder Rechnung (ab Business-Paket).</li>
-      </ul>
-
-      <h2>5. Laufzeit & Kündigung</h2>
+      <h2>4. Abonnement, Laufzeit, Kündigung</h2>
       <p>
-        Monatliche Pakete sind monatlich zum Monatsende kündbar. Jährliche Pakete sind mit einer Frist
-        von 30 Tagen zum Ende der Vertragslaufzeit kündbar. Die Kündigung ist im Dashboard oder per
-        E-Mail an <a href="mailto:hello@candiq.de">hello@candiq.de</a> möglich.
+        (1) Das Abonnement beginnt mit der Bestätigung der Bestellung durch candiq und der
+        erfolgreichen Zahlung über Stripe.
+      </p>
+      <p>
+        (2) Es läuft auf monatlicher oder jährlicher Basis (je nach gewähltem Tarif) und verlängert
+        sich automatisch um einen weiteren Abrechnungszeitraum, sofern es nicht zum Ende des
+        laufenden Zeitraums gekündigt wird.
+      </p>
+      <p>
+        (3) Die Kündigung erfolgt formfrei über das Kundenportal (<a href="/settings/billing">/settings/billing</a>)
+        oder per E-Mail an <a href="mailto:hello@candiq.de">hello@candiq.de</a>. Die Kündigung wird zum
+        Ende des laufenden Abrechnungszeitraums wirksam.
+      </p>
+      <p>
+        (4) Bis zum Ende des bezahlten Abrechnungszeitraums bleibt der Zugang zum SaaS bestehen.
+      </p>
+
+      <h2>5. Preise, Zahlung, Mehrwertsteuer</h2>
+      <p>
+        (1) Es gelten die zum Bestellzeitpunkt im Tarif-Plan ausgewiesenen Preise zzgl. der jeweils
+        gesetzlichen Mehrwertsteuer.
+      </p>
+      <p>
+        (2) B2B-Geschäftskunden mit gültiger USt-IdNr. innerhalb der EU (außerhalb Deutschlands)
+        können bei Bestellung das Reverse-Charge-Verfahren in Anspruch nehmen; die USt-IdNr.
+        wird im Stripe-Checkout abgefragt und automatisch geprüft.
+      </p>
+      <p>
+        (3) Zahlung erfolgt im Voraus über Stripe per Kreditkarte, SEPA-Lastschrift, Apple Pay
+        oder Google Pay.
+      </p>
+      <p>
+        (4) Bei Zahlungsverzug ist candiq berechtigt, den Zugang nach zweiter Mahnung zu sperren
+        und das Abonnement außerordentlich zu kündigen.
+      </p>
+
+      <h2>5a. Zielgruppe (B2B-Ausschluss Widerruf)</h2>
+      <p>
+        candiq richtet sich ausschließlich an Unternehmer im Sinne des § 14 BGB. Ein Widerrufsrecht
+        nach § 355 BGB besteht für Geschäftskunden nicht.
       </p>
 
       <h2>6. Pflichten des Kunden</h2>
@@ -84,7 +113,7 @@ export default function AgbPage() {
       </ul>
 
       <p className="text-text-muted text-xs mt-12">
-        Stand: April 2026. Vor Live-Gang individuell anwaltlich prüfen lassen.
+        Stand: Mai 2026. Vor Live-Gang individuell anwaltlich prüfen lassen.
       </p>
     </LegalShell>
   )

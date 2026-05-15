@@ -8,7 +8,13 @@ import { formatDate, formatDateTime, formatFileSize, CANDIDATE_STATUS, CHECK_STA
 import { CandidateActions } from './CandidateActions'
 import { Phone, Plus, ShieldCheck, ShieldAlert, FileText, Download, Mail } from 'lucide-react'
 
-export default async function CandidateDetailPage({ params }: { params: { id: string } }) {
+export default async function CandidateDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string }
+  searchParams?: { uploadFailed?: string }
+}) {
   const session = await getServerSession(authOptions)
   if (!session) return null
 
@@ -23,6 +29,9 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
   if (!candidate) notFound()
 
   const st = CANDIDATE_STATUS[candidate.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
+  const uploadFailures = searchParams?.uploadFailed
+    ? decodeURIComponent(searchParams.uploadFailed).split('|').filter(Boolean)
+    : []
 
   return (
     <>
@@ -38,6 +47,19 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
           </div>
         }
       />
+
+      {uploadFailures.length > 0 && (
+        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <div className="text-sm font-semibold text-amber-900 mb-1">
+            {uploadFailures.length === 1 ? '1 Datei' : `${uploadFailures.length} Dateien`} konnten nicht hochgeladen werden
+          </div>
+          <ul className="text-xs text-amber-800 space-y-0.5">
+            {uploadFailures.map((f, i) => (
+              <li key={i}>· {f}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column */}

@@ -126,9 +126,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Welcome-Mail (graceful: scheitert nicht den Request, wenn Provider fehlt).
+    //
+    // WICHTIG: `to` ist die validierte Input-Adresse (`cleanEmail`), nicht
+    // `user.email` aus dem DB-Round-Trip. Damit kann ein case-insensitiver
+    // Lookup oder ein abweichender DB-Wert NIE die Empfängeradresse
+    // beeinflussen — Empfänger ist immer die Adresse, die der Nutzer
+    // gerade eingegeben hat.
     const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
-    const tpl = welcomeEmail({ name: cleanName, email: user.email, loginUrl: `${baseUrl}/login` })
-    sendEmail({ to: user.email, subject: tpl.subject, html: tpl.html, text: tpl.text, userId: user.id, category: 'welcome' })
+    const tpl = welcomeEmail({ name: cleanName, email: cleanEmail, loginUrl: `${baseUrl}/login` })
+    sendEmail({ to: cleanEmail, subject: tpl.subject, html: tpl.html, text: tpl.text, userId: user.id, category: 'welcome' })
       .catch((err) => console.error('welcome_email_warn', err))
 
     return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })
