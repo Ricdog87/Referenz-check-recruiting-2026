@@ -19,8 +19,20 @@ export default function NewCandidatePage() {
   const [gdprConsent, setGdprConsent] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [error, setError] = useState('')
+  const [fileError, setFileError] = useState('')
   const [loading, setLoading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+
+  // Muss zu /api/upload (MAX_SIZE) passen — sonst akzeptiert die UI Dateien,
+  // die der Server stumm ablehnt.
+  const MAX_FILE_SIZE = 4 * 1024 * 1024
+  const ALLOWED_MIME = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
+  ]
 
   function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -28,13 +40,24 @@ export default function NewCandidatePage() {
 
   function handleFiles(newFiles: FileList | null) {
     if (!newFiles) return
-    const valid = Array.from(newFiles).filter((f) => {
-      const ok = ['application/pdf', 'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'image/jpeg', 'image/png'].includes(f.type)
-      return ok && f.size < 10 * 1024 * 1024
-    })
-    setFiles((prev) => [...prev, ...valid])
+    setFileError('')
+    const accepted: File[] = []
+    const rejected: string[] = []
+    for (const f of Array.from(newFiles)) {
+      if (!ALLOWED_MIME.includes(f.type)) {
+        rejected.push(`${f.name} (Dateityp nicht erlaubt)`)
+        continue
+      }
+      if (f.size > MAX_FILE_SIZE) {
+        rejected.push(`${f.name} (zu groß, max. 4 MB)`)
+        continue
+      }
+      accepted.push(f)
+    }
+    if (rejected.length > 0) {
+      setFileError(`Nicht hinzugefügt: ${rejected.join(', ')}`)
+    }
+    setFiles((prev) => [...prev, ...accepted])
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -52,7 +75,7 @@ export default function NewCandidatePage() {
       body: JSON.stringify({ ...form, gdprConsent }),
     })
 
-    const data = await res.json()
+    const data = await res.json().catch(() => ({}))
 
     if (!res.ok) {
       setError(data.error || 'Fehler beim Anlegen des Kandidaten.')
@@ -62,16 +85,33 @@ export default function NewCandidatePage() {
 
     const candidateId = data.id
 
-    // Upload files
+    // Uploads: Fehler sammeln & zeigen, statt sie zu verschlucken.
+    const failed: string[] = []
     for (const file of files) {
       const fd = new FormData()
       fd.append('file', file)
       fd.append('candidateId', candidateId)
       fd.append('type', 'CV')
-      await fetch('/api/upload', { method: 'POST', body: fd })
+      try {
+        const up = await fetch('/api/upload', { method: 'POST', body: fd })
+        if (!up.ok) {
+          const errData = await up.json().catch(() => ({}))
+          failed.push(`${file.name}: ${errData?.error ?? `HTTP ${up.status}`}`)
+        }
+      } catch (err: any) {
+        failed.push(`${file.name}: ${err?.message ?? 'Netzwerkfehler'}`)
+      }
     }
 
     setLoading(false)
+
+    if (failed.length > 0) {
+      // Kandidat ist trotzdem angelegt — auf Detail-Seite weiterleiten,
+      // aber mit Hinweis-Flag, damit die Seite einen Upload-Fehler zeigen kann.
+      router.push(`/candidates/${candidateId}?uploadFailed=${encodeURIComponent(failed.join('|'))}`)
+      return
+    }
+
     router.push(`/candidates/${candidateId}`)
   }
 
@@ -156,12 +196,18 @@ export default function NewCandidatePage() {
               <p className="text-sm text-text-secondary mb-2">
                 CV, Zeugnisse und weitere Unterlagen hier ablegen
               </p>
-              <p className="text-xs text-text-muted mb-4">PDF, DOC, DOCX, JPG, PNG · Max. 10 MB</p>
+              <p className="text-xs text-text-muted mb-4">PDF, DOC, DOCX, JPG, PNG · Max. 4 MB</p>
               <label className="btn-secondary cursor-pointer text-xs py-2">
                 Dateien auswählen
                 <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" onChange={(e) => handleFiles(e.target.files)} />
               </label>
             </div>
+
+            {fileError && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-xs text-amber-800">
+                {fileError}
+              </div>
+            )}
 
             {files.length > 0 && (
               <div className="space-y-2">
