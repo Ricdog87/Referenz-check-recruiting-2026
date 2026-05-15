@@ -71,13 +71,46 @@ export default function DatenschutzPage() {
         <li><strong>Art. 77 DSGVO</strong> — Beschwerderecht bei der Aufsichtsbehörde</li>
       </ul>
 
-      <h2>8. Cookies</h2>
+      <h2>8. Zahlungsabwicklung über Stripe</h2>
       <p>
-        Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
-        Es findet kein Marketing-Tracking und es werden keine Werbe-Pixel gesetzt.
+        Für die Abwicklung von Zahlungen und Abonnementsverwaltung nutzen wir den Zahlungs­dienstleister
+        Stripe Payments Europe, Limited, 1 Grand Canal Street Lower, Grand Canal Dock, Dublin,
+        D02 H210, Irland (im Folgenden „Stripe&ldquo;). Stripe verarbeitet im Auftrag personenbezogene
+        Daten (Name, Anschrift, E-Mail-Adresse, USt-IdNr., Zahlungsdaten) zur Durchführung des
+        Vertragsverhältnisses.
+      </p>
+      <p>
+        Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).
+        Zahlungsdaten (z. B. Kreditkartennummer, SEPA-Mandat) werden ausschließlich an Stripe
+        übermittelt; wir selbst speichern keine vollständigen Zahlungsmitteldaten.
+      </p>
+      <p>
+        Stripe ist ein europäisches Tochterunternehmen der Stripe, Inc. (USA). Soweit personen­bezogene
+        Daten im Rahmen der Zahlungsabwicklung an Stripe Inc. in die USA übermittelt werden,
+        erfolgt dies auf Grundlage der EU-Standardvertragsklauseln (Standard Contractual Clauses, SCC)
+        gemäß Art. 46 Abs. 2 lit. c DSGVO. Stripe Inc. ist außerdem unter dem EU-U.S. Data Privacy
+        Framework zertifiziert.
+      </p>
+      <p>
+        Die Auftragsverarbeitung erfolgt auf Basis eines Auftrags­verarbeitungs­vertrags (DPA) nach
+        Art. 28 DSGVO, abrufbar unter <a href="https://stripe.com/legal/dpa" target="_blank" rel="noopener noreferrer">stripe.com/legal/dpa</a>.
+        Datenschutz­erklärung von Stripe: <a href="https://stripe.com/de/privacy" target="_blank" rel="noopener noreferrer">stripe.com/de/privacy</a>.
+      </p>
+      <p>
+        <strong>Speicherdauer:</strong> Solange das Vertragsverhältnis besteht und gesetzliche
+        Aufbewahrungs­pflichten (insbesondere § 257 HGB, § 147 AO — 10 Jahre für Rechnungen)
+        bestehen.
       </p>
 
-      <h2>9. Reichweitenanalyse (Vercel Web Analytics &amp; Speed Insights)</h2>
+      <h2>9. Cookies</h2>
+      <p>
+        Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
+        Für die Reichweitenanalyse setzen wir Vercel Web Analytics ein — cookielos und auf Basis
+        von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
+        Reichweitenanalyse). Es werden keine Marketing-Pixel und keine Tracking-Cookies Dritter gesetzt.
+      </p>
+
+      <h2>10. Reichweitenanalyse (Vercel Web Analytics &amp; Speed Insights)</h2>
       <p>
         Wir nutzen Vercel Web Analytics und Vercel Speed Insights zur Messung der
         Reichweite und Performance unserer Website. Es werden keine Cookies gesetzt
@@ -88,14 +121,14 @@ export default function DatenschutzPage() {
         CA 91789, USA. Verarbeitung gemäß Standardvertragsklauseln.
       </p>
 
-      <h2>10. Aufbewahrungsfristen</h2>
+      <h2>11. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
         erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
       </p>
 
-      <h2>11. Stand</h2>
-      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: April 2026.</p>
+      <h2>12. Stand</h2>
+      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: Mai 2026.</p>
     </LegalShell>
   )
 }

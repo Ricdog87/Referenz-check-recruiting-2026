@@ -16,8 +16,15 @@ model User {
   role          String        @default("CLIENT")
   // HR_DEPARTMENT (interne HR-Abteilung im Unternehmen) | RECRUITMENT_AGENCY (Personaldienstleister/Headhunter)
   accountType   String        @default("HR_DEPARTMENT")
-  // STARTER | PROFESSIONAL | BUSINESS | ENTERPRISE | AGENCY_BASIC | AGENCY_PRO | AGENCY_SCALE
+  // NONE | STARTER | PROFESSIONAL | BUSINESS | ENTERPRISE | AGENCY_BASIC | AGENCY_PRO | AGENCY_SCALE
   plan          String        @default("STARTER")
+  // INACTIVE | ACTIVE | PAST_DUE | CANCELLED | INCOMPLETE | TRIALING
+  planStatus    String        @default("INACTIVE")
+  // MONTHLY | YEARLY
+  billingInterval      String?   @default("MONTHLY")
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  currentPeriodEnd     DateTime?
   trialEndsAt   DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
