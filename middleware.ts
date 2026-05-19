@@ -20,6 +20,13 @@ const PROTECTED_PREFIXES = [
   '/report',
 ]
 
+// HubSpot Meetings Embed (z. B. auf /termin) lädt Script + iframe von
+// dedizierten Subdomains; alle hier explizit, kein Wildcard.
+const HUBSPOT_SCRIPT = 'https://static.hsappstatic.net'
+const HUBSPOT_FRAME = 'https://meetings-eu1.hubspot.com'
+const HUBSPOT_CONNECT = 'https://forms.hubspot.com https://meetings-eu1.hubspot.com'
+const HUBSPOT_IMG = 'https://*.hubspotusercontent-eu1.net'
+
 function buildCsp(nonce: string): string {
   // Production: strikte Nonce-CSP. In Development braucht Next.js Hot-Reload
   // eval(), darum dort 'unsafe-eval' zulassen.
@@ -33,6 +40,8 @@ function buildCsp(nonce: string): string {
     // dynamisch nachgeladen (strict-dynamic propagiert Vertrauen).
     `https://js.stripe.com`,
     `https://va.vercel-scripts.com`,
+    // HubSpot Meetings Embed (für /termin)
+    HUBSPOT_SCRIPT,
     isDev ? `'unsafe-eval'` : null,
   ]
     .filter(Boolean)
@@ -45,12 +54,13 @@ function buildCsp(nonce: string): string {
     // CSP3: erlaubt inline `style="..."`-Attribute (framer-motion, dynamische
     // Gradienten). `<style>`-Blöcke sind weiterhin nonce-pflichtig.
     `style-src-attr 'unsafe-inline'`,
-    `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com`,
+    `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com ${HUBSPOT_IMG}`,
     `font-src 'self'`,
-    // connect-src: Stripe REST + Vercel Analytics / Speed Insights.
-    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com`,
-    // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks).
-    `frame-src https://js.stripe.com https://hooks.stripe.com`,
+    // connect-src: Stripe REST + Vercel Analytics / Speed Insights + HubSpot API
+    // (XHR vom Meetings-Embed-Script).
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT}`,
+    // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks) + HubSpot Meetings.
+    `frame-src https://js.stripe.com https://hooks.stripe.com ${HUBSPOT_FRAME}`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,
