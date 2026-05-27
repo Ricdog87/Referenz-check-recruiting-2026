@@ -30,10 +30,29 @@ const ACTION_META: Record<string, { label: string; icon: React.ComponentType<{ c
   LOGIN: { label: 'Anmeldung', icon: LogIn, color: 'text-text-muted bg-bg-secondary' },
   GDPR_EXPORT: { label: 'DSGVO-Export', icon: Download, color: 'text-violet bg-violet/10' },
   GDPR_DELETE: { label: 'DSGVO-Löschung', icon: Trash2, color: 'text-rose-600 bg-rose-50' },
+  CREATE: { label: 'Kandidat angelegt', icon: UserPlus, color: 'text-brand-600 bg-brand-50' },
+  UPDATE: { label: 'Aktualisiert', icon: Edit3, color: 'text-brand-600 bg-brand-50' },
+  DELETE: { label: 'Gelöscht', icon: Trash2, color: 'text-rose-600 bg-rose-50' },
+  EMAIL_SEND: { label: 'E-Mail versendet', icon: FileText, color: 'text-violet bg-violet/10' },
+  CONSENT_INVITE_SENT: { label: 'Einwilligungs-Einladung versendet', icon: FileText, color: 'text-brand-600 bg-brand-50' },
+  CONSENT_ACCEPTED: { label: 'Einwilligung erteilt', icon: ShieldCheck, color: 'text-emerald-600 bg-emerald-50' },
+  CONSENT_REVOKED: { label: 'Einwilligung widerrufen', icon: AlertCircle, color: 'text-rose-600 bg-rose-50' },
+  CANDIDATE_DOCUMENT_UPLOAD: { label: 'Dokument hochgeladen', icon: FileText, color: 'text-brand-600 bg-brand-50' },
+  CANDIDATE_DOCUMENT_DELETE: { label: 'Dokument entfernt', icon: Trash2, color: 'text-rose-600 bg-rose-50' },
+  PASSWORD_RESET_REQUEST: { label: 'Passwort-Reset angefordert', icon: AlertCircle, color: 'text-amber-600 bg-amber-50' },
+  PASSWORD_RESET_COMPLETED: { label: 'Passwort zurückgesetzt', icon: ShieldCheck, color: 'text-emerald-600 bg-emerald-50' },
+}
+
+function humanizeAction(action: string): string {
+  return action
+    .toLowerCase()
+    .split('_')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
 }
 
 function getActionMeta(action: string) {
-  return ACTION_META[action] ?? { label: action, icon: FileText, color: 'text-text-secondary bg-bg-secondary' }
+  return ACTION_META[action] ?? { label: humanizeAction(action), icon: FileText, color: 'text-text-secondary bg-bg-secondary' }
 }
 
 function formatDateTime(iso: string) {

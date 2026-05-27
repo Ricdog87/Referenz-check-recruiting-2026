@@ -69,30 +69,34 @@ export default async function BillingPage() {
               <div>
                 <div className="text-xs uppercase tracking-widest text-text-muted font-semibold">Aktueller Plan</div>
                 <div className="text-2xl font-bold text-text-primary mt-1">
-                  {PLAN_LABEL[user.plan] ?? user.plan}
+                  {isActive ? (PLAN_LABEL[user.plan] ?? user.plan) : 'Kein aktives Abo'}
                 </div>
               </div>
-              <span
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${TONE_CLASS[status.tone]}`}
-              >
-                {status.text}
-              </span>
+              {isActive && (
+                <span
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${TONE_CLASS[status.tone]}`}
+                >
+                  {status.text}
+                </span>
+              )}
             </div>
 
-            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border">
-              <div>
-                <dt className="text-xs text-text-muted">Abrechnungs-Intervall</dt>
-                <dd className="text-sm font-medium text-text-primary mt-0.5">
-                  {INTERVAL_LABEL[user.billingInterval ?? 'MONTHLY'] ?? user.billingInterval}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs text-text-muted">Nächste Abrechnung</dt>
-                <dd className="text-sm font-medium text-text-primary mt-0.5">
-                  {formattedEnd ?? '—'}
-                </dd>
-              </div>
-            </dl>
+            {isActive && (
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-border">
+                <div>
+                  <dt className="text-xs text-text-muted">Abrechnungs-Intervall</dt>
+                  <dd className="text-sm font-medium text-text-primary mt-0.5">
+                    {INTERVAL_LABEL[user.billingInterval ?? 'MONTHLY'] ?? user.billingInterval}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-text-muted">Nächste Abrechnung</dt>
+                  <dd className="text-sm font-medium text-text-primary mt-0.5">
+                    {formattedEnd ?? '—'}
+                  </dd>
+                </div>
+              </dl>
+            )}
           </div>
         </div>
 
