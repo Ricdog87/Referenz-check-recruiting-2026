@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { loadConsentByToken } from '@/lib/consent-token'
+import { sendEmail, consentAcceptedNotifyHrEmail } from '@/lib/email'
 import { rateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 
@@ -45,6 +46,12 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? 'Token ungültig.' }, { status: 410 })
   }
+
+  // HR-User-Details für Notification-Mail laden
+  const hrUser = await prisma.user.findFirst({
+    where: { candidates: { some: { id: record.candidateId } } },
+    select: { id: true, name: true, email: true },
+  })
 
   if (record.status === 'ACCEPTED') {
     return NextResponse.json({ error: 'Einwilligung wurde bereits erteilt.' }, { status: 409 })
@@ -163,6 +170,32 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
   })
 
   logger.info('consent_accepted', { candidateId: record.candidateId, refereesCount: referees.length })
+
+  // HR-Notification per E-Mail (fire-and-forget, blockt User-Response nicht)
+  if (hrUser?.email) {
+    const candidate = await prisma.candidate.findUnique({
+      where: { id: record.candidateId },
+      select: { firstName: true, lastName: true, position: true },
+    })
+    if (candidate) {
+      const baseUrl = process.env.NEXTAUTH_URL || 'https://candiq.de'
+      const mail = consentAcceptedNotifyHrEmail({
+        hrFirstName: hrUser.name?.split(' ')[0] || 'Team',
+        candidateName: `${candidate.firstName} ${candidate.lastName}`,
+        position: candidate.position,
+        refereesCount: referees.length,
+        candidateUrl: `${baseUrl}/candidates/${record.candidateId}`,
+      })
+      sendEmail({
+        to: hrUser.email,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
+        userId: hrUser.id,
+        category: 'consent_hr_notify',
+      }).catch((e) => logger.error('hr_notify_accepted_failed', e))
+    }
+  }
 
   return NextResponse.json({ ok: true, refereesCount: referees.length })
 }
