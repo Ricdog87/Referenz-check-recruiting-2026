@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { loadConsentByToken } from '@/lib/consent-token'
+import { prisma } from '@/lib/db'
 import { ConsentPortalClient } from './ConsentPortalClient'
 
 export const metadata: Metadata = {
@@ -31,6 +32,12 @@ export default async function CandidatePortalPage({ params }: { params: { token:
     )
   }
 
+  const documents = await prisma.document.findMany({
+    where: { candidateId: record.candidateId },
+    select: { id: true, originalName: true, size: true, type: true, createdAt: true },
+    orderBy: { createdAt: 'desc' },
+  })
+
   const initialData = {
     candidate: {
       firstName: record.candidate.firstName,
@@ -43,6 +50,13 @@ export default async function CandidatePortalPage({ params }: { params: { token:
     acceptedAt: record.acceptedAt?.toISOString() ?? null,
     consentVersion: record.consentVersion,
     scope: JSON.parse(record.scope) as string[],
+    documents: documents.map(d => ({
+      id: d.id,
+      originalName: d.originalName,
+      size: d.size,
+      type: d.type,
+      createdAt: d.createdAt.toISOString(),
+    })),
   }
 
   return <ConsentPortalClient token={params.token} initialData={initialData} />
