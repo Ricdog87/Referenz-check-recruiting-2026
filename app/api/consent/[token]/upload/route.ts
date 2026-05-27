@@ -90,7 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
 
   try {
     const blob = await put(blobPath, file, {
-      access: 'private',
+      access: 'public',
       addRandomSuffix: false,
       contentType: file.type,
     })
