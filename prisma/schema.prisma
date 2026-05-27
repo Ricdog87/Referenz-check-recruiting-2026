@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -54,6 +55,7 @@ model Candidate {
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents        Document[]
   checks           ReferenceCheck[]
+  consentTokens    ConsentToken[]
 
   @@index([userId])
 }
@@ -152,4 +154,37 @@ model AddonOrder {
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Bewerber-Self-Service-Consent (DSGVO Art. 6 Abs. 1 lit. a + Art. 7)
+// Erlaubt dem Bewerber, granulare Einwilligung zu erteilen, CV
+// hochzuladen, Referenzgeber selbst zu nennen und jederzeit zu widerrufen.
+// ─────────────────────────────────────────────────────────────────
+model ConsentToken {
+  id              String    @id @default(cuid())
+  candidateId     String
+  candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  // SHA-256 Hash des Tokens (Token selbst wird NIE gespeichert)
+  tokenHash       String    @unique
+  // JSON-Array der freigegebenen Scopes: ["REFERENCE_CHECK","CV_UPLOAD","CONTACT_REFEREES"]
+  scope           String
+  // PENDING_ACCEPT | ACCEPTED | REVOKED | EXPIRED
+  status          String    @default("PENDING_ACCEPT")
+  expiresAt       DateTime
+  sentAt          DateTime  @default(now())
+  acceptedAt      DateTime?
+  revokedAt       DateTime?
+  ipAccepted      String?
+  uaAccepted      String?
+  // Version der akzeptierten Datenschutzerklärung (revisionssicher)
+  consentVersion  String    @default("1.0")
+  // Vom Bewerber selbst genannte Referenzgeber (JSON-Array)
+  refereesJson    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([candidateId])
+  @@index([expiresAt])
+  @@index([status])
 }
