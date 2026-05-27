@@ -169,6 +169,12 @@ export default async function DashboardPage() {
         fullName={session.user.name}
         company={session.user.company}
         planName={planMeta.name}
+        stats={{
+          totalCandidates,
+          pendingConsent: candidateStatusGroups.find((g) => g.status === 'PENDING')?._count ?? 0,
+          inReview: activeCandidates,
+          completed: candidateStatusGroups.find((g) => g.status === 'COMPLETED')?._count ?? 0,
+        }}
       />
 
       <div className="space-y-6">

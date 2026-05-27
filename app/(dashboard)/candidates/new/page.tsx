@@ -175,28 +175,32 @@ export default function NewCandidatePage() {
             </div>
           </div>
 
-          {/* File upload */}
-          <div className="card-md space-y-4">
-            <h2 className="section-title">Dokumente</h2>
+          {/* File upload (optional, intern) */}
+          <div className="card-md space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="section-title">Optionale interne Dokumente</h2>
+                <p className="text-xs text-text-secondary mt-1">
+                  Z.B. ATS-Export, Bewerbungsanschreiben, interne Notizen. Den <strong>Lebenslauf lädt der Bewerber selbst</strong> über das DSGVO-konforme Einwilligungs-Portal hoch.
+                </p>
+              </div>
+            </div>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
-              className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${
-                dragOver ? 'border-brand-500 bg-brand-50/50' : 'border-border hover:border-brand-300 bg-bg-secondary/50'
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
+                dragOver ? 'border-brand-500 bg-brand-50/50' : 'border-border hover:border-brand-300 bg-bg-secondary/30'
               }`}
             >
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white mx-auto mb-3 shadow-card">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <p className="text-sm text-text-secondary mb-2">
-                CV, Zeugnisse und weitere Unterlagen hier ablegen
+              <p className="text-xs text-text-muted mb-2">
+                Drag & Drop ODER
               </p>
-              <p className="text-xs text-text-muted mb-4">PDF, DOC, DOCX, JPG, PNG · Max. 4 MB</p>
-              <label className="btn-secondary cursor-pointer text-xs py-2">
+              <label className="btn-secondary cursor-pointer text-xs py-1.5">
                 Dateien auswählen
                 <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" onChange={(e) => handleFiles(e.target.files)} />
               </label>
+              <p className="text-[10px] text-text-muted mt-2">PDF, DOC, DOCX, JPG, PNG · Max. 4 MB</p>
             </div>
 
             {fileError && (

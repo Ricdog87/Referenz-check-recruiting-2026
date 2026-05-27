@@ -93,7 +93,7 @@ export default async function CandidateDetailPage({
                   <p className="text-sm text-text-secondary">{candidate.position}</p>
                 </div>
               </div>
-              <span className={`badge ${st.color}`}>{st.label}</span>
+              {/* Status-Badge entfernt: bereits im InviteButton (Header) konsolidiert */}
             </div>
 
             <div className="grid grid-cols-2 gap-5 text-sm">
@@ -186,25 +186,56 @@ export default async function CandidateDetailPage({
 
         {/* Right column */}
         <div className="space-y-6">
-          {/* GDPR status */}
-          <div className={`card-md ${candidate.gdprConsent ? 'bg-emerald-50/40 border-emerald-200' : 'bg-amber-50/40 border-amber-200'}`}>
-            <div className="text-sm font-semibold mb-2 flex items-center gap-2">
-              {candidate.gdprConsent
-                ? <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                : <ShieldAlert className="w-4 h-4 text-amber-600" />}
-              DSGVO-Status
-            </div>
-            {candidate.gdprConsent ? (
-              <>
-                <p className="text-xs text-emerald-700 mb-1">Einwilligung erteilt</p>
-                {candidate.gdprConsentDate && (
-                  <p className="text-[11px] text-text-muted">{formatDateTime(candidate.gdprConsentDate)}</p>
-                )}
-              </>
-            ) : (
-              <p className="text-xs text-amber-700">Einwilligung ausstehend</p>
-            )}
-          </div>
+          {/* DSGVO-Status: konsolidiert aus ConsentToken + gdprConsent (Legacy) */}
+          {(() => {
+            const consentStatus = latestConsent?.status ?? 'NONE'
+            let icon, bgClass, title, detail, dateText
+            if (consentStatus === 'ACCEPTED') {
+              icon = <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              bgClass = 'bg-emerald-50/40 border-emerald-200'
+              title = 'Einwilligung erteilt'
+              detail = `${latestConsent && JSON.parse(latestConsent.refereesJson ?? '[]').length} Referenzgeber freigegeben`
+              dateText = latestConsent?.acceptedAt ? formatDateTime(latestConsent.acceptedAt) : null
+            } else if (consentStatus === 'PENDING_ACCEPT') {
+              icon = <ShieldAlert className="w-4 h-4 text-amber-600" />
+              bgClass = 'bg-amber-50/40 border-amber-200'
+              title = 'Einladung versendet'
+              detail = 'Warte auf Bewerber-Einwilligung'
+              dateText = latestConsent?.sentAt ? `Versendet am ${formatDateTime(latestConsent.sentAt)}` : null
+            } else if (consentStatus === 'REVOKED') {
+              icon = <ShieldAlert className="w-4 h-4 text-rose-600" />
+              bgClass = 'bg-rose-50/40 border-rose-200'
+              title = 'Einwilligung widerrufen'
+              detail = 'Bewerber hat seine Einwilligung zurückgezogen'
+              dateText = latestConsent?.revokedAt ? `Widerrufen am ${formatDateTime(latestConsent.revokedAt)}` : null
+            } else if (candidate.gdprConsent) {
+              // Legacy: manuell dokumentierte Einwilligung (ohne Token)
+              icon = <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              bgClass = 'bg-emerald-50/40 border-emerald-200'
+              title = 'Einwilligung dokumentiert'
+              detail = 'Manuell außerhalb des Tools erteilt'
+              dateText = candidate.gdprConsentDate ? formatDateTime(candidate.gdprConsentDate) : null
+            } else {
+              icon = <ShieldAlert className="w-4 h-4 text-amber-600" />
+              bgClass = 'bg-amber-50/40 border-amber-200'
+              title = 'Noch keine Einwilligung'
+              detail = candidate.email
+                ? 'Senden Sie die Einladung mit dem Button oben'
+                : 'Bewerber benötigt E-Mail für Einwilligungs-Anfrage'
+              dateText = null
+            }
+            return (
+              <div className={`card-md ${bgClass}`}>
+                <div className="text-sm font-semibold mb-2 flex items-center gap-2">
+                  {icon}
+                  DSGVO-Status
+                </div>
+                <p className="text-xs text-text-primary font-medium mb-1">{title}</p>
+                <p className="text-[11px] text-text-secondary mb-1">{detail}</p>
+                {dateText && <p className="text-[11px] text-text-muted">{dateText}</p>}
+              </div>
+            )
+          })()}
 
           {/* Documents */}
           <div className="card-md">
