@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { loadConsentByToken } from '@/lib/consent-token'
+import { prisma } from '@/lib/db'
 
 /**
  * GET /api/consent/:token
@@ -9,6 +10,11 @@ import { loadConsentByToken } from '@/lib/consent-token'
 export async function GET(_req: NextRequest, { params }: { params: { token: string } }) {
   try {
     const record = await loadConsentByToken(decodeURIComponent(params.token))
+    const documents = await prisma.document.findMany({
+      where: { candidateId: record.candidateId },
+      select: { id: true, originalName: true, size: true, type: true, createdAt: true },
+      orderBy: { createdAt: 'desc' },
+    })
     return NextResponse.json({
       candidate: {
         firstName: record.candidate.firstName,
@@ -21,6 +27,7 @@ export async function GET(_req: NextRequest, { params }: { params: { token: stri
       acceptedAt: record.acceptedAt?.toISOString() ?? null,
       consentVersion: record.consentVersion,
       scope: JSON.parse(record.scope) as string[],
+      documents,
     })
   } catch (err: any) {
     return NextResponse.json({ error: err?.message ?? 'Token ungültig.' }, { status: 410 })

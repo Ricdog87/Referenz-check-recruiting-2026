@@ -26,6 +26,14 @@ const EMPTY_REFEREE: Referee = {
   endDate: '',
 }
 
+type CandidateDocument = {
+  id: string
+  originalName: string
+  size: number
+  type: string
+  createdAt: string
+}
+
 type InitialData = {
   candidate: { firstName: string; lastName: string; position: string }
   hiringCompany: string
@@ -34,6 +42,7 @@ type InitialData = {
   acceptedAt: string | null
   consentVersion: string
   scope: string[]
+  documents: CandidateDocument[]
 }
 
 export function ConsentPortalClient({ token, initialData }: { token: string; initialData: InitialData }) {
@@ -48,6 +57,79 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [revokeConfirm, setRevokeConfirm] = useState(false)
+  const [documents, setDocuments] = useState<CandidateDocument[]>(initialData.documents || [])
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [dragOver, setDragOver] = useState(false)
+
+  const MAX_FILE_SIZE = 4 * 1024 * 1024
+  const ALLOWED_MIME = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
+  ]
+
+  async function uploadFiles(files: FileList | null) {
+    if (!files || files.length === 0) return
+    setUploadError(null)
+    setUploading(true)
+    const newDocs: CandidateDocument[] = []
+    for (const file of Array.from(files)) {
+      if (!ALLOWED_MIME.includes(file.type)) {
+        setUploadError(`${file.name}: Dateityp nicht erlaubt`)
+        continue
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setUploadError(`${file.name}: Datei zu groß (max. 4 MB)`)
+        continue
+      }
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('type', 'CV')
+      try {
+        const res = await fetch(`/api/consent/${encodeURIComponent(token)}/upload`, {
+          method: 'POST',
+          body: fd,
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setUploadError(data?.error || 'Upload fehlgeschlagen')
+          continue
+        }
+        newDocs.push({
+          ...data.document,
+          createdAt: new Date().toISOString(),
+        })
+      } catch (e: any) {
+        setUploadError(e?.message || 'Netzwerkfehler')
+      }
+    }
+    if (newDocs.length > 0) setDocuments(prev => [...newDocs, ...prev])
+    setUploading(false)
+  }
+
+  async function removeDocument(docId: string) {
+    setUploadError(null)
+    try {
+      const res = await fetch(`/api/consent/${encodeURIComponent(token)}/upload/${docId}`, { method: 'DELETE' })
+      const data = await res.json()
+      if (!res.ok) {
+        setUploadError(data?.error || 'Löschen fehlgeschlagen')
+        return
+      }
+      setDocuments(prev => prev.filter(d => d.id !== docId))
+    } catch (e: any) {
+      setUploadError(e?.message || 'Netzwerkfehler')
+    }
+  }
+
+  function formatBytes(b: number): string {
+    if (b < 1024) return `${b} B`
+    if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`
+    return `${(b / (1024 * 1024)).toFixed(1)} MB`
+  }
 
   const allScopesConfirmed = scopeConfirm.referenceCheck && scopeConfirm.contactReferees && scopeConfirm.retention
   const canSubmit = consentGiven && allScopesConfirmed && referees.every(r => r.firstName && r.lastName && r.company && (r.email || r.phone))
@@ -217,6 +299,68 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
               <dd className="sm:col-span-2 text-slate-900">Auskunft, Berichtigung, Löschung, Widerruf jederzeit · Beschwerde bei Aufsichtsbehörde</dd>
             </div>
           </dl>
+        </div>
+
+        {/* CV & Dokumente Upload */}
+        <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-6">
+          <h2 className="font-bold text-slate-900 mb-1">📄 Ihre Dokumente (optional)</h2>
+          <p className="text-sm text-slate-600 mb-4">
+            Laden Sie Ihren Lebenslauf und ggf. Zeugnisse hoch. Die Dokumente werden ausschließlich an <strong>{initialData.hiringCompany}</strong> übermittelt und nach 6 Monaten automatisch gelöscht.
+          </p>
+
+          <label
+            onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault()
+              setDragOver(false)
+              uploadFiles(e.dataTransfer.files)
+            }}
+            className={`block border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition ${
+              dragOver ? 'border-indigo-500 bg-indigo-50/50' : 'border-slate-300 bg-slate-50/40 hover:bg-slate-50'
+            } ${uploading ? 'opacity-60 pointer-events-none' : ''}`}
+          >
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
+              className="hidden"
+              onChange={(e) => uploadFiles(e.target.files)}
+            />
+            <div className="text-3xl mb-2">{uploading ? '⏳' : '⬆️'}</div>
+            <div className="text-sm font-semibold text-slate-900 mb-1">
+              {uploading ? 'Upload läuft…' : 'Dateien hier ablegen oder klicken'}
+            </div>
+            <div className="text-xs text-slate-500">PDF, DOC, DOCX, JPG, PNG · max. 4 MB pro Datei</div>
+          </label>
+
+          {uploadError && (
+            <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+              {uploadError}
+            </div>
+          )}
+
+          {documents.length > 0 && (
+            <ul className="mt-4 space-y-2">
+              {documents.map((doc) => (
+                <li key={doc.id} className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                  <span className="text-base">📎</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-slate-900 truncate">{doc.originalName}</div>
+                    <div className="text-xs text-slate-500">{formatBytes(doc.size)} · {doc.type}</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeDocument(doc.id)}
+                    className="text-xs text-rose-600 hover:underline px-2"
+                    title="Dokument entfernen"
+                  >
+                    Entfernen
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Referenzgeber-Liste */}
