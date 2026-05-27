@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, formatDateTime, formatFileSize, CANDIDATE_STATUS, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import { CandidateActions } from './CandidateActions'
+import { InviteButton } from './InviteButton'
 import { Phone, Plus, ShieldCheck, ShieldAlert, FileText, Download, Mail } from 'lucide-react'
 
 export default async function CandidateDetailPage({
@@ -23,10 +24,23 @@ export default async function CandidateDetailPage({
     include: {
       documents: true,
       checks: { orderBy: { createdAt: 'desc' } },
+      consentTokens: { orderBy: { createdAt: 'desc' }, take: 1 },
     },
   })
 
   if (!candidate) notFound()
+
+
+  const latestConsent = candidate.consentTokens?.[0]
+  const consentSummary = latestConsent
+    ? {
+        hasActive: latestConsent.status === 'PENDING_ACCEPT' || latestConsent.status === 'ACCEPTED',
+        status: latestConsent.status as 'NONE' | 'PENDING_ACCEPT' | 'ACCEPTED' | 'REVOKED' | 'EXPIRED',
+        expiresAt: latestConsent.expiresAt.toISOString(),
+        acceptedAt: latestConsent.acceptedAt?.toISOString(),
+        sentAt: latestConsent.sentAt.toISOString(),
+      }
+    : { hasActive: false, status: 'NONE' as const }
 
   const st = CANDIDATE_STATUS[candidate.status as keyof typeof CANDIDATE_STATUS] ?? CANDIDATE_STATUS.PENDING
   const uploadFailures = searchParams?.uploadFailed
@@ -39,7 +53,8 @@ export default async function CandidateDetailPage({
         title={`${candidate.firstName} ${candidate.lastName}`}
         subtitle={`${candidate.position}${candidate.department ? ` · ${candidate.department}` : ''}`}
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 items-center">
+            <InviteButton candidateId={candidate.id} candidateEmail={candidate.email} initialConsent={consentSummary} />
             <Link href={`/checks/new?candidateId=${candidate.id}`} className="btn-primary">
               <Plus className="w-4 h-4" /> Referenzprüfung
             </Link>
