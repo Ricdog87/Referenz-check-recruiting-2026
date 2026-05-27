@@ -74,14 +74,19 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
         position: candidate.position,
         candidateUrl: `${baseUrl}/candidates/${record.candidateId}`,
       })
-      sendEmail({
-        to: hrUser.email,
-        subject: mail.subject,
-        html: mail.html,
-        text: mail.text,
-        userId: hrUser.id,
-        category: 'consent_hr_revoke_notify',
-      }).catch((e) => logger.error('hr_notify_revoked_failed', e))
+      try {
+        const r = await sendEmail({
+          to: hrUser.email,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
+          userId: hrUser.id,
+          category: 'consent_hr_revoke_notify',
+        })
+        if (!r.ok) logger.error('hr_notify_revoked_failed', { error: r.error })
+      } catch (e) {
+        logger.error('hr_notify_revoked_exception', e)
+      }
     }
   }
 
