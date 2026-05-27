@@ -110,8 +110,10 @@ export default async function DashboardPage() {
   // Status distribution
   const statusDist = [
     { name: 'Ausstehend', value: candidateStatusGroups.find((g) => g.status === 'PENDING')?._count ?? 0, color: '#94a3b8' },
+    { name: 'Einwilligung erteilt', value: candidateStatusGroups.find((g) => g.status === 'CONSENT_GIVEN')?._count ?? 0, color: '#22c55e' },
     { name: 'In Prüfung', value: candidateStatusGroups.find((g) => g.status === 'IN_REVIEW')?._count ?? 0, color: '#6366f1' },
     { name: 'Abgeschlossen', value: candidateStatusGroups.find((g) => g.status === 'COMPLETED')?._count ?? 0, color: '#10b981' },
+    { name: 'Einwilligung widerrufen', value: candidateStatusGroups.find((g) => g.status === 'CONSENT_REVOKED')?._count ?? 0, color: '#fb7185' },
     { name: 'Abgelehnt', value: candidateStatusGroups.find((g) => g.status === 'REJECTED')?._count ?? 0, color: '#f43f5e' },
   ]
 
@@ -120,38 +122,41 @@ export default async function DashboardPage() {
   const checkLimit = planMeta.includedChecks
   const usagePct = checkLimit > 0 ? Math.min(100, Math.round((usedThisMonth / checkLimit) * 100)) : 0
 
+  // Avg turnaround value
+  const turnaroundValue = turnaround.reduce((a, b) => a + b.hours, 0) / Math.max(1, turnaround.filter(t => t.hours).length) || 0
+
   const stats = [
     {
       label: 'Kandidaten',
       value: totalCandidates,
-      sub: `${activeCandidates} in Prüfung`,
+      sub: totalCandidates === 0 ? 'Noch keine Kandidaten' : `${activeCandidates} in Prüfung`,
       icon: Users,
       tone: 'brand' as const,
-      delta: '+12%',
+      delta: null,
     },
     {
       label: 'Verifizierungsrate',
-      value: `${verificationRate}%`,
-      sub: `${verifiedChecks} verifiziert`,
+      value: totalChecks > 0 ? `${verificationRate}%` : '—',
+      sub: totalChecks === 0 ? 'Noch keine Prüfungen' : `${verifiedChecks} verifiziert`,
       icon: CheckCircle2,
       tone: 'emerald' as const,
-      delta: '+4%',
+      delta: null,
     },
     {
       label: 'Diskrepanzen',
       value: discrepancies,
-      sub: discrepancies === 0 ? 'Keine Auffälligkeiten' : 'gefunden',
+      sub: totalChecks === 0 ? 'Noch keine Prüfungen' : (discrepancies === 0 ? 'Keine Auffälligkeiten' : 'gefunden'),
       icon: AlertTriangle,
       tone: 'rose' as const,
-      delta: discrepancies > 0 ? '−1' : '0',
+      delta: null,
     },
     {
       label: 'Ø Durchlaufzeit',
-      value: `${turnaround.reduce((a, b) => a + b.hours, 0) / Math.max(1, turnaround.filter(t => t.hours).length) || 0} h`,
-      sub: 'letzte 7 Tage',
+      value: turnaroundValue > 0 ? `${turnaroundValue.toFixed(1)} h` : '—',
+      sub: turnaroundValue > 0 ? 'letzte 7 Tage' : 'Noch keine abgeschlossene Prüfung',
       icon: Clock,
       tone: 'violet' as const,
-      delta: '−18%',
+      delta: null,
     },
   ]
 
@@ -318,7 +323,7 @@ export default async function DashboardPage() {
 
 function StatCard({ label, value, sub, icon: Icon, tone, delta }: {
   label: string; value: string | number; sub: string;
-  icon: any; tone: 'brand' | 'emerald' | 'rose' | 'violet'; delta: string;
+  icon: any; tone: 'brand' | 'emerald' | 'rose' | 'violet'; delta: string | null;
 }) {
   const toneCls = {
     brand: 'text-brand-600 bg-brand-50 border-brand-200',
@@ -326,17 +331,17 @@ function StatCard({ label, value, sub, icon: Icon, tone, delta }: {
     rose: 'text-rose-600 bg-rose-50 border-rose-200',
     violet: 'text-violet bg-violet/10 border-violet/20',
   }[tone]
-  const deltaTone = delta.startsWith('+') ? 'text-emerald-700' : delta.startsWith('−') ? 'text-emerald-700' : 'text-text-muted'
+  const deltaTone = delta?.startsWith('+') ? 'text-emerald-700' : delta?.startsWith('−') ? 'text-emerald-700' : 'text-text-muted'
   return (
     <div className="card-md group hover:shadow-card-lg transition-shadow">
       <div className="flex items-start justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center ${toneCls}`}>
           <Icon className="w-5 h-5" />
         </div>
-        <span className={`text-xs font-bold ${deltaTone}`}>
+        {delta && <span className={`text-xs font-bold ${deltaTone}`}>
           <TrendingUp className="w-3 h-3 inline mr-0.5" />
           {delta}
-        </span>
+        </span>}
       </div>
       <div className="text-3xl font-bold text-text-primary tracking-tighter mb-1" style={{ fontFeatureSettings: '"tnum"' }}>
         {value}
