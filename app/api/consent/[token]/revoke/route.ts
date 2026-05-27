@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { loadConsentByToken } from '@/lib/consent-token'
+import { sendEmail, consentRevokedNotifyHrEmail } from '@/lib/email'
 import { rateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
 
@@ -54,6 +55,35 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
   })
 
   logger.info('consent_revoked', { candidateId: record.candidateId })
+
+  // HR-Notification: Bewerber hat widerrufen
+  const hrUser = await prisma.user.findFirst({
+    where: { candidates: { some: { id: record.candidateId } } },
+    select: { id: true, name: true, email: true },
+  })
+  if (hrUser?.email) {
+    const candidate = await prisma.candidate.findUnique({
+      where: { id: record.candidateId },
+      select: { firstName: true, lastName: true, position: true },
+    })
+    if (candidate) {
+      const baseUrl = process.env.NEXTAUTH_URL || 'https://candiq.de'
+      const mail = consentRevokedNotifyHrEmail({
+        hrFirstName: hrUser.name?.split(' ')[0] || 'Team',
+        candidateName: `${candidate.firstName} ${candidate.lastName}`,
+        position: candidate.position,
+        candidateUrl: `${baseUrl}/candidates/${record.candidateId}`,
+      })
+      sendEmail({
+        to: hrUser.email,
+        subject: mail.subject,
+        html: mail.html,
+        text: mail.text,
+        userId: hrUser.id,
+        category: 'consent_hr_revoke_notify',
+      }).catch((e) => logger.error('hr_notify_revoked_failed', e))
+    }
+  }
 
   return NextResponse.json({ ok: true })
 }

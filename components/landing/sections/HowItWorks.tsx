@@ -2,29 +2,29 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { Upload, Phone, FileCheck, ArrowDown } from 'lucide-react'
+import { Upload, Phone, ShieldCheck, ArrowDown } from 'lucide-react'
 import { Reveal } from '../Reveal'
 
 const steps = [
   {
     n: '01',
     icon: Upload,
-    title: 'Kandidat & Stationen erfassen',
-    body: 'CV hochladen, frühere Arbeitgeber und Referenzpersonen ergänzen. Die DSGVO-Einwilligung wird automatisch eingeholt und dokumentiert.',
+    title: 'Anfrage in 30 Sekunden anlegen',
+    body: 'Position und Bewerber-E-Mail eingeben. candiq sendet automatisch einen sicheren, zeitbegrenzten Einladungslink an den Bewerber. Sie sind sofort DSGVO-konform — die Einwilligung wird vor jeder Verarbeitung dokumentiert.',
     accent: 'from-brand-500 to-brand-600',
   },
   {
     n: '02',
-    icon: Phone,
-    title: 'Referenzen werden verifiziert',
-    body: 'Geschulte Reviewer prüfen telefonisch Position, Zeitraum, Verantwortung und Stärken. Keine Bots, keine generischen E-Mail-Tickets.',
+    icon: ShieldCheck,
+    title: 'Bewerber willigt selbst ein',
+    body: 'Im Self-Service-Portal: Bewerber liest die Datenschutz-Infos, nennt selbst seine Referenzgeber und erteilt die granulare Einwilligung gem. Art. 6 Abs. 1 lit. a DSGVO. Jederzeit widerrufbar. Audit-Trail mit IP und Zeitstempel.',
     accent: 'from-brand-600 to-violet',
   },
   {
     n: '03',
-    icon: FileCheck,
-    title: 'Strukturierter Report',
-    body: 'PDF-Report mit klarer Bewertung (verifiziert / Diskrepanz), Gesprächsnotizen und vollständigem Audit-Trail — direkt teilbar mit Hiring Manager und Compliance.',
+    icon: Phone,
+    title: 'Reviewer verifizieren, Sie bekommen den Report',
+    body: 'Geschulte Reviewer kontaktieren ausschließlich die vom Bewerber freigegebenen Referenzgeber — telefonisch, mit standardisierten Fragen. PDF-Report mit Bewertung pro Station und Diskrepanz-Markierung. Auto-Löschung nach 6 Monaten.',
     accent: 'from-violet to-cyan',
   },
 ]
@@ -46,7 +46,7 @@ export function HowItWorks() {
               Drei Schritte. <span className="text-gradient-brand">Verlässliches Signal.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Vom Kandidaten-Upload bis zum strukturierten Report — typischerweise in unter 48 Stunden.
+              Vom Auftrag bis zum Report — typischerweise in unter 48 Stunden. Bewerber-Self-Service, automatischer Einwilligungs-Workflow, geschulte Reviewer.
             </p>
           </div>
         </Reveal>
