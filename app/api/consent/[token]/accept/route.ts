@@ -186,14 +186,20 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
         refereesCount: referees.length,
         candidateUrl: `${baseUrl}/candidates/${record.candidateId}`,
       })
-      sendEmail({
-        to: hrUser.email,
-        subject: mail.subject,
-        html: mail.html,
-        text: mail.text,
-        userId: hrUser.id,
-        category: 'consent_hr_notify',
-      }).catch((e) => logger.error('hr_notify_accepted_failed', e))
+      try {
+        const r = await sendEmail({
+          to: hrUser.email,
+          subject: mail.subject,
+          html: mail.html,
+          text: mail.text,
+          userId: hrUser.id,
+          category: 'consent_hr_notify',
+        })
+        if (!r.ok) logger.error('hr_notify_accepted_failed', { error: r.error })
+        else logger.info('hr_notify_accepted_sent', { provider: r.provider })
+      } catch (e) {
+        logger.error('hr_notify_accepted_exception', e)
+      }
     }
   }
 
