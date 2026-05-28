@@ -132,9 +132,11 @@ export async function POST(req: NextRequest) {
         lastname: lastName,
         company,
         lifecyclestage: 'lead',
-        // Sammel-Feld 'message' — Standard-Property, immer vorhanden.
-        // Form-Kontext landet hier sodass Sales sofort sieht woher der Lead kommt.
+        // Beides: 'message' (Sales sieht sofort woher) PLUS Custom-Props
+        // (saubere Filterbarkeit in HubSpot-Segmenten)
         message: `[candiq Pilot 2026] Bewerbung über candiq.de · Hires/Jahr: ${hiresPerYear} · Firma: ${company} · IP: ${ip === 'unknown' ? '-' : ip}`,
+        candiq_source: 'pilot_program_2026',
+        candiq_hires_per_year: hiresPerYear,
       })
       if (sync.ok && process.env.HUBSPOT_PILOT_LIST_ID) {
         await addContactToList(sync.contactId, process.env.HUBSPOT_PILOT_LIST_ID)
