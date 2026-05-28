@@ -191,3 +191,27 @@ model ConsentToken {
   @@index([expiresAt])
   @@index([status])
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Pilot-Programm Q3/2026 — 10 HR-Teams, 25 % Discount Pro Jahr 1
+// gegen anonymisierte Case-Study nach 90 Tagen.
+// Form-Submits landen hier. Sobald 10 ACCEPTED-Eintraege existieren,
+// schwenkt die Public-Section auf "geschlossen, Wartelist".
+// ─────────────────────────────────────────────────────────────────
+model PilotApplication {
+  id            String   @id @default(cuid())
+  company       String
+  firstName     String
+  lastName      String
+  email         String
+  hiresPerYear  String
+  status        String   @default("PENDING") // PENDING | ACCEPTED | REJECTED | WITHDRAWN
+  notes         String?
+  ip            String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}

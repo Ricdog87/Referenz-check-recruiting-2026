@@ -7,6 +7,7 @@ import { Features } from '@/components/landing/sections/Features'
 import { TwoAudiences } from '@/components/landing/sections/TwoAudiences'
 import { OnboardingRoadmap } from '@/components/landing/sections/OnboardingRoadmap'
 import { Testimonials } from '@/components/landing/sections/Testimonials'
+import { PilotProgram } from '@/components/landing/sections/PilotProgram'
 import { ROICalculator } from '@/components/landing/sections/ROICalculator'
 import { CompliancePromise } from '@/components/landing/sections/CompliancePromise'
 import { PricingPreview } from '@/components/landing/sections/PricingPreview'
@@ -27,6 +28,7 @@ export default function LandingPage() {
         <TwoAudiences />
         <OnboardingRoadmap />
         <Testimonials />
+        <PilotProgram />
         <ROICalculator />
         <CompliancePromise />
         <PricingPreview />
