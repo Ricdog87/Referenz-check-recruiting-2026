@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { rateLimit } from '@/lib/rate-limit'
+import { upsertContact, addContactToList } from '@/lib/hubspot'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -122,6 +123,30 @@ export async function POST(req: NextRequest) {
         ip: ip === 'unknown' ? null : ip,
       },
     })
+
+    // HubSpot CRM-Sync — best-effort, nicht blockierend.
+    try {
+      const sync = await upsertContact({
+        email,
+        firstname: firstName,
+        lastname: lastName,
+        company,
+        // Standard HubSpot Property "Lifecycle stage" — gibt es immer
+        lifecyclestage: 'lead',
+        // Eigene Property: muss im HubSpot CRM angelegt sein.
+        // Falls nicht: ignoriert HubSpot still und kein Fehler.
+        candiq_source: 'pilot_program_2026',
+        candiq_hires_per_year: hiresPerYear,
+      })
+      if (sync.ok && process.env.HUBSPOT_PILOT_LIST_ID) {
+        await addContactToList(sync.contactId, process.env.HUBSPOT_PILOT_LIST_ID)
+      }
+      if (!sync.ok) {
+        console.warn('pilot_hubspot_sync_failed', { reason: sync.reason })
+      }
+    } catch (hsErr: any) {
+      console.error('pilot_hubspot_sync_error', { message: hsErr?.message })
+    }
 
     // E-Mails best-effort — Fehler nicht propagieren
     try {
