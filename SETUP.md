@@ -147,3 +147,23 @@ curl -X POST 'http://localhost:3000/api/demo?type=hr'
 - Rate-Limits: Registrierung 5/h pro IP, Demo 10/10min pro IP, Forgot-Password 5/h pro IP
 - Forgot-Password: Generische Antwort (kein User-Enumeration); Token-Hash in DB gespeichert (32-Byte Random, SHA-256), 60 Min. TTL, one-shot
 - E-Mails: Optional über Resend (ohne `RESEND_API_KEY` werden Mails nur in `AuditLog` protokolliert — bequem für Dev/Test)
+
+---
+
+## DSGVO Auto-Löschung (Cron)
+
+`/api/cron/cleanup` läuft täglich um **03:00 UTC** (in `vercel.json` als Cron eingetragen) und entfernt Bewerberdaten 180 Tage nach Verfahrensende.
+
+### Setup auf Vercel
+1. **Env-Variable setzen:** Vercel Project → Settings → Environment Variables → `CRON_SECRET` mit dem Output von `openssl rand -base64 32` für **Production** + **Preview**.
+2. **Deploy.** Vercel registriert den Cron beim Deploy automatisch — sichtbar unter Project → Settings → **Cron Jobs**.
+3. **Validierung:** Vercel Cron-Dashboard zeigt nach 24h den ersten Run mit Status 200.
+
+### Manueller Test
+```bash
+curl -i -H "Authorization: Bearer $CRON_SECRET" https://candiq.de/api/cron/cleanup
+# 200 → { "ok": true, "cutoffDate": "…", "deleted": { … } }
+# 401 → ohne / mit falschem Bearer
+```
+
+Jeder Run schreibt einen `AuditLog`-Entry mit `action="AUTO_CLEANUP_180D"`, auch bei 0 Löschungen — als Beweis, dass der Cron läuft.
