@@ -125,6 +125,8 @@ export default function RootLayout({
               __html: `
                 #hubspot-messages-iframe-container {
                   position: fixed !important;
+                  top: auto !important;
+                  left: auto !important;
                   bottom: 20px !important;
                   right: 20px !important;
                   z-index: 2147483000 !important;
