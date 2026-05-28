@@ -131,12 +131,10 @@ export async function POST(req: NextRequest) {
         firstname: firstName,
         lastname: lastName,
         company,
-        // Standard HubSpot Property "Lifecycle stage" — gibt es immer
         lifecyclestage: 'lead',
-        // Eigene Property: muss im HubSpot CRM angelegt sein.
-        // Falls nicht: ignoriert HubSpot still und kein Fehler.
-        candiq_source: 'pilot_program_2026',
-        candiq_hires_per_year: hiresPerYear,
+        // Sammel-Feld 'message' — Standard-Property, immer vorhanden.
+        // Form-Kontext landet hier sodass Sales sofort sieht woher der Lead kommt.
+        message: `[candiq Pilot 2026] Bewerbung über candiq.de · Hires/Jahr: ${hiresPerYear} · Firma: ${company} · IP: ${ip === 'unknown' ? '-' : ip}`,
       })
       if (sync.ok && process.env.HUBSPOT_PILOT_LIST_ID) {
         await addContactToList(sync.contactId, process.env.HUBSPOT_PILOT_LIST_ID)

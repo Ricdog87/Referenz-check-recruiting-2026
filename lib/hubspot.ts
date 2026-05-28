@@ -38,6 +38,7 @@ function isConfigured(): boolean {
  */
 export async function upsertContact(props: ContactProperties): Promise<SyncResult> {
   if (!isConfigured()) {
+    console.warn('[hubspot] not-configured — HUBSPOT_API_KEY missing')
     return { ok: false, reason: 'HUBSPOT_API_KEY not configured' }
   }
   if (!props.email) {
@@ -66,7 +67,9 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     })
     if (!searchRes.ok) {
       const text = await searchRes.text()
-      return { ok: false, reason: `search ${searchRes.status}: ${text.slice(0, 200)}` }
+      const reason = `search ${searchRes.status}: ${text.slice(0, 200)}`
+      console.warn('[hubspot] search-failed', { reason })
+      return { ok: false, reason }
     }
     const searchData = (await searchRes.json()) as {
       total?: number
@@ -90,7 +93,9 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
       })
       if (!updateRes.ok) {
         const text = await updateRes.text()
-        return { ok: false, reason: `update ${updateRes.status}: ${text.slice(0, 200)}` }
+        const reason = `update ${updateRes.status}: ${text.slice(0, 200)}`
+        console.warn('[hubspot] update-failed', { reason })
+        return { ok: false, reason }
       }
       return { ok: true, contactId: id }
     }
@@ -106,7 +111,9 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     })
     if (!createRes.ok) {
       const text = await createRes.text()
-      return { ok: false, reason: `create ${createRes.status}: ${text.slice(0, 200)}` }
+      const reason = `create ${createRes.status}: ${text.slice(0, 200)}`
+      console.warn('[hubspot] create-failed', { reason })
+      return { ok: false, reason }
     }
     const createData = (await createRes.json()) as { id?: string }
     if (!createData.id) {
