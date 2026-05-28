@@ -10,6 +10,7 @@ import { Testimonials } from '@/components/landing/sections/Testimonials'
 import { ROICalculator } from '@/components/landing/sections/ROICalculator'
 import { CompliancePromise } from '@/components/landing/sections/CompliancePromise'
 import { PricingPreview } from '@/components/landing/sections/PricingPreview'
+import { HomepageFaq } from '@/components/landing/sections/HomepageFaq'
 import { FinalCta } from '@/components/landing/sections/FinalCta'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 
@@ -29,6 +30,7 @@ export default function LandingPage() {
         <ROICalculator />
         <CompliancePromise />
         <PricingPreview />
+        <HomepageFaq />
         <FinalCta />
       </main>
       <LandingFooter />
