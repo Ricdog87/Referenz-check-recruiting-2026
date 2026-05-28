@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { rateLimit } from '@/lib/rate-limit'
+import { upsertContact } from '@/lib/hubspot'
 import { getLeadMagnet } from '@/content/resources/data'
 
 export const runtime = 'nodejs'
@@ -96,6 +97,23 @@ export async function POST(req: NextRequest) {
         ip: ip === 'unknown' ? null : ip,
       },
     })
+
+    // HubSpot CRM-Sync — best-effort, nicht blockierend.
+    try {
+      const sync = await upsertContact({
+        email,
+        firstname: firstName,
+        company: company ?? undefined,
+        lifecyclestage: 'subscriber',
+        candiq_source: `lead_magnet_${slug}`,
+        candiq_newsletter_opt_in: newsletter ? 'true' : 'false',
+      })
+      if (!sync.ok) {
+        console.warn('lead_magnet_hubspot_sync_failed', { reason: sync.reason })
+      }
+    } catch (hsErr: any) {
+      console.error('lead_magnet_hubspot_sync_error', { message: hsErr?.message })
+    }
 
     // Best-effort-Mail mit dem Link zur Resource
     try {
