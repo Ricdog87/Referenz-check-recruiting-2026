@@ -131,8 +131,17 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{
               __html: `
                 #hubspot-messages-iframe-container {
+                  /* position+z-index !important damit Container floating
+                     ueber allem ist. Anchor (bottom/right) NICHT !important —
+                     so kann HubSpots Open-State-JS die Werte ueberschreiben
+                     wenn es das Widget vergroessert. Beim Initial-Render
+                     greift dann unser Anchor. */
                   position: fixed !important;
                   z-index: 2147483000 !important;
+                  bottom: 20px;
+                  right: 20px;
+                  top: auto;
+                  left: auto;
                 }
               `,
             }}
