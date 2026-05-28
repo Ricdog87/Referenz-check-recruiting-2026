@@ -53,6 +53,8 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     'email', 'firstname', 'lastname', 'company', 'phone',
     'website', 'jobtitle', 'lifecyclestage', 'hs_lead_status',
     'message', 'address', 'city', 'state', 'zip', 'country',
+    // candiq-eigene Properties (HubSpot Settings → Properties → Contact)
+    'candiq_source', 'candiq_hires_per_year', 'candiq_newsletter_opt_in',
   ])
 
   try {
