@@ -24,7 +24,9 @@
     "next-auth": "^4.24.5",
     "react": "^18",
     "react-dom": "^18",
+    "react-markdown": "^10.1.0",
     "recharts": "^2.12.0",
+    "remark-gfm": "^4.0.1",
     "stripe": "^22.1.1",
     "tailwind-merge": "^2.2.0"
   },

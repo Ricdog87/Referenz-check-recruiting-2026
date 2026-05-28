@@ -43,6 +43,7 @@ export function LandingNav() {
           <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
           <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Preise</Link>
           <Link href="/preise#addons" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Add-ons</Link>
+          <Link href="/resources" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Ressourcen</Link>
         </div>
 
         <div className="hidden md:flex items-center gap-2">
