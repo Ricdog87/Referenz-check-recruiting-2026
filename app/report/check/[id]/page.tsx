@@ -33,7 +33,7 @@ export default async function CheckReportPage({ params }: { params: { id: string
   const res = check.result ? (CHECK_RESULT[check.result as keyof typeof CHECK_RESULT] ?? null) : null
 
   return (
-    <main className="report-shell">
+    <main id="main" className="report-shell">
       {/* Print controls — werden im Druck ausgeblendet */}
       <ReportPrintControls backHref={`/checks/${check.id}`} />
 

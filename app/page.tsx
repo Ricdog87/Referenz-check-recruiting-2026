@@ -16,17 +16,19 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <LandingNav />
-      <Hero />
-      <TrustBar />
-      <Problem />
-      <HowItWorks />
-      <Features />
-      <TwoAudiences />
-      <Testimonials />
-      <ROICalculator />
-      <CompliancePromise />
-      <PricingPreview />
-      <FinalCta />
+      <main id="main">
+        <Hero />
+        <TrustBar />
+        <Problem />
+        <HowItWorks />
+        <Features />
+        <TwoAudiences />
+        <Testimonials />
+        <ROICalculator />
+        <CompliancePromise />
+        <PricingPreview />
+        <FinalCta />
+      </main>
       <LandingFooter />
     </div>
   )

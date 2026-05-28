@@ -256,6 +256,7 @@ export default function DemoPage() {
         </div>
       </div>
 
+      <main id="main">
       {/* ── Hero ── */}
       <section className="relative pt-28 pb-16 px-6 overflow-hidden">
         {/* Animated blobs */}
@@ -422,6 +423,7 @@ export default function DemoPage() {
           <p className="text-xs text-text-muted mt-3">15 Minuten · individueller Testzugang · monatlich kündbar</p>
         </motion.div>
       </section>
+      </main>
     </div>
   )
 }

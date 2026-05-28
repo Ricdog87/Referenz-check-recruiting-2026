@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <MobileSidebarProvider>
       <div className="flex min-h-screen bg-bg-secondary">
         <Sidebar />
-        <main className="flex-1 min-w-0 overflow-x-hidden bg-bg-secondary">
+        <main id="main" className="flex-1 min-w-0 overflow-x-hidden bg-bg-secondary">
           <TopBar
             name={session?.user.name ?? ''}
             company={session?.user.company ?? ''}
