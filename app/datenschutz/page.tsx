@@ -189,6 +189,31 @@ export default function DatenschutzPage() {
         vor Ver&ouml;ffentlichung.
       </p>
 
+      <h2>9c. Lead-Magnet-Anfragen</h2>
+      <p>
+        Auf candiq.de bieten wir kostenlose Praxis-Guides (Lead-Magnets) zum Download.
+        Vor der Anzeige werden Vorname und gesch&auml;ftliche E-Mail-Adresse erhoben,
+        optional auch Firmenname. Zus&auml;tzlich speichern wir Zeitstempel, IP-Adresse
+        und User-Agent zur Missbrauchspr&auml;vention.
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)
+        f&uuml;r die Zusendung des Inhalts.
+      </p>
+      <p>
+        <strong>Newsletter (optional):</strong> Falls Sie das Newsletter-Kontrollk&auml;stchen
+        aktivieren, senden wir eine separate Best&auml;tigungs-E-Mail
+        (<strong>Double-Opt-In</strong>). Erst nach Klick auf den Best&auml;tigungs-Link
+        werden Sie zum Newsletter hinzugef&uuml;gt. Ohne diesen Klick erfolgt keine
+        Newsletter-Verarbeitung. Abmeldung jederzeit &uuml;ber den Link in jeder
+        Newsletter-E-Mail.
+      </p>
+      <p>
+        <strong>Speicherdauer:</strong> Lead-Magnet-Anfragen werden 24 Monate zur
+        Nachweis-Pflicht (Art. 7 Abs. 1 DSGVO) gespeichert und anschlie&szlig;end
+        gel&ouml;scht. Newsletter-Abonnenten bleiben gespeichert bis zur Abmeldung.
+      </p>
+
       <h2>10. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr

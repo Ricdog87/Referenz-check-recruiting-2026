@@ -215,3 +215,27 @@ model PilotApplication {
   @@index([status])
   @@index([createdAt])
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Lead-Magnet-Anfragen (Interview-Leitfaden, DSGVO-Checkliste, …)
+// E-Mail-Capture vor dem Markdown-Inhalt. DSGVO-Rechtsgrundlage:
+// Art. 6 Abs. 1 lit. a (Einwilligung); newsletter ist Double-Opt-In.
+// ─────────────────────────────────────────────────────────────────
+model LeadMagnetRequest {
+  id          String   @id @default(cuid())
+  slug        String   // welcher Lead-Magnet
+  firstName   String
+  email       String
+  company     String?
+  consent     Boolean  @default(true)
+  newsletter  Boolean  @default(false)
+  // DOI fuer Newsletter — Token wird per Mail verschickt
+  newsletterConfirmedAt DateTime?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([slug])
+  @@index([email])
+  @@index([createdAt])
+}
