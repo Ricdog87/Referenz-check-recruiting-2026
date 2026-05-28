@@ -114,11 +114,17 @@ export default function RootLayout({
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        {/* HubSpot Chat-Widget Floating-Position erzwingen.
-            HubSpot setzt sein Position-CSS dynamisch via inline-style
-            mit niedriger Prio. Mit !important sichern wir Position +
-            Anchor, KEINE Groesse/Transform — das laesst HubSpot's
-            Open-Animation und Body-Rendering intakt. */}
+        {/* HubSpot Chat-Widget — minimaler CSS-Override.
+            Wir sichern NUR `position: fixed` und einen sehr hohen z-index, damit
+            das Widget oberhalb aller anderen Layer floatet. ALLE Anchor-Werte
+            (top/left/bottom/right) UND alle Groessen ueberlaesst diese Datei
+            HubSpots eigener Runtime — sowohl der injected `<style>`-Block als
+            auch JS-gesetzte Inline-Styles fuer die Open-Animation gewinnen.
+            Hintergrund: ein `!important` auf top/left/bottom/right blockt
+            HubSpots Pixel-genaue Positionierung der inneren Children (Header,
+            Body, Footer) im Open-State und produziert auf Desktop ein
+            zerlegtes Layout (Footer-Input oben, X-Close mittig, Body leer).
+            Siehe Diagnose in PR-Body. */}
         {process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID && (
           <style
             nonce={nonce}
@@ -126,10 +132,6 @@ export default function RootLayout({
               __html: `
                 #hubspot-messages-iframe-container {
                   position: fixed !important;
-                  top: auto !important;
-                  left: auto !important;
-                  bottom: 20px !important;
-                  right: 20px !important;
                   z-index: 2147483000 !important;
                 }
               `,
