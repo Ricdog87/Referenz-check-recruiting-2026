@@ -60,7 +60,7 @@ function buildCsp(nonce: string): string {
   return [
     `default-src 'self'`,
     `script-src ${scriptSrc}`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `style-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
     // CSP3: erlaubt inline `style="..."`-Attribute (framer-motion, dynamische
     // Gradienten). `<style>`-Blöcke sind weiterhin nonce-pflichtig.
     `style-src-attr 'unsafe-inline'`,
