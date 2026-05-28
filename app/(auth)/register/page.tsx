@@ -41,7 +41,10 @@ function RegisterForm() {
   const [accountType, setAccountType] = useState<AccountType>(initialType)
   const [form, setForm] = useState({ name: '', company: '', email: '', password: '', passwordConfirm: '' })
   const [showPw, setShowPw] = useState(false)
-  const [gdprAccepted, setGdprAccepted] = useState(false)
+  // DSGVO: granulare Einwilligungen — AGB (Vertragsschluss) und Datenschutz
+  // (Informationspflicht) duerfen nicht gebuendelt werden (Planet49-Urteil).
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -61,7 +64,8 @@ function RegisterForm() {
     if (!EMAIL_REGEX.test(form.email.trim())) return 'Bitte geben Sie eine gültige E-Mail-Adresse ein.'
     if (form.password.length < 8) return 'Passwort muss mindestens 8 Zeichen haben.'
     if (form.password !== form.passwordConfirm) return 'Passwörter stimmen nicht überein.'
-    if (!gdprAccepted) return 'Bitte stimmen Sie der Datenschutzerklärung zu.'
+    if (!acceptTerms) return 'Bitte akzeptieren Sie die AGB.'
+    if (!acceptPrivacy) return 'Bitte bestätigen Sie, dass Sie die Datenschutzerklärung gelesen haben.'
     return null
   }
 
@@ -85,7 +89,8 @@ function RegisterForm() {
           password: form.password,
           accountType,
           plan: planId,
-          gdprAccepted,
+          acceptTerms,
+          acceptPrivacy,
         }),
       })
 
@@ -310,18 +315,64 @@ function RegisterForm() {
               </div>
             </div>
 
-            <label className="flex items-start gap-3 cursor-pointer p-4 rounded-xl bg-brand-50/40 border border-brand-100">
-              <div className="relative flex-shrink-0 mt-0.5">
-                <input type="checkbox" checked={gdprAccepted} onChange={(e) => setGdprAccepted(e.target.checked)} className="sr-only" />
-                <div className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${gdprAccepted ? 'bg-brand-500 border-brand-500' : 'border-border bg-white'}`}>
-                  {gdprAccepted && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+            {/* DSGVO Art. 7 + Planet49-Urteil: AGB und Datenschutz duerfen nicht
+                in einer Checkbox gebuendelt werden. Zwei separate Pflicht-Felder. */}
+            <div className="space-y-2.5">
+              <label className="flex items-start gap-3 cursor-pointer p-4 rounded-xl bg-brand-50/40 border border-brand-100">
+                <div className="relative flex-shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    name="accept_terms"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    aria-required="true"
+                    className="sr-only"
+                  />
+                  <div
+                    role="checkbox"
+                    aria-checked={acceptTerms}
+                    className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${acceptTerms ? 'bg-brand-500 border-brand-500' : 'border-border bg-white'}`}
+                  >
+                    {acceptTerms && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                  </div>
                 </div>
-              </div>
-              <span className="text-xs text-text-secondary leading-relaxed">
-                Ich habe die <Link href="/datenschutz" className="text-brand-700 hover:underline" target="_blank">Datenschutzerklärung</Link> und{' '}
-                <Link href="/agb" className="text-brand-700 hover:underline" target="_blank">AGB</Link> gelesen und stimme der Verarbeitung meiner Daten zu.
-              </span>
-            </label>
+                <span className="text-xs text-text-secondary leading-relaxed">
+                  Ich akzeptiere die{' '}
+                  <Link href="/agb" className="text-brand-700 hover:underline" target="_blank" rel="noopener noreferrer">
+                    AGB <span aria-hidden="true">↗</span>
+                  </Link>{' '}
+                  <span className="text-text-muted">(Öffnet sich in einem neuen Tab — Sie verlieren Ihre Eingaben nicht.)</span>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-3 cursor-pointer p-4 rounded-xl bg-brand-50/40 border border-brand-100">
+                <div className="relative flex-shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    name="accept_privacy"
+                    checked={acceptPrivacy}
+                    onChange={(e) => setAcceptPrivacy(e.target.checked)}
+                    aria-required="true"
+                    className="sr-only"
+                  />
+                  <div
+                    role="checkbox"
+                    aria-checked={acceptPrivacy}
+                    className={`w-5 h-5 rounded-md border transition-all flex items-center justify-center ${acceptPrivacy ? 'bg-brand-500 border-brand-500' : 'border-border bg-white'}`}
+                  >
+                    {acceptPrivacy && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                  </div>
+                </div>
+                <span className="text-xs text-text-secondary leading-relaxed">
+                  Ich habe die{' '}
+                  <Link href="/datenschutz" className="text-brand-700 hover:underline" target="_blank" rel="noopener noreferrer">
+                    Datenschutzerklärung <span aria-hidden="true">↗</span>
+                  </Link>{' '}
+                  gelesen.{' '}
+                  <span className="text-text-muted">(Kenntnisnahme, keine Einwilligung — Verarbeitung läuft auf Vertragsbasis nach Art. 6 (1) b DSGVO.)</span>
+                </span>
+              </label>
+            </div>
 
             {error && (
               <div role="alert" className="px-4 py-3 rounded-xl text-xs text-rose-700 bg-rose-50 border border-rose-200">
@@ -331,7 +382,7 @@ function RegisterForm() {
 
             <div className="flex gap-2">
               <button type="button" onClick={() => setStep(1)} disabled={loading} className="btn-secondary flex-1 py-3">Zurück</button>
-              <button type="submit" disabled={loading || !gdprAccepted} className="btn-primary flex-[2] py-3">
+              <button type="submit" disabled={loading || !acceptTerms || !acceptPrivacy} className="btn-primary flex-[2] py-3">
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
