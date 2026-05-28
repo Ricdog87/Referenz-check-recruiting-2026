@@ -5,6 +5,7 @@ import { Problem } from '@/components/landing/sections/Problem'
 import { HowItWorks } from '@/components/landing/sections/HowItWorks'
 import { Features } from '@/components/landing/sections/Features'
 import { TwoAudiences } from '@/components/landing/sections/TwoAudiences'
+import { OnboardingRoadmap } from '@/components/landing/sections/OnboardingRoadmap'
 import { Testimonials } from '@/components/landing/sections/Testimonials'
 import { ROICalculator } from '@/components/landing/sections/ROICalculator'
 import { CompliancePromise } from '@/components/landing/sections/CompliancePromise'
@@ -23,6 +24,7 @@ export default function LandingPage() {
         <HowItWorks />
         <Features />
         <TwoAudiences />
+        <OnboardingRoadmap />
         <Testimonials />
         <ROICalculator />
         <CompliancePromise />
