@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
-import { stripe, planFromPriceId, mapStripeStatus } from '@/lib/stripe'
+import { stripe, planFromPriceId, mapStripeStatus, addonSkuFromPriceId } from '@/lib/stripe'
+import { getAddon, type AddonSku } from '@/lib/addons'
 import { prisma } from '@/lib/db'
 
 export const runtime = 'nodejs'
@@ -47,7 +48,89 @@ export async function POST(req: NextRequest) {
       case 'checkout.session.completed': {
         const cs = event.data.object as Stripe.Checkout.Session
         const userId = cs.metadata?.userId
-        const subId = typeof cs.subscription === 'string' ? cs.subscription : cs.subscription?.id
+        const metaType = cs.metadata?.type
+        const metaSku = cs.metadata?.sku
+
+        // ── BRANCH A: One-time Add-on-Purchase (mode='payment') ──────────
+        if (metaType === 'addon' && cs.mode === 'payment' && userId) {
+          // SKU bestimmen: primaer aus metadata, fallback aus PriceID
+          let sku: AddonSku | null = (metaSku as AddonSku) ?? null
+          if (!sku) {
+            // Defensive Fallback: line_items expandieren um price-id zu kriegen
+            const expanded = await stripe.checkout.sessions.retrieve(cs.id, {
+              expand: ['line_items.data.price'],
+            })
+            const firstPriceId =
+              expanded.line_items?.data?.[0]?.price?.id ?? ''
+            sku = addonSkuFromPriceId(firstPriceId)
+          }
+          if (!sku) {
+            console.warn('stripe_addon_checkout_no_sku', {
+              sessionId: cs.id,
+              metaSku,
+            })
+            break
+          }
+
+          const addon = getAddon(sku)
+          if (!addon) {
+            console.warn('stripe_addon_unknown_sku', { sku })
+            break
+          }
+
+          // Idempotenter Insert: Unique-Constraint auf stripeSessionId
+          // verhindert Doppel-Order bei Webhook-Retries.
+          try {
+            const totalAmount =
+              typeof cs.amount_total === 'number'
+                ? cs.amount_total
+                : addon.price * 100 * addon.quantity
+            const order = await prisma.addonOrder.create({
+              data: {
+                userId,
+                sku: addon.sku,
+                quantity: addon.quantity,
+                unitPrice: addon.price * 100,
+                totalAmount,
+                status: 'CONFIRMED',
+                stripeSessionId: cs.id,
+                notes: `Stripe-Checkout · ${addon.name}`,
+              },
+            })
+
+            await prisma.auditLog.create({
+              data: {
+                userId,
+                action: 'ADDON_PAID',
+                entity: 'AddonOrder',
+                entityId: order.id,
+                details: JSON.stringify({
+                  sku: addon.sku,
+                  amountCents: totalAmount,
+                  sessionId: cs.id,
+                }),
+              },
+            })
+          } catch (e: any) {
+            // P2002 = Unique-Constraint-Verletzung → schon vorhandener Insert.
+            // Wir loggen das, ignorieren es aber, weil das Idempotency ist.
+            if (e?.code === 'P2002') {
+              console.info('stripe_addon_duplicate_event_ignored', {
+                sessionId: cs.id,
+                sku,
+              })
+            } else {
+              throw e
+            }
+          }
+          break
+        }
+
+        // ── BRANCH B: Subscription-Checkout (mode='subscription') ────────
+        const subId =
+          typeof cs.subscription === 'string'
+            ? cs.subscription
+            : cs.subscription?.id
         if (!userId || !subId) {
           console.warn('stripe_checkout_completed_missing_meta', { userId, subId })
           break
