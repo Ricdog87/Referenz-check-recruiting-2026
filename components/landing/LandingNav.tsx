@@ -42,6 +42,7 @@ export function LandingNav() {
           <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Features</Link>
           <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
           <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Preise</Link>
+          <Link href="/preise#addons" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Add-ons</Link>
         </div>
 
         <div className="hidden md:flex items-center gap-2">
@@ -80,6 +81,7 @@ export function LandingNav() {
           <Link href="#features" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Features</Link>
           <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">PDL-Warteliste</Link>
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Preise</Link>
+          <Link href="/preise#addons" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Add-ons</Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">
             <Link href="/demo" onClick={() => setOpen(false)} className="btn-secondary w-full flex items-center justify-center gap-1.5">
               <Zap className="w-3.5 h-3.5 text-brand-600" />Live-Demo
