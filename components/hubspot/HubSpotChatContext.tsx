@@ -61,44 +61,6 @@ export function HubSpotChatContext() {
     // wuerde Tracking ganz abstellen, das ist nicht gewollt.
   }, [session, status])
 
-  // Widget-Position EINMALIG setzen sobald HubSpot den Container
-  // einfuegt. KEIN dauerhafter Override, sonst kann HubSpot das Widget
-  // bei Klick nicht ordentlich oeffnen (Welcome-Message + Footer
-  // werden geblockt).
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    let positioned = false
-
-    const positionOnce = (el: HTMLElement) => {
-      if (positioned) return
-      positioned = true
-      // Nur Position und Anchor erzwingen, KEIN transform/width/height —
-      // HubSpot braucht Hoheit ueber Layout fuer Open-Animation.
-      el.style.setProperty('position', 'fixed', 'important')
-      el.style.setProperty('top', 'auto', 'important')
-      el.style.setProperty('left', 'auto', 'important')
-      el.style.setProperty('bottom', '20px', 'important')
-      el.style.setProperty('right', '20px', 'important')
-      el.style.setProperty('z-index', '2147483000', 'important')
-    }
-
-    const tryPosition = () => {
-      const el = document.getElementById('hubspot-messages-iframe-container')
-      if (el instanceof HTMLElement) {
-        positionOnce(el)
-        observer.disconnect()
-      }
-    }
-
-    // Beobachtet nur bis Container auftaucht, danach disconnect.
-    const observer = new MutationObserver(tryPosition)
-    observer.observe(document.body, { childList: true, subtree: true })
-
-    // Initial pass falls Container schon da ist
-    tryPosition()
-
-    return () => observer.disconnect()
-  }, [])
 
   return null
 }
