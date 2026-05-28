@@ -183,7 +183,7 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
   // ── ZUSTAND 1: Bereits angenommen ─────────────────────────────
   if (status === 'ACCEPTED') {
     return (
-      <main className="min-h-screen bg-slate-50 py-12 px-4">
+      <main id="main" className="min-h-screen bg-slate-50 py-12 px-4">
         <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-slate-200 p-8">
           <div className="text-center mb-6">
             <div className="text-5xl mb-3">✓</div>
@@ -243,7 +243,7 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
   // ── ZUSTAND 2: Widerrufen ─────────────────────────────────────
   if (status === 'REVOKED') {
     return (
-      <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <main id="main" className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 p-8 text-center">
           <div className="text-5xl mb-4">🛑</div>
           <h1 className="text-xl font-bold text-slate-900 mb-2">Einwilligung widerrufen</h1>
@@ -257,7 +257,7 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
 
   // ── ZUSTAND 3: Pending — Formular ─────────────────────────────
   return (
-    <main className="min-h-screen bg-slate-50 py-12 px-4">
+    <main id="main" className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">

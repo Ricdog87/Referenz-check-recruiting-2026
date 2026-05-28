@@ -12,7 +12,9 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <LandingNav />
-      <PricingClient />
+      <main id="main">
+        <PricingClient />
+      </main>
       <LandingFooter />
     </div>
   )

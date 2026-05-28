@@ -18,7 +18,7 @@ export default function TerminPage() {
     <>
       <LandingNav />
 
-      <main className="pt-16">
+      <main id="main" className="pt-16">
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-b from-white via-brand-50/40 to-white">
           {/* Brand-color blobs */}

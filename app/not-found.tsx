@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 relative overflow-hidden">
+    <main id="main" className="min-h-screen bg-white flex items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px]"
           style={{ background: 'radial-gradient(ellipse, rgba(99,102,241,0.16), transparent 60%)', filter: 'blur(80px)' }} />
@@ -20,6 +20,6 @@ export default function NotFound() {
           <Link href="/dashboard" className="btn-secondary">Zum Dashboard</Link>
         </div>
       </div>
-    </div>
+    </main>
   )
 }

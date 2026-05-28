@@ -115,6 +115,14 @@ export default function RootLayout({
         />
       </head>
       <body>
+        {/* A11y: BFSG-Pflicht — sichtbarer Skip-Link bei Tastatur-Fokus.
+            Springt zum nächsten <main id="main"> auf jeder Route. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand-600 focus:text-white focus:shadow-card-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand-300"
+        >
+          Zum Hauptinhalt springen
+        </a>
         <Providers>{children}</Providers>
       </body>
     </html>

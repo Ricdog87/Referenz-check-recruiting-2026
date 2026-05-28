@@ -26,11 +26,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 pb-16 relative z-10">
+      <main id="main" className="flex-1 flex items-center justify-center px-4 pb-16 relative z-10">
         <div className="w-full max-w-[440px]">
           {children}
         </div>
-      </div>
+      </main>
     </div>
   )
 }
