@@ -8,6 +8,7 @@ import { HR_PLANS } from '@/lib/utils'
 import { Reveal } from '@/components/landing/Reveal'
 import { BOOKING_URL } from '@/lib/site'
 import { PricingCTA } from '@/components/PricingCTA'
+import { AddonsShowcase } from '@/components/landing/sections/AddonsShowcase'
 
 export function PricingClient() {
   const [tab, setTab] = useState<'hr' | 'agency'>('hr')
@@ -206,6 +207,9 @@ export function PricingClient() {
           )}
         </div>
       </section>
+
+      {/* Recruiting-Services & Add-ons (Deep-Check premium hero + service grids) */}
+      <AddonsShowcase />
 
       {/* Comparison table */}
       <section className="py-20 px-6 bg-bg-secondary">
