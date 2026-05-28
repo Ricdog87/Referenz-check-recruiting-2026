@@ -38,6 +38,7 @@ export function LandingFooter() {
               { label: 'Features', href: '#features' },
               { label: 'So funktioniert\'s', href: '#wie-es-funktioniert' },
               { label: 'Preise', href: '/preise' },
+              { label: 'Add-ons & Services', href: '/preise#addons' },
               { label: 'Live-Demo', href: '/demo' },
               { label: 'Termin buchen', href: BOOKING_URL, external: true },
             ]}
