@@ -45,6 +45,16 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     return { ok: false, reason: 'email is required' }
   }
 
+  // HubSpot Standard-Properties die auf jedem Portal existieren.
+  // Alles andere (jobtitle, company_size, custom_*, …) muss vorher im
+  // HubSpot CRM angelegt sein, sonst lehnt die API mit
+  // PROPERTY_DOESNT_EXIST ab.
+  const ALLOWED = new Set([
+    'email', 'firstname', 'lastname', 'company', 'phone',
+    'website', 'jobtitle', 'lifecyclestage', 'hs_lead_status',
+    'message', 'address', 'city', 'state', 'zip', 'country',
+  ])
+
   try {
     // 1) Suche nach existierendem Contact per E-Mail
     const searchRes = await fetch(`${HUBSPOT_API_BASE}/crm/v3/objects/contacts/search`, {
@@ -77,7 +87,9 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     }
 
     const properties = Object.fromEntries(
-      Object.entries(props).filter(([, v]) => v !== undefined && v !== ''),
+      Object.entries(props).filter(
+        ([k, v]) => ALLOWED.has(k) && v !== undefined && v !== '',
+      ),
     )
 
     if (searchData.results?.[0]?.id) {
