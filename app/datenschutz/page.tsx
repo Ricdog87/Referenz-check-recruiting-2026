@@ -126,6 +126,12 @@ export default function DatenschutzPage() {
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
         erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
       </p>
+      <p>
+        <strong>Automatische Löschung nach 180 Tagen:</strong> Bewerber- und Referenzprüfungs-Daten,
+        deren Verfahren abgeschlossen, abgelehnt oder vom Bewerber widerrufen wurde, werden
+        spätestens 180 Tage nach Verfahrensende automatisch gelöscht. Die Löschung läuft als
+        täglicher Cron-Job um <strong>03:00 UTC</strong> und wird im Audit-Log protokolliert.
+      </p>
 
       <h2>12. Stand</h2>
       <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: Mai 2026.</p>
