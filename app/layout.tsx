@@ -128,8 +128,6 @@ export default function RootLayout({
                   bottom: 20px !important;
                   right: 20px !important;
                   z-index: 2147483000 !important;
-                  width: auto !important;
-                  height: auto !important;
                 }
                 #hubspot-messages-iframe-container.widget-align-left {
                   right: auto !important;
