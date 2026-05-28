@@ -105,8 +105,7 @@ export async function POST(req: NextRequest) {
         firstname: firstName,
         company: company ?? undefined,
         lifecyclestage: 'subscriber',
-        candiq_source: `lead_magnet_${slug}`,
-        candiq_newsletter_opt_in: newsletter ? 'true' : 'false',
+        message: `[candiq Resource: ${slug}] Lead-Magnet von candiq.de · Newsletter-Opt-In: ${newsletter ? 'ja' : 'nein'}`,
       })
       if (!sync.ok) {
         console.warn('lead_magnet_hubspot_sync_failed', { reason: sync.reason })
