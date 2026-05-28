@@ -48,9 +48,9 @@ export default function DatenschutzPage() {
       <h2>5. Datenspeicherung & Hosting</h2>
       <p>
         Personenbezogene Daten werden in Rechenzentren innerhalb der Europäischen Union, vorrangig in
-        Deutschland, verarbeitet. Eine Übermittlung in Drittländer findet nicht statt; Ausnahme sind die
-        unter „Reichweitenanalyse&ldquo; genannten Vercel-Dienste, die auf Basis der EU-Standardvertragsklauseln
-        eingebunden sind.
+        Deutschland, verarbeitet. Eine Übermittlung personenbezogener Daten in Drittländer findet
+        ausschließlich im Rahmen der Zahlungsabwicklung über Stripe statt (siehe Punkt 8) und beruht
+        auf den EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO.
       </p>
 
       <h2>6. Verschlüsselung</h2>
@@ -102,33 +102,29 @@ export default function DatenschutzPage() {
         bestehen.
       </p>
 
-      <h2>9. Cookies</h2>
+      <h2>9. Cookies, Tracking und Reichweitenanalyse</h2>
       <p>
-        Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
-        Für die Reichweitenanalyse setzen wir Vercel Web Analytics ein — cookielos und auf Basis
-        von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
-        Reichweitenanalyse). Es werden keine Marketing-Pixel und keine Tracking-Cookies Dritter gesetzt.
+        Wir verwenden ausschließlich <strong>technisch notwendige Cookies</strong> (Session- und
+        CSRF-Cookies für Authentifizierung). Es findet <strong>kein Tracking, kein Marketing-Pixel,
+        keine Werbe- oder Profiling-Cookies, keine Reichweitenanalyse und kein A/B-Testing</strong>
+        statt. Wir setzen keine externen Analyse-, Tracking-, Heatmapping- oder Session-Replay-Dienste
+        ein.
+      </p>
+      <p>
+        Hosting-bedingt protokolliert unser Hoster Vercel kurzlebige technische Logs (IP-Adresse,
+        Zeitstempel, User-Agent, aufgerufene URL) zur Sicherstellung des Betriebs und zur Abwehr
+        von Angriffen. Diese Logs werden nach spätestens 24 Stunden anonymisiert bzw. gelöscht.
+        Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am sicheren Betrieb).
       </p>
 
-      <h2>10. Reichweitenanalyse (Vercel Web Analytics &amp; Speed Insights)</h2>
-      <p>
-        Wir nutzen Vercel Web Analytics und Vercel Speed Insights zur Messung der
-        Reichweite und Performance unserer Website. Es werden keine Cookies gesetzt
-        und keine personenbezogenen Daten dauerhaft gespeichert. IP-Adressen werden
-        vor der Verarbeitung pseudonymisiert (gehasht). Rechtsgrundlage ist Art. 6
-        Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
-        Reichweitenanalyse). Anbieter: Vercel Inc., 340 S Lemon Ave #4133, Walnut,
-        CA 91789, USA. Verarbeitung gemäß Standardvertragsklauseln.
-      </p>
-
-      <h2>11. Aufbewahrungsfristen</h2>
+      <h2>10. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
         erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
       </p>
 
-      <h2>12. Stand</h2>
-      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: Mai 2026.</p>
+      <h2>11. Stand</h2>
+      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: 28. Mai 2026.</p>
     </LegalShell>
   )
 }
