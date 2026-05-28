@@ -162,6 +162,33 @@ export default function DatenschutzPage() {
         hello@candiq.de der Verarbeitung widersprechen (Art. 21 DSGVO).
       </p>
 
+      <h2>9b. Pilot-Programm Q3/2026 &mdash; Bewerbungs-Formular</h2>
+      <p>
+        Auf candiq.de bieten wir Interessenten die M&ouml;glichkeit, sich f&uuml;r unser
+        zeitlich begrenztes Pilot-Programm Q3/2026 zu bewerben. Erhoben werden dabei:
+        Firmenname, Vor- und Nachname, gesch&auml;ftliche E-Mail-Adresse und die geplante
+        Anzahl an Hires pro Jahr. Zus&auml;tzlich speichern wir Zeitstempel, IP-Adresse
+        und User-Agent zur Missbrauchspr&auml;vention.
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) f&uuml;r
+        die Bearbeitung der Pilot-Bewerbung sowie Art. 6 Abs. 1 lit. b DSGVO
+        (vorvertragliche Ma&szlig;nahmen).
+      </p>
+      <p>
+        <strong>Speicherdauer:</strong> Bewerbungen werden bis zum Ende des Pilot-Programms
+        (max. 12 Monate Laufzeit + 24 Monate Nachweisfrist nach Art. 7 Abs. 1 DSGVO)
+        gespeichert. Bewerbungen, die nicht zu einer Pilot-Teilnahme f&uuml;hren, werden
+        sp&auml;testens nach 6 Monaten gel&ouml;scht. Sie k&ouml;nnen Ihre Einwilligung jederzeit
+        per E-Mail an hello@candiq.de widerrufen.
+      </p>
+      <p>
+        <strong>Anonymisierte Case-Study:</strong> Pilot-Teilnehmer verpflichten sich
+        zu einer anonymisierten Case-Study nach 90 Tagen. Diese erfolgt ohne Klarnamen,
+        ohne Firmenlogo und nur mit Ihrer ausdr&uuml;cklichen, schriftlichen Freigabe
+        vor Ver&ouml;ffentlichung.
+      </p>
+
       <h2>10. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
