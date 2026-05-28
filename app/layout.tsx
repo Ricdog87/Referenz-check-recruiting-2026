@@ -114,11 +114,27 @@ export default function RootLayout({
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        {/* HubSpot Chat-Widget Styles werden komplett von HubSpot selbst
-            geliefert — moeglich gemacht durch unsere CSP-Erweiterung
-            'unsafe-inline' fuer style-src in middleware.ts. Eigene Overrides
-            stoeren das interne Widget-Layout (Welcome-Message + Footer
-            verschieben sich), darum bewusst KEINE. */}
+        {/* HubSpot Chat-Widget Floating-Position erzwingen.
+            HubSpot rendert per default position:static am Page-Ende —
+            wir setzen nur position+anchor (NICHT width/height) damit das
+            interne Widget-Layout intakt bleibt. */}
+        {process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID && (
+          <style
+            nonce={nonce}
+            dangerouslySetInnerHTML={{
+              __html: `
+                #hubspot-messages-iframe-container {
+                  position: fixed !important;
+                  top: auto !important;
+                  left: auto !important;
+                  bottom: 20px !important;
+                  right: 20px !important;
+                  z-index: 2147483000 !important;
+                }
+              `,
+            }}
+          />
+        )}
       </head>
       <body>
         {/* A11y: BFSG-Pflicht — sichtbarer Skip-Link bei Tastatur-Fokus.
