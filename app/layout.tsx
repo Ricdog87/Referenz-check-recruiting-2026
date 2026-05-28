@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { headers } from 'next/headers'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
@@ -124,6 +125,17 @@ export default function RootLayout({
           Zum Hauptinhalt springen
         </a>
         <Providers>{children}</Providers>
+
+        {/* HubSpot Live-Chat (Conversations) — nur rendern wenn Portal-ID
+            via Env gesetzt. Lazy-loaded mit strategy='afterInteractive'.
+            CSP-Domains in middleware.ts whitelisted (eu1-Region). */}
+        {process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID && (
+          <Script
+            id="hs-script-loader"
+            strategy="afterInteractive"
+            src={`https://js-eu1.hs-scripts.com/${process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID}.js`}
+          />
+        )}
       </body>
     </html>
   )
