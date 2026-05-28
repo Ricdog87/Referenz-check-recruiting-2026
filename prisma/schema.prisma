@@ -150,6 +150,9 @@ model AddonOrder {
   totalAmount Int      // in cents
   status      String   @default("CONFIRMED") // CONFIRMED | DELIVERED | CANCELED | REFUNDED
   notes       String?
+  // Stripe-Checkout-Session-ID — Idempotency fuer Webhook-Replays.
+  // Unique sodass derselbe Stripe-Event keine doppelte Order anlegt.
+  stripeSessionId String? @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
