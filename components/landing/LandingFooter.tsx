@@ -50,6 +50,9 @@ export function LandingFooter() {
               { label: 'HR-Abteilungen', href: '/preise#hr' },
               { label: 'Personaldienstleister (bald verfügbar)', href: '/waitlist-agency' },
               { label: 'Enterprise', href: '/preise#enterprise' },
+              { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
+              { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
+              { label: 'Healthcare-Recruiting', href: '/branchen/healthcare-recruiting' },
             ]}
           />
 
