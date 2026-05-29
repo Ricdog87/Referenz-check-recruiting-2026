@@ -33,41 +33,41 @@ export function LandingNav() {
             height={32}
             className="h-8 w-auto"
           />
-          <span className="hidden sm:inline-block text-[10px] font-semibold uppercase tracking-widest text-brand-600 px-1.5 py-0.5 rounded-md bg-brand-50 border border-brand-100 ml-1">Pro</span>
+          <span className="hidden xl:inline-block text-[10px] font-semibold uppercase tracking-widest text-brand-600 px-1.5 py-0.5 rounded-md bg-brand-50 border border-brand-100 ml-1">Pro</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-1">
-          <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">So funktioniert&rsquo;s</Link>
-          <Link href="#zielgruppen" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Für wen</Link>
-          <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Features</Link>
-          <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
-          <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Preise</Link>
-          <Link href="/preise#addons" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Add-ons</Link>
-          <Link href="/resources" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">Ressourcen</Link>
+        <div className="hidden lg:flex items-center gap-0.5">
+          <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">So funktioniert&rsquo;s</Link>
+          <Link href="#zielgruppen" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Für wen</Link>
+          <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Features</Link>
+          <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
+          <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Preise</Link>
+          <Link href="/preise#addons" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Add-ons</Link>
+          <Link href="/resources" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Ressourcen</Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-2">
+        <div className="hidden lg:flex items-center gap-1.5">
           <LocaleSwitcher />
-          <Link href="/demo" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-800 px-3 py-2 rounded-full transition-colors hover:bg-brand-50">
+          <Link href="/demo" className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-brand-700 hover:text-brand-800 px-2.5 py-2 rounded-full transition-colors hover:bg-brand-50">
             <Zap className="w-3.5 h-3.5" />
             Live-Demo
           </Link>
-          <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-text-primary px-4 py-2 rounded-full transition-colors">
+          <Link href="/login" className="whitespace-nowrap text-sm font-medium text-text-secondary hover:text-text-primary px-2.5 py-2 rounded-full transition-colors">
             Anmelden
           </Link>
           <Link
             href={BOOKING_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5"
+            className="btn-primary whitespace-nowrap text-xs py-2 px-3.5 inline-flex items-center gap-1.5"
           >
             <CalendarCheck className="w-3.5 h-3.5" />
             Termin buchen
           </Link>
         </div>
 
-        <button onClick={() => setOpen(!open)} className="md:hidden p-2 rounded-lg hover:bg-bg-secondary">
+        <button onClick={() => setOpen(!open)} className="lg:hidden p-2 rounded-lg hover:bg-bg-secondary">
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
@@ -77,7 +77,7 @@ export function LandingNav() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="md:hidden border-t border-border bg-white px-6 py-4 space-y-2"
+          className="lg:hidden border-t border-border bg-white px-6 py-4 space-y-2"
         >
           <Link href="#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert&rsquo;s</Link>
           <Link href="#zielgruppen" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für wen</Link>
