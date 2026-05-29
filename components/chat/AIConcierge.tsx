@@ -180,7 +180,7 @@ export function AIConcierge() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: open ? 0 : 1, y: open ? 20 : 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed bottom-5 right-5 z-[9000] inline-flex items-center gap-2 rounded-full bg-text-primary text-white px-4 py-3 shadow-card-lg hover:shadow-xl transition-shadow"
+        className="fixed bottom-5 right-5 z-[9000] inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-brand-600 via-brand-500 to-violet text-white px-4 py-3 shadow-[0_10px_30px_-8px_rgba(79,70,229,0.55)] hover:shadow-[0_14px_40px_-8px_rgba(79,70,229,0.7)] hover:scale-[1.03] transition-all duration-200 ring-1 ring-white/15"
         style={{ pointerEvents: open ? 'none' : 'auto' }}
       >
         <MessageSquare className="w-5 h-5" />
@@ -199,17 +199,25 @@ export function AIConcierge() {
             transition={{ duration: 0.22 }}
             role="dialog"
             aria-label="candiq AI-Concierge"
-            className="fixed bottom-5 right-5 z-[9001] w-[calc(100vw-2.5rem)] max-w-[420px] h-[min(640px,calc(100vh-2.5rem))] bg-white border border-border rounded-2xl shadow-card-lg flex flex-col overflow-hidden"
+            className="fixed bottom-5 right-5 z-[9001] w-[calc(100vw-2.5rem)] max-w-[420px] h-[min(640px,calc(100vh-2.5rem))] bg-white border border-brand-100 rounded-2xl shadow-[0_20px_60px_-15px_rgba(79,70,229,0.35),0_8px_25px_-8px_rgba(15,23,42,0.15)] flex flex-col overflow-hidden ring-1 ring-brand-100/50"
           >
-            {/* Header */}
-            <header className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-text-primary text-white">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
+            {/* Header — candiq brand gradient */}
+            <header className="relative flex items-center justify-between gap-3 px-4 py-3.5 bg-gradient-to-br from-brand-600 via-brand-500 to-violet text-white overflow-hidden">
+              {/* soft inner highlight */}
+              <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.18),transparent_55%)]" />
+              <div className="relative flex items-center gap-2.5">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 ring-1 ring-white/20 backdrop-blur-sm">
+                  <Sparkles className="w-4 h-4" />
+                </div>
                 <div>
-                  <div className="text-sm font-bold leading-tight">
+                  <div className="text-sm font-bold leading-tight tracking-tight">
                     {isEn ? 'candiq concierge' : 'candiq-Concierge'}
                   </div>
-                  <div className="text-[10px] opacity-70">
+                  <div className="text-[10px] opacity-85 flex items-center gap-1.5 mt-0.5">
+                    <span className="relative inline-flex w-1.5 h-1.5">
+                      <span className="absolute inline-flex w-full h-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                      <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    </span>
                     {isEn ? 'AI · GDPR-compliant · 24/7' : 'KI · DSGVO-konform · 24/7'}
                   </div>
                 </div>
@@ -218,7 +226,7 @@ export function AIConcierge() {
                 type="button"
                 aria-label={isEn ? 'Close chat' : 'Chat schließen'}
                 onClick={() => setOpen(false)}
-                className="p-1 rounded-md hover:bg-white/10 transition-colors"
+                className="relative p-1.5 rounded-lg hover:bg-white/15 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -227,8 +235,13 @@ export function AIConcierge() {
             {/* Messages */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
               {messages.length === 0 && (
-                <div className="text-sm text-text-secondary leading-relaxed bg-bg-secondary border border-border rounded-xl p-3">
-                  {welcome}
+                <div className="flex gap-2.5 items-start">
+                  <div className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-violet text-white shadow-sm">
+                    <Sparkles className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="text-sm text-text-secondary leading-relaxed bg-brand-50 border border-brand-100 rounded-2xl rounded-tl-md px-3.5 py-2.5 flex-1">
+                    {welcome}
+                  </div>
                 </div>
               )}
               {messages.map((m) => (
@@ -243,7 +256,7 @@ export function AIConcierge() {
 
             {/* Composer */}
             <footer className="border-t border-border p-3">
-              <div className="flex items-end gap-2 bg-bg-secondary border border-border rounded-xl px-3 py-2 focus-within:border-brand-400 transition-colors">
+              <div className="flex items-end gap-2 bg-bg-secondary border border-border rounded-xl px-3 py-2 focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 transition-all">
                 <textarea
                   ref={inputRef}
                   value={input}
@@ -259,7 +272,7 @@ export function AIConcierge() {
                   onClick={send}
                   disabled={busy || !input.trim()}
                   aria-label={isEn ? 'Send' : 'Senden'}
-                  className="p-2 rounded-lg bg-brand-600 hover:bg-brand-700 text-white disabled:opacity-40 disabled:hover:bg-brand-600 transition-colors"
+                  className="p-2 rounded-lg bg-gradient-to-br from-brand-600 to-violet hover:from-brand-700 hover:to-brand-700 text-white disabled:opacity-40 disabled:hover:from-brand-600 disabled:hover:to-violet hover:scale-[1.04] active:scale-[0.98] transition-all duration-150 shadow-sm shadow-brand-600/20"
                 >
                   {busy ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -288,7 +301,7 @@ function MessageBubble({ m }: { m: Message }) {
       <div
         className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
           isUser
-            ? 'bg-brand-600 text-white rounded-br-md'
+            ? 'bg-gradient-to-br from-brand-600 to-violet text-white rounded-br-md shadow-sm shadow-brand-600/20'
             : 'bg-bg-secondary text-text-primary border border-border rounded-bl-md'
         }`}
       >
