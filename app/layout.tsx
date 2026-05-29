@@ -38,6 +38,11 @@ export const metadata: Metadata = {
   publisher: 'RSG Recruiting Solutions group GmbH',
   alternates: {
     canonical: '/',
+    languages: {
+      de: '/',
+      en: '/en',
+      'x-default': '/',
+    },
   },
   openGraph: {
     type: 'website',
@@ -103,10 +108,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const nonce = headers().get('x-nonce') ?? undefined
+  const h = headers()
+  const nonce = h.get('x-nonce') ?? undefined
+  // `x-pathname` wird in middleware.ts gesetzt. Sobald die URL mit `/en`
+  // beginnt, liefern wir `<html lang="en">`. Fallback ist immer 'de'.
+  const pathname = h.get('x-pathname') ?? ''
+  const lang = pathname.startsWith('/en') ? 'en' : 'de'
 
   return (
-    <html lang="de" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang={lang} suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"
