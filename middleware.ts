@@ -27,14 +27,6 @@ const HUBSPOT_FRAME = 'https://meetings-eu1.hubspot.com'
 const HUBSPOT_CONNECT = 'https://forms.hubspot.com https://meetings-eu1.hubspot.com'
 const HUBSPOT_IMG = 'https://*.hubspotusercontent-eu1.net'
 
-// HubSpot Live-Chat (Conversations) — Loader-Subdomains, eu1-Region.
-// Doku: https://developers.hubspot.com/docs/api/conversations/chat-widget-sdk
-const HS_CHAT_SCRIPT =
-  'https://js-eu1.hs-scripts.com https://js.hs-banner.com https://js.usemessages.com https://js-eu1.usemessages.com https://js-eu1.hs-banner.com'
-const HS_CHAT_CONNECT =
-  'https://api-eu1.hubspot.com https://api.hubspot.com https://track-eu1.hubspot.com https://app-eu1.hubspot.com'
-const HS_CHAT_FRAME = 'https://app-eu1.hubspot.com'
-const HS_CHAT_IMG = 'https://forms.hsforms.com https://track-eu1.hubspot.com'
 
 function buildCsp(nonce: string): string {
   // Production: strikte Nonce-CSP. In Development braucht Next.js Hot-Reload
@@ -51,7 +43,6 @@ function buildCsp(nonce: string): string {
     `https://va.vercel-scripts.com`,
     // HubSpot Meetings Embed (für /termin)
     HUBSPOT_SCRIPT,
-    HS_CHAT_SCRIPT,
     isDev ? `'unsafe-eval'` : null,
   ]
     .filter(Boolean)
@@ -64,13 +55,13 @@ function buildCsp(nonce: string): string {
     // CSP3: erlaubt inline `style="..."`-Attribute (framer-motion, dynamische
     // Gradienten). `<style>`-Blöcke sind weiterhin nonce-pflichtig.
     `style-src-attr 'unsafe-inline'`,
-    `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com ${HUBSPOT_IMG} ${HS_CHAT_IMG}`,
+    `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com ${HUBSPOT_IMG}`,
     `font-src 'self'`,
     // connect-src: Stripe REST + Vercel Analytics / Speed Insights + HubSpot API
     // (XHR vom Meetings-Embed-Script).
-    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT} ${HS_CHAT_CONNECT}`,
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT}`,
     // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks) + HubSpot Meetings.
-    `frame-src https://js.stripe.com https://hooks.stripe.com ${HUBSPOT_FRAME} ${HS_CHAT_FRAME}`,
+    `frame-src https://js.stripe.com https://hooks.stripe.com ${HUBSPOT_FRAME}`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,

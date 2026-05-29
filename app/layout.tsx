@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
 import { headers } from 'next/headers'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
@@ -114,39 +113,6 @@ export default function RootLayout({
           nonce={nonce}
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
-        {/* HubSpot Chat-Widget — minimaler CSS-Override.
-            Wir sichern NUR `position: fixed` und einen sehr hohen z-index, damit
-            das Widget oberhalb aller anderen Layer floatet. ALLE Anchor-Werte
-            (top/left/bottom/right) UND alle Groessen ueberlaesst diese Datei
-            HubSpots eigener Runtime — sowohl der injected `<style>`-Block als
-            auch JS-gesetzte Inline-Styles fuer die Open-Animation gewinnen.
-            Hintergrund: ein `!important` auf top/left/bottom/right blockt
-            HubSpots Pixel-genaue Positionierung der inneren Children (Header,
-            Body, Footer) im Open-State und produziert auf Desktop ein
-            zerlegtes Layout (Footer-Input oben, X-Close mittig, Body leer).
-            Siehe Diagnose in PR-Body. */}
-        {process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID && (
-          <style
-            nonce={nonce}
-            dangerouslySetInnerHTML={{
-              __html: `
-                #hubspot-messages-iframe-container {
-                  /* position+z-index !important damit Container floating
-                     ueber allem ist. Anchor (bottom/right) NICHT !important —
-                     so kann HubSpots Open-State-JS die Werte ueberschreiben
-                     wenn es das Widget vergroessert. Beim Initial-Render
-                     greift dann unser Anchor. */
-                  position: fixed !important;
-                  z-index: 2147483000 !important;
-                  bottom: 20px;
-                  right: 20px;
-                  top: auto;
-                  left: auto;
-                }
-              `,
-            }}
-          />
-        )}
       </head>
       <body>
         {/* A11y: BFSG-Pflicht — sichtbarer Skip-Link bei Tastatur-Fokus.
@@ -158,17 +124,6 @@ export default function RootLayout({
           Zum Hauptinhalt springen
         </a>
         <Providers>{children}</Providers>
-
-        {/* HubSpot Live-Chat (Conversations) — nur rendern wenn Portal-ID
-            via Env gesetzt. Lazy-loaded mit strategy='afterInteractive'.
-            CSP-Domains in middleware.ts whitelisted (eu1-Region). */}
-        {process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID && (
-          <Script
-            id="hs-script-loader"
-            strategy="afterInteractive"
-            src={`https://js-eu1.hs-scripts.com/${process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID}.js`}
-          />
-        )}
       </body>
     </html>
   )

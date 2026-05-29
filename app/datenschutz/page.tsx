@@ -117,35 +117,37 @@ export default function DatenschutzPage() {
         Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am sicheren Betrieb).
       </p>
 
-      <h2>9a. HubSpot Live-Chat &amp; Terminbuchung</h2>
+      <h2>9a. HubSpot Terminbuchung &amp; CRM-Sync</h2>
       <p>
-        Auf candiq.de bieten wir einen <strong>Live-Chat zur Kontaktaufnahme</strong> sowie eine
-        Terminbuchung &uuml;ber das HubSpot Meetings-Widget an. Anbieter ist die HubSpot Ireland
-        Limited, 2nd Floor, 30 North Wall Quay, Dublin 1, D01 R0H8, Irland (im Folgenden
-        &bdquo;HubSpot&ldquo;), als europ&auml;ische Tochter der HubSpot, Inc. (USA).
+        Auf candiq.de bieten wir eine Terminbuchung &uuml;ber das HubSpot
+        Meetings-Widget an (Wrapper-Page <code>/termin</code>). Zus&auml;tzlich
+        synchronisieren wir Form-Submits (Pilot-Programm, Lead-Magnet-Anfragen)
+        mit dem HubSpot CRM, sodass unser Sales-Team antworten kann.
+        Anbieter ist die HubSpot Ireland Limited, 2nd Floor, 30 North Wall Quay,
+        Dublin 1, D01 R0H8, Irland (im Folgenden &bdquo;HubSpot&ldquo;), als
+        europ&auml;ische Tochter der HubSpot, Inc. (USA).
       </p>
       <p>
-        Beim Aufruf einer Seite mit aktivem Chat- oder Meetings-Widget &uuml;bertr&auml;gt Ihr
-        Browser folgende Daten an HubSpot: IP-Adresse, User-Agent, Spracheinstellung, aufgerufene
-        URL, Zeitstempel sowie ggf. Cookie-IDs zur Wiedererkennung w&auml;hrend der Sitzung.
-        Wenn Sie eine Nachricht im Chat senden oder ein Buchungs-Formular ausf&uuml;llen, werden
-        zus&auml;tzlich die von Ihnen eingegebenen Informationen (z.&nbsp;B. Name, E-Mail-Adresse,
-        Nachrichtentext) &uuml;bertragen und in unserem CRM gespeichert.
+        Beim Aufruf der Terminbuchungs-Seite oder bei Form-Submits werden
+        folgende Daten verarbeitet: IP-Adresse, User-Agent, Zeitstempel,
+        sowie die von Ihnen eingegebenen Form-Felder (z.&nbsp;B. Name,
+        E-Mail-Adresse, Firma, Nachricht).
       </p>
       <p>
-        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an
-        einer effizienten Kommunikation mit Interessenten und Kunden) sowie bei aktiver
-        Kontaktanfrage Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Ma&szlig;nahmen).
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes
+        Interesse an einer effizienten Kommunikation mit Interessenten) sowie
+        Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Ma&szlig;nahmen).
       </p>
       <p>
-        <strong>Drittland&uuml;bermittlung:</strong> Soweit personenbezogene Daten an HubSpot, Inc.
-        in die USA &uuml;bermittelt werden, erfolgt dies auf Grundlage von Standardvertragsklauseln
-        gem&auml;&szlig; Art. 46 Abs. 2 lit. c DSGVO. HubSpot, Inc. ist au&szlig;erdem unter dem
-        EU-U.S. Data Privacy Framework zertifiziert.
+        <strong>Drittland&uuml;bermittlung:</strong> Soweit personenbezogene Daten an
+        HubSpot, Inc. in die USA &uuml;bermittelt werden, erfolgt dies auf Grundlage
+        von Standardvertragsklauseln gem&auml;&szlig; Art. 46 Abs. 2 lit. c DSGVO.
+        HubSpot, Inc. ist au&szlig;erdem unter dem EU-U.S. Data Privacy Framework
+        zertifiziert.
       </p>
       <p>
-        <strong>Auftragsverarbeitung:</strong> Auf Basis eines Auftragsverarbeitungsvertrags (DPA)
-        nach Art. 28 DSGVO, abrufbar unter{' '}
+        <strong>Auftragsverarbeitung:</strong> Auf Basis eines
+        Auftragsverarbeitungsvertrags (DPA) nach Art. 28 DSGVO, abrufbar unter{' '}
         <a href="https://legal.hubspot.com/dpa" target="_blank" rel="noopener noreferrer">
           legal.hubspot.com/dpa
         </a>
@@ -156,10 +158,11 @@ export default function DatenschutzPage() {
         .
       </p>
       <p>
-        <strong>Speicherdauer:</strong> Chat-Verl&auml;ufe und Buchungsdaten werden f&uuml;r die
-        Dauer der Gesch&auml;ftsbeziehung sowie zur Erf&uuml;llung gesetzlicher
-        Aufbewahrungspflichten gespeichert. Sie k&ouml;nnen jederzeit per E-Mail an
-        hello@candiq.de der Verarbeitung widersprechen (Art. 21 DSGVO).
+        <strong>Speicherdauer:</strong> Form-Submits und Termin-Buchungen werden
+        f&uuml;r die Dauer der Gesch&auml;ftsbeziehung sowie zur Erf&uuml;llung
+        gesetzlicher Aufbewahrungspflichten gespeichert. Sie k&ouml;nnen jederzeit
+        per E-Mail an hello@candiq.de der Verarbeitung widersprechen
+        (Art. 21 DSGVO).
       </p>
 
       <h2>9b. Pilot-Programm Q3/2026 &mdash; Bewerbungs-Formular</h2>
