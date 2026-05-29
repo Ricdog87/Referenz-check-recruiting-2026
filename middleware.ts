@@ -76,8 +76,11 @@ function withNonceAndCsp(req: NextRequest): NextResponse {
 
   // Nonce in Request-Headern, damit Server Components ihn via `headers()`
   // lesen und an inline `<script>` / `<style>` weitergeben können.
+  // x-pathname erlaubt dem Root-Layout, locale-bewusst `<html lang>` zu setzen,
+  // ohne next-intl-Middleware aufsetzen zu müssen (Quelle des PR #62-500ers).
   const requestHeaders = new Headers(req.headers)
   requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set('x-pathname', req.nextUrl.pathname)
 
   const response = NextResponse.next({
     request: { headers: requestHeaders },
