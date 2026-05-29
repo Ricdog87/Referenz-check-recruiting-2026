@@ -31,7 +31,7 @@ export function CompliancePromiseEn() {
                   <ShieldCheck className="w-3.5 h-3.5" /> Our compliance promise
                 </div>
                 <h2 className="text-[clamp(28px,4vw,42px)] font-bold tracking-tighter mb-4 leading-[1.1]">
-                  Compliance isn't <br />
+                  Compliance isn&rsquo;t <br />
                   <span className="bg-gradient-to-r from-cyan-300 via-violet-300 to-brand-300 bg-clip-text text-transparent">
                     an add-on.
                   </span>

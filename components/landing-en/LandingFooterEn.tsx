@@ -56,7 +56,7 @@ export function LandingFooterEn() {
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted">
           <div>© 2026 RSG Recruiting Solutions group GmbH · All rights reserved.</div>
           <div className="hidden md:block text-[11px] text-text-muted">
-            Most pages are currently in German. We're rolling out English progressively.
+            Most pages are currently in German. We&rsquo;re rolling out English progressively.
           </div>
           <div className="flex items-center gap-4">
             <Link href="/" className="hover:text-text-primary transition-colors">Deutsch</Link>

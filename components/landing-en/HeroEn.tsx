@@ -60,7 +60,7 @@ export function HeroEn() {
             className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9"
           >
             ChatGPT writes every CV to match the job posting. <span className="font-semibold text-text-primary">candiq</span> verifies
-            what's actually true — references, employment history, responsibilities — before you waste another interview.
+            what&rsquo;s actually true — references, employment history, responsibilities — before you waste another interview.
             Structured report in under 48 hours.
           </motion.p>
 
