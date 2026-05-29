@@ -33,7 +33,6 @@ export function LandingNav() {
             height={32}
             className="h-8 w-auto"
           />
-          <span className="hidden 2xl:inline-block text-[10px] font-semibold uppercase tracking-widest text-brand-600 px-1.5 py-0.5 rounded-md bg-brand-50 border border-brand-100 ml-2 mr-3">Pro</span>
         </Link>
 
         {/* Desktop nav */}
