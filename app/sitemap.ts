@@ -5,11 +5,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://candiq.de'
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
   const pages: MetadataRoute.Sitemap = [
-    // hreflang-Alternates werden in app/[locale]/layout.tsx über die
-    // Metadata-API gesetzt (Next 14.0 Sitemap-Typ kennt noch keine
-    // `alternates`-Field — kommt erst ab Next 14.2).
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
-    { url: `${BASE_URL}/en`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/demo`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/preise`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/register`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
