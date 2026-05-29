@@ -3,6 +3,29 @@ import { headers } from 'next/headers'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
+import AIConciergeMount from '@/components/chat/AIConciergeMount'
+
+// Routes auf denen der Chat NICHT geladen wird (Auth + Dashboard).
+const PRIVATE_PREFIXES = [
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/dashboard',
+  '/candidates',
+  '/checks',
+  '/clients',
+  '/settings',
+  '/audit',
+  '/analytics',
+  '/addons',
+  '/integrations',
+  '/candidate/', // Demo-Candidate-Profil (interaktiv, kein Chat-Overlay)
+]
+
+function shouldShowConcierge(pathname: string): boolean {
+  return !PRIVATE_PREFIXES.some((p) => pathname.startsWith(p))
+}
 
 const inter = Inter({
   subsets: ['latin'],
@@ -134,6 +157,7 @@ export default function RootLayout({
           Zum Hauptinhalt springen
         </a>
         <Providers>{children}</Providers>
+        {shouldShowConcierge(pathname) ? <AIConciergeMount /> : null}
       </body>
     </html>
   )
