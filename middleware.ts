@@ -1,8 +1,6 @@
 import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import createIntlMiddleware from 'next-intl/middleware'
-import { routing } from './i18n/routing'
 
 /**
  * Auth-geschützte Pfade. Alle anderen Routen dürfen ohne Token besucht werden,
@@ -21,17 +19,6 @@ const PROTECTED_PREFIXES = [
   '/addons',
   '/report',
 ]
-
-/**
- * Pfade, die durch next-intl-Routing laufen (Locale-Detection + Rewrite).
- * Aktuell nur die Landing-Page-Familie. Weitere Marketing-Routen wandern
- * in PR 2+ unter `app/[locale]/` und werden hier ergänzt.
- */
-const I18N_ROUTES = new Set<string>(['/', '/de', '/en'])
-
-function isI18nRoute(pathname: string): boolean {
-  return I18N_ROUTES.has(pathname)
-}
 
 // HubSpot Meetings Embed (z. B. auf /termin) lädt Script + iframe von
 // dedizierten Subdomains; alle hier explizit, kein Wildcard.
@@ -83,39 +70,18 @@ function buildCsp(nonce: string): string {
   ].join('; ')
 }
 
-const intlMiddleware = createIntlMiddleware(routing)
-
-/**
- * Komponiert pro Request:
- *  1. CSP-Nonce + Header
- *  2. next-intl-Routing (Locale-Detection, Rewrite/Redirect) — nur fuer
- *     Pfade in I18N_ROUTES. Andere Pfade laufen normal weiter.
- *  3. Header-Forwarding (x-nonce, Locale, CSP) in den finalen Response.
- *
- * Wichtig: next-intl macht u.U. ein `redirect()` (z.B. wenn Sprache aus
- * Cookie/Header anderes will als URL). Den Redirect respektieren wir,
- * setzen aber trotzdem CSP-Header drauf.
- */
 function withNonceAndCsp(req: NextRequest): NextResponse {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
   const csp = buildCsp(nonce)
 
+  // Nonce in Request-Headern, damit Server Components ihn via `headers()`
+  // lesen und an inline `<script>` / `<style>` weitergeben können.
   const requestHeaders = new Headers(req.headers)
   requestHeaders.set('x-nonce', nonce)
 
-  // next-intl nur fuer i18n-Routen einschalten, sonst Pass-through.
-  const isI18n = isI18nRoute(req.nextUrl.pathname)
-  let response: NextResponse
-
-  if (isI18n) {
-    response = intlMiddleware(req) as NextResponse
-    // Wir muessen den Nonce in den vom intl-middleware erzeugten
-    // Forward-Headern setzen, damit Server Components ihn lesen.
-    response.headers.set('x-middleware-request-x-nonce', nonce)
-  } else {
-    response = NextResponse.next({ request: { headers: requestHeaders } })
-  }
-
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  })
   response.headers.set('Content-Security-Policy', csp)
   return response
 }

@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
 import { Inter, JetBrains_Mono } from 'next/font/google'
-import { getLocale } from 'next-intl/server'
 import './globals.css'
 import { Providers } from './providers'
 
@@ -99,18 +98,15 @@ const organizationJsonLd = {
   },
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const nonce = headers().get('x-nonce') ?? undefined
-  // Auf Nicht-i18n-Routen (z. B. /dashboard, /preise) hat next-intl noch keinen
-  // Locale-Context — wir fallen sicher auf 'de' zurück.
-  const locale = await getLocale().catch(() => 'de')
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="de" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <head>
         <script
           type="application/ld+json"
