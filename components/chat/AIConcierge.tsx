@@ -135,6 +135,25 @@ export function AIConcierge() {
           m.id === assistantMsg.id ? { ...m, streaming: false } : m,
         ),
       )
+
+      // Fire-and-forget Sales-Intent-Analyse. Ergebnis ist fuer den
+      // Visitor unsichtbar — bei Hot-Lead (Score >= 60) wird intern
+      // gealertet. Fehler schlucken: darf das Chat-UX nie blocken.
+      const intentPayload = [...history, { role: assistantMsg.role, content: acc }]
+        .map((m) => ({ role: m.role, content: m.content }))
+      try {
+        void fetch('/api/chat/intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: intentPayload,
+            currentPath: pathname,
+          }),
+          keepalive: true,
+        }).catch(() => {})
+      } catch {
+        // ignore — Best-Effort
+      }
     } catch (e: any) {
       setError(e?.message ?? (isEn ? 'Something went wrong.' : 'Etwas ist schiefgelaufen.'))
       // Failed assistant message wieder entfernen
