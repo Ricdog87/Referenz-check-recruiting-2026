@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, Zap, CalendarCheck } from 'lucide-react'
 import { BOOKING_URL } from '@/lib/site'
+import { LocaleSwitcher } from '@/components/landing-i18n/LocaleSwitcher'
 
 export function LandingNav() {
   const { scrollY } = useScroll()
@@ -47,6 +48,7 @@ export function LandingNav() {
         </div>
 
         <div className="hidden md:flex items-center gap-2">
+          <LocaleSwitcher />
           <Link href="/demo" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:text-brand-800 px-3 py-2 rounded-full transition-colors hover:bg-brand-50">
             <Zap className="w-3.5 h-3.5" />
             Live-Demo
