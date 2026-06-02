@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, Clock, FileText, Mail } from 'lucide-react'
 import { LEAD_MAGNETS } from '@/content/resources/data'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'Ressourcen für HR-Teams | candiq',
+export const metadata: Metadata = pageMeta({
+  title: 'Ressourcen für HR-Teams',
   description:
     'Kostenlose PDF-Ressourcen für DACH-Recruiting-Teams: strukturierter Interview-Leitfaden mit Scorecards, DSGVO-Checkliste mit Rechtsgrundlagen pro Verarbeitungsschritt.',
-}
+  path: '/resources',
+})
 
 export default function ResourcesPage() {
   return (

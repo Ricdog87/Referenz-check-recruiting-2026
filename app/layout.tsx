@@ -59,22 +59,14 @@ export const metadata: Metadata = {
   authors: [{ name: 'RSG Recruiting Solutions group GmbH' }],
   creator: 'candiq',
   publisher: 'RSG Recruiting Solutions group GmbH',
-  alternates: {
-    canonical: '/',
-    languages: {
-      de: '/',
-      en: '/en',
-      'x-default': '/',
-    },
-  },
+  // WICHTIG: KEIN globales `alternates.canonical` und KEIN globales
+  // `openGraph.url/title` hier — sonst erben alle Unterseiten das Canonical
+  // der Startseite und Google wertet sie als Duplikate. Jede Seite setzt ihr
+  // eigenes Canonical + OG (statisch via `metadata` oder via `generateMetadata`).
   openGraph: {
     type: 'website',
     locale: 'de_DE',
-    url: BASE_URL,
     siteName: 'candiq',
-    title: 'candiq — DSGVO-konforme Referenzprüfung für Recruiting',
-    description:
-      'Verifizierte Referenzen in unter 48 Stunden. DSGVO-konform, Server in Deutschland. Live-Demo ohne Anmeldung.',
   },
   twitter: {
     card: 'summary_large_image',

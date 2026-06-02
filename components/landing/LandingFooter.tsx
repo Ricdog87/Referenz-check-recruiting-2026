@@ -5,7 +5,7 @@ export function LandingFooter() {
   return (
     <footer className="border-t border-border bg-bg-secondary px-6 py-14">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-5 gap-10 mb-12">
+        <div className="grid md:grid-cols-6 gap-10 mb-12">
           {/* Brand col */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center mb-5" aria-label="candiq Startseite">
@@ -54,6 +54,17 @@ export function LandingFooter() {
               { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
               { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
               { label: 'Healthcare-Recruiting', href: '/branchen/healthcare-recruiting' },
+            ]}
+          />
+
+          <FooterCol
+            title="Referenzprüfung"
+            links={[
+              { label: 'Referenzprüfung (Leitfaden)', href: '/referenzpruefung' },
+              { label: 'Reference-Check DSGVO', href: '/reference-check-dsgvo' },
+              { label: 'Arbeitszeugnis prüfen', href: '/zeugnis-pruefen-lassen' },
+              { label: 'Lebenslauf verifizieren', href: '/lebenslauf-verifizieren' },
+              { label: 'candiq vs. Validato', href: '/vergleich/validato-alternative' },
             ]}
           />
 

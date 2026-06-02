@@ -14,8 +14,22 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const m = getLeadMagnet(params.slug)
-  if (!m) return { title: 'Ressource nicht gefunden | candiq' }
-  return m.metadata
+  if (!m) return { title: 'Ressource nicht gefunden', robots: { index: false, follow: true } }
+  const p = `/resources/${m.slug}`
+  const url = `https://candiq.de${p}`
+  const ogTitle = typeof m.metadata.title === 'string' ? `${m.metadata.title} | candiq` : 'candiq'
+  return {
+    ...m.metadata,
+    alternates: { canonical: p },
+    openGraph: {
+      type: 'article',
+      locale: 'de_DE',
+      siteName: 'candiq',
+      url,
+      title: ogTitle,
+      description: (m.metadata.description as string | undefined) ?? undefined,
+    },
+  }
 }
 
 export default function LeadMagnetPage({ params }: { params: { slug: string } }) {

@@ -2,13 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, CalendarCheck } from 'lucide-react'
 import { listVerticals } from './data'
+import { pageMeta } from '@/lib/seo'
 import { BOOKING_URL } from '@/lib/site'
 
-export const metadata: Metadata = {
-  title: 'Branchen-Lösungen | candiq',
+export const metadata: Metadata = pageMeta({
+  title: 'Branchen-Lösungen für Referenzprüfung',
   description:
     'candiq für Tech, Sales und Healthcare-Recruiting. Vertikal-spezifische Reference-Checks, Zeugnis-Verifizierung und strukturierte Interviews — DSGVO-konform, in 7 Tagen.',
-}
+  path: '/branchen',
+})
 
 export default function BranchenPage() {
   const verticals = listVerticals()
