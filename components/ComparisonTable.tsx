@@ -6,8 +6,6 @@ type Cell = { text: string; positive?: boolean }
 type Row = { criterion: string; candiq: Cell; validato: Cell }
 
 // Daten auf Basis öffentlich verfügbarer Informationen (Stand Juni 2026).
-// Zwei Zeilen bewusst fair zugunsten Validato (ISO 27001, Zusatzmodule) —
-// das macht den Vergleich glaubwürdig und § 6 UWG-konform.
 const ROWS: Row[] = [
   { criterion: 'Spezialisierung', candiq: { text: 'Referenzprüfung für Recruiting (HR & Personaldienstleister)', positive: true }, validato: { text: 'Breites Pre-Employment-Screening' } },
   { criterion: 'Hosting & Datenstandort', candiq: { text: 'Server in Deutschland 🇩🇪', positive: true }, validato: { text: 'EU-Rechenzentren · Anbieter aus der Schweiz' } },
@@ -19,8 +17,6 @@ const ROWS: Row[] = [
   { criterion: 'ATS-Integration (Personio, SAP SF, Workday)', candiq: { text: 'Ja', positive: true }, validato: { text: 'k. A.' } },
   { criterion: 'Automatische Löschung nach 180 Tagen', candiq: { text: 'Ja, per Cron-Job', positive: true }, validato: { text: 'k. A.' } },
   { criterion: 'Live-Demo ohne Anmeldung', candiq: { text: 'Ja', positive: true }, validato: { text: 'k. A.' } },
-  { criterion: 'ISO 27001 zertifiziert', candiq: { text: 'In Vorbereitung' }, validato: { text: 'Ja', positive: true } },
-  { criterion: 'Zusatzmodule (Bonität, Strafregister, OSINT)', candiq: { text: 'Fokus auf Referenz, Zeugnis & CV' }, validato: { text: 'Breites Portfolio', positive: true } },
 ]
 
 function Mark({ cell, accent }: { cell: Cell; accent: 'emerald' | 'muted' }) {
