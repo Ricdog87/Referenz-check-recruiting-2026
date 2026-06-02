@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { BOOKING_URL } from '@/lib/site'
+import { CookieSettingsButton } from '@/components/analytics/CookieSettingsButton'
 
 export function LandingFooter() {
   return (
@@ -85,6 +86,7 @@ export function LandingFooter() {
             PDL-Pakete befinden sich in Vorbereitung. Jetzt für frühen Zugang vormerken.
           </div>
           <div className="flex items-center gap-4">
+            <CookieSettingsButton />
             <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
             <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>
             <a href="mailto:hello@candiq.de" className="hover:text-text-primary transition-colors">hello@candiq.de</a>

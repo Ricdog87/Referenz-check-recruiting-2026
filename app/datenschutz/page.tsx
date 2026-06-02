@@ -102,19 +102,64 @@ export default function DatenschutzPage() {
         bestehen.
       </p>
 
-      <h2>9. Cookies, Tracking und Reichweitenanalyse</h2>
+      <h2>9. Cookies und technisch notwendige Speicherung</h2>
       <p>
-        Wir verwenden ausschließlich <strong>technisch notwendige Cookies</strong> (Session- und
-        CSRF-Cookies für Authentifizierung). Es findet <strong>kein Tracking, kein Marketing-Pixel,
-        keine Werbe- oder Profiling-Cookies, keine Reichweitenanalyse und kein A/B-Testing</strong>
-        statt. Wir setzen keine externen Analyse-, Tracking-, Heatmapping- oder Session-Replay-Dienste
-        ein.
+        Wir verwenden <strong>technisch notwendige Cookies</strong> (Session- und CSRF-Cookies für
+        Authentifizierung) sowie ein First-Party-Cookie <code>candiq_consent</code> zur Speicherung
+        Ihrer Einwilligungs-Entscheidung (Nachweis nach Art. 7 Abs. 1 DSGVO, Speicherdauer 180 Tage).
+        Diese Cookies sind ohne Einwilligung zulässig (§ 25 Abs. 2 Nr. 2 TTDSG).
       </p>
       <p>
         Hosting-bedingt protokolliert unser Hoster Vercel kurzlebige technische Logs (IP-Adresse,
         Zeitstempel, User-Agent, aufgerufene URL) zur Sicherstellung des Betriebs und zur Abwehr
         von Angriffen. Diese Logs werden nach spätestens 24 Stunden anonymisiert bzw. gelöscht.
         Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am sicheren Betrieb).
+      </p>
+
+      <h2>9b. Webanalyse mit Google Analytics 4</h2>
+      <p>
+        Auf candiq.de setzen wir <strong>Google Analytics 4 (GA4)</strong> ein, um anonymisiert zu
+        messen, wie unsere Seite genutzt wird (z.&nbsp;B. besuchte Seiten, Verweildauer,
+        Geräte-Typ). Anbieter ist die Google Ireland Ltd., Gordon House, Barrow Street, Dublin 4,
+        Irland (im Folgenden &bdquo;Google&ldquo;).
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) sowie
+        § 25 Abs. 1 TTDSG. GA4 wird ausschließlich geladen, wenn Sie über unser Consent-Banner
+        aktiv zugestimmt haben. Vor Ihrer Einwilligung werden keine Daten an Google übertragen
+        und keine Analyse-Cookies gesetzt.
+      </p>
+      <p>
+        <strong>Consent Mode v2:</strong> Wir nutzen den Google Consent Mode v2 mit Standard
+        &bdquo;denied&ldquo; für alle Storage-Kategorien. Erst bei Einwilligung setzen wir
+        <code>analytics_storage = granted</code>; Marketing-Storage bleibt deaktiviert (wir
+        führen keine Werbe-Kampagnen mit GA4-Daten).
+      </p>
+      <p>
+        <strong>Cookies & Speicherdauer:</strong> Bei aktiver Einwilligung setzt GA4 die Cookies
+        <code>_ga</code> (Speicherdauer 2 Jahre) und <code>_ga_*</code> (Speicherdauer 2 Jahre).
+        Die in GA4 gespeicherten Daten werden nach der von uns gewählten Aufbewahrungsfrist
+        (max. 14 Monate) automatisch gelöscht.
+      </p>
+      <p>
+        <strong>IP-Anonymisierung:</strong> GA4 verarbeitet IP-Adressen standardmäßig
+        anonymisiert; eine direkte Personenbeziehbarkeit ist ausgeschlossen.
+      </p>
+      <p>
+        <strong>Drittlandübermittlung:</strong> Google kann Daten an Google LLC in die USA
+        übermitteln. Grundlage ist der EU-US Data Privacy Framework (Angemessenheitsbeschluss
+        der EU-Kommission vom 10.07.2023) sowie ergänzend die EU-Standardvertragsklauseln nach
+        Art. 46 Abs. 2 lit. c DSGVO.
+      </p>
+      <p>
+        <strong>Widerruf:</strong> Sie können Ihre Einwilligung jederzeit über den Button
+        &bdquo;Cookie-Einstellungen&ldquo; im Footer widerrufen. Der Widerruf wirkt für die
+        Zukunft; bereits erhobene Daten bleiben davon unberührt.
+      </p>
+      <p>
+        <strong>Auftragsverarbeitung:</strong> Mit Google besteht ein Auftragsverarbeitungsvertrag
+        nach Art. 28 DSGVO (Google Ads Data Processing Terms). Weitere Informationen:
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"> policies.google.com/privacy</a>.
       </p>
 
       <h2>9a. HubSpot Terminbuchung &amp; CRM-Sync</h2>
