@@ -87,6 +87,17 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
   },
+  // Site-Verification für Search-Engine-Tooling. Tokens werden via Env-Vars
+  // gesetzt — fehlt eine Var, wird das jeweilige Meta-Tag einfach nicht
+  // gerendert. Verifikation läuft pro Suchmaschine via "Meta-Tag"-Methode.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    other: {
+      ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+        ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+        : {}),
+    },
+  },
 }
 
 export const viewport: Viewport = {
