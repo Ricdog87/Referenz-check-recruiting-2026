@@ -49,9 +49,9 @@ export function LandingFooter() {
           <FooterCol
             title="Für wen"
             links={[
-              { label: 'HR-Abteilungen', href: '/preise#hr' },
+              { label: 'HR-Abteilungen', href: '/fuer/hr-abteilungen' },
+              { label: 'Mittelstand 200+ MA', href: '/fuer/mittelstand' },
               { label: 'Personaldienstleister (bald verfügbar)', href: '/waitlist-agency' },
-              { label: 'Enterprise', href: '/preise#enterprise' },
               { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
               { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
               { label: 'Healthcare-Recruiting', href: '/branchen/healthcare-recruiting' },

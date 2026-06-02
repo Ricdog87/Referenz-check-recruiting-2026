@@ -35,6 +35,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/branchen/tech-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/branchen/sales-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/branchen/healthcare-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+
+    // Zielgruppen-Seiten
+    { url: `${BASE_URL}/fuer/hr-abteilungen`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${BASE_URL}/fuer/mittelstand`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${BASE_URL}/waitlist-agency`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
 
     // Ressourcen
