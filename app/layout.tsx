@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import AIConciergeMount from '@/components/chat/AIConciergeMount'
+import { ConsentManager } from '@/components/analytics/ConsentManager'
 
 // Routes auf denen der Chat NICHT geladen wird (Auth + Dashboard).
 const PRIVATE_PREFIXES = [
@@ -150,6 +151,9 @@ export default function RootLayout({
         </a>
         <Providers>{children}</Providers>
         {shouldShowConcierge(pathname) ? <AIConciergeMount /> : null}
+        {process.env.NEXT_PUBLIC_GA_ID ? (
+          <ConsentManager gaId={process.env.NEXT_PUBLIC_GA_ID} />
+        ) : null}
       </body>
     </html>
   )
