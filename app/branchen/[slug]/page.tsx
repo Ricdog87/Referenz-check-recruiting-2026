@@ -13,8 +13,22 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const v = getVertical(params.slug)
-  if (!v) return { title: 'Branche nicht gefunden | candiq' }
-  return v.metadata
+  if (!v) return { title: 'Branche nicht gefunden', robots: { index: false, follow: true } }
+  const path = `/branchen/${v.slug}`
+  const url = `https://candiq.de${path}`
+  const ogTitle = typeof v.metadata.title === 'string' ? `${v.metadata.title} | candiq` : 'candiq'
+  return {
+    ...v.metadata,
+    alternates: { canonical: path },
+    openGraph: {
+      type: 'website',
+      locale: 'de_DE',
+      siteName: 'candiq',
+      url,
+      title: ogTitle,
+      description: (v.metadata.description as string | undefined) ?? undefined,
+    },
+  }
 }
 
 export default function VerticalPage({ params }: { params: { slug: string } }) {
