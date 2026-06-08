@@ -161,7 +161,7 @@ export default function RootLayout({
           Zum Hauptinhalt springen
         </a>
         <Providers>{children}</Providers>
-        {shouldShowConcierge(pathname) ? <AIConciergeMount /> : null}
+        {false && shouldShowConcierge(pathname) ? <AIConciergeMount /> : null}
         {process.env.NEXT_PUBLIC_GA_ID ? (
           <ConsentManager gaId={process.env.NEXT_PUBLIC_GA_ID} />
         ) : null}
