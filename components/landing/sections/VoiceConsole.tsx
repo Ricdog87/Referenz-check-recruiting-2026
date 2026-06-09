@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useConversation } from '@elevenlabs/react'
+import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, PhoneOff, Loader2 } from 'lucide-react'
 
 const AGENT_ID = 'agent_9601ktktemgwfk3tey407mkkxnc5'
@@ -27,7 +27,7 @@ function Waveform({ active }: { active: boolean }) {
   )
 }
 
-export default function VoiceConsole() {
+function Console() {
   const [error, setError] = useState<string | null>(null)
   const [starting, setStarting] = useState(false)
   const conversation = useConversation({
@@ -44,7 +44,7 @@ export default function VoiceConsole() {
     setStarting(true)
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true })
-      await conversation.startSession({ agentId: AGENT_ID, connectionType: 'webrtc' })
+      conversation.startSession({ agentId: AGENT_ID, connectionType: 'webrtc' })
     } catch {
       setError('Mikrofon nicht freigegeben oder Verbindung fehlgeschlagen.')
     } finally {
@@ -52,12 +52,8 @@ export default function VoiceConsole() {
     }
   }, [conversation])
 
-  const stop = useCallback(async () => {
-    try {
-      await conversation.endSession()
-    } catch {
-      /* noop */
-    }
+  const stop = useCallback(() => {
+    conversation.endSession()
   }, [conversation])
 
   const statusLabel = isActive ? (isSpeaking ? 'KI SPRICHT' : 'HÖRT ZU') : isConnecting ? 'VERBINDE…' : 'BEREIT'
@@ -86,5 +82,13 @@ export default function VoiceConsole() {
       {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
       <p className="mt-4 text-xs text-slate-400">Kostenlos · ca. 2 Min · Mikrofon erforderlich · DSGVO · Server in der EU</p>
     </>
+  )
+}
+
+export default function VoiceConsole() {
+  return (
+    <ConversationProvider>
+      <Console />
+    </ConversationProvider>
   )
 }
