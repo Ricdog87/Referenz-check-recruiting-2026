@@ -6,7 +6,7 @@ import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
   Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag, ScrollText, X,
-  CreditCard,
+  CreditCard, ShieldCheck,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
 import { useMobileSidebar } from './MobileSidebarContext'
@@ -33,6 +33,7 @@ export function Sidebar() {
   const { data: session } = useSession()
   const { open, setOpen } = useMobileSidebar()
   const isAgency = session?.user?.accountType === 'RECRUITMENT_AGENCY'
+  const isReviewer = session?.user?.role === 'REVIEWER' || session?.user?.role === 'ADMIN'
 
   const nav = [
     ...NAV_BASE,
@@ -90,6 +91,12 @@ export function Sidebar() {
             <NavItem key={item.href} {...item} pathname={pathname} />
           ))}
         </NavSection>
+
+        {isReviewer && (
+          <NavSection label="Review">
+            <NavItem href="/reviewer/queue" label="Reviewer-Queue" icon={ShieldCheck} pathname={pathname} />
+          </NavSection>
+        )}
 
         <NavSection label="Konto">
           {NAV_INTEGRATIONS.map((item) => (
