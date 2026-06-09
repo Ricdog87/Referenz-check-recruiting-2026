@@ -18,6 +18,7 @@ const PROTECTED_PREFIXES = [
   '/audit',
   '/addons',
   '/report',
+  '/reviewer',
 ]
 
 // HubSpot Meetings Embed (z. B. auf /termin) lädt Script + iframe von

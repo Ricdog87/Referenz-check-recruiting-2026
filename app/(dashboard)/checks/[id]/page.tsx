@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import { CheckEditor } from './CheckEditor'
+import { HandoverToReviewerButton } from './HandoverToReviewerButton'
 import { Printer } from 'lucide-react'
 
 export default async function CheckDetailPage({ params }: { params: { id: string } }) {
@@ -29,6 +30,7 @@ export default async function CheckDetailPage({ params }: { params: { id: string
         subtitle={`${check.candidate.firstName} ${check.candidate.lastName} · ${check.candidate.position}`}
         action={
           <div className="flex gap-2">
+            <HandoverToReviewerButton checkId={check.id} status={check.status} />
             <Link href={`/report/check/${check.id}`} className="btn-secondary" target="_blank" rel="noopener">
               <Printer className="w-4 h-4" /> Report (PDF)
             </Link>
