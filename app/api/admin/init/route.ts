@@ -13,8 +13,12 @@ export const maxDuration = 30
  *   GET /api/admin/init?secret=YOUR_SECRET
  */
 export async function GET(req: NextRequest) {
-  const secret = req.nextUrl.searchParams.get('secret')
-  if (!process.env.INIT_SECRET || secret !== process.env.INIT_SECRET) {
+  const querySecret = req.nextUrl.searchParams.get('secret')
+  const headerSecret = req.headers.get('x-init-secret')
+  const bearerToken = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim()
+  const presentedSecret = headerSecret || bearerToken || querySecret
+
+  if (!process.env.INIT_SECRET || presentedSecret !== process.env.INIT_SECRET) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 

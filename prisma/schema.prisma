@@ -9,34 +9,53 @@ datasource db {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  email         String        @unique
-  name          String
-  company       String
-  password      String
-  role          String        @default("CLIENT")
+  id                   String               @id @default(cuid())
+  email                String               @unique
+  name                 String
+  company              String
+  password             String
+  role                 String               @default("CLIENT")
   // HR_DEPARTMENT (interne HR-Abteilung im Unternehmen) | RECRUITMENT_AGENCY (Personaldienstleister/Headhunter)
-  accountType   String        @default("HR_DEPARTMENT")
+  accountType          String               @default("HR_DEPARTMENT")
   // NONE | STARTER | PROFESSIONAL | BUSINESS | ENTERPRISE | AGENCY_BASIC | AGENCY_PRO | AGENCY_SCALE
-  plan          String        @default("STARTER")
+  plan                 String               @default("STARTER")
   // INACTIVE | ACTIVE | PAST_DUE | CANCELLED | INCOMPLETE | TRIALING
-  planStatus    String        @default("INACTIVE")
+  planStatus           String               @default("INACTIVE")
   // MONTHLY | YEARLY
-  billingInterval      String?   @default("MONTHLY")
-  stripeCustomerId     String?   @unique
-  stripeSubscriptionId String?   @unique
+  billingInterval      String?              @default("MONTHLY")
+  stripeCustomerId     String?              @unique
+  stripeSubscriptionId String?              @unique
   currentPeriodEnd     DateTime?
-  trialEndsAt   DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  candidates    Candidate[]
-  gdprConsents  GdprConsent[]
-  auditLogs     AuditLog[]
-  addonOrders   AddonOrder[]
-  resetTokens   PasswordResetToken[]
+  trialEndsAt          DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  candidates           Candidate[]
+  gdprConsents         GdprConsent[]
+  auditLogs            AuditLog[]
+  cvAnalysisReports    CvAnalysisReport[]
+  addonOrders          AddonOrder[]
+  resetTokens          PasswordResetToken[]
 }
 
 model Candidate {
+  id              String           @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String?
+  phone           String?
+  position        String
+  department      String?
+  notes           String?
+  status          String           @default("PENDING")
+  gdprConsent     Boolean          @default(false)
+  gdprConsentDate DateTime?
+  gdprConsentIp   String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents       Document[]
+  checks          ReferenceCheck[]
   id               String           @id @default(cuid())
   firstName        String
   lastName         String
@@ -126,14 +145,14 @@ model AuditLog {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String   @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
   expiresAt DateTime
   usedAt    DateTime?
   ip        String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId])
   @@index([expiresAt])
@@ -146,8 +165,8 @@ model AddonOrder {
   // SINGLE_CHECK | CHECK_PACK_5 | CHECK_PACK_10 | INTERVIEW | EXPRESS_24H | BULK_CV
   sku         String
   quantity    Int      @default(1)
-  unitPrice   Int      // in cents
-  totalAmount Int      // in cents
+  unitPrice   Int // in cents
+  totalAmount Int // in cents
   status      String   @default("CONFIRMED") // CONFIRMED | DELIVERED | CANCELED | REFUNDED
   notes       String?
   // Stripe-Checkout-Session-ID — Idempotency fuer Webhook-Replays.
@@ -159,6 +178,15 @@ model AddonOrder {
   @@index([userId])
 }
 
+model CvAnalysisReport {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report    Json
+  inputHash String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 // ─────────────────────────────────────────────────────────────────
 // Bewerber-Self-Service-Consent (DSGVO Art. 6 Abs. 1 lit. a + Art. 7)
 // Erlaubt dem Bewerber, granulare Einwilligung zu erteilen, CV
