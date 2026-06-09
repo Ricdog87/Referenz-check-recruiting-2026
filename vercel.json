@@ -3,6 +3,10 @@
         "framework": "nextjs",
         "functions": {
                   "app/api/upload/route.ts": { "maxDuration": 30 },
-                  "app/api/gdpr/export/route.ts": { "maxDuration": 30 }
-        }
+                  "app/api/gdpr/export/route.ts": { "maxDuration": 30 },
+                  "app/api/cron/cleanup/route.ts": { "maxDuration": 60 }
+        },
+        "crons": [
+                  { "path": "/api/cron/cleanup", "schedule": "0 3 * * *" }
+        ]
 }

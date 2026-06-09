@@ -10,38 +10,69 @@ interface WelcomeBarProps {
   fullName: string
   company: string
   planName: string
+  stats?: {
+    totalCandidates: number
+    pendingConsent: number
+    inReview: number
+    completed: number
+  }
 }
 
-const TIPS = [
+// Default-Tips (Fallback wenn keine stats vorhanden)
+const DEFAULT_TIPS = [
   {
-    title: 'Schon gewusst?',
-    text: 'candiq Interview ist jetzt verfügbar — strukturierte Kompetenz-Interviews mit Scorecard, ab €199 pro Kandidat.',
-    cta: 'Interview buchen',
-    href: '/addons',
-  },
-  {
-    title: 'Tipp',
-    text: 'Sie können bis zu 3 frühere Arbeitgeber pro Kandidat anlegen. Mehr Datenpunkte = aussagekräftigerer Report.',
+    title: 'Best Practice',
+    text: '2–3 Referenzgeber pro Position liefern den aussagekräftigsten Report. Der Bewerber nennt die Personen selbst im Self-Service-Portal.',
     cta: 'Kandidat anlegen',
     href: '/candidates/new',
   },
   {
-    title: 'Express',
-    text: 'Brauchen Sie eine Verifizierung in unter 24 h? Buchen Sie Express-Bearbeitung als Add-on (€29 Aufpreis).',
-    cta: 'Express aktivieren',
-    href: '/addons',
+    title: 'DSGVO-Sicher',
+    text: 'Alle Daten werden auf deutschen Servern gespeichert und nach Art. 32 DSGVO verschlüsselt. Audit-Trail dokumentiert jeden Zugriff.',
+    cta: 'Audit-Trail ansehen',
+    href: '/audit',
   },
   {
-    title: 'Compliance',
-    text: 'Alle Reports werden auf deutschen Servern gespeichert und nach DSGVO Art. 32 verschlüsselt — auditierbar auf Knopfdruck.',
-    cta: 'Audit-Trail ansehen',
-    href: '/settings',
+    title: 'Tipp',
+    text: 'Nach Abschluss können Sie den PDF-Report direkt mit Hiring Manager und Compliance teilen — inklusive Diskrepanz-Markierung.',
+    cta: 'Referenzprüfungen ansehen',
+    href: '/checks',
   },
 ]
 
-export function WelcomeBar({ firstName, fullName, company, planName }: WelcomeBarProps) {
+// Generiere persönliche Action-Tips basierend auf User-Daten
+function getPersonalizedTip(stats?: WelcomeBarProps['stats']) {
+  if (!stats || stats.totalCandidates === 0) {
+    return {
+      title: 'Erste Schritte',
+      text: 'Legen Sie Ihren ersten Kandidaten an. Der Bewerber bekommt eine sichere DSGVO-konforme Einladung per E-Mail und wickelt die Einwilligung selbst ab.',
+      cta: 'Ersten Kandidaten anlegen',
+      href: '/candidates/new',
+    }
+  }
+  if (stats.pendingConsent > 0) {
+    return {
+      title: 'Action erforderlich',
+      text: `${stats.pendingConsent} Bewerber warten auf Einwilligungs-Anfrage. Senden Sie die Anfrage mit einem Klick aus dem Kandidaten-Detail.`,
+      cta: 'Kandidaten ansehen',
+      href: '/candidates?status=PENDING',
+    }
+  }
+  if (stats.inReview > 0) {
+    return {
+      title: 'In Prüfung',
+      text: `${stats.inReview} Referenz-Checks sind aktuell aktiv. Unsere Reviewer kontaktieren die freigegebenen Referenzgeber typischerweise innerhalb von 48 Stunden.`,
+      cta: 'Prüfungen ansehen',
+      href: '/checks',
+    }
+  }
+  // Wenn alles ruhig: random default tip
+  return DEFAULT_TIPS[Math.floor(Math.random() * DEFAULT_TIPS.length)]
+}
+
+export function WelcomeBar({ firstName, fullName, company, planName, stats }: WelcomeBarProps) {
   const [greeting, setGreeting] = useState('Guten Tag')
-  const [tip, setTip] = useState(TIPS[0])
+  const tip = getPersonalizedTip(stats)
 
   useEffect(() => {
     const h = new Date().getHours()
@@ -49,9 +80,6 @@ export function WelcomeBar({ firstName, fullName, company, planName }: WelcomeBa
     else if (h < 14) setGreeting('Guten Mittag')
     else if (h < 18) setGreeting('Guten Tag')
     else setGreeting('Guten Abend')
-
-    // Pick a random tip on first paint, stable per session
-    setTip(TIPS[Math.floor(Math.random() * TIPS.length)])
   }, [])
 
   return (

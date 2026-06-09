@@ -22,6 +22,24 @@ const TOOLTIP_STYLE = {
 }
 
 export function ActivityAreaChart({ data }: { data: CheckTrend[] }) {
+  // Empty-State: Wenn alle Datenpunkte total=0 sind, zeige hilfreichen CTA
+  const isEmpty = data.every((d) => d.total === 0 && d.verified === 0 && d.discrepancy === 0)
+  if (isEmpty) {
+    return (
+      <div className="w-full h-72 flex flex-col items-center justify-center text-center px-6">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center text-brand-600 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <p className="text-sm font-semibold text-text-primary mb-1">Noch keine Aktivität</p>
+        <p className="text-xs text-text-secondary max-w-sm mb-3">
+          Sobald die ersten Referenzprüfungen abgeschlossen werden, sehen Sie hier Ihren Verlauf der letzten 14 Tage.
+        </p>
+        <a href="/candidates/new" className="text-xs font-semibold text-brand-700 hover:text-brand-800">
+          Ersten Kandidaten anlegen →
+        </a>
+      </div>
+    )
+  }
   return (
     <div className="w-full h-72">
       <ResponsiveContainer>

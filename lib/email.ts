@@ -176,3 +176,75 @@ export function checkCompletedEmail(opts: { name: string; candidateName: string;
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c))
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Bewerber-Einladung zum Self-Service-Consent-Portal
+// ─────────────────────────────────────────────────────────────────
+export function candidateConsentInviteEmail(opts: {
+  candidateFirstName: string
+  hiringCompany: string
+  position: string
+  portalUrl: string
+  expiresInDays: number
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Einwilligung zur Referenzprüfung</h1>
+    <p>Hallo ${escapeHtml(opts.candidateFirstName)},</p>
+    <p><strong>${escapeHtml(opts.hiringCompany)}</strong> möchte für Ihre Bewerbung als <strong>${escapeHtml(opts.position)}</strong> eine professionelle Referenzprüfung durchführen.</p>
+    <p>Bei candiq haben <strong>Sie die volle Kontrolle</strong>: Sie sehen vor jeder Prüfung, welche Daten verarbeitet werden, Sie nennen selbst die Referenzgeber, die kontaktiert werden dürfen, und Sie können Ihre Einwilligung jederzeit widerrufen.</p>
+    <p style="margin: 24px 0;"><a class="btn" href="${opts.portalUrl}">Einwilligungs-Portal öffnen</a></p>
+    <p>Der Link ist <strong>${opts.expiresInDays} Tage</strong> gültig und ausschließlich für Sie bestimmt.</p>
+    <p style="font-size: 13px; color: #475569; margin-top: 24px;"><strong>Datenschutz auf einen Blick:</strong></p>
+    <p style="font-size: 13px; color: #475569;">
+      • Rechtsgrundlage: Ihre Einwilligung gem. Art. 6 Abs. 1 lit. a DSGVO<br>
+      • Speicherdauer: max. 6 Monate nach Abschluss des Bewerbungsverfahrens<br>
+      • Server in Deutschland · Übertragung TLS-verschlüsselt<br>
+      • Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Widerruf jederzeit
+    </p>
+    <p style="font-size: 12px; color: #94a3b8;">Falls Sie sich nicht beworben haben oder die Anfrage nicht erkennen, können Sie diese E-Mail einfach ignorieren — es passiert dann nichts.</p>
+  `)
+  const text = `Einwilligung zur Referenzprüfung\n\nHallo ${opts.candidateFirstName},\n\n${opts.hiringCompany} möchte für Ihre Bewerbung als ${opts.position} eine Referenzprüfung durchführen.\n\nSie haben die volle Kontrolle: Sie nennen selbst die Referenzgeber und können jederzeit widerrufen.\n\nPortal öffnen (${opts.expiresInDays} Tage gültig):\n${opts.portalUrl}\n\nRechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO · Server in Deutschland · Auto-Löschung nach 6 Monaten\n\nFalls Sie sich nicht beworben haben, ignorieren Sie diese E-Mail.`
+  return { subject: `Einwilligung zur Referenzprüfung — ${opts.hiringCompany}`, html, text }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// HR-Notification: Bewerber hat Einwilligung erteilt
+// ─────────────────────────────────────────────────────────────────
+export function consentAcceptedNotifyHrEmail(opts: {
+  hrFirstName: string
+  candidateName: string
+  position: string
+  refereesCount: number
+  candidateUrl: string
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Einwilligung erhalten ✓</h1>
+    <p>Hallo ${escapeHtml(opts.hrFirstName)},</p>
+    <p><strong>${escapeHtml(opts.candidateName)}</strong> (${escapeHtml(opts.position)}) hat die Einwilligung zur Referenzprüfung erteilt und <strong>${opts.refereesCount} Referenzgeber</strong> freigegeben.</p>
+    <p>Sie können jetzt die Prüfung starten — die Reviewer kontaktieren ausschließlich die vom Bewerber genannten Personen.</p>
+    <p style="margin: 24px 0;"><a class="btn" href="${opts.candidateUrl}">Kandidat öffnen</a></p>
+    <p style="font-size: 12px; color: #94a3b8;">Audit-Trail dokumentiert: Zeitpunkt, IP, User-Agent und akzeptierte Datenschutzversion.</p>
+  `)
+  const text = `Einwilligung erhalten ✓\n\n${opts.candidateName} (${opts.position}) hat eingewilligt und ${opts.refereesCount} Referenzgeber freigegeben.\n\nJetzt prüfung starten: ${opts.candidateUrl}`
+  return { subject: `candiq — ${opts.candidateName}: Einwilligung erteilt (${opts.refereesCount} Referenzen)`, html, text }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// HR-Notification: Bewerber hat Einwilligung widerrufen
+// ─────────────────────────────────────────────────────────────────
+export function consentRevokedNotifyHrEmail(opts: {
+  hrFirstName: string
+  candidateName: string
+  position: string
+  candidateUrl: string
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>⚠️ Einwilligung widerrufen</h1>
+    <p>Hallo ${escapeHtml(opts.hrFirstName)},</p>
+    <p><strong>${escapeHtml(opts.candidateName)}</strong> (${escapeHtml(opts.position)}) hat die zuvor erteilte Einwilligung zur Referenzprüfung widerrufen (Art. 7 Abs. 3 DSGVO).</p>
+    <p>Alle offenen Referenzprüfungen wurden automatisch gestoppt. Bitte informieren Sie das Recruiting-Team.</p>
+    <p style="margin: 24px 0;"><a class="btn" href="${opts.candidateUrl}">Kandidat öffnen</a></p>
+  `)
+  const text = `Einwilligung widerrufen — ${opts.candidateName} (${opts.position})\n\nAlle offenen Prüfungen wurden gestoppt.\n\n${opts.candidateUrl}`
+  return { subject: `candiq — ${opts.candidateName}: Einwilligung widerrufen`, html, text }
+}

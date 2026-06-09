@@ -31,8 +31,10 @@ export function formatFileSize(bytes: number): string {
 
 export const CANDIDATE_STATUS = {
   PENDING: { label: 'Ausstehend', color: 'bg-slate-100 text-slate-700 border border-slate-200' },
+  CONSENT_GIVEN: { label: 'Einwilligung erteilt', color: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
   IN_REVIEW: { label: 'In Prüfung', color: 'bg-brand-50 text-brand-700 border border-brand-200' },
   COMPLETED: { label: 'Abgeschlossen', color: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  CONSENT_REVOKED: { label: 'Einwilligung widerrufen', color: 'bg-rose-50 text-rose-700 border border-rose-200' },
   REJECTED: { label: 'Abgelehnt', color: 'bg-rose-50 text-rose-700 border border-rose-200' },
 } as const
 
@@ -40,6 +42,7 @@ export const CHECK_STATUS = {
   OPEN: { label: 'Offen', color: 'bg-slate-100 text-slate-700 border border-slate-200' },
   IN_PROGRESS: { label: 'In Bearbeitung', color: 'bg-amber-50 text-amber-700 border border-amber-200' },
   COMPLETED: { label: 'Abgeschlossen', color: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+  CANCELLED: { label: 'Abgebrochen', color: 'bg-slate-100 text-slate-600 border border-slate-200' },
   FAILED: { label: 'Fehlgeschlagen', color: 'bg-rose-50 text-rose-700 border border-rose-200' },
 } as const
 

@@ -27,6 +27,7 @@ const HUBSPOT_FRAME = 'https://meetings-eu1.hubspot.com'
 const HUBSPOT_CONNECT = 'https://forms.hubspot.com https://meetings-eu1.hubspot.com'
 const HUBSPOT_IMG = 'https://*.hubspotusercontent-eu1.net'
 
+
 function buildCsp(nonce: string): string {
   // Production: strikte Nonce-CSP. In Development braucht Next.js Hot-Reload
   // eval(), darum dort 'unsafe-eval' zulassen.
@@ -50,7 +51,7 @@ function buildCsp(nonce: string): string {
   return [
     `default-src 'self'`,
     `script-src ${scriptSrc}`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    `style-src 'self' 'nonce-${nonce}' 'unsafe-inline'`,
     // CSP3: erlaubt inline `style="..."`-Attribute (framer-motion, dynamische
     // Gradienten). `<style>`-Blöcke sind weiterhin nonce-pflichtig.
     `style-src-attr 'unsafe-inline'`,
@@ -58,9 +59,11 @@ function buildCsp(nonce: string): string {
     `font-src 'self'`,
     // connect-src: Stripe REST + Vercel Analytics / Speed Insights + HubSpot API
     // (XHR vom Meetings-Embed-Script).
-    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT}`,
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT} https://api.elevenlabs.io wss://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.us.elevenlabs.io https://*.livekit.cloud wss://*.livekit.cloud https://storage.googleapis.com`,
     // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks) + HubSpot Meetings.
     `frame-src https://js.stripe.com https://hooks.stripe.com ${HUBSPOT_FRAME}`,
+    `media-src 'self' blob: data: https://storage.googleapis.com`,
+    `worker-src 'self' blob:`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,
@@ -75,8 +78,11 @@ function withNonceAndCsp(req: NextRequest): NextResponse {
 
   // Nonce in Request-Headern, damit Server Components ihn via `headers()`
   // lesen und an inline `<script>` / `<style>` weitergeben können.
+  // x-pathname erlaubt dem Root-Layout, locale-bewusst `<html lang>` zu setzen,
+  // ohne next-intl-Middleware aufsetzen zu müssen (Quelle des PR #62-500ers).
   const requestHeaders = new Headers(req.headers)
   requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set('x-pathname', req.nextUrl.pathname)
 
   const response = NextResponse.next({
     request: { headers: requestHeaders },

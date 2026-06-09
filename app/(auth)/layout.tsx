@@ -1,4 +1,10 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
+
+// Auth-Seiten (Login, Register, Passwort-Reset) gehören nicht in den Index.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -26,11 +32,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </Link>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4 pb-16 relative z-10">
+      <main id="main" className="flex-1 flex items-center justify-center px-4 pb-16 relative z-10">
         <div className="w-full max-w-[440px]">
           {children}
         </div>
-      </div>
+      </main>
     </div>
   )
 }

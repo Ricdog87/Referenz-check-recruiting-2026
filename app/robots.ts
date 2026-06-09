@@ -7,8 +7,13 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/preise', '/demo', '/login', '/register', '/waitlist-agency'],
-        disallow: ['/api/', '/dashboard', '/candidates', '/checks', '/analytics', '/settings', '/integrations', '/clients', '/addons'],
+        allow: [
+          '/', '/preise', '/demo', '/waitlist-agency', '/branchen', '/resources',
+          '/referenzpruefung', '/reference-check-dsgvo', '/zeugnis-pruefen-lassen',
+          '/lebenslauf-verifizieren', '/pre-employment-screening', '/background-check-dsgvo',
+          '/vergleich', '/fuer',
+        ],
+        disallow: ['/api/', '/dashboard', '/candidates', '/checks', '/analytics', '/settings', '/integrations', '/clients', '/addons', '/login', '/register', '/forgot-password', '/reset-password'],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,

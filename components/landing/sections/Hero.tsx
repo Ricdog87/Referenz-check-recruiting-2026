@@ -42,7 +42,7 @@ export function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600" />
             </span>
-            <span className="text-text-primary">Für HR-Teams · DSGVO-konform · Server in Deutschland</span>
+            <span className="text-text-primary">Die menschliche Vertrauensschicht für Hiring · DSGVO-konform · Made in Germany</span>
           </motion.div>
 
           {/* Headline */}
@@ -52,9 +52,9 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-[clamp(40px,6.5vw,72px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary"
           >
-            <span className="block">Bewerber, die auf dem Papier</span>
-            <span className="block">perfekt aussehen —</span>
-            <span className="block"><span className="text-gradient-brand">aber sind sie es auch?</span></span>
+            <span className="block">Die menschliche</span>
+            <span className="block"><span className="text-gradient-brand">Vertrauensschicht</span></span>
+            <span className="block">für Hiring im KI-Zeitalter.</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -64,9 +64,9 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9"
           >
-            ChatGPT schreibt jeden Lebenslauf passend zur Stelle. <span className="font-semibold text-text-primary">candiq</span> verifiziert,
-            was wirklich stimmt — Referenzen, Stationen, Tätigkeiten — bevor Sie Ihr nächstes Interview verschwenden.
-            Strukturierter Report in unter 48 Stunden.
+            Während die Branche mit KI gegen KI-Betrug kämpft, baut <span className="font-semibold text-text-primary">candiq</span> die menschliche
+            Vertrauensschicht, zu der das Hiring gerade zurückkehrt. <span className="font-semibold text-text-primary">KI fürs Tempo, geschulte Reviewer für den Beweis</span> —
+            produktisiert, DSGVO-konform, Audit-Report in unter 48 Stunden.
           </motion.p>
 
           {/* CTAs */}
@@ -107,7 +107,7 @@ export function Hero() {
             {[
               { icon: Clock3, k: 'Unter 48 h', v: 'Vom Auftrag bis zum Report' },
               { icon: FileCheck2, k: 'Strukturierter Report', v: 'Verifiziert · Diskrepanz · Notizen' },
-              { icon: BadgeCheck, k: 'Echte Telefonate', v: 'Geschulte Reviewer, keine Bots' },
+              { icon: BadgeCheck, k: 'Verifiziert von Menschen', v: 'Keine Bot-Anrufe bei Ihren Referenzgebern' },
             ].map(({ icon: Icon, k, v }) => (
               <div key={k} className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center flex-shrink-0">

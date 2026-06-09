@@ -48,9 +48,9 @@ export default function DatenschutzPage() {
       <h2>5. Datenspeicherung & Hosting</h2>
       <p>
         Personenbezogene Daten werden in Rechenzentren innerhalb der Europäischen Union, vorrangig in
-        Deutschland, verarbeitet. Eine Übermittlung in Drittländer findet nicht statt; Ausnahme sind die
-        unter „Reichweitenanalyse&ldquo; genannten Vercel-Dienste, die auf Basis der EU-Standardvertragsklauseln
-        eingebunden sind.
+        Deutschland, verarbeitet. Eine Übermittlung personenbezogener Daten in Drittländer findet
+        ausschließlich im Rahmen der Zahlungsabwicklung über Stripe statt (siehe Punkt 8) und beruht
+        auf den EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO.
       </p>
 
       <h2>6. Verschlüsselung</h2>
@@ -102,33 +102,180 @@ export default function DatenschutzPage() {
         bestehen.
       </p>
 
-      <h2>9. Cookies</h2>
+      <h2>9. Cookies und technisch notwendige Speicherung</h2>
       <p>
-        Wir verwenden ausschließlich technisch notwendige Cookies (Session-Cookie für Authentifizierung).
-        Für die Reichweitenanalyse setzen wir Vercel Web Analytics ein — cookielos und auf Basis
-        von Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
-        Reichweitenanalyse). Es werden keine Marketing-Pixel und keine Tracking-Cookies Dritter gesetzt.
+        Wir verwenden <strong>technisch notwendige Cookies</strong> (Session- und CSRF-Cookies für
+        Authentifizierung) sowie ein First-Party-Cookie <code>candiq_consent</code> zur Speicherung
+        Ihrer Einwilligungs-Entscheidung (Nachweis nach Art. 7 Abs. 1 DSGVO, Speicherdauer 180 Tage).
+        Diese Cookies sind ohne Einwilligung zulässig (§ 25 Abs. 2 Nr. 2 TTDSG).
+      </p>
+      <p>
+        Hosting-bedingt protokolliert unser Hoster Vercel kurzlebige technische Logs (IP-Adresse,
+        Zeitstempel, User-Agent, aufgerufene URL) zur Sicherstellung des Betriebs und zur Abwehr
+        von Angriffen. Diese Logs werden nach spätestens 24 Stunden anonymisiert bzw. gelöscht.
+        Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am sicheren Betrieb).
       </p>
 
-      <h2>10. Reichweitenanalyse (Vercel Web Analytics &amp; Speed Insights)</h2>
+      <h2>9b. Webanalyse mit Google Analytics 4</h2>
       <p>
-        Wir nutzen Vercel Web Analytics und Vercel Speed Insights zur Messung der
-        Reichweite und Performance unserer Website. Es werden keine Cookies gesetzt
-        und keine personenbezogenen Daten dauerhaft gespeichert. IP-Adressen werden
-        vor der Verarbeitung pseudonymisiert (gehasht). Rechtsgrundlage ist Art. 6
-        Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer datenschutzfreundlichen
-        Reichweitenanalyse). Anbieter: Vercel Inc., 340 S Lemon Ave #4133, Walnut,
-        CA 91789, USA. Verarbeitung gemäß Standardvertragsklauseln.
+        Auf candiq.de setzen wir <strong>Google Analytics 4 (GA4)</strong> ein, um anonymisiert zu
+        messen, wie unsere Seite genutzt wird (z.&nbsp;B. besuchte Seiten, Verweildauer,
+        Geräte-Typ). Anbieter ist die Google Ireland Ltd., Gordon House, Barrow Street, Dublin 4,
+        Irland (im Folgenden &bdquo;Google&ldquo;).
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) sowie
+        § 25 Abs. 1 TTDSG. GA4 wird ausschließlich geladen, wenn Sie über unser Consent-Banner
+        aktiv zugestimmt haben. Vor Ihrer Einwilligung werden keine Daten an Google übertragen
+        und keine Analyse-Cookies gesetzt.
+      </p>
+      <p>
+        <strong>Consent Mode v2:</strong> Wir nutzen den Google Consent Mode v2 mit Standard
+        &bdquo;denied&ldquo; für alle Storage-Kategorien. Erst bei Einwilligung setzen wir
+        <code>analytics_storage = granted</code>; Marketing-Storage bleibt deaktiviert (wir
+        führen keine Werbe-Kampagnen mit GA4-Daten).
+      </p>
+      <p>
+        <strong>Cookies & Speicherdauer:</strong> Bei aktiver Einwilligung setzt GA4 die Cookies
+        <code>_ga</code> (Speicherdauer 2 Jahre) und <code>_ga_*</code> (Speicherdauer 2 Jahre).
+        Die in GA4 gespeicherten Daten werden nach der von uns gewählten Aufbewahrungsfrist
+        (max. 14 Monate) automatisch gelöscht.
+      </p>
+      <p>
+        <strong>IP-Anonymisierung:</strong> GA4 verarbeitet IP-Adressen standardmäßig
+        anonymisiert; eine direkte Personenbeziehbarkeit ist ausgeschlossen.
+      </p>
+      <p>
+        <strong>Drittlandübermittlung:</strong> Google kann Daten an Google LLC in die USA
+        übermitteln. Grundlage ist der EU-US Data Privacy Framework (Angemessenheitsbeschluss
+        der EU-Kommission vom 10.07.2023) sowie ergänzend die EU-Standardvertragsklauseln nach
+        Art. 46 Abs. 2 lit. c DSGVO.
+      </p>
+      <p>
+        <strong>Widerruf:</strong> Sie können Ihre Einwilligung jederzeit über den Button
+        &bdquo;Cookie-Einstellungen&ldquo; im Footer widerrufen. Der Widerruf wirkt für die
+        Zukunft; bereits erhobene Daten bleiben davon unberührt.
+      </p>
+      <p>
+        <strong>Auftragsverarbeitung:</strong> Mit Google besteht ein Auftragsverarbeitungsvertrag
+        nach Art. 28 DSGVO (Google Ads Data Processing Terms). Weitere Informationen:
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer"> policies.google.com/privacy</a>.
       </p>
 
-      <h2>11. Aufbewahrungsfristen</h2>
+      <h2>9a. HubSpot Terminbuchung &amp; CRM-Sync</h2>
+      <p>
+        Auf candiq.de bieten wir eine Terminbuchung &uuml;ber das HubSpot
+        Meetings-Widget an (Wrapper-Page <code>/termin</code>). Zus&auml;tzlich
+        synchronisieren wir Form-Submits (Pilot-Programm, Lead-Magnet-Anfragen)
+        mit dem HubSpot CRM, sodass unser Sales-Team antworten kann.
+        Anbieter ist die HubSpot Ireland Limited, 2nd Floor, 30 North Wall Quay,
+        Dublin 1, D01 R0H8, Irland (im Folgenden &bdquo;HubSpot&ldquo;), als
+        europ&auml;ische Tochter der HubSpot, Inc. (USA).
+      </p>
+      <p>
+        Beim Aufruf der Terminbuchungs-Seite oder bei Form-Submits werden
+        folgende Daten verarbeitet: IP-Adresse, User-Agent, Zeitstempel,
+        sowie die von Ihnen eingegebenen Form-Felder (z.&nbsp;B. Name,
+        E-Mail-Adresse, Firma, Nachricht).
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (berechtigtes
+        Interesse an einer effizienten Kommunikation mit Interessenten) sowie
+        Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Ma&szlig;nahmen).
+      </p>
+      <p>
+        <strong>Drittland&uuml;bermittlung:</strong> Soweit personenbezogene Daten an
+        HubSpot, Inc. in die USA &uuml;bermittelt werden, erfolgt dies auf Grundlage
+        von Standardvertragsklauseln gem&auml;&szlig; Art. 46 Abs. 2 lit. c DSGVO.
+        HubSpot, Inc. ist au&szlig;erdem unter dem EU-U.S. Data Privacy Framework
+        zertifiziert.
+      </p>
+      <p>
+        <strong>Auftragsverarbeitung:</strong> Auf Basis eines
+        Auftragsverarbeitungsvertrags (DPA) nach Art. 28 DSGVO, abrufbar unter{' '}
+        <a href="https://legal.hubspot.com/dpa" target="_blank" rel="noopener noreferrer">
+          legal.hubspot.com/dpa
+        </a>
+        . Datenschutzerkl&auml;rung von HubSpot:{' '}
+        <a href="https://legal.hubspot.com/de/privacy-policy" target="_blank" rel="noopener noreferrer">
+          legal.hubspot.com/de/privacy-policy
+        </a>
+        .
+      </p>
+      <p>
+        <strong>Speicherdauer:</strong> Form-Submits und Termin-Buchungen werden
+        f&uuml;r die Dauer der Gesch&auml;ftsbeziehung sowie zur Erf&uuml;llung
+        gesetzlicher Aufbewahrungspflichten gespeichert. Sie k&ouml;nnen jederzeit
+        per E-Mail an hello@candiq.de der Verarbeitung widersprechen
+        (Art. 21 DSGVO).
+      </p>
+
+      <h2>9b. Pilot-Programm Q3/2026 &mdash; Bewerbungs-Formular</h2>
+      <p>
+        Auf candiq.de bieten wir Interessenten die M&ouml;glichkeit, sich f&uuml;r unser
+        zeitlich begrenztes Pilot-Programm Q3/2026 zu bewerben. Erhoben werden dabei:
+        Firmenname, Vor- und Nachname, gesch&auml;ftliche E-Mail-Adresse und die geplante
+        Anzahl an Hires pro Jahr. Zus&auml;tzlich speichern wir Zeitstempel, IP-Adresse
+        und User-Agent zur Missbrauchspr&auml;vention.
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung) f&uuml;r
+        die Bearbeitung der Pilot-Bewerbung sowie Art. 6 Abs. 1 lit. b DSGVO
+        (vorvertragliche Ma&szlig;nahmen).
+      </p>
+      <p>
+        <strong>Speicherdauer:</strong> Bewerbungen werden bis zum Ende des Pilot-Programms
+        (max. 12 Monate Laufzeit + 24 Monate Nachweisfrist nach Art. 7 Abs. 1 DSGVO)
+        gespeichert. Bewerbungen, die nicht zu einer Pilot-Teilnahme f&uuml;hren, werden
+        sp&auml;testens nach 6 Monaten gel&ouml;scht. Sie k&ouml;nnen Ihre Einwilligung jederzeit
+        per E-Mail an hello@candiq.de widerrufen.
+      </p>
+      <p>
+        <strong>Anonymisierte Case-Study:</strong> Pilot-Teilnehmer verpflichten sich
+        zu einer anonymisierten Case-Study nach 90 Tagen. Diese erfolgt ohne Klarnamen,
+        ohne Firmenlogo und nur mit Ihrer ausdr&uuml;cklichen, schriftlichen Freigabe
+        vor Ver&ouml;ffentlichung.
+      </p>
+
+      <h2>9c. Lead-Magnet-Anfragen</h2>
+      <p>
+        Auf candiq.de bieten wir kostenlose Praxis-Guides (Lead-Magnets) zum Download.
+        Vor der Anzeige werden Vorname und gesch&auml;ftliche E-Mail-Adresse erhoben,
+        optional auch Firmenname. Zus&auml;tzlich speichern wir Zeitstempel, IP-Adresse
+        und User-Agent zur Missbrauchspr&auml;vention.
+      </p>
+      <p>
+        <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)
+        f&uuml;r die Zusendung des Inhalts.
+      </p>
+      <p>
+        <strong>Newsletter (optional):</strong> Falls Sie das Newsletter-Kontrollk&auml;stchen
+        aktivieren, senden wir eine separate Best&auml;tigungs-E-Mail
+        (<strong>Double-Opt-In</strong>). Erst nach Klick auf den Best&auml;tigungs-Link
+        werden Sie zum Newsletter hinzugef&uuml;gt. Ohne diesen Klick erfolgt keine
+        Newsletter-Verarbeitung. Abmeldung jederzeit &uuml;ber den Link in jeder
+        Newsletter-E-Mail.
+      </p>
+      <p>
+        <strong>Speicherdauer:</strong> Lead-Magnet-Anfragen werden 24 Monate zur
+        Nachweis-Pflicht (Art. 7 Abs. 1 DSGVO) gespeichert und anschlie&szlig;end
+        gel&ouml;scht. Newsletter-Abonnenten bleiben gespeichert bis zur Abmeldung.
+      </p>
+
+      <h2>10. Aufbewahrungsfristen</h2>
       <p>
         Personenbezogene Daten werden gelöscht, sobald sie für den Verarbeitungszweck nicht mehr
         erforderlich sind. Audit-Logs werden für 24 Monate aufbewahrt (Art. 32 DSGVO Sicherheits-Anforderung).
       </p>
+      <p>
+        <strong>Automatische Löschung nach 180 Tagen:</strong> Bewerber- und Referenzprüfungs-Daten,
+        deren Verfahren abgeschlossen, abgelehnt oder vom Bewerber widerrufen wurde, werden
+        spätestens 180 Tage nach Verfahrensende automatisch gelöscht. Die Löschung läuft als
+        täglicher Cron-Job um <strong>03:00 UTC</strong> und wird im Audit-Log protokolliert.
+      </p>
 
-      <h2>12. Stand</h2>
-      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: Mai 2026.</p>
+      <h2>11. Stand</h2>
+      <p>Diese Datenschutzerklärung wurde zuletzt aktualisiert: 28. Mai 2026.</p>
     </LegalShell>
   )
 }

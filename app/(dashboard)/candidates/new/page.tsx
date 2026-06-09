@@ -16,7 +16,7 @@ export default function NewCandidatePage() {
     department: '',
     notes: '',
   })
-  const [gdprConsent, setGdprConsent] = useState(false)
+  // gdprConsent wird durch Bewerber im Self-Service-Portal erteilt — siehe ConsentToken-Flow
   const [files, setFiles] = useState<File[]>([])
   const [error, setError] = useState('')
   const [fileError, setFileError] = useState('')
@@ -62,17 +62,13 @@ export default function NewCandidatePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!gdprConsent) {
-      setError('Bitte bestätigen Sie die DSGVO-Einwilligung des Kandidaten.')
-      return
-    }
     setError('')
     setLoading(true)
 
     const res = await fetch('/api/candidates', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, gdprConsent }),
+      body: JSON.stringify(form),
     })
 
     const data = await res.json().catch(() => ({}))
@@ -179,28 +175,32 @@ export default function NewCandidatePage() {
             </div>
           </div>
 
-          {/* File upload */}
-          <div className="card-md space-y-4">
-            <h2 className="section-title">Dokumente</h2>
+          {/* File upload (optional, intern) */}
+          <div className="card-md space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="section-title">Optionale interne Dokumente</h2>
+                <p className="text-xs text-text-secondary mt-1">
+                  Z.B. ATS-Export, Bewerbungsanschreiben, interne Notizen. Den <strong>Lebenslauf lädt der Bewerber selbst</strong> über das DSGVO-konforme Einwilligungs-Portal hoch.
+                </p>
+              </div>
+            </div>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
               onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files) }}
-              className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all ${
-                dragOver ? 'border-brand-500 bg-brand-50/50' : 'border-border hover:border-brand-300 bg-bg-secondary/50'
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-all ${
+                dragOver ? 'border-brand-500 bg-brand-50/50' : 'border-border hover:border-brand-300 bg-bg-secondary/30'
               }`}
             >
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white mx-auto mb-3 shadow-card">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <p className="text-sm text-text-secondary mb-2">
-                CV, Zeugnisse und weitere Unterlagen hier ablegen
+              <p className="text-xs text-text-muted mb-2">
+                Drag & Drop ODER
               </p>
-              <p className="text-xs text-text-muted mb-4">PDF, DOC, DOCX, JPG, PNG · Max. 4 MB</p>
-              <label className="btn-secondary cursor-pointer text-xs py-2">
+              <label className="btn-secondary cursor-pointer text-xs py-1.5">
                 Dateien auswählen
                 <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" className="hidden" onChange={(e) => handleFiles(e.target.files)} />
               </label>
+              <p className="text-[10px] text-text-muted mt-2">PDF, DOC, DOCX, JPG, PNG · Max. 4 MB</p>
             </div>
 
             {fileError && (
@@ -230,28 +230,18 @@ export default function NewCandidatePage() {
             )}
           </div>
 
-          {/* GDPR consent */}
-          <div className="card-md bg-brand-50/40 border-brand-200 space-y-3">
+          {/* DSGVO-Info: Bewerber willigt selbst ein via Self-Service-Portal */}
+          <div className="card-md bg-emerald-50/40 border-emerald-200 space-y-2">
             <h2 className="section-title flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              DSGVO-Einwilligung
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              DSGVO — Bewerber willigt selbst ein
             </h2>
             <p className="text-xs text-text-secondary leading-relaxed">
-              Gemäß Art. 6 DSGVO ist eine Rechtsgrundlage für die Verarbeitung personenbezogener Daten erforderlich.
-              Bestätigen Sie, dass der Kandidat über die Referenzprüfung informiert wurde und seine Einwilligung erteilt hat.
+              Sie sind <strong>automatisch DSGVO-konform</strong>: Nach dem Anlegen senden Sie dem Bewerber per Klick eine sichere Einwilligungs-Anfrage. Der Bewerber gibt die Einwilligung selbst, nennt seine Referenzgeber und behält jederzeit das Widerrufsrecht (Art. 7 Abs. 3 DSGVO). Audit-Trail inklusive.
             </p>
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={gdprConsent}
-                onChange={(e) => setGdprConsent(e.target.checked)}
-                className="mt-0.5 accent-brand-600"
-              />
-              <span className="text-sm text-text-primary">
-                Der Kandidat wurde über die Verarbeitung seiner personenbezogenen Daten informiert und hat
-                seine Einwilligung zur Referenzprüfung erteilt. Die Einwilligung ist dokumentiert.
-              </span>
-            </label>
+            <p className="text-xs text-emerald-700 font-medium">
+              ✓ Keine schriftliche Einwilligung außerhalb des Tools nötig.
+            </p>
           </div>
 
           {error && (

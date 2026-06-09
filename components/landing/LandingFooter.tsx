@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { BOOKING_URL } from '@/lib/site'
+import { CookieSettingsButton } from '@/components/analytics/CookieSettingsButton'
 
 export function LandingFooter() {
   return (
     <footer className="border-t border-border bg-bg-secondary px-6 py-14">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-5 gap-10 mb-12">
+        <div className="grid md:grid-cols-6 gap-10 mb-12">
           {/* Brand col */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center mb-5" aria-label="candiq Startseite">
@@ -38,6 +39,8 @@ export function LandingFooter() {
               { label: 'Features', href: '#features' },
               { label: 'So funktioniert\'s', href: '#wie-es-funktioniert' },
               { label: 'Preise', href: '/preise' },
+              { label: 'Add-ons & Services', href: '/preise#addons' },
+              { label: 'Ressourcen', href: '/resources' },
               { label: 'Live-Demo', href: '/demo' },
               { label: 'Termin buchen', href: BOOKING_URL, external: true },
             ]}
@@ -46,9 +49,23 @@ export function LandingFooter() {
           <FooterCol
             title="Für wen"
             links={[
-              { label: 'HR-Abteilungen', href: '/preise#hr' },
+              { label: 'HR-Abteilungen', href: '/fuer/hr-abteilungen' },
+              { label: 'Mittelstand 200+ MA', href: '/fuer/mittelstand' },
               { label: 'Personaldienstleister (bald verfügbar)', href: '/waitlist-agency' },
-              { label: 'Enterprise', href: '/preise#enterprise' },
+              { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
+              { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
+              { label: 'Healthcare-Recruiting', href: '/branchen/healthcare-recruiting' },
+            ]}
+          />
+
+          <FooterCol
+            title="Referenzprüfung"
+            links={[
+              { label: 'Referenzprüfung (Leitfaden)', href: '/referenzpruefung' },
+              { label: 'Reference-Check DSGVO', href: '/reference-check-dsgvo' },
+              { label: 'Arbeitszeugnis prüfen', href: '/zeugnis-pruefen-lassen' },
+              { label: 'Lebenslauf verifizieren', href: '/lebenslauf-verifizieren' },
+              { label: 'candiq vs. Validato', href: '/vergleich/validato-alternative' },
             ]}
           />
 
@@ -69,6 +86,7 @@ export function LandingFooter() {
             PDL-Pakete befinden sich in Vorbereitung. Jetzt für frühen Zugang vormerken.
           </div>
           <div className="flex items-center gap-4">
+            <CookieSettingsButton />
             <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
             <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>
             <a href="mailto:hello@candiq.de" className="hover:text-text-primary transition-colors">hello@candiq.de</a>

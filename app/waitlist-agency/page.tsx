@@ -30,6 +30,7 @@ export default function AgencyWaitlistPage() {
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <LandingNav />
 
+      <main id="main">
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div
@@ -146,6 +147,7 @@ export default function AgencyWaitlistPage() {
           </div>
         </div>
       </section>
+      </main>
 
       <LandingFooter />
     </div>

@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -55,6 +56,25 @@ model Candidate {
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents       Document[]
   checks          ReferenceCheck[]
+  id               String           @id @default(cuid())
+  firstName        String
+  lastName         String
+  email            String?
+  phone            String?
+  position         String
+  department       String?
+  notes            String?
+  status           String           @default("PENDING")
+  gdprConsent      Boolean          @default(false)
+  gdprConsentDate  DateTime?
+  gdprConsentIp    String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents        Document[]
+  checks           ReferenceCheck[]
+  consentTokens    ConsentToken[]
 
   @@index([userId])
 }
@@ -149,6 +169,9 @@ model AddonOrder {
   totalAmount Int // in cents
   status      String   @default("CONFIRMED") // CONFIRMED | DELIVERED | CANCELED | REFUNDED
   notes       String?
+  // Stripe-Checkout-Session-ID — Idempotency fuer Webhook-Replays.
+  // Unique sodass derselbe Stripe-Event keine doppelte Order anlegt.
+  stripeSessionId String? @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -164,5 +187,83 @@ model CvAnalysisReport {
   createdAt DateTime @default(now())
 
   @@index([userId])
+// ─────────────────────────────────────────────────────────────────
+// Bewerber-Self-Service-Consent (DSGVO Art. 6 Abs. 1 lit. a + Art. 7)
+// Erlaubt dem Bewerber, granulare Einwilligung zu erteilen, CV
+// hochzuladen, Referenzgeber selbst zu nennen und jederzeit zu widerrufen.
+// ─────────────────────────────────────────────────────────────────
+model ConsentToken {
+  id              String    @id @default(cuid())
+  candidateId     String
+  candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  // SHA-256 Hash des Tokens (Token selbst wird NIE gespeichert)
+  tokenHash       String    @unique
+  // JSON-Array der freigegebenen Scopes: ["REFERENCE_CHECK","CV_UPLOAD","CONTACT_REFEREES"]
+  scope           String
+  // PENDING_ACCEPT | ACCEPTED | REVOKED | EXPIRED
+  status          String    @default("PENDING_ACCEPT")
+  expiresAt       DateTime
+  sentAt          DateTime  @default(now())
+  acceptedAt      DateTime?
+  revokedAt       DateTime?
+  ipAccepted      String?
+  uaAccepted      String?
+  // Version der akzeptierten Datenschutzerklärung (revisionssicher)
+  consentVersion  String    @default("1.0")
+  // Vom Bewerber selbst genannte Referenzgeber (JSON-Array)
+  refereesJson    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([candidateId])
+  @@index([expiresAt])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Pilot-Programm Q3/2026 — 10 HR-Teams, 25 % Discount Pro Jahr 1
+// gegen anonymisierte Case-Study nach 90 Tagen.
+// Form-Submits landen hier. Sobald 10 ACCEPTED-Eintraege existieren,
+// schwenkt die Public-Section auf "geschlossen, Wartelist".
+// ─────────────────────────────────────────────────────────────────
+model PilotApplication {
+  id            String   @id @default(cuid())
+  company       String
+  firstName     String
+  lastName      String
+  email         String
+  hiresPerYear  String
+  status        String   @default("PENDING") // PENDING | ACCEPTED | REJECTED | WITHDRAWN
+  notes         String?
+  ip            String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Lead-Magnet-Anfragen (Interview-Leitfaden, DSGVO-Checkliste, …)
+// E-Mail-Capture vor dem Markdown-Inhalt. DSGVO-Rechtsgrundlage:
+// Art. 6 Abs. 1 lit. a (Einwilligung); newsletter ist Double-Opt-In.
+// ─────────────────────────────────────────────────────────────────
+model LeadMagnetRequest {
+  id          String   @id @default(cuid())
+  slug        String   // welcher Lead-Magnet
+  firstName   String
+  email       String
+  company     String?
+  consent     Boolean  @default(true)
+  newsletter  Boolean  @default(false)
+  // DOI fuer Newsletter — Token wird per Mail verschickt
+  newsletterConfirmedAt DateTime?
+  ip          String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([slug])
+  @@index([email])
   @@index([createdAt])
 }

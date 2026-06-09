@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ADDONS, ADDON_CATEGORIES, formatEuro, type Addon, type AddonSku } from '@/lib/addons'
 import { useToast } from '@/components/Toaster'
 import {
@@ -62,9 +63,40 @@ const COLOR_CLASSES = {
 
 export default function AddonsPage() {
   const { toast } = useToast()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeCategory, setActiveCategory] = useState<string>('ALL')
   const [loading, setLoading] = useState<AddonSku | null>(null)
   const [success, setSuccess] = useState<AddonSku | null>(null)
+
+  // Nach Stripe-Redirect: ?ok=1&sku=… → Erfolg, ?cancel=1 → Abbruch.
+  useEffect(() => {
+    const ok = searchParams.get('ok')
+    const cancel = searchParams.get('cancel')
+    const sku = searchParams.get('sku') as AddonSku | null
+    if (ok === '1' && sku) {
+      const a = ADDONS.find((x) => x.sku === sku)
+      setSuccess(sku)
+      toast({
+        variant: 'success',
+        title: a ? `${a.name} bezahlt` : 'Buchung bezahlt',
+        description:
+          'Stripe hat die Zahlung bestätigt. Wir aktivieren das Add-on innerhalb von 24 Stunden — Sie bekommen eine E-Mail von hello@candiq.de.',
+      })
+      // URL-Params nach Anzeige aus der History entfernen, damit Reload nicht
+      // den Toast erneut feuert und die URL sauber bleibt.
+      router.replace('/dashboard/addons')
+      setTimeout(() => setSuccess(null), 6000)
+    } else if (cancel === '1') {
+      toast({
+        variant: 'error',
+        title: 'Buchung abgebrochen',
+        description: 'Sie haben den Checkout verlassen. Kein Betrag wurde abgebucht.',
+      })
+      router.replace('/dashboard/addons')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const categories = ['ALL', ...Object.keys(ADDON_CATEGORIES)] as const
   const filtered = activeCategory === 'ALL'
@@ -82,20 +114,18 @@ export default function AddonsPage() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Fehler beim Buchen')
-      setSuccess(addon.sku)
-      toast({
-        variant: 'success',
-        title: `${addon.name} gebucht`,
-        description: `${formatEuro(addon.price * addon.quantity)} · Wir aktivieren das Add-on innerhalb von 24h.`,
-      })
-      setTimeout(() => setSuccess(null), 4000)
+      if (data.checkoutUrl) {
+        // Redirect zur Stripe-Checkout-Session.
+        window.location.assign(data.checkoutUrl)
+        return
+      }
+      throw new Error('Keine Checkout-URL erhalten.')
     } catch (e: any) {
       toast({
         variant: 'error',
         title: 'Buchung fehlgeschlagen',
         description: e.message,
       })
-    } finally {
       setLoading(null)
     }
   }

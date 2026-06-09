@@ -10,8 +10,8 @@ import { Reveal, StaggerChildren, StaggerItem } from '../Reveal'
 const features = [
   {
     icon: Phone,
-    title: 'Telefonische Verifizierung',
-    desc: 'Geschulte Reviewer führen strukturierte Reference-Calls — keine Bots, keine generische E-Mail-Tickerei.',
+    title: 'Mensch ruft an, KI dokumentiert',
+    desc: 'Geschulte Reviewer führen den Verifizierungs-Call mit standardisiertem Fragenkatalog. candiq dokumentiert wörtlich. Keine Bot-Anrufe bei Ihren Referenzgebern — niemals.',
     color: 'from-brand-500 to-brand-700',
     glow: 'rgba(99,102,241,0.3)',
   },

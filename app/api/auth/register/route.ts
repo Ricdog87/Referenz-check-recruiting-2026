@@ -20,6 +20,12 @@ const MAX_EMAIL_LEN = 254
 const MAX_PASSWORD_LEN = 128
 const MIN_PASSWORD_LEN = 8
 
+// Aktuell gueltige Versionen der jeweiligen Rechtsdokumente. Bei Aenderung der
+// Texte muss hier hochgezogen werden, damit revisionssicher nachweisbar bleibt,
+// welche Fassung der User beim Signup akzeptiert hat (DSGVO Art. 7 Abs. 1).
+const TERMS_VERSION = '1.0'
+const PRIVACY_VERSION = '1.0'
+
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req)
   const rl = rateLimit(`register:${ip}`, 5, 60 * 60 * 1000)
@@ -37,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Ungültige Anfrage.' }, { status: 400 })
   }
 
-  const { name, company, email, password, gdprAccepted, accountType, plan } = body ?? {}
+  const { name, company, email, password, acceptTerms, acceptPrivacy, accountType, plan } = body ?? {}
   const cleanName = String(name ?? '').trim().slice(0, MAX_NAME_LEN)
   const cleanCompany = String(company ?? '').trim().slice(0, MAX_COMPANY_LEN)
   const cleanEmail = String(email ?? '').trim().toLowerCase().slice(0, MAX_EMAIL_LEN)
@@ -65,8 +71,20 @@ export async function POST(req: NextRequest) {
   if (rawPassword.length > MAX_PASSWORD_LEN) {
     return NextResponse.json({ error: `Passwort darf maximal ${MAX_PASSWORD_LEN} Zeichen haben.` }, { status: 400 })
   }
-  if (!gdprAccepted) {
-    return NextResponse.json({ error: 'Bitte stimmen Sie der Datenschutzerklärung zu.' }, { status: 400 })
+  // DSGVO Art. 7 + Planet49: AGB und Datenschutz duerfen nicht gebuendelt
+  // akzeptiert werden. Beide Felder werden hier einzeln und mit klarer
+  // Fehlermeldung geprueft.
+  if (acceptTerms !== true) {
+    return NextResponse.json(
+      { error: 'Bitte akzeptieren Sie die AGB.', field: 'acceptTerms' },
+      { status: 400 },
+    )
+  }
+  if (acceptPrivacy !== true) {
+    return NextResponse.json(
+      { error: 'Bitte bestätigen Sie, dass Sie die Datenschutzerklärung gelesen haben.', field: 'acceptPrivacy' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -86,6 +104,8 @@ export async function POST(req: NextRequest) {
     const trialEndsAt = new Date()
     trialEndsAt.setDate(trialEndsAt.getDate() + 14)
 
+    const userAgent = req.headers.get('user-agent')?.slice(0, 500) ?? ''
+
     const user = await withDbRecovery(() =>
       prisma.user.create({
         data: {
@@ -96,13 +116,24 @@ export async function POST(req: NextRequest) {
           accountType: cleanAccountType,
           plan: cleanPlan,
           trialEndsAt,
+          // Zwei getrennte Consent-Records, einer pro Rechtsdokument-Version.
+          // Bei einer Aenderung von AGB oder Datenschutz wird beim naechsten
+          // Touchpoint die neue Version erneut angefragt — Audit-Trail bleibt.
           gdprConsents: {
-            create: {
-              type: 'REGISTRATION',
-              granted: true,
-              ip,
-              userAgent: req.headers.get('user-agent')?.slice(0, 500) ?? '',
-            },
+            create: [
+              {
+                type: `TERMS_ACCEPT_v${TERMS_VERSION}`,
+                granted: true,
+                ip,
+                userAgent,
+              },
+              {
+                type: `PRIVACY_NOTICE_v${PRIVACY_VERSION}`,
+                granted: true,
+                ip,
+                userAgent,
+              },
+            ],
           },
         },
         select: { id: true, email: true },
@@ -118,6 +149,18 @@ export async function POST(req: NextRequest) {
           entity: 'User',
           entityId: user.id,
           details: `Konto erstellt · Plan: ${cleanPlan} · Trial bis ${trialEndsAt.toISOString().slice(0, 10)}`,
+          ip,
+        },
+      })
+      // Separater Eintrag: revisionssicher dokumentieren, welche Versionen
+      // der Rechtsdokumente bei diesem Signup akzeptiert wurden.
+      await prisma.auditLog.create({
+        data: {
+          userId: user.id,
+          action: 'REGISTRATION_CONSENT',
+          entity: 'User',
+          entityId: user.id,
+          details: `terms_version=${TERMS_VERSION} privacy_version=${PRIVACY_VERSION}`,
           ip,
         },
       })

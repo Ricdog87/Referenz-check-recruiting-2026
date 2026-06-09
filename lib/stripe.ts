@@ -1,4 +1,5 @@
 import Stripe from 'stripe'
+import type { AddonSku } from './addons'
 
 if (!process.env.STRIPE_SECRET_KEY) {
   // Im Build-Phase nicht hart failen — Vercel buildet ohne Runtime-Env teilweise.
@@ -73,4 +74,35 @@ export function mapStripeStatus(status: Stripe.Subscription.Status): string {
     default:
       return 'INACTIVE'
   }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// ONE-TIME ADD-ON PRICES
+// ─────────────────────────────────────────────────────────────────
+// Wired pro AddonSku → Stripe price_… ID via Env-Var
+// (STRIPE_PRICE_ADDON_<SKU>). Build-time Tolerance: leere Strings als
+// Fallback, sodass der Build nicht failt, wenn ein Env-Var fehlt.
+// Runtime-Check passiert in /api/addons/route.ts vor Checkout-Create.
+
+export const STRIPE_ADDON_PRICES: Record<AddonSku, string> = {
+  SINGLE_CHECK: process.env.STRIPE_PRICE_ADDON_SINGLE_CHECK ?? '',
+  CHECK_PACK_5: process.env.STRIPE_PRICE_ADDON_CHECK_PACK_5 ?? '',
+  CHECK_PACK_10: process.env.STRIPE_PRICE_ADDON_CHECK_PACK_10 ?? '',
+  EXPRESS_24H: process.env.STRIPE_PRICE_ADDON_EXPRESS_24H ?? '',
+  BULK_CV: process.env.STRIPE_PRICE_ADDON_BULK_CV ?? '',
+  PRE_SCREENING_CALL: process.env.STRIPE_PRICE_ADDON_PRE_SCREENING_CALL ?? '',
+  DOCUMENT_VERIFICATION: process.env.STRIPE_PRICE_ADDON_DOCUMENT_VERIFICATION ?? '',
+  CV_SCREENING: process.env.STRIPE_PRICE_ADDON_CV_SCREENING ?? '',
+  INTERVIEW: process.env.STRIPE_PRICE_ADDON_INTERVIEW ?? '',
+}
+
+/**
+ * Reverse-Lookup: Stripe price_… ID → AddonSku.
+ * Webhook braucht das, falls metadata.sku fehlt (Defense-in-Depth).
+ */
+export function addonSkuFromPriceId(priceId: string): AddonSku | null {
+  for (const [sku, id] of Object.entries(STRIPE_ADDON_PRICES) as [AddonSku, string][]) {
+    if (id && id === priceId) return sku
+  }
+  return null
 }
