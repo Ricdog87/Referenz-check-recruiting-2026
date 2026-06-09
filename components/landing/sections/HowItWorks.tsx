@@ -23,8 +23,8 @@ const steps = [
   {
     n: '03',
     icon: Phone,
-    title: 'KI ruft an, Reviewer gibt frei — Sie bekommen den Report',
-    body: 'candiq Voice kontaktiert ausschließlich die vom Bewerber freigegebenen Referenzgeber — telefonisch, mit standardisiertem Fragenkatalog, wörtlich protokolliert. Ein geschulter Reviewer prüft und gibt den Report frei. PDF mit Bewertung pro Station und Diskrepanz-Markierung. Auto-Löschung nach 6 Monaten.',
+    title: 'Geschulte Reviewer rufen an — KI dokumentiert',
+    body: 'Ein geschulter Reviewer kontaktiert die freigegebenen Referenzgeber telefonisch — mit standardisiertem Fragenkatalog, AGG-konform, ohne Stil- oder Herkunfts-Bewertung. Ein echter Mensch bürgt für einen echten Menschen. candiq dokumentiert das Gespräch wörtlich, liefert den PDF-Report mit Bewertung pro Station und Diskrepanz-Markierung. Auto-Löschung nach 6 Monaten.',
     accent: 'from-violet to-cyan',
   },
 ]
@@ -46,7 +46,7 @@ export function HowItWorks() {
               Drei Schritte. <span className="text-gradient-brand">Verlässliches Signal.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Vom Auftrag bis zum Report — typischerweise in unter 48 Stunden. Bewerber-Self-Service, automatischer Einwilligungs-Workflow, KI-Telefonat und menschliche Freigabe.
+              Vom Auftrag bis zum Report — typischerweise in unter 48 Stunden. Bewerber-Self-Service per KI, dokumentierte Einwilligung, Verifizierung durch geschulte Menschen.
             </p>
           </div>
         </Reveal>
