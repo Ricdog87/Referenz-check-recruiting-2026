@@ -33,7 +33,8 @@ function Console() {
   const conversation = useConversation({
     onError: (message) => {
       console.error('[candiq voice]', message)
-      setError('Verbindung fehlgeschlagen. Bitte Mikrofon erlauben und erneut versuchen.')
+      const text = typeof message === 'string' && message ? message : 'Verbindung fehlgeschlagen'
+      setError(text)
       setStarting(false)
     },
   })
@@ -54,7 +55,7 @@ function Console() {
       conversation.startSession({ agentId: AGENT_ID, connectionType: 'websocket' })
     } catch (e) {
       console.error('[candiq voice] start', e)
-      setError('Verbindung konnte nicht gestartet werden.')
+      setError(e instanceof Error ? e.message : 'Verbindung konnte nicht gestartet werden.')
       setStarting(false)
     }
   }, [conversation])
