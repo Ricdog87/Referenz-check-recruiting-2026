@@ -56,25 +56,7 @@ model Candidate {
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   documents       Document[]
   checks          ReferenceCheck[]
-  id               String           @id @default(cuid())
-  firstName        String
-  lastName         String
-  email            String?
-  phone            String?
-  position         String
-  department       String?
-  notes            String?
-  status           String           @default("PENDING")
-  gdprConsent      Boolean          @default(false)
-  gdprConsentDate  DateTime?
-  gdprConsentIp    String?
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  userId           String
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  documents        Document[]
-  checks           ReferenceCheck[]
-  consentTokens    ConsentToken[]
+  consentTokens   ConsentToken[]
 
   @@index([userId])
 }
@@ -187,6 +169,8 @@ model CvAnalysisReport {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Bewerber-Self-Service-Consent (DSGVO Art. 6 Abs. 1 lit. a + Art. 7)
 // Erlaubt dem Bewerber, granulare Einwilligung zu erteilen, CV

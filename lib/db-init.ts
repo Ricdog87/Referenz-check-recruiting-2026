@@ -94,6 +94,80 @@ export async function runSchemaSync() {
       END IF;
     END $$
   `)
+
+  // ConsentToken — Bewerber-Self-Service-Consent-Portal
+  // (DSGVO Art. 6 Abs. 1 lit. a + Art. 7). Wird in
+  // POST /api/candidates/:id/invite + /api/consent/:token/* benutzt.
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "ConsentToken" (
+      "id" TEXT NOT NULL,
+      "candidateId" TEXT NOT NULL,
+      "tokenHash" TEXT NOT NULL,
+      "scope" TEXT NOT NULL,
+      "status" TEXT NOT NULL DEFAULT 'PENDING_ACCEPT',
+      "expiresAt" TIMESTAMP(3) NOT NULL,
+      "sentAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "acceptedAt" TIMESTAMP(3),
+      "revokedAt" TIMESTAMP(3),
+      "ipAccepted" TEXT,
+      "uaAccepted" TEXT,
+      "consentVersion" TEXT NOT NULL DEFAULT '1.0',
+      "refereesJson" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "ConsentToken_pkey" PRIMARY KEY ("id")
+    )
+  `)
+  await prisma.$executeRawUnsafe(
+    `CREATE UNIQUE INDEX IF NOT EXISTS "ConsentToken_tokenHash_key" ON "ConsentToken"("tokenHash")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ConsentToken_candidateId_idx" ON "ConsentToken"("candidateId")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ConsentToken_expiresAt_idx" ON "ConsentToken"("expiresAt")`,
+  )
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "ConsentToken_status_idx" ON "ConsentToken"("status")`,
+  )
+  await prisma.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'ConsentToken_candidateId_fkey'
+      ) THEN
+        ALTER TABLE "ConsentToken" ADD CONSTRAINT "ConsentToken_candidateId_fkey"
+          FOREIGN KEY ("candidateId") REFERENCES "Candidate"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+      END IF;
+    END $$
+  `)
+
+  // CvAnalysisReport — Speicher für die Ergebnisse von POST /api/cv-analysis
+  // (deterministische Checks + LLM-Claim-Analyse).
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "CvAnalysisReport" (
+      "id" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "report" JSONB NOT NULL,
+      "inputHash" TEXT NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "CvAnalysisReport_pkey" PRIMARY KEY ("id")
+    )
+  `)
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS "CvAnalysisReport_userId_idx" ON "CvAnalysisReport"("userId")`,
+  )
+  await prisma.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'CvAnalysisReport_userId_fkey'
+      ) THEN
+        ALTER TABLE "CvAnalysisReport" ADD CONSTRAINT "CvAnalysisReport_userId_fkey"
+          FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+      END IF;
+    END $$
+  `)
 }
 
 /**
