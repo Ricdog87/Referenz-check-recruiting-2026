@@ -12,6 +12,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@elevenlabs/react": "1.6.4",
     "@prisma/client": "^5.7.0",
     "@stripe/stripe-js": "^9.5.0",
     "@vercel/blob": "^0.22.0",
