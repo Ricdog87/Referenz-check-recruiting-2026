@@ -1,0 +1,58 @@
+import { describe, expect, it } from 'vitest'
+import { candidateInputSchema, riskReportSchema } from '@/lib/cv-analysis/types'
+import { runDeterministicChecks } from '@/lib/cv-analysis/deterministicChecks'
+import { runExternalChecks, type ExternalCheckAdapter } from '@/lib/cv-analysis/externalChecks'
+import { buildRiskReport } from '@/lib/cv-analysis/score'
+import { fabricatedCv } from './fixtures/fabricatedCv'
+import { cleanCv } from './fixtures/cleanCv'
+
+const lookupAdapter: ExternalCheckAdapter = {
+  async lookupCompany(company) {
+    if (company === 'Beta AG') return { status: 'unknown', reason: 'Test-Lookup ohne verifizierten Treffer.' }
+    return { status: 'verified', domain: 'example.com', reason: 'Test-Lookup verifiziert.' }
+  },
+}
+
+describe('CV analysis schemas', () => {
+  it('validates candidate input and rejects missing consent', () => {
+    expect(candidateInputSchema.parse(cleanCv).consentGiven).toBe(true)
+    expect(candidateInputSchema.safeParse({ ...cleanCv, consentGiven: 'yes' }).success).toBe(false)
+  })
+
+  it('validates risk reports and requires reasons on every flag', () => {
+    const report = buildRiskReport(
+      [{ claim: 'Future role', type: 'timeline_future_date', severity: 'high', reason: 'End date is in the future.', source: 'deterministic' }],
+      ['Confirm dates with the employer.'],
+      ['Human review only.'],
+    )
+
+    expect(riskReportSchema.parse(report).flags.every((flag) => flag.reason.length > 0)).toBe(true)
+  })
+})
+
+describe('deterministic CV checks', () => {
+  it('flags fabricated timeline patterns without style or AI-writing analysis', () => {
+    const flags = runDeterministicChecks(fabricatedCv, new Date('2026-06-09T00:00:00.000Z'))
+
+    expect(flags.some((flag) => flag.type === 'timeline_future_date')).toBe(true)
+    expect(flags.some((flag) => flag.type === 'timeline_overlap')).toBe(true)
+    expect(flags.some((flag) => flag.type === 'title_duration_plausibility')).toBe(true)
+    expect(flags.every((flag) => flag.reason.trim().length > 0)).toBe(true)
+    expect(flags.map((flag) => `${flag.type} ${flag.reason}`).join(' ')).not.toMatch(/grammar|fluency|style|ki-?text/i)
+  })
+
+  it('does not flag a clean continuous CV timeline', () => {
+    const flags = runDeterministicChecks(cleanCv, new Date('2026-06-09T00:00:00.000Z'))
+
+    expect(flags).toEqual([])
+  })
+})
+
+describe('external CV checks', () => {
+  it('flags freemail referees and keeps every reason explainable', async () => {
+    const flags = await runExternalChecks(fabricatedCv, lookupAdapter)
+
+    expect(flags.some((flag) => flag.type === 'referee_email_risk')).toBe(true)
+    expect(flags.every((flag) => flag.reason.trim().length > 0)).toBe(true)
+  })
+})
