@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, PhoneOff, Loader2 } from 'lucide-react'
 
@@ -31,23 +31,30 @@ function Console() {
   const [error, setError] = useState<string | null>(null)
   const [starting, setStarting] = useState(false)
   const conversation = useConversation({
-    onError: () => setError('Verbindung fehlgeschlagen. Bitte erneut versuchen.'),
+    onError: (message) => {
+      console.error('[candiq voice]', message)
+      setError('Verbindung fehlgeschlagen. Bitte Mikrofon erlauben und erneut versuchen.')
+      setStarting(false)
+    },
   })
 
   const status = conversation.status
   const isActive = status === 'connected'
-  const isConnecting = status === 'connecting' || starting
+  const isConnecting = starting || status === 'connecting'
   const isSpeaking = conversation.isSpeaking
 
-  const start = useCallback(async () => {
+  useEffect(() => {
+    if (status === 'connected' || status === 'error') setStarting(false)
+  }, [status])
+
+  const start = useCallback(() => {
     setError(null)
     setStarting(true)
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-      conversation.startSession({ agentId: AGENT_ID, connectionType: 'webrtc' })
-    } catch {
-      setError('Mikrofon nicht freigegeben oder Verbindung fehlgeschlagen.')
-    } finally {
+      conversation.startSession({ agentId: AGENT_ID, connectionType: 'websocket' })
+    } catch (e) {
+      console.error('[candiq voice] start', e)
+      setError('Verbindung konnte nicht gestartet werden.')
       setStarting(false)
     }
   }, [conversation])
