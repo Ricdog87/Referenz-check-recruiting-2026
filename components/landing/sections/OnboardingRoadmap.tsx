@@ -34,9 +34,9 @@ const steps = [
   },
   {
     day: 'Tag 4–5',
-    title: 'Reviewer übernehmen die Verifizierung',
+    title: 'KI verifiziert, Reviewer gibt frei',
     body:
-      'Unsere geschulten Reviewer kontaktieren die freigegebenen Referenzgeber telefonisch — standardisierte Fragebögen, dokumentierte Antworten, Diskrepanz-Markierung. Sie sehen den Live-Status im Dashboard.',
+      'candiq Voice kontaktiert die freigegebenen Referenzgeber telefonisch — standardisierte Fragebögen, wörtliches Protokoll, Diskrepanz-Markierung. Ein geschulter Reviewer prüft und gibt frei. Sie sehen den Live-Status im Dashboard.',
     icon: Sparkles,
     accent: 'from-violet to-cyan',
   },
