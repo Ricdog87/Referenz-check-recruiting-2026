@@ -59,9 +59,11 @@ function buildCsp(nonce: string): string {
     `font-src 'self'`,
     // connect-src: Stripe REST + Vercel Analytics / Speed Insights + HubSpot API
     // (XHR vom Meetings-Embed-Script).
-    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT}`,
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT} https://api.elevenlabs.io wss://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.us.elevenlabs.io https://*.livekit.cloud wss://*.livekit.cloud https://storage.googleapis.com`,
     // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks) + HubSpot Meetings.
     `frame-src https://js.stripe.com https://hooks.stripe.com ${HUBSPOT_FRAME}`,
+    `media-src 'self' blob: data: https://storage.googleapis.com`,
+    `worker-src 'self' blob:`,
     `object-src 'none'`,
     `base-uri 'self'`,
     `form-action 'self'`,
