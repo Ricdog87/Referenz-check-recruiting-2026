@@ -85,7 +85,7 @@ function Console() {
         ) : (
           <Mic className="h-5 w-5" />
         )}
-        {isConnecting ? 'Verbinde…' : isActive ? 'Gespräch beenden' : 'Mit der KI-Telefonassistentin sprechen'}
+        {isConnecting ? 'Verbinde…' : isActive ? 'Gespräch beenden' : 'candiq Voice ausprobieren'}
       </button>
       {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
       <p className="mt-4 text-xs text-slate-400">Kostenlos · ca. 2 Min · Mikrofon erforderlich · DSGVO · Server in der EU</p>

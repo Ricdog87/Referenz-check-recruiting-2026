@@ -195,8 +195,8 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
           <div className="bg-slate-50 rounded-xl p-5 text-sm text-slate-700 mb-6">
             <p className="font-semibold mb-2">Was passiert jetzt?</p>
             <ul className="space-y-1.5 list-none">
-              <li>1. Unsere KI-Telefonassistentin kontaktiert ausschließlich die von Ihnen freigegebenen Referenzgeber.</li>
-              <li>2. Die Gespräche folgen standardisierten Fragen — als KI-Telefonat angekündigt, keine Hintergrundrecherche.</li>
+              <li>1. Geschulte Reviewer kontaktieren ausschließlich die von Ihnen freigegebenen Referenzgeber — telefonisch, kein Bot.</li>
+              <li>2. Die Gespräche folgen einem standardisierten Fragenkatalog, AGG-konform, keine Hintergrundrecherche.</li>
               <li>3. Der Report wird ausschließlich an <strong>{initialData.hiringCompany}</strong> übermittelt.</li>
               <li>4. Ihre Daten werden spätestens nach 6 Monaten automatisch gelöscht.</li>
             </ul>
