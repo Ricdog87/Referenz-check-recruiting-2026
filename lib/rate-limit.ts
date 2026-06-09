@@ -51,6 +51,9 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateLim
 }
 
 export function getClientIp(req: { headers: Headers }): string {
+  const vercelForwardedFor = req.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim()
+  if (vercelForwardedFor) return vercelForwardedFor
+
   return (
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     req.headers.get('x-real-ip') ??
