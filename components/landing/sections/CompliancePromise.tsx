@@ -1,13 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ShieldCheck, Lock, Server, FileText } from 'lucide-react'
+import { ShieldCheck, UserCheck, Server, FileText } from 'lucide-react'
 import { Reveal } from '../Reveal'
 
 const items = [
   { icon: ShieldCheck, label: 'DSGVO-konform', sub: 'by Design' },
   { icon: Server, label: 'Server in Deutschland', sub: 'Hosting in DE' },
-  { icon: Lock, label: 'Verschlüsselte Übertragung', sub: 'HTTPS überall' },
+  { icon: UserCheck, label: 'Verifizierung durch echte Menschen', sub: 'Keine Bot-Anrufe bei Ihren Referenzgebern' },
   { icon: FileText, label: 'Auftragsverarbeitungsvertrag', sub: 'Standard inklusive' },
 ]
 

@@ -10,8 +10,8 @@ import { Reveal, StaggerChildren, StaggerItem } from '../Reveal'
 const features = [
   {
     icon: Phone,
-    title: 'KI ruft an, Mensch gibt frei',
-    desc: 'candiq Voice führt strukturierte Reference-Calls und erreicht Referenzgeber in Minuten. Ein geschulter Reviewer gibt jeden Report frei.',
+    title: 'Mensch ruft an, KI dokumentiert',
+    desc: 'Geschulte Reviewer führen den Verifizierungs-Call mit standardisiertem Fragenkatalog. candiq dokumentiert wörtlich. Keine Bot-Anrufe bei Ihren Referenzgebern — niemals.',
     color: 'from-brand-500 to-brand-700',
     glow: 'rgba(99,102,241,0.3)',
   },

@@ -2,29 +2,29 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
-import { Bot, Hourglass, Banknote } from 'lucide-react'
+import { Bot, UserX, Banknote } from 'lucide-react'
 import { Reveal, StaggerChildren, StaggerItem } from '../Reveal'
 
 const cards = [
   {
     icon: Bot,
-    headline: 'KI-Lebenslauf',
-    title: 'Auf jede Stelle wie maßgeschneidert',
-    body: 'ChatGPT formuliert Tätigkeiten und Anschreiben perfekt zur Stelle um. Was im CV steht, sagt heute wenig darüber aus, was der Kandidat wirklich kann.',
+    headline: 'KI-CVs als Norm',
+    title: 'Jeder Lebenslauf passt auf jede Stelle',
+    body: 'ChatGPT formuliert Tätigkeiten, Anschreiben und Skills perfekt zur Ausschreibung — in Minuten, von jedem Kandidaten. Was im CV steht, sagt heute wenig darüber aus, was er wirklich kann.',
     color: 'bg-rose-50 text-rose-600 border-rose-200',
   },
   {
-    icon: Hourglass,
-    headline: 'Bewerber­flut',
-    title: 'Mehr Bewerbungen, weniger Signal',
-    body: 'Pro Stelle landen Dutzende Bewerbungen mit auswechselbaren Buzzwords im Postfach. Jeder zweite Kandidat verbraucht ein Erstgespräch — die meisten ohne Mehrwert.',
+    icon: UserX,
+    headline: 'Deepfakes & Fake-Kandidaten',
+    title: 'Bis 2028 ist jedes 4. Profil gefälscht',
+    body: 'Gartner prognostiziert: bis 2028 wird jedes vierte Kandidatenprofil gefälscht sein. Stimmen-Klone im Video-Interview, KI-generierte Referenzgeber, erfundene Stationen. Die Industrie kehrt deshalb zu Präsenz-Interviews zurück — Google, Cisco, McKinsey machen es vor.',
     color: 'bg-amber-50 text-amber-600 border-amber-200',
   },
   {
     icon: Banknote,
-    headline: 'Fehl­besetzung',
-    title: '1,5× Jahresgehalt im Schnitt',
-    body: 'SHRM und Bain beziffern die Kosten einer einzigen Fehleinstellung auf das 1,5-fache des Jahresgehalts — bei Schlüsselrollen geht es schnell in den sechsstelligen Bereich.',
+    headline: 'Ungeprüfte Behauptung',
+    title: 'Das eigentliche Problem ist nicht die KI',
+    body: 'Eine KI-geschriebene Behauptung wird nicht durch eine KI-geprüfte Behauptung wahr. SHRM und Bain beziffern die Kosten einer Fehleinstellung auf das 1,5-fache des Jahresgehalts. Sie zahlen den vollen Preis für jede Behauptung, die niemand verifiziert hat.',
     color: 'bg-brand-50 text-brand-600 border-brand-200',
   },
 ]
@@ -48,11 +48,11 @@ export function Problem() {
               Das Problem
             </div>
             <h2 className="text-[clamp(32px,5vw,52px)] font-bold tracking-tighter mb-5 text-text-primary">
-              Schöner Lebenslauf <br className="hidden sm:block"/>
-              ist heute <span className="text-gradient-brand">kein Signal mehr.</span>
+              Der CV ist kein Signal mehr.<br className="hidden sm:block"/>
+              <span className="text-gradient-brand">2026 entscheidet die Verifikation.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              HR-Teams und Personaldienstleister bewerten zunehmend Texte, die eine KI geschrieben hat. Echte Eignung lässt sich daraus nicht ablesen.
+              KI-generierte Lebensläufe sind heute die Norm, Deepfake-Interviews und Fake-Referenzgeber kein Sci-Fi mehr. Das Problem ist nicht die KI — sondern die Behauptung, die niemand prüft.
             </p>
           </div>
         </Reveal>

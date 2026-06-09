@@ -7,7 +7,9 @@ import { Hero } from '@/components/landing/sections/Hero'
 import VoiceDemo from '@/components/landing/sections/VoiceDemo'
 import { TrustBar } from '@/components/landing/sections/TrustBar'
 import { Problem } from '@/components/landing/sections/Problem'
+import { SpeedAndProof } from '@/components/landing/sections/SpeedAndProof'
 import { HowItWorks } from '@/components/landing/sections/HowItWorks'
+import { FabricationCheck } from '@/components/landing/sections/FabricationCheck'
 import { Features } from '@/components/landing/sections/Features'
 import { TwoAudiences } from '@/components/landing/sections/TwoAudiences'
 import { OnboardingRoadmap } from '@/components/landing/sections/OnboardingRoadmap'
@@ -41,10 +43,12 @@ export default function LandingPage() {
       <LandingNav />
       <main id="main">
         <Hero />
-        <VoiceDemo />
         <TrustBar />
         <Problem />
+        <SpeedAndProof />
         <HowItWorks />
+        <VoiceDemo />
+        <FabricationCheck />
         <Features />
         <TwoAudiences />
         <OnboardingRoadmap />

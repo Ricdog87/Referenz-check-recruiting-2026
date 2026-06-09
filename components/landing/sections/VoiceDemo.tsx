@@ -41,18 +41,18 @@ export default function VoiceDemo() {
       <div className="relative mx-auto max-w-3xl px-6 text-center">
         <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-indigo-200">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          Neu · candiq Voice
+          Kandidaten-seitig · Intake &amp; Pre-Screening
         </div>
 
         <h2 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          Erleben Sie Ihre{' '}
+          candiq Voice — der{' '}
           <span className="bg-gradient-to-r from-indigo-400 to-fuchsia-400 bg-clip-text text-transparent">
-            KI-Telefonassistentin
+            Komfort-Layer
           </span>{' '}
-          — live.
+          für Ihre Kandidaten.
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-lg text-slate-300">
-          Nicht über KI-Telefonie lesen — hören Sie selbst. Ein Klick, Ihre Stimme, Antwort in unter einer Sekunde.
+          Kandidaten erreichen candiq 24/7 für Intake und Terminierung — die KI nimmt ab, in unter einer Sekunde. Hören Sie selbst, wie sich das anfühlt: ein Klick, Ihre Stimme.
         </p>
 
         <div className="mx-auto mt-12 max-w-md rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-sm">
@@ -78,7 +78,7 @@ export default function VoiceDemo() {
 
         <p className="mx-auto mt-8 flex max-w-md items-center justify-center gap-2 text-xs text-slate-500">
           <ShieldCheck className="h-4 w-4 shrink-0" />
-          Live-Demo mit unserer KI-gestützten, trainierten Telefonassistentin. Mikrofonzugriff nur während des Gesprächs. Jeder echte Reference-Report wird von geschulten Reviewern freigegeben.
+          candiq Voice spricht mit Ihren Kandidaten — niemals mit deren Referenzgebern. Die Verifizierung läuft immer über geschulte Menschen. Mikrofonzugriff nur während dieses Demo-Gesprächs.
         </p>
       </div>
 
