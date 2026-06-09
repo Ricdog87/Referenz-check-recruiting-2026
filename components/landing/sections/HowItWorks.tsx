@@ -23,8 +23,8 @@ const steps = [
   {
     n: '03',
     icon: Phone,
-    title: 'Reviewer verifizieren, Sie bekommen den Report',
-    body: 'Geschulte Reviewer kontaktieren ausschließlich die vom Bewerber freigegebenen Referenzgeber — telefonisch, mit standardisierten Fragen. PDF-Report mit Bewertung pro Station und Diskrepanz-Markierung. Auto-Löschung nach 6 Monaten.',
+    title: 'KI ruft an, Reviewer gibt frei — Sie bekommen den Report',
+    body: 'candiq Voice kontaktiert ausschließlich die vom Bewerber freigegebenen Referenzgeber — telefonisch, mit standardisiertem Fragenkatalog, wörtlich protokolliert. Ein geschulter Reviewer prüft und gibt den Report frei. PDF mit Bewertung pro Station und Diskrepanz-Markierung. Auto-Löschung nach 6 Monaten.',
     accent: 'from-violet to-cyan',
   },
 ]
@@ -46,7 +46,7 @@ export function HowItWorks() {
               Drei Schritte. <span className="text-gradient-brand">Verlässliches Signal.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Vom Auftrag bis zum Report — typischerweise in unter 48 Stunden. Bewerber-Self-Service, automatischer Einwilligungs-Workflow, geschulte Reviewer.
+              Vom Auftrag bis zum Report — typischerweise in unter 48 Stunden. Bewerber-Self-Service, automatischer Einwilligungs-Workflow, KI-Telefonat und menschliche Freigabe.
             </p>
           </div>
         </Reveal>
