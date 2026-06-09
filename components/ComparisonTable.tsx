@@ -10,7 +10,7 @@ const ROWS: Row[] = [
   { criterion: 'Spezialisierung', candiq: { text: 'Referenzprüfung für Recruiting (HR & Personaldienstleister)', positive: true }, validato: { text: 'Breites Pre-Employment-Screening' } },
   { criterion: 'Hosting & Datenstandort', candiq: { text: 'Server in Deutschland 🇩🇪', positive: true }, validato: { text: 'EU-Rechenzentren · Anbieter aus der Schweiz' } },
   { criterion: 'Durchlaufzeit bis zum Report', candiq: { text: 'unter 48 h · Express 24 h', positive: true }, validato: { text: 'ca. 24 h' } },
-  { criterion: 'Verifizierung', candiq: { text: 'KI-Telefonassistentin + menschliche Freigabe', positive: true }, validato: { text: 'Analysten · telefonische Interviews' } },
+  { criterion: 'Verifizierung', candiq: { text: 'Geschulte Reviewer · echte Telefonate (keine Bots)', positive: true }, validato: { text: 'Analysten · telefonische Interviews' } },
   { criterion: 'Preise öffentlich einsehbar', candiq: { text: 'Ja — ab 65 €/Mo · Einzelcheck 49 €', positive: true }, validato: { text: 'Auf Anfrage' } },
   { criterion: 'Monatlich kündbar · kein Mindestvertrag', candiq: { text: 'Ja', positive: true }, validato: { text: 'k. A.' } },
   { criterion: 'Self-Service-Einwilligung der Kandidaten', candiq: { text: 'Granulares Consent-Portal + Audit-Trail (Art. 6 & 7 DSGVO)', positive: true }, validato: { text: 'DSGVO-konform' } },
