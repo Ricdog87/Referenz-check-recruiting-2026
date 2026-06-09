@@ -367,7 +367,7 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
         <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-6">
           <h2 className="font-bold text-slate-900 mb-1">👥 Ihre Referenzgeber</h2>
           <p className="text-sm text-slate-600 mb-4">
-            Nennen Sie 1–5 Personen aus früheren Arbeitsverhältnissen, die unsere Reviewer kontaktieren dürfen.
+            Nennen Sie 1–5 Personen aus früheren Arbeitsverhältnissen, die unsere KI-gestützte, trainierte Telefonassistentin (mit menschlicher Freigabe durch geschulte Reviewer) kontaktieren darf.
           </p>
 
           {referees.map((r, i) => (
@@ -487,7 +487,7 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
                 className="mt-1 w-5 h-5 rounded text-indigo-600"
               />
               <span className="text-sm text-slate-900">
-                Die Kontaktaufnahme mit den oben genannten Referenzgebern durch geschulte Reviewer.
+                Die Kontaktaufnahme mit den oben genannten Referenzgebern durch unsere KI-gestützte, trainierte Telefonassistentin (mit menschlicher Freigabe durch geschulte Reviewer).
               </span>
             </label>
             <label className="flex items-start gap-3 cursor-pointer">
