@@ -8,6 +8,32 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Workspace {
+  id          String            @id @default(uuid()) @db.Uuid
+  name        String
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  members     WorkspaceMember[]
+  candidates  Candidate[]
+  documents   Document[]
+  checks      ReferenceCheck[]
+  gdprConsents GdprConsent[]
+  auditLogs   AuditLog[]
+  addonOrders AddonOrder[]
+}
+
+model WorkspaceMember {
+  userId      String
+  workspaceId String            @db.Uuid
+  role        String            @default("MEMBER")
+  createdAt   DateTime          @default(now())
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workspaceId])
+  @@index([workspaceId])
+}
+
 model User {
   id            String        @id @default(cuid())
   email         String        @unique
@@ -34,6 +60,7 @@ model User {
   auditLogs     AuditLog[]
   addonOrders   AddonOrder[]
   resetTokens   PasswordResetToken[]
+  workspaceMemberships WorkspaceMember[]
 }
 
 model Candidate {
@@ -52,12 +79,15 @@ model Candidate {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   userId           String
+  workspaceId      String           @db.Uuid
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace        Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   documents        Document[]
   checks           ReferenceCheck[]
   consentTokens    ConsentToken[]
 
   @@index([userId])
+  @@index([workspaceId])
 }
 
 model Document {
@@ -70,9 +100,12 @@ model Document {
   type         String    @default("CV")
   createdAt    DateTime  @default(now())
   candidateId  String
+  workspaceId  String    @db.Uuid
   candidate    Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([candidateId])
+  @@index([workspaceId])
 }
 
 model ReferenceCheck {
@@ -93,15 +126,20 @@ model ReferenceCheck {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   candidateId     String
+  workspaceId     String    @db.Uuid
   candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([candidateId])
+  @@index([workspaceId])
 }
 
 model GdprConsent {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  workspaceId String    @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   type      String
   granted   Boolean
   ip        String?
@@ -109,12 +147,15 @@ model GdprConsent {
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([workspaceId])
 }
 
 model AuditLog {
   id        String   @id @default(cuid())
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId      String?
+  workspaceId String   @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   action    String
   entity    String
   entityId  String?
@@ -123,12 +164,15 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([workspaceId])
 }
 
 model PasswordResetToken {
   id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  workspaceId String    @db.Uuid
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   token     String   @unique
   expiresAt DateTime
   usedAt    DateTime?
@@ -142,7 +186,9 @@ model PasswordResetToken {
 model AddonOrder {
   id          String   @id @default(cuid())
   userId      String
+  workspaceId String   @db.Uuid
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   // SINGLE_CHECK | CHECK_PACK_5 | CHECK_PACK_10 | INTERVIEW | EXPRESS_24H | BULK_CV
   sku         String
   quantity    Int      @default(1)
@@ -157,6 +203,7 @@ model AddonOrder {
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+  @@index([workspaceId])
 }
 
 // ─────────────────────────────────────────────────────────────────
