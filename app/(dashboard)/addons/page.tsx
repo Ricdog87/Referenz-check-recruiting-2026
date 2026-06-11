@@ -7,11 +7,17 @@ import { useToast } from '@/components/Toaster'
 import {
   ShoppingBag, Sparkles, CheckCircle2, Loader2, ArrowRight,
   BadgeCheck, Zap, Package, Mic, Phone, Layers, Upload,
+  PhoneCall, FileCheck, ScanSearch,
 } from 'lucide-react'
 
-const CATEGORY_ICONS = {
+// Muss alle Keys aus ADDON_CATEGORIES abdecken — ein fehlender Eintrag
+// rendert als undefined-Komponente (React "type is invalid").
+const CATEGORY_ICONS: Record<keyof typeof ADDON_CATEGORIES, typeof Phone> = {
   CHECK: Phone,
   INTERVIEW: Mic,
+  PRE_SCREENING: PhoneCall,
+  DOCUMENT: FileCheck,
+  SCREENING: ScanSearch,
   SPEED: Zap,
   BULK: Upload,
 }
