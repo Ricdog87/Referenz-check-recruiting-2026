@@ -159,7 +159,10 @@ function NavSection({ label, children }: { label: string; children: React.ReactN
 }
 
 function NavItem({ href, label, icon: Icon, pathname }: { href: string; label: string; icon: any; pathname: string }) {
-  const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href + '/'))
+  // /settings nur bei exakter Übereinstimmung aktiv — /settings/billing hat
+  // einen eigenen Nav-Eintrag und würde sonst beide gleichzeitig markieren.
+  const active = pathname === href
+    || (href !== '/dashboard' && href !== '/settings' && pathname.startsWith(href + '/'))
   return (
     <Link href={href} className={active ? 'nav-item-active' : 'nav-item'}>
       <Icon className={`w-4 h-4 ${active ? 'text-brand-600' : 'text-text-muted'}`} />
