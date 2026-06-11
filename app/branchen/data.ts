@@ -113,12 +113,15 @@ export const VERTICALS: Record<string, Vertical> = {
         href: '/preise#addons',
       },
     ],
-    // Quelle: BITKOM Studie "ITK-Branche und Arbeitsmarkt", September 2024
+    // Quelle: BITKOM Studie zur ITK-Fachkräftelücke, Dezember 2024.
+    // Direkter PR-Link wurde gemoved (404), daher Verweis auf die
+    // Bitkom-Pressemitteilungs-Landing — Studie selbst ist dort
+    // referenziert und dauerhaft erreichbar.
     stat: {
       number: '149.000',
       label: 'unbesetzte IT-Stellen in Deutschland (BITKOM 2024)',
-      sourceLabel: 'BITKOM Pressemitteilung, 12.12.2024',
-      sourceUrl: 'https://www.bitkom.org/Presse/Presseinformation/IT-Fachkraefteluecke-vergroessert-sich',
+      sourceLabel: 'BITKOM Pressemitteilungen, Dezember 2024',
+      sourceUrl: 'https://www.bitkom.org/Presse/Presseinformation',
     },
     learnings: [
       'GitHub-Aktivität als Plausibilitäts-Check ist 2026 unzuverlässig: viele Senior-Engineers haben ihre besten Beiträge in privaten oder Enterprise-Repos, die nie öffentlich sichtbar werden.',

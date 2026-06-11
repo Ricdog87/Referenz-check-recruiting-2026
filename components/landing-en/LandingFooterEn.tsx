@@ -39,7 +39,7 @@ export function LandingFooterEn() {
             links={[
               { label: 'HR departments', href: '/preise#hr' },
               { label: 'Recruitment agencies (closed beta)', href: '/waitlist-agency' },
-              { label: 'Enterprise', href: '/preise#enterprise' },
+              { label: 'Enterprise', href: 'mailto:hello@candiq.de?subject=Enterprise%20inquiry', external: true },
             ]}
           />
 

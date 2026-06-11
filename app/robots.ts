@@ -12,6 +12,8 @@ export default function robots(): MetadataRoute.Robots {
           '/referenzpruefung', '/reference-check-dsgvo', '/zeugnis-pruefen-lassen',
           '/lebenslauf-verifizieren', '/pre-employment-screening', '/background-check-dsgvo',
           '/vergleich', '/fuer',
+          // Detail-Seiten (PR #86) + Termin-Page (PR #89)
+          '/roi-rechner', '/pilotprogramm', '/compliance', '/termin',
         ],
         disallow: ['/api/', '/dashboard', '/candidates', '/checks', '/analytics', '/settings', '/integrations', '/clients', '/addons', '/login', '/register', '/forgot-password', '/reset-password'],
       },

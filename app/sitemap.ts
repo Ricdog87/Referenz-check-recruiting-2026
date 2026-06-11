@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { listStaedte } from '@/data/staedte'
+import { LEAD_MAGNETS } from '@/content/resources/data'
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://candiq.de'
 
@@ -46,8 +47,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Ressourcen
     { url: `${BASE_URL}/resources`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/resources/interview-leitfaden`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
-    { url: `${BASE_URL}/resources/dsgvo-checkliste-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
+    // Lead-Magnet-Slugs aus der Single-Source-of-Truth — verhindert, dass
+    // neue Magnete in der Sitemap vergessen werden.
+    ...LEAD_MAGNETS.map((m) => ({
+      url: `${BASE_URL}/resources/${m.slug}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    })),
+
+    // Termin-Buchungs-Page (candiq-Branded HubSpot-Wrapper) — sollte
+    // fuer Brand-Suche indexierbar sein.
+    { url: `${BASE_URL}/termin`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
 
     // Rechtliches
     { url: `${BASE_URL}/datenschutz`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },

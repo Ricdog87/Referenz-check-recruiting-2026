@@ -210,7 +210,7 @@ function PremiumCard({ addon }: { addon: Addon }) {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <a
-              href="#addon-details"
+              href="#addons"
               className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/25 text-white transition-all"
             >
               Mehr erfahren
