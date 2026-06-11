@@ -31,6 +31,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Produkt & Branchen
     { url: `${BASE_URL}/demo`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/preise`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE_URL}/roi-rechner`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${BASE_URL}/pilotprogramm`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE_URL}/compliance`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${BASE_URL}/branchen`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${BASE_URL}/branchen/tech-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/branchen/sales-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
