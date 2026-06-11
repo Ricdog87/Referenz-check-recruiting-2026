@@ -66,15 +66,18 @@ export function Hero() {
       {/* Grid background */}
       <div className="absolute inset-0 grid-bg grid-bg-mask opacity-60 pointer-events-none" />
 
-      <motion.div style={{ opacity: fadeOut }} className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-14 items-center">
-        {/* LEFT: Copy */}
-        <motion.div style={{ y: textY }}>
+      <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-[1.05fr_1fr] gap-8 lg:gap-14 items-center">
+        {/* LEFT: Copy — auf Mobile als zweites (order-2), Voice-Card oben.
+            Auf Desktop links wie bisher (lg:order-1). FadeOut nur auf
+            Copy, damit die Voice-Card beim Scroll nicht unsichtbar wird
+            (das war auf Mobile der "verschwindet beim Scrollen"-Bug). */}
+        <motion.div style={{ y: textY, opacity: fadeOut }} className="order-2 lg:order-1">
           {/* Live badge — referenziert direkt das Voice-Element */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 mb-7 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white border border-brand-200 shadow-card"
+            className="inline-flex items-center gap-2 mb-7 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white border border-brand-200 shadow-card order-1"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
@@ -83,25 +86,17 @@ export function Hero() {
             <span className="text-text-primary">{copy.badge}</span>
           </motion.div>
 
-          {/* Headline — sensorisch, Voice im Zentrum */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-[clamp(40px,6.5vw,72px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary"
-          >
+          {/* Headline — KEIN initial-opacity-0, weil das LCP-Element ist.
+              Framer-Motion-Fade verzoegert den Render um delay+duration
+              und macht LCP unnoetig spaet (gemessen 2.4s, Schwelle 2.5s). */}
+          <h1 className="text-[clamp(40px,6.5vw,72px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary">
             <span className="block">{copy.headline.line1}</span>
             <span className="block"><span className="text-gradient-brand">{copy.headline.line2}</span></span>
             <span className="block">{copy.headline.line3}</span>
-          </motion.h1>
+          </h1>
 
-          {/* Subtitle — Erlebnis statt Feature, CTA in den Fließtext */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9"
-          >
+          {/* Subtitle — direkter Render, kein Animation-Delay. */}
+          <p className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9">
             {copy.subline.intro}{' '}
             <span className="font-semibold text-text-primary">
               Klicken Sie das Mikrofon{' '}
@@ -110,7 +105,7 @@ export function Hero() {
               </Link>
               {' '}{copy.subline.cta}
             </span>
-          </motion.p>
+          </p>
 
           {/* CTAs */}
           <motion.div
@@ -164,18 +159,19 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* RIGHT: Voice console — dark glass card, anker für Sticky-CTA und Mobile-CTA */}
+        {/* RIGHT: Voice console — auf Mobile als erstes (order-1, "wow first"),
+            auf Desktop rechts wie bisher (lg:order-2). */}
         <motion.div
           id="voice-demo"
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="scroll-mt-24"
+          className="scroll-mt-24 order-1 lg:order-2"
         >
           <div className="relative">
             {/* Outer glow ring */}
             <div className="absolute -inset-3 rounded-[2.5rem] bg-gradient-to-br from-indigo-500/35 via-fuchsia-500/25 to-cyan-500/25 blur-2xl" />
-            <div className="relative rounded-[2rem] border border-white/10 bg-slate-950 p-7 sm:p-8 shadow-2xl">
+            <div className="relative rounded-[2rem] border border-white/10 bg-slate-950 p-5 sm:p-8 shadow-2xl">
               <div className="flex items-center justify-center gap-2 text-[11px] font-medium uppercase tracking-[0.2em] text-indigo-300">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                 Live · im Browser · keine Wartezeit
@@ -197,7 +193,7 @@ export function Hero() {
             </div>
           </div>
         </motion.div>
-      </motion.div>
+      </div>
     </section>
   )
 }

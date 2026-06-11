@@ -98,16 +98,27 @@ export function ConsentManager({ gaId }: { gaId: string }) {
       role="dialog"
       aria-label="Cookie-Einstellungen"
       aria-live="polite"
-      className="fixed inset-x-0 bottom-0 z-[9998] p-4 sm:p-6"
+      className="fixed inset-x-0 bottom-0 z-[9998] p-3 sm:p-6"
     >
-      <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-white shadow-card-xl p-5 sm:p-6">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center flex-shrink-0">
+      <div className="max-w-3xl mx-auto rounded-2xl border border-border bg-white shadow-card-xl p-4 sm:p-6">
+        <div className="flex items-start gap-3 mb-3 sm:mb-4">
+          <div className="hidden sm:flex w-9 h-9 rounded-xl bg-brand-50 border border-brand-100 items-center justify-center flex-shrink-0">
             <ShieldCheck className="w-4 h-4 text-brand-600" />
           </div>
           <div className="flex-1">
             <h2 className="text-sm font-bold text-text-primary mb-1">Datenschutz-Einstellungen</h2>
-            <p className="text-xs text-text-secondary leading-relaxed">
+            {/* Mobile: kompakte Variante. Desktop: vollständiger Text.
+                Senior-Mobile-UX: der Banner darf nicht 60 % Viewport
+                einnehmen, sonst sind alle CTAs darunter unklickbar. */}
+            <p className="text-xs text-text-secondary leading-relaxed sm:hidden">
+              Wir nutzen technisch notwendige Cookies (immer aktiv) und optional Google Analytics zur
+              Reichweitenmessung —{' '}
+              <Link href="/datenschutz" className="text-brand-700 font-semibold hover:underline">
+                Details
+              </Link>
+              .
+            </p>
+            <p className="hidden sm:block text-xs text-text-secondary leading-relaxed">
               Wir nutzen technisch notwendige Cookies (immer aktiv). Zusätzlich möchten wir mit Google
               Analytics anonymisiert messen, wie unsere Seite genutzt wird — nur mit Ihrer Einwilligung.
               Sie können frei wählen und Ihre Entscheidung jederzeit über &bdquo;Cookie-Einstellungen&ldquo; im
@@ -151,18 +162,45 @@ export function ConsentManager({ gaId }: { gaId: string }) {
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+        {/* Mobile: zwei Buttons inline (Akzeptieren + Ablehnen),
+            "Einstellungen" als kleiner Text-Link darunter — spart 60+ px
+            Vertical und verhindert dass Hero-CTAs darunter unklickbar
+            werden. Desktop: vollständige 3-Button-Reihe wie bisher. */}
+        <div className="grid grid-cols-2 sm:hidden gap-2 mb-2">
+          <button
+            onClick={() => decide('denied')}
+            className="btn-secondary text-sm py-2.5"
+          >
+            Ablehnen
+          </button>
+          <button
+            onClick={() => decide(showDetails ? (analyticsChecked ? 'granted' : 'denied') : 'granted')}
+            className="btn-primary text-sm py-2.5"
+          >
+            {showDetails ? 'Speichern' : 'Akzeptieren'}
+          </button>
+        </div>
+        {!showDetails && (
+          <button
+            onClick={() => setShowDetails(true)}
+            className="sm:hidden text-xs text-text-muted underline underline-offset-2 hover:text-text-primary"
+          >
+            Einstellungen
+          </button>
+        )}
+
+        <div className="hidden sm:flex flex-row gap-2 justify-end">
           {showDetails ? (
             <button
               onClick={() => decide(analyticsChecked ? 'granted' : 'denied')}
-              className="btn-primary text-sm py-2.5 px-5 order-1 sm:order-3"
+              className="btn-primary text-sm py-2.5 px-5 order-3"
             >
               Auswahl speichern
             </button>
           ) : (
             <button
               onClick={() => setShowDetails(true)}
-              className="btn-secondary text-sm py-2.5 px-5 order-3 sm:order-1"
+              className="btn-secondary text-sm py-2.5 px-5 order-1"
             >
               Einstellungen
             </button>
@@ -175,7 +213,7 @@ export function ConsentManager({ gaId }: { gaId: string }) {
           </button>
           <button
             onClick={() => decide('granted')}
-            className="btn-primary text-sm py-2.5 px-5 order-1 sm:order-3"
+            className="btn-primary text-sm py-2.5 px-5 order-3"
           >
             Alle akzeptieren
           </button>

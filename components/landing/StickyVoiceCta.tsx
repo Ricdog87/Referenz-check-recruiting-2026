@@ -37,7 +37,7 @@ export function StickyVoiceCta() {
       href="#voice-demo"
       aria-label="candiq Voice ausprobieren"
       onClick={() => trackHeroEngagement('sticky_voice_click', getHeroVariant())}
-      className={`fixed bottom-5 right-5 z-40 hidden sm:inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-5 py-3.5 text-sm font-semibold text-white shadow-2xl shadow-indigo-500/40 transition-all duration-300 hover:scale-105 hover:shadow-fuchsia-500/40 ${
+      className={`fixed bottom-5 right-5 z-[60] inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 px-4 py-3 sm:px-5 sm:py-3.5 text-xs sm:text-sm font-semibold text-white shadow-2xl shadow-indigo-500/40 transition-all duration-300 hover:scale-105 hover:shadow-fuchsia-500/40 ${
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'
       }`}
     >
