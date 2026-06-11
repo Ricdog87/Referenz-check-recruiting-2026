@@ -136,8 +136,6 @@ export function PricingPreview() {
 
                   <Link
                     href={BOOKING_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all ${
                       p.highlight
                         ? 'bg-white text-brand-700 hover:bg-bg-secondary'

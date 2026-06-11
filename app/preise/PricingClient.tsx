@@ -324,8 +324,6 @@ export function PricingClient() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="btn-primary py-3 px-7 inline-flex items-center gap-2"
             >
               <CalendarCheck className="w-4 h-4" />

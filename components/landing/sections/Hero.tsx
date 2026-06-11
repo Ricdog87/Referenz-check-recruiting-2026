@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { ArrowRight, CalendarCheck, ShieldCheck, Headphones } from 'lucide-react'
 import { BOOKING_URL } from '@/lib/site'
+import { getHeroVariant, HERO_COPY, trackHeroEngagement } from '@/lib/abExperiment'
 
 const VoiceConsole = dynamic(() => import('./VoiceConsole'), {
   ssr: false,
@@ -41,6 +42,15 @@ export function Hero() {
   const textY = useTransform(scrollYProgress, [0, 1], [0, -60])
   const fadeOut = useTransform(scrollYProgress, [0, 0.5], [1, 0])
 
+  // A/B-Variante: server-stabil per env-var, GA4-Tracking client-side
+  const variant = getHeroVariant()
+  const copy = HERO_COPY[variant]
+
+  useEffect(() => {
+    // Ein 'view'-Event pro Mount — GA4 segmentiert nach variant-Param.
+    trackHeroEngagement('view', variant)
+  }, [variant])
+
   return (
     <section ref={ref} id="hero" className="relative pt-28 pb-24 lg:pb-32 px-6 overflow-hidden">
       {/* Animated background blobs */}
@@ -70,7 +80,7 @@ export function Hero() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-500 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-600" />
             </span>
-            <span className="text-text-primary">candiq Voice ist live · Probieren Sie es jetzt →</span>
+            <span className="text-text-primary">{copy.badge}</span>
           </motion.div>
 
           {/* Headline — sensorisch, Voice im Zentrum */}
@@ -80,9 +90,9 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-[clamp(40px,6.5vw,72px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary"
           >
-            <span className="block">Ihre Kandidaten</span>
-            <span className="block"><span className="text-gradient-brand">sprechen mit candiq.</span></span>
-            <span className="block">In Sekunden. Rund um die Uhr.</span>
+            <span className="block">{copy.headline.line1}</span>
+            <span className="block"><span className="text-gradient-brand">{copy.headline.line2}</span></span>
+            <span className="block">{copy.headline.line3}</span>
           </motion.h1>
 
           {/* Subtitle — Erlebnis statt Feature, CTA in den Fließtext */}
@@ -92,14 +102,13 @@ export function Hero() {
             transition={{ duration: 0.7, delay: 0.25 }}
             className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9"
           >
-            Echte Stimme statt Kontaktformular — die KI nimmt ab, sammelt Stationen und Referenzgeber
-            strukturiert, geschulte Reviewer verifizieren. Sie sehen jedes Wort im Dashboard.{' '}
+            {copy.subline.intro}{' '}
             <span className="font-semibold text-text-primary">
               Klicken Sie das Mikrofon{' '}
               <Link href="#voice-demo" className="underline decoration-2 decoration-brand-400 underline-offset-4 hover:text-brand-700 lg:no-underline">
                 rechts
               </Link>
-              {' '}und hören Sie selbst, wie sich das für Ihre Kandidaten anfühlt.
+              {' '}{copy.subline.cta}
             </span>
           </motion.p>
 
@@ -112,8 +121,7 @@ export function Hero() {
           >
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() => trackHeroEngagement('booking_click', variant)}
               className="btn-primary text-base py-3.5 px-7 group"
             >
               <CalendarCheck className="w-4 h-4" />
@@ -121,7 +129,11 @@ export function Hero() {
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             {/* Mobile-only Anker zum Voice-Demo (auf Desktop schon sichtbar) */}
-            <Link href="#voice-demo" className="btn-secondary text-base py-3.5 px-7 lg:hidden">
+            <Link
+              href="#voice-demo"
+              onClick={() => trackHeroEngagement('voice_click', variant)}
+              className="btn-secondary text-base py-3.5 px-7 lg:hidden"
+            >
               <Headphones className="w-4 h-4 text-brand-600" />
               candiq Voice testen
             </Link>

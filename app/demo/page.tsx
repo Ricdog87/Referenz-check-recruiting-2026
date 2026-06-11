@@ -215,8 +215,6 @@ function DemoCard({ demo }: { demo: typeof DEMOS[0] }) {
       <div className="px-5 pb-5">
         <Link
           href={BOOKING_URL}
-          target="_blank"
-          rel="noopener noreferrer"
           className="w-full relative flex items-center justify-center gap-2 py-3.5 rounded-2xl text-sm font-bold text-white transition-all overflow-hidden group/btn"
           style={{ background: demo.gradient, boxShadow: `0 8px 24px ${demo.glowColor}` }}
         >
@@ -245,8 +243,6 @@ export default function DemoPage() {
             <Link href="/login" className="text-xs font-medium text-text-secondary hover:text-text-primary transition-colors">Anmelden</Link>
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full text-white transition-all"
               style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 4px 14px rgba(79,70,229,.3)' }}
             >
@@ -322,8 +318,6 @@ export default function DemoPage() {
             </p>
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-base font-bold px-7 py-3.5 rounded-full text-white transition-all hover:scale-[1.02] mb-10"
               style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 8px 30px rgba(79,70,229,.35)' }}
             >
@@ -411,8 +405,6 @@ export default function DemoPage() {
           <p className="text-sm text-text-secondary mb-4">Überzeugt? Wir richten Ihren persönlichen Testzugang im 15-Min-Call ein.</p>
           <Link
             href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-base font-bold px-8 py-3.5 rounded-full text-white transition-all hover:scale-105"
             style={{ background: 'linear-gradient(135deg,#4f46e5,#8b5cf6)', boxShadow: '0 8px 30px rgba(79,70,229,.35)' }}
           >

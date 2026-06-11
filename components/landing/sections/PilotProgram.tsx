@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+import { PilotSlotCounter } from '../PilotSlotCounter'
 
 const HIRES_OPTIONS = [
   { value: '5-19', label: '5–19 Hires/Jahr' },
@@ -67,6 +68,11 @@ export function PilotProgram() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 mb-4 self-start">
                 <Sparkles className="w-3.5 h-3.5" />
                 Pilot-Programm Q3/2026
+              </div>
+              {/* Live-Counter direkt unter dem Badge: gleicher Knappheits-
+                  Trigger, der Form und Slot-Anzeige verkoppelt */}
+              <div className="mb-5">
+                <PilotSlotCounter />
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tighter mb-4 text-text-primary leading-tight">
                 10 HR-Teams gesucht — 25 % Discount im ersten Jahr.

@@ -57,8 +57,6 @@ export function LandingNav() {
           </Link>
           <Link
             href={BOOKING_URL}
-            target="_blank"
-            rel="noopener noreferrer"
             className="btn-primary whitespace-nowrap text-xs py-2 px-3.5 inline-flex items-center gap-1.5"
           >
             <CalendarCheck className="w-3.5 h-3.5" />
@@ -91,8 +89,6 @@ export function LandingNav() {
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               onClick={() => setOpen(false)}
               className="btn-primary w-full flex items-center justify-center gap-1.5"
             >

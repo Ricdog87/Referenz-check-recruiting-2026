@@ -5,9 +5,10 @@ import { LandingNav } from '@/components/landing/LandingNav'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 import { StickyVoiceCta } from '@/components/landing/StickyVoiceCta'
 import { JsonLd } from '@/components/JsonLd'
-import { pageMeta, softwareApplicationJsonLd } from '@/lib/seo'
+import { pageMeta, softwareApplicationJsonLd, breadcrumbJsonLd } from '@/lib/seo'
 import { ROICalculator } from '@/components/landing/sections/ROICalculator'
 import { FinalCta } from '@/components/landing/sections/FinalCta'
+import { RelatedPagesStrip } from '@/components/landing/RelatedPagesStrip'
 import { BOOKING_URL } from '@/lib/site'
 
 export const metadata: Metadata = pageMeta({
@@ -21,6 +22,10 @@ export default function RoiRechnerPage() {
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <JsonLd data={softwareApplicationJsonLd()} />
+      <JsonLd data={breadcrumbJsonLd([
+        { name: 'Start', path: '/' },
+        { name: 'ROI-Rechner', path: '/roi-rechner' },
+      ])} />
       <LandingNav />
       <main id="main">
         {/* Page-Hero — kurz, dann direkt der Rechner */}
@@ -75,8 +80,6 @@ export default function RoiRechnerPage() {
           <div className="max-w-3xl mx-auto text-center">
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="btn-primary text-base py-3.5 px-7 inline-flex group"
             >
               <CalendarCheck className="w-4 h-4" />
@@ -89,6 +92,7 @@ export default function RoiRechnerPage() {
           </div>
         </section>
 
+        <RelatedPagesStrip currentHref="/roi-rechner" />
         <FinalCta />
       </main>
       <LandingFooter />

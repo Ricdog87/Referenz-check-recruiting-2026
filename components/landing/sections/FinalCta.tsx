@@ -38,8 +38,6 @@ export function FinalCta() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="btn-primary text-base py-4 px-8 group"
             >
               <CalendarCheck className="w-4 h-4" />

@@ -3,8 +3,10 @@ import { LandingNav } from '@/components/landing/LandingNav'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 import { StickyVoiceCta } from '@/components/landing/StickyVoiceCta'
 import { JsonLd } from '@/components/JsonLd'
-import { pageMeta, softwareApplicationJsonLd } from '@/lib/seo'
+import { pageMeta, softwareApplicationJsonLd, breadcrumbJsonLd } from '@/lib/seo'
 import { PilotProgram } from '@/components/landing/sections/PilotProgram'
+import { PilotSlotCounter } from '@/components/landing/PilotSlotCounter'
+import { RelatedPagesStrip } from '@/components/landing/RelatedPagesStrip'
 import { Sparkles } from 'lucide-react'
 
 export const metadata: Metadata = pageMeta({
@@ -18,6 +20,10 @@ export default function PilotprogrammPage() {
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <JsonLd data={softwareApplicationJsonLd()} />
+      <JsonLd data={breadcrumbJsonLd([
+        { name: 'Start', path: '/' },
+        { name: 'Pilot-Programm', path: '/pilotprogramm' },
+      ])} />
       <LandingNav />
       <main id="main">
         {/* Page-Hero */}
@@ -37,6 +43,10 @@ export default function PilotprogrammPage() {
               Strategie-Call mit unserem Gründerteam, Ihr Feedback fließt direkt
               ins Produkt.
             </p>
+            {/* Live-Scarcity: echte ACCEPTED-Belegung aus der DB */}
+            <div className="mt-7 flex justify-center">
+              <PilotSlotCounter />
+            </div>
           </div>
         </section>
 
@@ -57,6 +67,7 @@ export default function PilotprogrammPage() {
         </section>
 
         <PilotProgram />
+        <RelatedPagesStrip currentHref="/pilotprogramm" />
       </main>
       <LandingFooter />
       <StickyVoiceCta />
