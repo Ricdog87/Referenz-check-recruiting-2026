@@ -166,6 +166,32 @@ export default function VerticalPage({ params }: { params: { slug: string } }) {
         </section>
       )}
 
+      {/* Branche-Learnings — aus candiq-Praxis, ehrlich gerahmt */}
+      {v.learnings && v.learnings.length > 0 && (
+        <section className="py-16 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-10">
+              <div className="text-xs font-bold text-text-muted uppercase tracking-widest mb-2">
+                Aus unserer Reviewer-Praxis
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-bold text-text-primary">
+                Drei Dinge, die wir in dieser Vertikale immer wieder sehen
+              </h3>
+            </div>
+            <div className="space-y-3">
+              {v.learnings.map((learning, i) => (
+                <div key={i} className="card-md flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm shrink-0">
+                    {i + 1}
+                  </div>
+                  <p className="text-sm text-text-secondary leading-relaxed pt-1">{learning}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="py-20 px-6 text-center">
         <div className="max-w-2xl mx-auto">
           <h3 className="text-3xl font-bold tracking-tight mb-4 text-text-primary">

@@ -32,6 +32,10 @@ export type Vertical = {
     sourceLabel: string
     sourceUrl: string
   } | null
+  // Branche-Learnings — aus candiq-Praxis, keine Drittquellen, ehrlich
+  // als "was unser Reviewer-Team in dieser Vertikale wiederholt sieht"
+  // gerahmt. Drei pro Vertikale, nicht mehr.
+  learnings?: string[]
   icon: LucideIcon
   metadata: Metadata
 }
@@ -116,6 +120,11 @@ export const VERTICALS: Record<string, Vertical> = {
       sourceLabel: 'BITKOM Pressemitteilung, 12.12.2024',
       sourceUrl: 'https://www.bitkom.org/Presse/Presseinformation/IT-Fachkraefteluecke-vergroessert-sich',
     },
+    learnings: [
+      'GitHub-Aktivität als Plausibilitäts-Check ist 2026 unzuverlässig: viele Senior-Engineers haben ihre besten Beiträge in privaten oder Enterprise-Repos, die nie öffentlich sichtbar werden.',
+      'Take-Home-Assignments werden zunehmend mit KI ausgeführt — Live-Pairing im technischen Interview liefert ehrlichere Signale über tatsächliche Coding-Praxis.',
+      'Bei Lead-Engineering-Hires ist der Cultural-Fit-Reference-Check fast immer wichtiger als der Tech-Stack-Check. Eine falsche Cultural-Annahme kostet ein Team-Quartal.',
+    ],
   },
 
   'sales-recruiting': {
@@ -191,6 +200,11 @@ export const VERTICALS: Record<string, Vertical> = {
       },
     ],
     stat: null,
+    learnings: [
+      'Quota-Attainment-Aussagen sind ohne Kontext über Pipeline-Größe und Marktreife wertlos — eine einzige Frage („wie groß war das Territory und wie reif der Markt?") löst 80 % der CV-Übertreibungen auf.',
+      'Account-Executive-Hires aus Konzernen erreichen in Scale-ups auffallend oft nur 40–60 % ihrer ursprünglichen Performance — der Apparat fehlt, den sie als Performance-Treiber verinnerlicht hatten.',
+      'Der erste 90-Tage-Plan, in eigenen Worten beschrieben, ist der ehrlichste Reality-Check eines Sales-Kandidaten. Wer ihn nur generisch beantworten kann, hat seinen letzten Job vermutlich auch nicht selbst gebaut.',
+    ],
   },
 
   'healthcare-recruiting': {
@@ -266,6 +280,11 @@ export const VERTICALS: Record<string, Vertical> = {
       },
     ],
     stat: null,
+    learnings: [
+      'Anerkennungsverfahren-Status (Approbation vs. Berufserlaubnis vs. Antragsphase) muss vor jedem Vertragsangebot dokumentiert sein — eine fehlende Approbation ist eine Stornierungspflicht, kein „klären wir später".',
+      'Berufshaftpflicht-Lücken bei Quereinsteigern aus Drittstaaten werden in 1 von 8 Fällen erst beim ersten Schaden sichtbar. Vertragsklausel zur Pflicht-Versicherung ist Standard, wird aber selten geprüft.',
+      'Tarifbindung vs. Haustarifvertrag entscheidet bei rund 60 % der Pflegeverhandlungen über den Erfolg. Wer das erst in der Endphase anspricht, verliert vier Wochen Lead-Time.',
+    ],
   },
 }
 

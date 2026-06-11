@@ -309,6 +309,44 @@ export async function POST(req: Request) {
       } catch (err) {
         logger.error('intent_alert_exception', err as any)
       }
+
+      // HubSpot-Sync: bei Hot-Lead mit erkannter E-Mail, Contact upserten
+      // mit Score-Metadaten. Best-effort — Fehler stoppen den Flow nicht.
+      // Brauchbar fuer Sales-Folgeprozess in HubSpot (Pipeline-View,
+      // Sequenzen, Aufgaben).
+      if (lead.email_provided) {
+        try {
+          const { upsertContact, addContactToList } = await import('@/lib/hubspot')
+          const sync = await upsertContact({
+            email: lead.email_provided,
+            // Standard-HubSpot-Properties
+            company: lead.company_size_hint,
+            // Custom-Properties (muessen im HubSpot-Portal angelegt sein,
+            // sonst werden sie verworfen — lib/hubspot dokumentiert das).
+            candiq_lead_score: String(lead.score),
+            candiq_lead_intent: lead.intent,
+            candiq_lead_industry: lead.industry_hint ?? '',
+            candiq_lead_timing: lead.timing_hint ?? '',
+            candiq_lead_source: 'ai_concierge',
+            candiq_lead_pathname: pathname ?? '',
+            candiq_lead_summary: lead.summary.slice(0, 250),
+          })
+          if (sync.ok) {
+            logger.info('intent_hubspot_synced', { contactId: sync.contactId })
+            const listId = process.env.HUBSPOT_HOT_LEAD_LIST_ID
+            if (listId) {
+              const listResult = await addContactToList(sync.contactId, listId)
+              if (!listResult.ok) {
+                logger.warn('intent_hubspot_list_add_failed', { error: listResult.reason })
+              }
+            }
+          } else {
+            logger.warn('intent_hubspot_sync_failed', { reason: sync.reason })
+          }
+        } catch (err) {
+          logger.error('intent_hubspot_sync_exception', err as any)
+        }
+      }
     }
   }
 
