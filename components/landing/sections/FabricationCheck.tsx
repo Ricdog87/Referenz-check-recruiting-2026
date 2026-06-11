@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Building2, CalendarClock, BadgeCheck, UserSearch, BookCheck, ShieldCheck, Sparkles, Play, Loader2, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { Reveal } from '../Reveal'
+import { trackConversion } from '@/lib/conversionTracking'
 
 const checks = [
   {
@@ -182,6 +183,7 @@ function LiveDemo() {
     setActive(kind)
     setError(null)
     setReport(null)
+    trackConversion('fabrication_demo', { preset: kind })
     try {
       const res = await fetch('/api/cv-analysis/preview', {
         method: 'POST',

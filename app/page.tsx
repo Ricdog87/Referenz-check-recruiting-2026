@@ -15,6 +15,7 @@ import { HomepageFaq } from '@/components/landing/sections/HomepageFaq'
 import { FinalCta } from '@/components/landing/sections/FinalCta'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 import { StickyVoiceCta } from '@/components/landing/StickyVoiceCta'
+import { VoiceFollowupTeaser } from '@/components/landing/VoiceFollowupTeaser'
 
 export const metadata: Metadata = {
   ...pageMeta({
@@ -65,6 +66,7 @@ export default function LandingPage() {
       </main>
       <LandingFooter />
       <StickyVoiceCta />
+      <VoiceFollowupTeaser />
     </div>
   )
 }

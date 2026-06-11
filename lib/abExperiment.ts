@@ -20,7 +20,20 @@ export const HERO_EXPERIMENT_ID = 'hero_voice_v1'
 
 export function getHeroVariant(): HeroVariant {
   const v = (process.env.NEXT_PUBLIC_HERO_VARIANT ?? 'A').toUpperCase()
-  return v === 'B' ? 'B' : 'A'
+  if (v === 'B') return 'B'
+  // 'ROLLING' = client-side 50/50-Auslosung mit Sticky-per-Visit-Cookie.
+  // Aktiviert nur, wenn der Cookie-basierte Roller per env-flag scharf
+  // gestellt ist (Default off, weil ohne Traffic-Volumen sinnlos).
+  if (v === 'ROLLING') {
+    if (typeof document === 'undefined') return 'A' // SSR-Default
+    const m = document.cookie.match(/(?:^|;\s*)candiq_hero_v=([AB])/)
+    if (m) return m[1] as HeroVariant
+    const rolled: HeroVariant = Math.random() < 0.5 ? 'A' : 'B'
+    // Cookie 30 Tage, SameSite=Lax, HttpOnly NICHT (client liest selbst).
+    document.cookie = `candiq_hero_v=${rolled}; Max-Age=${30 * 24 * 60 * 60}; Path=/; SameSite=Lax`
+    return rolled
+  }
+  return 'A'
 }
 
 export const HERO_COPY: Record<HeroVariant, {

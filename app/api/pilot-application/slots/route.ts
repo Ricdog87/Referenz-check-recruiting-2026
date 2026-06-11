@@ -21,21 +21,29 @@ const MAX_PILOT_SLOTS = parseInt(process.env.PILOT_PROGRAM_MAX_SLOTS ?? '10', 10
  */
 export async function GET() {
   let used = 0
+  let pipeline = 0
   try {
-    used = await prisma.pilotApplication.count({ where: { status: 'ACCEPTED' } })
+    // Zwei Queries parallel: ACCEPTED (belegte Slots) + PENDING (Pipeline,
+    // optionaler Trust-Signal fuer die Marketing-Page).
+    const [usedCount, pipelineCount] = await Promise.all([
+      prisma.pilotApplication.count({ where: { status: 'ACCEPTED' } }),
+      prisma.pilotApplication.count({ where: { status: 'PENDING' } }),
+    ])
+    used = usedCount
+    pipeline = pipelineCount
   } catch (err) {
     // DB-Ausfall: konservativer Default (Programm offen, Counter neutral).
     // Pilot-Seite zeigt dann nur den Max-Wert ohne aktuelle Belegung —
     // weniger Conversion-Signal, aber kein 500 fuer den Besucher.
     console.error('pilot_slots_count_failed', err)
     return NextResponse.json(
-      { max: MAX_PILOT_SLOTS, used: 0, remaining: MAX_PILOT_SLOTS, full: false, degraded: true },
+      { max: MAX_PILOT_SLOTS, used: 0, remaining: MAX_PILOT_SLOTS, full: false, pipeline: 0, degraded: true },
       { status: 200, headers: { 'Cache-Control': 'no-store' } },
     )
   }
   const remaining = Math.max(0, MAX_PILOT_SLOTS - used)
   return NextResponse.json(
-    { max: MAX_PILOT_SLOTS, used, remaining, full: remaining === 0 },
+    { max: MAX_PILOT_SLOTS, used, remaining, full: remaining === 0, pipeline },
     { status: 200, headers: { 'Cache-Control': 'public, max-age=60, s-maxage=60' } },
   )
 }

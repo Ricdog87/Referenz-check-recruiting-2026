@@ -1,14 +1,24 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Calculator, TrendingUp, ShieldCheck } from 'lucide-react'
 import { Reveal } from '../Reveal'
+import { trackConversionDebounced } from '@/lib/conversionTracking'
 
 export function ROICalculator() {
   const [hires, setHires] = useState(20)
   const [avgSalary, setAvgSalary] = useState(70000)
   const [misHireRate, setMisHireRate] = useState(15)
+
+  // Debounced GA4-Event: nicht 50 Events pro Drag, nur finale Werte.
+  useEffect(() => {
+    trackConversionDebounced('roi_calculator', {
+      hires,
+      avg_salary: avgSalary,
+      mis_hire_rate: misHireRate,
+    })
+  }, [hires, avgSalary, misHireRate])
 
   const misHires = (hires * misHireRate) / 100
   const misHireCost = misHires * avgSalary * 1.5
