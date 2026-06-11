@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 import { PilotSlotCounter } from '../PilotSlotCounter'
+import { trackConversion } from '@/lib/conversionTracking'
 
 const HIRES_OPTIONS = [
   { value: '5-19', label: '5–19 Hires/Jahr' },
@@ -29,6 +30,7 @@ export function PilotProgram() {
     if (status === 'submitting') return
     setStatus('submitting')
     setMessage('')
+    trackConversion('pilot_form_submit', { hires_per_year: form.hiresPerYear || 'unknown' })
     try {
       const res = await fetch('/api/pilot-application', {
         method: 'POST',
@@ -43,6 +45,7 @@ export function PilotProgram() {
       }
       setStatus('success')
       setMessage(data.message ?? 'Vielen Dank! Wir melden uns innerhalb von 2 Werktagen.')
+      trackConversion('pilot_form_success', { hires_per_year: form.hiresPerYear || 'unknown' })
     } catch (err: any) {
       setStatus('error')
       setMessage('Netzwerk-Fehler. Bitte versuchen Sie es erneut.')

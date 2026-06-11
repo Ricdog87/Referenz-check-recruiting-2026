@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, PhoneOff, Loader2 } from 'lucide-react'
+import { trackConversion } from '@/lib/conversionTracking'
 
 const AGENT_ID = 'agent_9601ktktemgwfk3tey407mkkxnc5'
 
@@ -30,6 +31,7 @@ function Waveform({ active }: { active: boolean }) {
 function Console() {
   const [error, setError] = useState<string | null>(null)
   const [starting, setStarting] = useState(false)
+  const startedAtRef = useRef<number | null>(null)
   const conversation = useConversation({
     onError: (message) => {
       console.error('[candiq voice]', message)
@@ -51,6 +53,8 @@ function Console() {
   const start = useCallback(() => {
     setError(null)
     setStarting(true)
+    startedAtRef.current = Date.now()
+    trackConversion('voice_demo_start')
     try {
       conversation.startSession({ agentId: AGENT_ID, connectionType: 'websocket' })
     } catch (e) {
@@ -61,6 +65,9 @@ function Console() {
   }, [conversation])
 
   const stop = useCallback(() => {
+    const seconds = startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : 0
+    trackConversion('voice_demo_end', { duration_seconds: seconds })
+    startedAtRef.current = null
     conversation.endSession()
   }, [conversation])
 
