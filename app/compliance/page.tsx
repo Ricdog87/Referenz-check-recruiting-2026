@@ -5,10 +5,34 @@ import { LandingNav } from '@/components/landing/LandingNav'
 import { LandingFooter } from '@/components/landing/LandingFooter'
 import { StickyVoiceCta } from '@/components/landing/StickyVoiceCta'
 import { JsonLd } from '@/components/JsonLd'
-import { pageMeta, softwareApplicationJsonLd } from '@/lib/seo'
+import { pageMeta, softwareApplicationJsonLd, breadcrumbJsonLd, faqJsonLd } from '@/lib/seo'
 import { CompliancePromise } from '@/components/landing/sections/CompliancePromise'
 import { FinalCta } from '@/components/landing/sections/FinalCta'
+import { RelatedPagesStrip } from '@/components/landing/RelatedPagesStrip'
 import { BOOKING_URL } from '@/lib/site'
+
+const COMPLIANCE_FAQ = [
+  {
+    q: 'Wo werden die Personaldaten gespeichert?',
+    a: 'Ausschließlich in Rechenzentren in Deutschland und EU. Die Datenbank liegt bei einer EU-Region eines deutschen Cloud-Anbieters (Supabase EU). Keine Datenübermittlung in unsichere Drittstaaten ohne dokumentierte Standardvertragsklauseln.',
+  },
+  {
+    q: 'Wie lange werden Kandidatendaten aufbewahrt?',
+    a: 'Abgeschlossene Referenzprüfungen werden nach maximal 180 Tagen automatisch gelöscht — über einen täglich laufenden Cron-Job. Die Frist ist pro Kandidaten-Status differenziert und gesetzlich begründbar. Bewerber können vorher jederzeit Löschung verlangen (Art. 17 DSGVO).',
+  },
+  {
+    q: 'Gibt es einen Auftragsverarbeitungsvertrag?',
+    a: 'Ja, ein Standard-AVV nach Art. 28 DSGVO ist im Lieferumfang enthalten — keine Sonderverhandlung nötig. Für regulierte Branchen (Banking, Healthcare, Versicherung) bieten wir branchenspezifische Anpassungen.',
+  },
+  {
+    q: 'Werden Referenzgeber von einer KI angerufen?',
+    a: 'Nein. Referenzgeber werden ausschließlich von geschulten menschlichen Reviewern persönlich kontaktiert. KI dokumentiert und strukturiert nur, was Menschen verifiziert haben. candiq Voice spricht ausschließlich mit Kandidaten — niemals mit deren Referenzgebern.',
+  },
+  {
+    q: 'Wie ist die DSAR-Auskunft (Art. 15 DSGVO) organisiert?',
+    a: 'Jeder Lesezugriff, jede Statusänderung und jede E-Mail wird in einem Audit-Trail mit Zeitstempel, Akteur und IP protokolliert. Eine Auskunft an einen Betroffenen ist damit ein gezielter Datenbank-Export, keine wochenlange manuelle Recherche.',
+  },
+]
 
 export const metadata: Metadata = pageMeta({
   title: 'Compliance & DSGVO — Wie candiq Personaldaten schützt',
@@ -54,6 +78,11 @@ export default function CompliancePage() {
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <JsonLd data={softwareApplicationJsonLd()} />
+      <JsonLd data={breadcrumbJsonLd([
+        { name: 'Start', path: '/' },
+        { name: 'Compliance & DSGVO', path: '/compliance' },
+      ])} />
+      <JsonLd data={faqJsonLd(COMPLIANCE_FAQ)} />
       <LandingNav />
       <main id="main">
         {/* Page-Hero */}
@@ -123,8 +152,6 @@ export default function CompliancePage() {
               </div>
               <Link
                 href={BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="btn-secondary text-sm py-2 px-4 inline-flex"
               >
                 <CalendarCheck className="w-4 h-4" />
@@ -134,6 +161,37 @@ export default function CompliancePage() {
           </div>
         </section>
 
+        {/* Sichtbare FAQ — gleicher Content wie der FAQPage-JsonLd oben.
+            Strukturierte Daten + sichtbarer Text ist die Google-konforme
+            Variante; nur strukturiert ohne sichtbar wuerde als spam-naher
+            "hidden content" gewertet. */}
+        <section className="py-16 px-6">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-10">
+              <div className="text-xs font-bold text-text-muted uppercase tracking-widest mb-2">
+                Datenschutz-FAQ
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-text-primary">
+                Die fünf Fragen, die jedes Datenschutz-Team zuerst stellt
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {COMPLIANCE_FAQ.map(({ q, a }) => (
+                <details key={q} className="card-md group">
+                  <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
+                    <span className="text-base font-semibold text-text-primary">{q}</span>
+                    <ArrowRight className="w-4 h-4 text-text-muted shrink-0 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <p className="text-sm text-text-secondary leading-relaxed mt-3 pt-3 border-t border-border">
+                    {a}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <RelatedPagesStrip currentHref="/compliance" />
         <FinalCta />
       </main>
       <LandingFooter />

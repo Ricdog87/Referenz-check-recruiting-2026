@@ -133,8 +133,6 @@ export default function AgencyWaitlistPage() {
                     <div className="mt-3">
                       <Link
                         href={BOOKING_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="text-sm font-semibold text-emerald-800 hover:underline inline-flex items-center gap-1"
                       >
                         Termin für Testzugang buchen <CalendarCheck className="w-4 h-4" />

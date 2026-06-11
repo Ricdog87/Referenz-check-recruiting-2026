@@ -72,8 +72,6 @@ export function HeroEn() {
           >
             <a
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="btn-primary text-base py-3.5 px-7 group"
             >
               <CalendarCheck className="w-4 h-4" />

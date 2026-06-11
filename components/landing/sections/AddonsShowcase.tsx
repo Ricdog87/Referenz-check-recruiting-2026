@@ -142,8 +142,6 @@ export function AddonsShowcase() {
             </div>
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="btn-primary whitespace-nowrap"
             >
               <CalendarCheck className="w-4 h-4" />
@@ -205,8 +203,6 @@ function PremiumCard({ addon }: { addon: Addon }) {
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href={BOOKING_URL}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-base font-bold bg-white text-brand-700 hover:bg-bg-secondary shadow-card transition-all"
             >
               <CalendarCheck className="w-4 h-4" />
@@ -318,8 +314,6 @@ function ServiceCard({ addon }: { addon: Addon }) {
         </div>
         <Link
           href={BOOKING_URL}
-          target="_blank"
-          rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold btn-primary whitespace-nowrap"
         >
           <CalendarCheck className="w-3.5 h-3.5" />
