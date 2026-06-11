@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { candidateInputSchema, riskReportSchema } from '@/lib/cv-analysis/types'
 import { runDeterministicChecks } from '@/lib/cv-analysis/deterministicChecks'
 import { runExternalChecks, type ExternalCheckAdapter } from '@/lib/cv-analysis/externalChecks'
@@ -54,5 +54,30 @@ describe('external CV checks', () => {
 
     expect(flags.some((flag) => flag.type === 'referee_email_risk')).toBe(true)
     expect(flags.every((flag) => flag.reason.trim().length > 0)).toBe(true)
+  })
+})
+
+describe('LLM claim analysis resilience', () => {
+  it('falls back instead of throwing when the LLM API call fails', async () => {
+    vi.resetModules()
+    vi.stubEnv('ANTHROPIC_API_KEY', 'sk-ant-test-invalid')
+    vi.doMock('@anthropic-ai/sdk', () => ({
+      default: class {
+        messages = {
+          create: async () => {
+            throw new Error('404 not_found_error: model not found')
+          },
+        }
+      },
+    }))
+
+    const { runLlmClaimAnalysis } = await import('@/lib/cv-analysis/llmClaimAnalysis')
+    const analysis = await runLlmClaimAnalysis(candidateInputSchema.parse(cleanCv))
+
+    expect(analysis.claims).toEqual([])
+    expect(analysis.checklist.length).toBeGreaterThan(0)
+
+    vi.doUnmock('@anthropic-ai/sdk')
+    vi.unstubAllEnvs()
   })
 })

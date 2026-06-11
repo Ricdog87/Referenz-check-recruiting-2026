@@ -61,7 +61,7 @@ async function callOpenAI(system: string, user: string): Promise<string> {
 async function callAnthropic(system: string, user: string): Promise<string> {
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   const response = await client.messages.create({
-    model: process.env.CV_ANALYSIS_ANTHROPIC_MODEL ?? 'claude-3-5-haiku-latest',
+    model: process.env.CV_ANALYSIS_ANTHROPIC_MODEL ?? 'claude-haiku-4-5',
     temperature: 0,
     max_tokens: 2000,
     system,
@@ -78,7 +78,16 @@ async function callConfiguredLlm(system: string, user: string): Promise<string> 
 
 async function parseWithSchema<T>(schema: z.ZodSchema<T>, system: string, user: string, fallback: T): Promise<T> {
   for (let attempt = 0; attempt < 2; attempt++) {
-    const text = await callConfiguredLlm(system, user)
+    let text: string
+    try {
+      text = await callConfiguredLlm(system, user)
+    } catch (err) {
+      // LLM-API-Fehler (ungültiger Key, retired Model, Netz) darf den
+      // Gesamt-Report nicht killen: deterministische + externe Checks
+      // bleiben maßgeblich, Retry mit gleichem Fehlerbild wäre sinnlos.
+      console.error('cv-analysis_llm_call_failed', err)
+      return fallback
+    }
     let json: unknown
     try {
       json = jsonFromText(text)
