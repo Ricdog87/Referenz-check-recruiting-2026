@@ -200,13 +200,67 @@ export async function POST(req: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        // Phase 1: nur loggen. Mahnflow ist Phase 2.
+        // Plan-Status auf PAST_DUE setzen + Audit-Log. Stripe selbst
+        // schickt dem Kunden die Mahn-Mails; wir reflektieren den Status
+        // ins Dashboard, damit der Kunde proaktiv handeln kann (Stripe-
+        // Customer-Portal-Link in der Billing-UI).
         const inv = event.data.object as Stripe.Invoice
+        const customerId = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id
+        // Stripe API "dahlia" hat invoice.subscription entfernt; subId
+        // koennen wir nicht mehr direkt vom Invoice-Objekt lesen. Fuer
+        // den Status-Update reicht customerId — der User hat nur eine
+        // aktive Subscription gleichzeitig.
         console.warn('stripe_invoice_payment_failed', {
           invoiceId: inv.id,
-          customerId: typeof inv.customer === 'string' ? inv.customer : inv.customer?.id,
+          customerId,
           amountDue: inv.amount_due,
         })
+        if (!customerId) break
+
+        const user = await prisma.user.findUnique({
+          where: { stripeCustomerId: customerId },
+          select: { id: true, email: true, name: true, planStatus: true },
+        })
+        if (!user) {
+          console.warn('stripe_payment_failed_user_not_found', { customerId })
+          break
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { planStatus: 'PAST_DUE' },
+        })
+
+        await prisma.auditLog.create({
+          data: {
+            userId: user.id,
+            action: 'PAYMENT_FAILED',
+            entity: 'Subscription',
+            entityId: null,
+            details: JSON.stringify({
+              invoiceId: inv.id,
+              amountDueCents: inv.amount_due,
+              previousStatus: user.planStatus,
+            }),
+          },
+        }).catch((e) => console.error('stripe_payment_failed_audit_log_error', e))
+
+        // Best-effort: User per Mail benachrichtigen. Resend liefert via
+        // lib/email; ohne RESEND_API_KEY laeuft das in den AuditLog
+        // (Dev-Modus).
+        try {
+          const { sendEmail } = await import('@/lib/email')
+          await sendEmail({
+            to: user.email,
+            subject: 'Ihre candiq-Zahlung ist fehlgeschlagen',
+            text: `Hallo ${user.name},\n\nIhre letzte candiq-Abrechnung konnte nicht eingezogen werden. Bitte aktualisieren Sie Ihre Zahlungsmethode im Stripe-Customer-Portal — den Link finden Sie in Ihrem candiq-Dashboard unter "Abrechnung".\n\nDamit Ihr Zugang nicht unterbrochen wird, bitte innerhalb der nächsten Tage erledigen. Bei Rückfragen einfach auf diese Mail antworten.\n\nViele Grüße,\ncandiq`,
+            html: `<p>Hallo ${user.name},</p><p>Ihre letzte candiq-Abrechnung konnte nicht eingezogen werden. Bitte aktualisieren Sie Ihre Zahlungsmethode im Stripe-Customer-Portal — den Link finden Sie in Ihrem candiq-Dashboard unter <strong>Abrechnung</strong>.</p><p>Damit Ihr Zugang nicht unterbrochen wird, bitte innerhalb der nächsten Tage erledigen. Bei Rückfragen einfach auf diese Mail antworten.</p><p>Viele Grüße,<br>candiq</p>`,
+            category: 'stripe_payment_failed',
+          })
+        } catch (e) {
+          console.error('stripe_payment_failed_email_error', e)
+        }
+
         break
       }
 
