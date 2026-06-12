@@ -26,17 +26,17 @@ const audiences = [
   {
     icon: Users2,
     badge: 'Personaldienstleister',
-    title: 'Personaldienstleister (Closed Beta)',
+    title: 'Personaldienstleister',
     description:
-      'Sie liefern Kandidaten an Endkunden — und Ihr Wert hängt davon ab, dass die Vorqualifizierung wirklich stimmt. PDL-Pakete mit Multi-Mandanten und White-Label sind aktuell in Closed Beta.',
+      'Sie liefern Kandidaten an Endkunden — und Ihr Wert hängt davon ab, dass die Vorqualifizierung wirklich stimmt. PDL-Pakete sind ab sofort buchbar; Multi-Mandanten und White-Label folgen iterativ mit den ersten Pilotkunden.',
     bullets: [
+      'Verifizierte Referenzen vor Vermittlung statt nach Reklamation',
+      'Audit-Trail pro Kandidat als Beweismittel gegenüber Endkunden',
       'Geplant: Mandanten-Verwaltung mit eigenen Workflows',
       'Geplant: White-Label inkl. Logo & Reports',
-      'Geplant: Bulk-Upload für ganze Pipelines',
-      'Geplant: API & Webhooks für Ihre Systeme',
     ],
-    cta: 'Frühen Zugang anfragen',
-    href: '/waitlist-agency',
+    cta: 'PDL-Konto anlegen',
+    href: '/register?type=RECRUITMENT_AGENCY',
     gradient: 'from-violet via-violet to-cyan',
     bg: 'from-violet/10 to-white',
   },

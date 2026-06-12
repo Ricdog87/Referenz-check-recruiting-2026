@@ -54,7 +54,7 @@ export function LandingFooter() {
             links={[
               { label: 'HR-Abteilungen', href: '/fuer/hr-abteilungen' },
               { label: 'Mittelstand 200+ MA', href: '/fuer/mittelstand' },
-              { label: 'Personaldienstleister (bald verfügbar)', href: '/waitlist-agency' },
+              { label: 'Personaldienstleister', href: '/register?type=RECRUITMENT_AGENCY' },
               { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
               { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
               { label: 'Healthcare-Recruiting', href: '/branchen/healthcare-recruiting' },
