@@ -59,11 +59,11 @@ const features = [
   },
   {
     icon: Users,
-    title: 'Multi-Mandanten (Closed Beta)',
-    desc: 'Für Personaldienstleister: Endkunden mit eigenem Branding und getrennten Workflows verwalten — derzeit in Closed Beta.',
+    title: 'Multi-Mandanten',
+    desc: 'Für Personaldienstleister: Endkunden mit eigenem Branding und getrennten Workflows verwalten. PDL-Konten sind ab sofort buchbar; Mandanten-Features folgen iterativ.',
     color: 'from-amber-500 to-rose-500',
     glow: 'rgba(245,158,11,0.3)',
-    badge: 'Closed Beta',
+    badge: 'Roadmap',
   },
   {
     icon: Mic,

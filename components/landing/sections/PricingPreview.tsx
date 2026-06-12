@@ -178,10 +178,11 @@ export function PricingPreview() {
 
             <div className="card-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="text-sm text-text-secondary">
-                Geplanter Launch: Q4 2026. Tragen Sie sich ein, um als Erste informiert zu werden.
+                PDL-Konten sind ab sofort buchbar. Multi-Mandanten + White-Label folgen iterativ — wir
+                planen die Roadmap gemeinsam mit den ersten Pilotkunden.
               </div>
-              <Link href="/waitlist-agency" className="btn-primary whitespace-nowrap">
-                Auf PDL-Warteliste setzen <ArrowRight className="w-4 h-4" />
+              <Link href="/register?type=RECRUITMENT_AGENCY" className="btn-primary whitespace-nowrap">
+                PDL-Konto anlegen <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </motion.div>

@@ -40,7 +40,7 @@ export function LandingNav() {
           <Link href="#wie-es-funktioniert" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">So funktioniert&rsquo;s</Link>
           <Link href="/fuer/hr-abteilungen" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Für wen</Link>
           <Link href="#features" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Features</Link>
-          <Link href="/waitlist-agency" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">PDL-Warteliste</Link>
+          <Link href="/register?type=RECRUITMENT_AGENCY" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Für PDL</Link>
           <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Preise</Link>
           <Link href="/preise#addons" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Add-ons</Link>
           <Link href="/resources" className="text-sm font-medium text-text-secondary hover:text-text-primary whitespace-nowrap px-2.5 py-2 rounded-lg transition-colors">Ressourcen</Link>
@@ -79,7 +79,7 @@ export function LandingNav() {
           <Link href="#wie-es-funktioniert" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">So funktioniert&rsquo;s</Link>
           <Link href="/fuer/hr-abteilungen" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für wen</Link>
           <Link href="#features" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Features</Link>
-          <Link href="/waitlist-agency" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">PDL-Warteliste</Link>
+          <Link href="/register?type=RECRUITMENT_AGENCY" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Für PDL</Link>
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Preise</Link>
           <Link href="/preise#addons" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Add-ons</Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">
