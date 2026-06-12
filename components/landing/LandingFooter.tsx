@@ -79,12 +79,14 @@ export function LandingFooter() {
               { label: 'AGB', href: '/agb' },
               { label: 'Impressum', href: '/impressum' },
               { label: 'AVV (Auftragsverarbeitung)', href: '/datenschutz#avv' },
+              { label: 'KI-Lösungen: rsg-ai.de', href: 'https://rsg-ai.de', external: true },
+              { label: 'Personalvermittlung: recruiting-sg.de', href: 'https://recruiting-sg.de', external: true },
             ]}
           />
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-text-muted">
-          <div>© 2026 RSG Recruiting Solutions group GmbH · Alle Rechte vorbehalten.</div>
+          <div>© 2026 RSG Recruiting Solutions group GmbH · Alle Rechte vorbehalten. · <a href="https://recruiting-sg.de" target="_blank" rel="noopener noreferrer" className="hover:text-text-primary transition-colors">Personalvermittlung</a> · <a href="https://rsg-ai.de" target="_blank" rel="noopener noreferrer" className="hover:text-text-primary transition-colors">KI-Lösungen</a></div>
           <div className="hidden md:block text-[11px] text-text-muted">
             PDL-Pakete befinden sich in Vorbereitung. Jetzt für frühen Zugang vormerken.
           </div>
