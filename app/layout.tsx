@@ -111,16 +111,17 @@ export const viewport: Viewport = {
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'candiq',
-  legalName: 'RSG Recruiting Solutions group GmbH',
+  '@type': ['SoftwareApplication', 'Organization'],
+  name: 'Candiq',
+  legalName: 'Candiq – Referenzcheck für Personaldienstleister',
   url: BASE_URL,
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description: 'Digitale Referenzcheck-Plattform für Personaldienstleister und HR-Teams. Schnelle, strukturierte Referenzprüfung von Kandidaten.',
   logo: `${BASE_URL}/logo-mark.svg`,
   email: 'hello@candiq.de',
   telephone: '+49 176 60772556',
   vatID: 'DE458027073',
-  taxID: 'HRB 35951',
-  sameAs: ['https://www.linkedin.com/in/ricardoserrano-rsgai/'],
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Am Heiligenhaus 9',
@@ -128,6 +129,26 @@ const organizationJsonLd = {
     addressLocality: 'Wiesbaden',
     addressCountry: 'DE',
   },
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'RSG Recruiting Solutions Group GmbH',
+    legalName: 'RSG Recruiting Solutions Group GmbH',
+    '@id': 'https://www.recruiting-sg.de/#organization',
+    taxID: 'DE458027073',
+    url: 'https://www.recruiting-sg.de',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock',
+  },
+  sameAs: [
+    'https://www.recruiting-sg.de',
+    'https://www.rsg-ai.de',
+    'https://www.linkedin.com/in/ricardoserrano-rsgai/',
+  ],
+  knowsAbout: ['Referenzcheck', 'Personaldienstleister', 'Recruiting', 'Kandidatenprüfung', 'HR-Software'],
 }
 
 export default function RootLayout({
