@@ -55,6 +55,13 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     'message', 'address', 'city', 'state', 'zip', 'country',
     // candiq-eigene Properties (HubSpot Settings → Properties → Contact)
     'candiq_source', 'candiq_hires_per_year', 'candiq_newsletter_opt_in',
+    // AI-Concierge-Lead-Scoring-Properties (PR #88 + #89). Existieren
+    // im HubSpot-Portal seit 12.06.2026; fehlten in dieser Allowlist,
+    // weshalb candiq_lead_score & Co. stillschweigend verworfen wurden
+    // und die Active-List "candiq Hot Leads (Score >= 60)" leer blieb.
+    'candiq_lead_score', 'candiq_lead_intent', 'candiq_lead_industry',
+    'candiq_lead_timing', 'candiq_lead_source', 'candiq_lead_pathname',
+    'candiq_lead_summary',
   ])
 
   try {
@@ -80,7 +87,7 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     if (!searchRes.ok) {
       const text = await searchRes.text()
       const reason = `search ${searchRes.status}: ${text.slice(0, 200)}`
-      console.warn('[hubspot] search-failed', { reason })
+      console.error('[hubspot] search-failed', { status: searchRes.status, body: text.slice(0, 500) })
       return { ok: false, reason }
     }
     const searchData = (await searchRes.json()) as {
@@ -88,11 +95,26 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
       results?: Array<{ id: string }>
     }
 
+    // Properties gegen ALLOWED-Whitelist filtern. Verworfene Properties
+    // sichtbar machen — sonst sucht man stundenlang wenn ein neuer
+    // Custom-Property-Name in der Whitelist fehlt (genau der Bug, der
+    // den Hot-Lead-Sync seit Anlage der candiq_lead_*-Properties
+    // unsichtbar gemacht hat).
     const properties = Object.fromEntries(
       Object.entries(props).filter(
         ([k, v]) => ALLOWED.has(k) && v !== undefined && v !== '',
       ),
     )
+    const dropped = Object.keys(props).filter(
+      (k) => props[k] !== undefined && props[k] !== '' && !ALLOWED.has(k),
+    )
+    if (dropped.length > 0) {
+      console.warn('[hubspot] properties-dropped-not-in-allowlist', {
+        email: props.email,
+        dropped,
+        hint: 'In lib/hubspot.ts in das ALLOWED-Set aufnehmen.',
+      })
+    }
 
     if (searchData.results?.[0]?.id) {
       // 2a) Existiert → Update
@@ -108,7 +130,12 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
       if (!updateRes.ok) {
         const text = await updateRes.text()
         const reason = `update ${updateRes.status}: ${text.slice(0, 200)}`
-        console.warn('[hubspot] update-failed', { reason })
+        console.error('[hubspot] update-failed', {
+          contactId: id,
+          status: updateRes.status,
+          body: text.slice(0, 500),
+          sentProperties: Object.keys(properties),
+        })
         return { ok: false, reason }
       }
       return { ok: true, contactId: id }
@@ -126,7 +153,12 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     if (!createRes.ok) {
       const text = await createRes.text()
       const reason = `create ${createRes.status}: ${text.slice(0, 200)}`
-      console.warn('[hubspot] create-failed', { reason })
+      console.error('[hubspot] create-failed', {
+        email: props.email,
+        status: createRes.status,
+        body: text.slice(0, 500),
+        sentProperties: Object.keys(properties),
+      })
       return { ok: false, reason }
     }
     const createData = (await createRes.json()) as { id?: string }

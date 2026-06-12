@@ -56,11 +56,14 @@ function buildCsp(nonce: string): string {
     // CSP3: erlaubt inline `style="..."`-Attribute (framer-motion, dynamische
     // Gradienten). `<style>`-Blöcke sind weiterhin nonce-pflichtig.
     `style-src-attr 'unsafe-inline'`,
-    `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com ${HUBSPOT_IMG}`,
+    `img-src 'self' blob: data: https://*.public.blob.vercel-storage.com ${HUBSPOT_IMG} https://*.google-analytics.com https://www.googletagmanager.com`,
     `font-src 'self'`,
     // connect-src: Stripe REST + Vercel Analytics / Speed Insights + HubSpot API
-    // (XHR vom Meetings-Embed-Script).
-    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT} https://api.elevenlabs.io wss://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.us.elevenlabs.io https://*.livekit.cloud wss://*.livekit.cloud https://storage.googleapis.com`,
+    // (XHR vom Meetings-Embed-Script) + GA4 (gtag.js feuert /g/collect-Hits
+    // an region1.google-analytics.com bzw. www.google-analytics.com; ohne
+    // diese Hosts dropped der Browser jeden Hit lautlos und wir sehen 0
+    // Analytics-Daten trotz korrekt konfiguriertem gtag).
+    `connect-src 'self' https://api.stripe.com https://vitals.vercel-insights.com https://va.vercel-scripts.com ${HUBSPOT_CONNECT} https://api.elevenlabs.io wss://api.elevenlabs.io https://api.us.elevenlabs.io wss://api.us.elevenlabs.io https://*.livekit.cloud wss://*.livekit.cloud https://storage.googleapis.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com`,
     // frame-src: Stripe Checkout/Elements + 3-D-Secure (hooks) + HubSpot Meetings.
     `frame-src https://js.stripe.com https://hooks.stripe.com ${HUBSPOT_FRAME}`,
     `media-src 'self' blob: data: https://storage.googleapis.com`,
