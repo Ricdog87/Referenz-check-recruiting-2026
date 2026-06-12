@@ -47,19 +47,26 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://candiq.de'
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'candiq — DSGVO-konforme Referenzprüfung für Recruiting',
+    default: 'candiq — Referenzcheck Software für Personaldienstleister',
     template: '%s · candiq',
   },
   description:
     'candiq verifiziert Referenzen, Zeugnisse und Tätigkeiten Ihrer Kandidaten — DSGVO-konform, in unter 48 Stunden. Vermeiden Sie kostspielige Fehlbesetzungen.',
   keywords: [
-    'Referenzprüfung', 'Reference Check', 'Recruiting', 'B2B', 'DSGVO',
-    'Kandidatenprüfung', 'HR Software', 'Background Check', 'Verifizierung',
-    'Personaldienstleister', 'Zeugnisprüfung', 'candiq',
+    'Referenzcheck',
+    'Referenzprüfung',
+    'Reference Check',
+    'Recruiting',
+    'B2B',
+    'DSGVO',
+    'Personaldienstleister',
+    'HR Software',
+    'Recruiting-Software',
+    'candiq',
   ],
-  authors: [{ name: 'RSG Recruiting Solutions group GmbH' }],
+  authors: [{ name: 'RSG Recruiting Solutions Group GmbH' }],
   creator: 'candiq',
-  publisher: 'RSG Recruiting Solutions group GmbH',
+  publisher: 'RSG Recruiting Solutions Group GmbH',
   // WICHTIG: KEIN globales `alternates.canonical` und KEIN globales
   // `openGraph.url/title` hier — sonst erben alle Unterseiten das Canonical
   // der Startseite und Google wertet sie als Duplikate. Jede Seite setzt ihr
@@ -71,7 +78,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'candiq — Referenzprüfung für Recruiting',
+    title: 'candiq — Referenzcheck Software für Personaldienstleister',
     description: 'DSGVO-konforme Referenzprüfung. Live-Demo ohne Anmeldung.',
   },
   robots: {
@@ -111,44 +118,52 @@ export const viewport: Viewport = {
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
-  '@type': ['SoftwareApplication', 'Organization'],
-  name: 'Candiq',
-  legalName: 'Candiq – Referenzcheck für Personaldienstleister',
-  url: BASE_URL,
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Web',
-  description: 'Digitale Referenzcheck-Plattform für Personaldienstleister und HR-Teams. Schnelle, strukturierte Referenzprüfung von Kandidaten.',
-  logo: `${BASE_URL}/logo-mark.svg`,
-  email: 'hello@candiq.de',
-  telephone: '+49 176 60772556',
-  vatID: 'DE458027073',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: 'Am Heiligenhaus 9',
-    postalCode: '65207',
-    addressLocality: 'Wiesbaden',
-    addressCountry: 'DE',
-  },
-  parentOrganization: {
-    '@type': 'Organization',
-    name: 'RSG Recruiting Solutions Group GmbH',
-    legalName: 'RSG Recruiting Solutions Group GmbH',
-    '@id': 'https://www.recruiting-sg.de/#organization',
-    taxID: 'DE458027073',
-    url: 'https://www.recruiting-sg.de',
-  },
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'EUR',
-    availability: 'https://schema.org/InStock',
-  },
-  sameAs: [
-    'https://www.recruiting-sg.de',
-    'https://www.rsg-ai.de',
-    'https://www.linkedin.com/in/ricardoserrano-rsgai/',
+  '@graph': [
+    {
+      '@type': ['Organization', 'SoftwareApplication'],
+      '@id': BASE_URL + '/#organization',
+      name: 'Candiq — Referenzcheck für Personaldienstleister',
+      legalName: 'RSG Recruiting Solutions Group GmbH',
+      url: BASE_URL,
+      logo: BASE_URL + '/logo-mark.svg',
+      email: 'hello@candiq.de',
+      telephone: '+49 176 60772556',
+      vatID: 'DE458027073',
+      leiCode: 'HRB 35951',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Web',
+      description: 'Digitale Referenzcheck-Plattform für Personaldienstleister und HR-Teams. Schnelle, strukturierte Referenzprüfung von Kandidaten.',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR', description: 'Kostenlose Demo verfügbar' },
+      parentOrganization: {
+        '@type': 'Organization',
+        '@id': 'https://www.recruiting-sg.de/#organization',
+        name: 'RSG Recruiting Solutions Group GmbH',
+        url: 'https://www.recruiting-sg.de',
+        vatID: 'DE458027073',
+        identifier: 'HRB 35951',
+        sameAs: ['https://www.recruiting-sg.de', 'https://www.rsg-ai.de'],
+      },
+      sameAs: ['https://www.recruiting-sg.de', 'https://www.linkedin.com/in/ricardoserrano-rsgai/'],
+      knowsAbout: ['Referenzcheck', 'Personaldienstleister', 'Recruiting-Software', 'DSGVO-konformes Recruiting', 'Headhunting', 'Personalvermittlung'],
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Am Heiligenhaus 9',
+        postalCode: '65207',
+        addressLocality: 'Wiesbaden',
+        addressRegion: 'Hessen',
+        addressCountry: 'DE',
+      },
+      founder: { '@type': 'Person', name: 'Ricardo Serrano', jobTitle: 'Gründer & Geschäftsführer' },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': BASE_URL + '/#website',
+      url: BASE_URL,
+      name: 'candiq — Referenzcheck Software für Personaldienstleister',
+      publisher: { '@id': BASE_URL + '/#organization' },
+      inLanguage: 'de-DE',
+    },
   ],
-  knowsAbout: ['Referenzcheck', 'Personaldienstleister', 'Recruiting', 'Kandidatenprüfung', 'HR-Software'],
 }
 
 export default function RootLayout({
@@ -174,7 +189,7 @@ export default function RootLayout({
       </head>
       <body>
         {/* A11y: BFSG-Pflicht — sichtbarer Skip-Link bei Tastatur-Fokus.
-            Springt zum nächsten <main id="main"> auf jeder Route. */}
+        Springt zum nächsten <main id="main"> auf jeder Route. */}
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand-600 focus:text-white focus:shadow-card-lg focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-brand-300"
