@@ -8,6 +8,20 @@ const nextConfig = {
       },
     ],
   },
+  // H1 (SEO): Duplicate-Content beseitigen. Die fuenf statischen Geo-Pages
+  // /referenzcheck-{stadt} werden dauerhaft auf den kanonischen dynamischen
+  // Pfad /referenzpruefung/{stadt} umgeleitet. Bewusst `statusCode: 301`
+  // (nicht `permanent: true`, das waere 308) — klassischer Permanent-Redirect,
+  // den Crawler erwarten und den der Smoke-Test explizit auf 301 prueft.
+  async redirects() {
+    return [
+      { source: '/referenzcheck-berlin',    destination: '/referenzpruefung/berlin',    statusCode: 301 },
+      { source: '/referenzcheck-muenchen',  destination: '/referenzpruefung/muenchen',  statusCode: 301 },
+      { source: '/referenzcheck-hamburg',   destination: '/referenzpruefung/hamburg',   statusCode: 301 },
+      { source: '/referenzcheck-koeln',     destination: '/referenzpruefung/koeln',     statusCode: 301 },
+      { source: '/referenzcheck-frankfurt', destination: '/referenzpruefung/frankfurt', statusCode: 301 },
+    ]
+  },
   async headers() {
     // Hinweis: Die Content-Security-Policy wird per Request in `middleware.ts`
     // mit Nonce gesetzt. Hier nur statische, request-unabhängige Header.
