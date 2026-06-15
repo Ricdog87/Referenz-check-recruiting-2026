@@ -64,12 +64,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/datenschutz`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE_URL}/agb`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
 
-    // Geo SEO — Referenzcheck Personaldienstleister nach Stadt
-    { url: `${BASE_URL}/referenzcheck-frankfurt`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/referenzcheck-muenchen`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/referenzcheck-hamburg`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/referenzcheck-berlin`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/referenzcheck-koeln`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
   ]
 
   return pages
