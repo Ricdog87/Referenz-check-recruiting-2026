@@ -34,9 +34,10 @@ function RegisterForm() {
   const params = useSearchParams()
   const planId = params.get('plan') ?? 'PROFESSIONAL'
   const requestedType = (params.get('type') as AccountType | null) ?? 'HR_DEPARTMENT'
-  // PDL-Registrierung war Closed Beta — jetzt geoeffnet. Wir nehmen den
-  // requestedType direkt uebernommen statt auf HR_DEPARTMENT zu fallen.
-  const initialType: AccountType = requestedType
+  // PDL-Registrierung ist Closed Beta — kommt ueber dedizierten Sales-Flow
+  // (siehe /waitlist-agency). Falls jemand mit ?type=RECRUITMENT_AGENCY
+  // hier landet, fallen wir auf HR_DEPARTMENT zurueck.
+  const initialType: AccountType = requestedType === 'RECRUITMENT_AGENCY' ? 'HR_DEPARTMENT' : requestedType
   const plan = getPlanById(planId)
 
   const [step, setStep] = useState(1)
@@ -165,7 +166,35 @@ function RegisterForm() {
                 {(Object.keys(ACCOUNT_TYPES) as AccountType[]).map((t) => {
                   const meta = ACCOUNT_TYPES[t]
                   const Icon = t === 'HR_DEPARTMENT' ? Building2 : Users2
+                  const comingSoon = t === 'RECRUITMENT_AGENCY'
                   const active = accountType === t
+
+                  // PDL-Konten sind Closed Beta — Karte nicht klickbar,
+                  // mit Hinweis auf /waitlist-agency.
+                  if (comingSoon) {
+                    return (
+                      <div
+                        key={t}
+                        aria-disabled="true"
+                        className="flex items-start gap-3 p-4 rounded-xl border text-left border-violet/30 bg-violet/5 opacity-85"
+                      >
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-bg-secondary text-text-secondary">
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-semibold text-text-primary text-sm">
+                            {meta.label} <span className="text-violet font-semibold">(bald verfügbar)</span>
+                          </div>
+                          <div className="text-xs text-text-secondary mt-0.5">
+                            PDL-Konten sind aktuell in der Closed Beta. Bitte über die Warteliste vormerken — wir kontaktieren Sie zum Launch.
+                          </div>
+                          <Link href="/waitlist-agency" className="inline-flex mt-2 text-xs font-semibold text-violet hover:underline">
+                            Zur PDL-Warteliste →
+                          </Link>
+                        </div>
+                      </div>
+                    )
+                  }
 
                   return (
                     <button

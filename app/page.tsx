@@ -10,6 +10,7 @@ import { FabricationCheck } from '@/components/landing/sections/FabricationCheck
 import { HowItWorks } from '@/components/landing/sections/HowItWorks'
 import { Features } from '@/components/landing/sections/Features'
 import { Testimonials } from '@/components/landing/sections/Testimonials'
+import { ROICalculator } from '@/components/landing/sections/ROICalculator'
 import { PricingPreview } from '@/components/landing/sections/PricingPreview'
 import { HomepageFaq } from '@/components/landing/sections/HomepageFaq'
 import { FinalCta } from '@/components/landing/sections/FinalCta'
@@ -34,13 +35,18 @@ export default function LandingPage() {
   // 3-Akt-Dramaturgie statt 18-Sektion-Liste:
   // Akt 1 (Wow):          Hero mit Live-Voice rechts + TrustBar
   // Akt 2 (Beweis):       Problem -> SpeedAndProof -> FabricationCheck-Live -> HowItWorks -> Features -> Testimonials
-  // Akt 3 (Entscheidung): PricingPreview -> HomepageFaq -> FinalCta
+  // Akt 3 (Entscheidung): ROICalculator -> PricingPreview -> HomepageFaq -> FinalCta
   //
-  // Detail-Sektionen (OnboardingRoadmap, PilotProgram, ROICalculator,
-  // ComparisonTable, CompliancePromise, TwoAudiences) sind bewusst nicht
-  // mehr auf der Startseite — sie sind ueber Footer-Links und eigene
-  // URLs (/preise, /pilotprogramm, /validato-vergleich, /compliance,
-  // /fuer) erreichbar, sobald der Wow-Effekt gegriffen hat.
+  // ROI-Rechner ist Pflicht-USP („Was kostet mich eine Fehlbesetzung?"):
+  // kein Verstecken in Footer-Link mehr, sondern direkt vor der Pricing-
+  // Decision-Section sichtbar. Vollversion bleibt parallel auf
+  // /roi-rechner als eigene SEO-Page erreichbar.
+  //
+  // Detail-Sektionen (OnboardingRoadmap, PilotProgram, ComparisonTable,
+  // CompliancePromise, TwoAudiences) sind bewusst nicht auf der
+  // Startseite — sie sind ueber Footer-Links und eigene URLs
+  // (/preise, /pilotprogramm, /validato-vergleich, /compliance, /fuer)
+  // erreichbar.
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <JsonLd data={softwareApplicationJsonLd()} />
@@ -60,6 +66,7 @@ export default function LandingPage() {
         <Testimonials />
 
         {/* Akt 3: Entscheidung */}
+        <ROICalculator />
         <PricingPreview />
         <HomepageFaq />
         <FinalCta />

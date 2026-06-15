@@ -49,10 +49,11 @@ export async function POST(req: NextRequest) {
   const cleanEmail = String(email ?? '').trim().toLowerCase().slice(0, MAX_EMAIL_LEN)
   const rawPassword = typeof password === 'string' ? password : ''
 
-  // PDL-Registrierung war Closed Beta bis 06/2026. Jetzt geoeffnet —
-  // wenn du sie temporaer wieder schliessen willst, setze die Env-Var
-  // PDL_REGISTRATION_OPEN=false in Vercel; Default (unset) = offen.
-  const pdlOpen = (process.env.PDL_REGISTRATION_OPEN ?? 'true').toLowerCase() !== 'false'
+  // PDL-Registrierung: standardmaessig GESCHLOSSEN — PDL-Pakete sind in
+  // Vorbereitung und werden spaeter ueber den dedizierten Sales-Flow
+  // freigegeben. Falls geoeffnet werden soll, in Vercel-Env explizit:
+  // PDL_REGISTRATION_OPEN=true setzen.
+  const pdlOpen = (process.env.PDL_REGISTRATION_OPEN ?? 'false').toLowerCase() === 'true'
   if (accountType === 'RECRUITMENT_AGENCY' && !pdlOpen) {
     return NextResponse.json(
       { error: 'PDL-Konten sind aktuell in der Closed Beta. Bitte nutzen Sie die Warteliste unter /waitlist-agency.' },
