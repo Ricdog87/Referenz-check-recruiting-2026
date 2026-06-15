@@ -33,14 +33,16 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   // 3-Akt-Dramaturgie statt 18-Sektion-Liste:
-  // Akt 1 (Wow):          Hero mit Live-Voice rechts + TrustBar
-  // Akt 2 (Beweis):       Problem -> SpeedAndProof -> FabricationCheck-Live -> HowItWorks -> Features -> Testimonials
-  // Akt 3 (Entscheidung): ROICalculator -> PricingPreview -> HomepageFaq -> FinalCta
+  // Akt 1 (Wow + Money-Math):  Hero mit Live-Voice -> ROI-Rechner direkt
+  //                            danach (USP „Was kostet eine Fehlbesetzung?"
+  //                            soll als erstes nach dem Wow-Moment landen)
+  //                            -> TrustBar
+  // Akt 2 (Beweis):            Problem -> SpeedAndProof -> FabricationCheck-Live
+  //                            -> HowItWorks -> Features -> Testimonials
+  // Akt 3 (Entscheidung):      PricingPreview -> HomepageFaq -> FinalCta
   //
-  // ROI-Rechner ist Pflicht-USP („Was kostet mich eine Fehlbesetzung?"):
-  // kein Verstecken in Footer-Link mehr, sondern direkt vor der Pricing-
-  // Decision-Section sichtbar. Vollversion bleibt parallel auf
-  // /roi-rechner als eigene SEO-Page erreichbar.
+  // ROI-Vollversion bleibt parallel auf /roi-rechner als eigene SEO-Page
+  // erreichbar (Geo-Targeting, Direct-Linking, deeper Drill-Down).
   //
   // Detail-Sektionen (OnboardingRoadmap, PilotProgram, ComparisonTable,
   // CompliancePromise, TwoAudiences) sind bewusst nicht auf der
@@ -53,8 +55,9 @@ export default function LandingPage() {
       <JsonLd data={serviceJsonLd()} />
       <LandingNav />
       <main id="main">
-        {/* Akt 1: Wow */}
+        {/* Akt 1: Wow + Money-Math */}
         <Hero />
+        <ROICalculator />
         <TrustBar />
 
         {/* Akt 2: Beweis */}
@@ -66,7 +69,6 @@ export default function LandingPage() {
         <Testimonials />
 
         {/* Akt 3: Entscheidung */}
-        <ROICalculator />
         <PricingPreview />
         <HomepageFaq />
         <FinalCta />
