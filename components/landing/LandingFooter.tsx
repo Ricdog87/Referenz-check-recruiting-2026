@@ -6,7 +6,7 @@ export function LandingFooter() {
   return (
     <footer className="border-t border-border bg-bg-secondary px-6 py-14">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-6 gap-10 mb-12">
+        <div className="grid md:grid-cols-3 lg:grid-cols-7 gap-10 mb-12">
           {/* Brand col */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center mb-5" aria-label="candiq Startseite">
@@ -68,7 +68,22 @@ export function LandingFooter() {
               { label: 'Reference-Check DSGVO', href: '/reference-check-dsgvo' },
               { label: 'Arbeitszeugnis prüfen', href: '/zeugnis-pruefen-lassen' },
               { label: 'Lebenslauf verifizieren', href: '/lebenslauf-verifizieren' },
+              { label: 'Pre-Employment Screening', href: '/pre-employment-screening' },
+              { label: 'Background Check DSGVO', href: '/background-check-dsgvo' },
               { label: 'candiq vs. Validato', href: '/vergleich/validato-alternative' },
+            ]}
+          />
+
+          <FooterCol
+            title="Standorte"
+            links={[
+              { label: 'Referenzprüfung Berlin', href: '/referenzpruefung/berlin' },
+              { label: 'Referenzprüfung München', href: '/referenzpruefung/muenchen' },
+              { label: 'Referenzprüfung Hamburg', href: '/referenzpruefung/hamburg' },
+              { label: 'Referenzprüfung Frankfurt', href: '/referenzpruefung/frankfurt' },
+              { label: 'Referenzprüfung Köln', href: '/referenzpruefung/koeln' },
+              { label: 'Referenzprüfung Stuttgart', href: '/referenzpruefung/stuttgart' },
+              { label: 'Referenzprüfung Düsseldorf', href: '/referenzpruefung/duesseldorf' },
             ]}
           />
 
