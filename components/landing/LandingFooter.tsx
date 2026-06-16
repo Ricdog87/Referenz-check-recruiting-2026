@@ -55,6 +55,7 @@ export function LandingFooter() {
               { label: 'HR-Abteilungen', href: '/fuer/hr-abteilungen' },
               { label: 'Mittelstand 200+ MA', href: '/fuer/mittelstand' },
               { label: 'Personaldienstleister', href: '/register?type=RECRUITMENT_AGENCY' },
+              { label: 'Bewerber:innen (Beta Q4 2026)', href: '/bewerber' },
               { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
               { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
               { label: 'Healthcare-Recruiting', href: '/branchen/healthcare-recruiting' },

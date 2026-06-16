@@ -14,6 +14,8 @@ export default function robots(): MetadataRoute.Robots {
           '/vergleich', '/fuer',
           // Detail-Seiten (PR #86) + Termin-Page (PR #89)
           '/roi-rechner', '/pilotprogramm', '/compliance', '/termin',
+          // Bewerber-Self-Service Phase 1 (Waitlist)
+          '/bewerber',
         ],
         disallow: ['/api/', '/dashboard', '/candidates', '/checks', '/analytics', '/settings', '/integrations', '/clients', '/addons', '/login', '/register', '/forgot-password', '/reset-password'],
       },
