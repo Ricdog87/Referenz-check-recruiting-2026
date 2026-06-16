@@ -1,18 +1,18 @@
 /**
  * Hero-Variant-A/B-Setup — minimal & SSR-sicher.
  *
- * Variante wird per env-var NEXT_PUBLIC_HERO_VARIANT gesetzt:
- *  - 'A' (default): "Ihre Kandidaten sprechen mit candiq" — sensorisch
- *  - 'B':           "candiq nimmt das Telefon ab" — utilitaristisch
+ * Beide Varianten machen klar: candiq verifiziert Referenzen — die
+ * eigentliche Pruefung wird von geschulten Reviewern am Telefon
+ * gefuehrt, NICHT von einer KI mit dem Kandidaten. Die Voice-Demo
+ * rechts ist eine interaktive Produktdemo, kein Teil des produktiven
+ * Pruefungs-Flows.
  *
- * Sticky-per-Visit-Cookie-Rolling wäre der naechste Schritt — derzeit
- * kein nennenswertes Traffic-Volumen, daher statischer Switch:
- * Variante A 2 Wochen ausspielen, GA4-Conversion vergleichen, dann B
- * 2 Wochen ausspielen. Klassisches sequenzielles Pre-Volume-A/B.
+ * Variante wird per env-var NEXT_PUBLIC_HERO_VARIANT gesetzt:
+ *  - 'A' (default): "Referenzen verifiziert." — outcome-orientiert
+ *  - 'B':           "Wir pruefen, wer wirklich was war." — substanz-orientiert
  *
  * Tracking-Events landen im GA4 als 'hero_engagement' mit Parametern
- * action + variant + experiment_id. Im GA4 Explorations-Report als
- * Segmente vergleichbar.
+ * action + variant + experiment_id.
  */
 export type HeroVariant = 'A' | 'B'
 
@@ -45,29 +45,29 @@ export const HERO_COPY: Record<HeroVariant, {
   }
 }> = {
   A: {
-    badge: 'candiq Voice ist live · Probieren Sie es jetzt →',
+    badge: 'candiq Voice · Interaktive Produkt-Demo →',
     headline: {
-      line1: 'Ihre Kandidaten',
-      line2: 'sprechen mit candiq.',
-      line3: 'In Sekunden. Rund um die Uhr.',
+      line1: 'Referenzen',
+      line2: 'verifiziert.',
+      line3: 'DSGVO-konform. In unter 48 h.',
     },
     subline: {
       intro:
-        'Echte Stimme statt Kontaktformular — die KI nimmt ab, sammelt Stationen und Referenzgeber strukturiert, geschulte Reviewer verifizieren. Sie sehen jedes Wort im Dashboard.',
-      cta: 'und hören Sie selbst, wie sich das für Ihre Kandidaten anfühlt.',
+        'Geschulte Reviewer rufen die Referenzgeber persönlich an, prüfen jede Station strukturiert und markieren Diskrepanzen. Sie sehen jeden Befund revisionssicher im Dashboard.',
+      cta: 'und erleben Sie unsere Voice-Demo selbst.',
     },
   },
   B: {
-    badge: 'candiq Voice · Live im Browser ausprobieren →',
+    badge: 'candiq Voice · Interaktive Produkt-Demo →',
     headline: {
-      line1: 'candiq nimmt das',
-      line2: 'Telefon ab.',
-      line3: 'In Sekunden. 24/7.',
+      line1: 'Wir prüfen,',
+      line2: 'wer wirklich was war.',
+      line3: 'Mensch-geprüft. DSGVO-konform.',
     },
     subline: {
       intro:
-        'Während Ihr Bewerbungsformular still ist, läuft candiq Voice. Ihre Kandidaten erreichen Sie sofort — die KI dokumentiert, geschulte Reviewer verifizieren.',
-      cta: 'und prüfen Sie selbst, wie das klingt.',
+        'Bevor Sie einstellen: Unsere Reviewer telefonieren mit den ehemaligen Arbeitgebern und dokumentieren jede Station. Diskrepanzen zur Eigenangabe werden markiert — Sie entscheiden auf Faktenbasis.',
+      cta: 'und testen Sie unsere Voice-Demo im Browser.',
     },
   },
 }

@@ -33,37 +33,32 @@ export const metadata: Metadata = {
 
 export default function LandingPage() {
   // 3-Akt-Dramaturgie statt 18-Sektion-Liste:
-  // Akt 1 (Wow + Money-Math):  Hero mit Live-Voice -> ROI-Rechner direkt
-  //                            danach (USP „Was kostet eine Fehlbesetzung?"
-  //                            soll als erstes nach dem Wow-Moment landen)
+  // Akt 1 (Wow + USP-Probe):   Hero -> FabricationCheck (CV-Fabrikations-
+  //                            Demo direkt im Browser — starker USP,
+  //                            bewusst hoch geholt aus Founder-Feedback)
+  //                            -> ROI-Rechner (Money-Math)
   //                            -> TrustBar
-  // Akt 2 (Beweis):            Problem -> SpeedAndProof -> FabricationCheck-Live
-  //                            -> HowItWorks -> Features -> Testimonials
+  // Akt 2 (Beweis):            Problem -> SpeedAndProof -> HowItWorks
+  //                            -> Features -> Testimonials
   // Akt 3 (Entscheidung):      PricingPreview -> HomepageFaq -> FinalCta
   //
   // ROI-Vollversion bleibt parallel auf /roi-rechner als eigene SEO-Page
   // erreichbar (Geo-Targeting, Direct-Linking, deeper Drill-Down).
-  //
-  // Detail-Sektionen (OnboardingRoadmap, PilotProgram, ComparisonTable,
-  // CompliancePromise, TwoAudiences) sind bewusst nicht auf der
-  // Startseite — sie sind ueber Footer-Links und eigene URLs
-  // (/preise, /pilotprogramm, /validato-vergleich, /compliance, /fuer)
-  // erreichbar.
   return (
     <div className="min-h-screen bg-white text-text-primary overflow-x-hidden antialiased">
       <JsonLd data={softwareApplicationJsonLd()} />
       <JsonLd data={serviceJsonLd()} />
       <LandingNav />
       <main id="main">
-        {/* Akt 1: Wow + Money-Math */}
+        {/* Akt 1: Wow + USP-Probe + Money-Math */}
         <Hero />
+        <FabricationCheck />
         <ROICalculator />
         <TrustBar />
 
         {/* Akt 2: Beweis */}
         <Problem />
         <SpeedAndProof />
-        <FabricationCheck />
         <HowItWorks />
         <Features />
         <Testimonials />
