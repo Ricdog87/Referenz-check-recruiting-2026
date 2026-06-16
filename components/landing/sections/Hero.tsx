@@ -99,9 +99,9 @@ export function Hero() {
           <p className="text-lg text-text-secondary leading-relaxed max-w-xl mb-9">
             {copy.subline.intro}{' '}
             <span className="font-semibold text-text-primary">
-              Klicken Sie das Mikrofon{' '}
+              Klicken Sie{' '}
               <Link href="#voice-demo" className="underline decoration-2 decoration-brand-400 underline-offset-4 hover:text-brand-700 lg:no-underline">
-                rechts
+                rechts auf das Mikrofon
               </Link>
               {' '}{copy.subline.cta}
             </span>
@@ -177,17 +177,18 @@ export function Hero() {
                 Live · im Browser · keine Wartezeit
               </div>
               <h2 className="text-center text-xl sm:text-2xl font-semibold text-white mt-4">
-                candiq Voice ausprobieren
+                candiq Voice — interaktive Demo
               </h2>
               <p className="text-center text-xs text-slate-400 mt-1.5">
-                Klicken, sprechen, hören — Ihre Live-Demo.
+                Klicken, sprechen, hören — so klingt unsere Voice-Technologie.
               </p>
               <VoiceConsole />
               <div className="mt-6 flex items-start gap-2 text-[11px] leading-relaxed text-slate-400 border-t border-white/10 pt-5">
                 <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5 text-indigo-300" />
                 <span>
-                  candiq Voice spricht <strong className="text-slate-200">nur mit Kandidaten</strong> —
-                  Referenzgeber werden immer von geschulten Reviewern persönlich angerufen.
+                  Das ist eine <strong className="text-slate-200">Produkt-Demo</strong>. Die echten
+                  Referenzprüfungen führen geschulte Reviewer persönlich am Telefon mit
+                  den Referenzgebern — niemals ein Bot.
                 </span>
               </div>
             </div>
