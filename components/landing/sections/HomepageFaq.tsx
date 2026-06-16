@@ -40,11 +40,11 @@ const FAQS: Faq[] = [
     q: 'Wie schnell ist der erste Report da?',
     a: (
       <>
-        Etwa <strong>7 Tage nach dem Termin</strong> — siehe Roadmap weiter
-        oben auf dieser Seite. Tag 1 = Kennenlern-Termin & Setup, Tag 2-3 =
-        Bewerber-Einladungen raus, Tag 4-5 = Referenzgeber-Telefonate, Tag 6-7
-        = strukturierter PDF-Audit-Report in Ihrem Dashboard. Express-24h-Add-on
-        verfügbar für eilige Hires.
+        Der <strong>Report liegt in unter 48 Stunden</strong> ab freigegebenem
+        Auftrag vor (Express-Option: 24 h). Beim allerersten Mal kommt das
+        Onboarding hinzu — vom Kennenlern-Termin über die Bewerber-Einladung bis
+        zum ersten Report sind es typischerweise rund 7 Tage. Danach läuft jede
+        weitere Prüfung in unter 48 Stunden.
       </>
     ),
   },

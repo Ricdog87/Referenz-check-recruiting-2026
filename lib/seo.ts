@@ -111,7 +111,7 @@ export function serviceJsonLd(opts?: { areaServed?: string; name?: string }) {
     },
     areaServed: opts?.areaServed ?? 'Deutschland',
     description:
-      'Telefonische Verifizierung von Referenzen, Arbeitszeugnissen und Tätigkeitsangaben durch unsere KI-gestützte, trainierte Telefonassistentin — jeder Report von geschulten Reviewern freigegeben. DSGVO-konform, Server in Deutschland.',
+      'Telefonische Verifizierung von Referenzen, Arbeitszeugnissen und Tätigkeitsangaben durch geschulte Reviewer — ein Mensch ruft an, nie ein Bot. KI dokumentiert und strukturiert nur, was Menschen verifiziert haben. DSGVO-konform, Server in Deutschland.',
   }
 }
 

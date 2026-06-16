@@ -22,7 +22,7 @@ export const STAEDTE: Stadt[] = [
       'Besonders relevant für Tech & SaaS, Startups, Plattform-Unternehmen und den öffentlichen Sektor. Bei Lead- und Senior-Engineering-Rollen, wo eine Fehlbesetzung ein ganzes Team ausbremst, lohnt sich die Express-Option in 24 Stunden.',
     localFaq: {
       q: 'Funktioniert candiq für internationale Kandidaten in Berlin?',
-      a: 'Ja — unsere KI-gestützte, trainierte Telefonassistentin führt Referenzgespräche auch mit Referenzgebern im Ausland, die Einwilligung läuft über das mehrsprachige Self-Service-Portal.',
+      a: 'Ja — geschulte Reviewer führen die Referenzgespräche persönlich, auch mit Referenzgebern im Ausland (ein Mensch ruft an, nie ein Bot). Die Einwilligung läuft über das mehrsprachige Self-Service-Portal.',
     },
   },
   {
@@ -97,7 +97,7 @@ export const STAEDTE: Stadt[] = [
       'Stark für Automotive & Zulieferer, Maschinen- und Anlagenbau sowie Ingenieurdienstleistung. candiq verifiziert Projektverantwortung, Zeiträume und Tätigkeiten bei Ingenieur- und Technik-Rollen — bevor Sie in einen langen, teuren Auswahlprozess investieren.',
     localFaq: {
       q: 'Kann candiq technische Rollen sinnvoll prüfen?',
-      a: 'Ja — die Fragenkataloge unserer KI-gestützten, trainierten Telefonassistentin lassen sich vertikal anpassen, auch für Engineering und Operations.',
+      a: 'Ja — die Fragenkataloge unserer geschulten Reviewer lassen sich vertikal anpassen, auch für Engineering und Operations.',
     },
   },
   {
