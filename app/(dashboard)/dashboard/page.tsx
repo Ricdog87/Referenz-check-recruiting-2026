@@ -19,6 +19,18 @@ export default async function DashboardPage() {
   const userId = session.user.id
   const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
 
+  // Jede einzelne Query-Promise so wrappen, dass ein Fehler in einer einzelnen
+  // Query NIE das gesamte Dashboard auf error.tsx schickt. Pro Query gibt es
+  // einen typsicheren Fallback. Hintergrund: Andre Sola (Juni 2026) ist nach
+  // Login auf eine globale error.tsx geflogen — ein einzelner Query-Fail
+  // (z. B. nicht-applizierte Migration, leere Relation, Driver-Hick-Up) darf
+  // niemals einen Prospect-Account "killen".
+  const safe = <T,>(p: Promise<T>, fallback: T, label: string): Promise<T> =>
+    p.catch((err) => {
+      console.error(`[dashboard:query_fail] ${label}`, err?.message ?? err)
+      return fallback
+    })
+
   const [
     totalCandidates,
     activeCandidates,
@@ -35,38 +47,58 @@ export default async function DashboardPage() {
     addonOrders,
     recentEvents,
   ] = await Promise.all([
-    prisma.candidate.count({ where: { userId } }),
-    prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'OPEN' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'IN_PROGRESS' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }),
-    prisma.candidate.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 6,
-      include: { _count: { select: { checks: true } } },
-    }),
-    prisma.referenceCheck.findMany({
-      where: { candidate: { userId } },
-      orderBy: { updatedAt: 'desc' },
-      take: 6,
-      include: { candidate: { select: { firstName: true, lastName: true, position: true } } },
-    }),
-    prisma.candidate.groupBy({ by: ['status'], where: { userId }, _count: true }),
-    prisma.referenceCheck.findMany({
-      where: { candidate: { userId } },
-      select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
-    }),
-    prisma.candidate.count({ where: { userId, gdprConsent: true } }),
-    prisma.addonOrder.count({ where: { userId } }),
-    prisma.auditLog.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'desc' },
-      take: 8,
-      select: { id: true, action: true, entity: true, details: true, createdAt: true },
-    }),
+    safe(prisma.candidate.count({ where: { userId } }), 0, 'totalCandidates'),
+    safe(prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }), 0, 'activeCandidates'),
+    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }), 0, 'completedChecks'),
+    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'OPEN' } }), 0, 'openChecks'),
+    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'IN_PROGRESS' } }), 0, 'inProgressChecks'),
+    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }), 0, 'discrepancies'),
+    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }), 0, 'verifiedChecks'),
+    safe(
+      prisma.candidate.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 6,
+        include: { _count: { select: { checks: true } } },
+      }),
+      [],
+      'recentCandidates',
+    ),
+    safe(
+      prisma.referenceCheck.findMany({
+        where: { candidate: { userId } },
+        orderBy: { updatedAt: 'desc' },
+        take: 6,
+        include: { candidate: { select: { firstName: true, lastName: true, position: true } } },
+      }),
+      [],
+      'recentChecks',
+    ),
+    safe(
+      prisma.candidate.groupBy({ by: ['status'], where: { userId }, _count: true }),
+      [] as { status: string; _count: number }[],
+      'candidateStatusGroups',
+    ),
+    safe(
+      prisma.referenceCheck.findMany({
+        where: { candidate: { userId } },
+        select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
+      }),
+      [] as { createdAt: Date; calledAt: Date | null; result: string | null; status: string; updatedAt: Date }[],
+      'allChecks',
+    ),
+    safe(prisma.candidate.count({ where: { userId, gdprConsent: true } }), 0, 'consentedCandidates'),
+    safe(prisma.addonOrder.count({ where: { userId } }), 0, 'addonOrders'),
+    safe(
+      prisma.auditLog.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: 8,
+        select: { id: true, action: true, entity: true, details: true, createdAt: true },
+      }),
+      [] as { id: string; action: string; entity: string; details: string | null; createdAt: Date }[],
+      'recentEvents',
+    ),
   ])
 
   const totalChecks = openChecks + inProgressChecks + completedChecks
@@ -82,7 +114,11 @@ export default async function DashboardPage() {
     d.setHours(0, 0, 0, 0)
     const next = new Date(d); next.setDate(d.getDate() + 1)
     const dayChecks = allChecks.filter((c) => {
-      const t = c.updatedAt.getTime()
+      // updatedAt ist im Schema non-null, aber in Prisma-Sicht ist der
+      // Driver-Layer nicht zu 100% trauenswert (Edge-Cases bei nicht
+      // migrierten Spalten o.ae.). Defensiv pruefen.
+      if (!c?.updatedAt || typeof (c.updatedAt as Date).getTime !== 'function') return false
+      const t = (c.updatedAt as Date).getTime()
       return t >= d.getTime() && t < next.getTime()
     })
     trend.push({
@@ -93,18 +129,26 @@ export default async function DashboardPage() {
     })
   }
 
-  // Avg turnaround in hours
-  const turnaroundChecks = allChecks.filter((c) => c.calledAt && c.createdAt)
+  // Avg turnaround in hours — defensiv. Nur Eintraege mit zwei validen Dates.
+  const turnaroundChecks = allChecks.filter(
+    (c): c is typeof c & { calledAt: Date; createdAt: Date } =>
+      !!c?.calledAt && !!c?.createdAt
+        && typeof (c.calledAt as Date).getTime === 'function'
+        && typeof (c.createdAt as Date).getTime === 'function',
+  )
   const turnaround: { day: string; hours: number }[] = []
   const dayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0)
+    const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0, 0, 0, 0)
     const next = new Date(d); next.setDate(d.getDate() + 1)
-    const dc = turnaroundChecks.filter((c) => c.calledAt!.getTime() >= d.getTime() && c.calledAt!.getTime() < next.getTime())
+    const dc = turnaroundChecks.filter((c) => c.calledAt.getTime() >= d.getTime() && c.calledAt.getTime() < next.getTime())
     const avgH = dc.length === 0
       ? 0
-      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt!.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
-    turnaround.push({ day: dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1], hours: avgH })
+      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
+    // Array-Index defensiv: getDay() liefert immer 0-6, dayLabels hat 7 Eintraege.
+    // Trotzdem Fallback fuer Engine-Edge-Cases (z. B. Timezone-Verschiebungen).
+    const dayLabel = dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1] ?? '—'
+    turnaround.push({ day: dayLabel, hours: avgH })
   }
 
   // Status distribution
@@ -268,7 +312,7 @@ export default async function DashboardPage() {
                       className="flex items-center justify-between p-2.5 rounded-xl hover:bg-bg-secondary transition-colors group">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-brand-700">
-                          {c.firstName[0]}{c.lastName[0]}
+                          {(c.firstName?.[0] ?? '').toUpperCase()}{(c.lastName?.[0] ?? '').toUpperCase()}
                         </div>
                         <div className="min-w-0">
                           <div className="text-xs font-semibold text-text-primary truncate group-hover:text-brand-700 transition-colors">
@@ -308,10 +352,10 @@ export default async function DashboardPage() {
                         </div>
                         <div className="min-w-0">
                           <div className="text-xs font-semibold text-text-primary truncate">
-                            {chk.employerName}
+                            {chk.employerName ?? '—'}
                           </div>
                           <div className="text-[10px] text-text-muted truncate">
-                            {chk.candidate.firstName} {chk.candidate.lastName}
+                            {chk.candidate?.firstName ?? ''} {chk.candidate?.lastName ?? ''}
                           </div>
                         </div>
                       </div>
