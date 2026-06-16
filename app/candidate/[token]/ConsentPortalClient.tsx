@@ -276,7 +276,7 @@ export function ConsentPortalClient({ token, initialData }: { token: string; ini
           <dl className="space-y-2.5 text-sm">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
               <dt className="text-slate-500 font-medium">Verantwortlich</dt>
-              <dd className="sm:col-span-2 text-slate-900">{initialData.hiringCompany} (gemeinsam mit candiq GmbH als Auftragsverarbeiter)</dd>
+              <dd className="sm:col-span-2 text-slate-900">{initialData.hiringCompany} (gemeinsam mit der RSG Recruiting Solutions group GmbH — Betreiberin der Marke candiq — als Auftragsverarbeiter)</dd>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
               <dt className="text-slate-500 font-medium">Zweck</dt>
