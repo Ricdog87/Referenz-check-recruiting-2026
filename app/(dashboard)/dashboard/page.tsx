@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
 import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
@@ -19,17 +20,9 @@ export default async function DashboardPage() {
   const userId = session.user.id
   const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
 
-  // Jede einzelne Query-Promise so wrappen, dass ein Fehler in einer einzelnen
-  // Query NIE das gesamte Dashboard auf error.tsx schickt. Pro Query gibt es
-  // einen typsicheren Fallback. Hintergrund: Andre Sola (Juni 2026) ist nach
-  // Login auf eine globale error.tsx geflogen — ein einzelner Query-Fail
-  // (z. B. nicht-applizierte Migration, leere Relation, Driver-Hick-Up) darf
-  // niemals einen Prospect-Account "killen".
-  const safe = <T,>(p: Promise<T>, fallback: T, label: string): Promise<T> =>
-    p.catch((err) => {
-      console.error(`[dashboard:query_fail] ${label}`, err?.message ?? err)
-      return fallback
-    })
+  // Jede einzelne Query so wrappen, dass ein Fehler NIE das gesamte Dashboard
+  // auf error.tsx schickt. Pro Query gibt es einen typsicheren Fallback.
+  // Siehe lib/safe-query.ts fuer Rationale.
 
   const [
     totalCandidates,
@@ -47,14 +40,14 @@ export default async function DashboardPage() {
     addonOrders,
     recentEvents,
   ] = await Promise.all([
-    safe(prisma.candidate.count({ where: { userId } }), 0, 'totalCandidates'),
-    safe(prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }), 0, 'activeCandidates'),
-    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }), 0, 'completedChecks'),
-    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'OPEN' } }), 0, 'openChecks'),
-    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'IN_PROGRESS' } }), 0, 'inProgressChecks'),
-    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }), 0, 'discrepancies'),
-    safe(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }), 0, 'verifiedChecks'),
-    safe(
+    safeQuery(prisma.candidate.count({ where: { userId } }), 0, 'totalCandidates'),
+    safeQuery(prisma.candidate.count({ where: { userId, status: 'IN_REVIEW' } }), 0, 'activeCandidates'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }), 0, 'completedChecks'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'OPEN' } }), 0, 'openChecks'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'IN_PROGRESS' } }), 0, 'inProgressChecks'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }), 0, 'discrepancies'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }), 0, 'verifiedChecks'),
+    safeQuery(
       prisma.candidate.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },
@@ -64,7 +57,7 @@ export default async function DashboardPage() {
       [],
       'recentCandidates',
     ),
-    safe(
+    safeQuery(
       prisma.referenceCheck.findMany({
         where: { candidate: { userId } },
         orderBy: { updatedAt: 'desc' },
@@ -74,12 +67,12 @@ export default async function DashboardPage() {
       [],
       'recentChecks',
     ),
-    safe(
+    safeQuery(
       prisma.candidate.groupBy({ by: ['status'], where: { userId }, _count: true }),
       [] as { status: string; _count: number }[],
       'candidateStatusGroups',
     ),
-    safe(
+    safeQuery(
       prisma.referenceCheck.findMany({
         where: { candidate: { userId } },
         select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true },
@@ -87,9 +80,9 @@ export default async function DashboardPage() {
       [] as { createdAt: Date; calledAt: Date | null; result: string | null; status: string; updatedAt: Date }[],
       'allChecks',
     ),
-    safe(prisma.candidate.count({ where: { userId, gdprConsent: true } }), 0, 'consentedCandidates'),
-    safe(prisma.addonOrder.count({ where: { userId } }), 0, 'addonOrders'),
-    safe(
+    safeQuery(prisma.candidate.count({ where: { userId, gdprConsent: true } }), 0, 'consentedCandidates'),
+    safeQuery(prisma.addonOrder.count({ where: { userId } }), 0, 'addonOrders'),
+    safeQuery(
       prisma.auditLog.findMany({
         where: { userId },
         orderBy: { createdAt: 'desc' },

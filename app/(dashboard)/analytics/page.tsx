@@ -1,9 +1,19 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 import { Header } from '@/components/layout/Header'
 import { ActivityAreaChart, StatusPieChart, TurnaroundBarChart } from '@/components/dashboard/DashboardCharts'
 import { TrendingUp, Target, Activity, Award } from 'lucide-react'
+
+type AnalyticsCheck = {
+  createdAt: Date
+  calledAt: Date | null
+  result: string | null
+  status: string
+  updatedAt: Date
+  employerName: string
+}
 
 export default async function AnalyticsPage() {
   const session = await getServerSession(authOptions)
@@ -18,26 +28,35 @@ export default async function AnalyticsPage() {
     discrepancies,
     allChecks,
   ] = await Promise.all([
-    prisma.candidate.count({ where: { userId } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }),
-    prisma.referenceCheck.findMany({
-      where: { candidate: { userId } },
-      select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true, employerName: true },
-    }),
+    safeQuery(prisma.candidate.count({ where: { userId } }), 0, 'analytics.totalCandidates'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, status: 'COMPLETED' } }), 0, 'analytics.completedChecks'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'VERIFIED' } }), 0, 'analytics.verifiedChecks'),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId }, result: 'DISCREPANCY_FOUND' } }), 0, 'analytics.discrepancies'),
+    safeQuery(
+      prisma.referenceCheck.findMany({
+        where: { candidate: { userId } },
+        select: { createdAt: true, calledAt: true, result: true, status: true, updatedAt: true, employerName: true },
+      }),
+      [] as AnalyticsCheck[],
+      'analytics.allChecks',
+    ),
   ])
 
   const totalChecks = allChecks.length
   const verificationRate = totalChecks > 0 ? Math.round((verifiedChecks / totalChecks) * 100) : 0
   const discrepancyRate = totalChecks > 0 ? Math.round((discrepancies / totalChecks) * 100) : 0
 
-  // 30-day trend
+  // 30-day trend — defensiver Date-Guard, falls updatedAt im Driver-Layer
+  // mal nicht als Date-Instanz materialisiert wird.
   const trend: { date: string; total: number; verified: number; discrepancy: number }[] = []
   for (let i = 29; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0)
     const next = new Date(d); next.setDate(d.getDate() + 1)
-    const dc = allChecks.filter((c) => c.updatedAt.getTime() >= d.getTime() && c.updatedAt.getTime() < next.getTime())
+    const dc = allChecks.filter((c) => {
+      if (!c?.updatedAt || typeof (c.updatedAt as Date).getTime !== 'function') return false
+      const t = (c.updatedAt as Date).getTime()
+      return t >= d.getTime() && t < next.getTime()
+    })
     trend.push({
       date: d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }),
       total: dc.length,
@@ -54,17 +73,23 @@ export default async function AnalyticsPage() {
     { name: 'Verweigert', value: allChecks.filter(c => c.result === 'DECLINED').length, color: '#94a3b8' },
   ]
 
-  // Turnaround per weekday
+  // Turnaround per weekday — Predicate-Filter narrowed beide Date-Felder,
+  // damit das ! im reduce wegfaellt.
+  const callable = allChecks.filter(
+    (c): c is AnalyticsCheck & { calledAt: Date; createdAt: Date } =>
+      !!c?.calledAt && !!c?.createdAt
+        && typeof (c.calledAt as Date).getTime === 'function'
+        && typeof (c.createdAt as Date).getTime === 'function',
+  )
   const dayLabels = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
   const turnaround = dayLabels.map((day, idx) => {
-    const dc = allChecks.filter((c) => {
-      if (!c.calledAt) return false
+    const dc = callable.filter((c) => {
       const wd = c.calledAt.getDay()
       return (wd === 0 ? 6 : wd - 1) === idx
     })
     const avgH = dc.length === 0
       ? 0
-      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt!.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
+      : Math.round(dc.reduce((acc, c) => acc + (c.calledAt.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
     return { day, hours: avgH }
   })
 

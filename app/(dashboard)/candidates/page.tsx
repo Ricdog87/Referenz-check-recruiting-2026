@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, CANDIDATE_STATUS } from '@/lib/utils'
@@ -30,13 +31,21 @@ export default async function CandidatesPage({
   }
 
   const [candidates, statusCounts, total] = await Promise.all([
-    prisma.candidate.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: { _count: { select: { checks: true, documents: true } } },
-    }),
-    prisma.candidate.groupBy({ by: ['status'], where: { userId: session.user.id }, _count: true }),
-    prisma.candidate.count({ where: { userId: session.user.id } }),
+    safeQuery(
+      prisma.candidate.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        include: { _count: { select: { checks: true, documents: true } } },
+      }),
+      [],
+      'candidates.list',
+    ),
+    safeQuery(
+      prisma.candidate.groupBy({ by: ['status'], where: { userId: session.user.id }, _count: true }),
+      [] as { status: string; _count: number }[],
+      'candidates.statusCounts',
+    ),
+    safeQuery(prisma.candidate.count({ where: { userId: session.user.id } }), 0, 'candidates.total'),
   ])
 
   return (
@@ -131,7 +140,7 @@ export default async function CandidatesPage({
                         <td className="px-5 py-3.5">
                           <Link href={`/candidates/${c.id}`} className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-100 to-violet/20 border border-brand-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-brand-700">
-                              {c.firstName[0]}{c.lastName[0]}
+                              {(c.firstName?.[0] ?? '').toUpperCase()}{(c.lastName?.[0] ?? '').toUpperCase()}
                             </div>
                             <div>
                               <div className="text-sm font-semibold text-text-primary group-hover:text-brand-700 transition-colors">

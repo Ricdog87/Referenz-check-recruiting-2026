@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 import { Header } from '@/components/layout/Header'
 import Link from 'next/link'
 import { formatDate, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
@@ -20,17 +21,25 @@ export default async function ChecksPage({
   }
 
   const [checks, total, statusCounts] = await Promise.all([
-    prisma.referenceCheck.findMany({
-      where,
-      orderBy: { updatedAt: 'desc' },
-      include: { candidate: { select: { id: true, firstName: true, lastName: true, position: true } } },
-    }),
-    prisma.referenceCheck.count({ where: { candidate: { userId: session.user.id } } }),
-    prisma.referenceCheck.groupBy({
-      by: ['status'],
-      where: { candidate: { userId: session.user.id } },
-      _count: true,
-    }),
+    safeQuery(
+      prisma.referenceCheck.findMany({
+        where,
+        orderBy: { updatedAt: 'desc' },
+        include: { candidate: { select: { id: true, firstName: true, lastName: true, position: true } } },
+      }),
+      [],
+      'checks.list',
+    ),
+    safeQuery(prisma.referenceCheck.count({ where: { candidate: { userId: session.user.id } } }), 0, 'checks.total'),
+    safeQuery(
+      prisma.referenceCheck.groupBy({
+        by: ['status'],
+        where: { candidate: { userId: session.user.id } },
+        _count: true,
+      }),
+      [] as { status: string; _count: number }[],
+      'checks.statusCounts',
+    ),
   ])
 
   return (
@@ -105,9 +114,9 @@ export default async function ChecksPage({
                         <Phone className="w-5 h-5" />
                       </div>
                       <div className="min-w-0">
-                        <div className="font-semibold text-text-primary group-hover:text-brand-700 transition-colors truncate">{chk.employerName}</div>
+                        <div className="font-semibold text-text-primary group-hover:text-brand-700 transition-colors truncate">{chk.employerName ?? '—'}</div>
                         <div className="text-xs text-text-secondary mt-0.5 truncate">
-                          {chk.candidate.firstName} {chk.candidate.lastName}
+                          {chk.candidate?.firstName ?? ''} {chk.candidate?.lastName ?? ''}
                           {chk.position && <span className="text-text-muted"> · {chk.position}</span>}
                         </div>
                       </div>

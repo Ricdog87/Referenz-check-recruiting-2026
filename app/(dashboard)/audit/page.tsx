@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 import { Header } from '@/components/layout/Header'
 import { AuditTrailClient } from './AuditTrailClient'
 
@@ -21,22 +22,34 @@ export default async function AuditPage({
   }
 
   const [logs, total, actions, entities] = await Promise.all([
-    prisma.auditLog.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      take: 200,
-    }),
-    prisma.auditLog.count({ where: { userId: session.user.id } }),
-    prisma.auditLog.groupBy({
-      by: ['action'],
-      where: { userId: session.user.id },
-      _count: true,
-    }),
-    prisma.auditLog.groupBy({
-      by: ['entity'],
-      where: { userId: session.user.id },
-      _count: true,
-    }),
+    safeQuery(
+      prisma.auditLog.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        take: 200,
+      }),
+      [] as Awaited<ReturnType<typeof prisma.auditLog.findMany>>,
+      'audit.logs',
+    ),
+    safeQuery(prisma.auditLog.count({ where: { userId: session.user.id } }), 0, 'audit.total'),
+    safeQuery(
+      prisma.auditLog.groupBy({
+        by: ['action'],
+        where: { userId: session.user.id },
+        _count: true,
+      }),
+      [] as { action: string; _count: number }[],
+      'audit.actions',
+    ),
+    safeQuery(
+      prisma.auditLog.groupBy({
+        by: ['entity'],
+        where: { userId: session.user.id },
+        _count: true,
+      }),
+      [] as { entity: string; _count: number }[],
+      'audit.entities',
+    ),
   ])
 
   return (
@@ -53,7 +66,8 @@ export default async function AuditPage({
           entityId: l.entityId,
           details: l.details,
           ip: l.ip,
-          createdAt: l.createdAt.toISOString(),
+          // createdAt ist im Schema non-null, aber defensiv (Driver-Edge-Cases).
+          createdAt: l.createdAt instanceof Date ? l.createdAt.toISOString() : new Date().toISOString(),
         }))}
         actions={actions.map((a) => ({ value: a.action, count: a._count }))}
         entities={entities.map((e) => ({ value: e.entity, count: e._count }))}
