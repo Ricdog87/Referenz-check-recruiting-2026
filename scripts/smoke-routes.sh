@@ -26,6 +26,7 @@ ROUTES=(
   "/demo"
   "/termin"
   "/waitlist-agency"
+  "/bewerber"
   "/roi-rechner"
   "/pilotprogramm"
   "/compliance"

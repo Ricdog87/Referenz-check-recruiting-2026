@@ -286,12 +286,15 @@ export default function DatenschutzPage() {
         vor Ver&ouml;ffentlichung.
       </p>
 
-      <h2>14. Lead-Magnet-Anfragen</h2>
+      <h2>14. Lead-Magnet-Anfragen &amp; Bewerber-Waitlist</h2>
       <p>
-        Auf candiq.de bieten wir kostenlose Praxis-Guides (Lead-Magnets) zum Download.
-        Vor der Anzeige werden Vorname und gesch&auml;ftliche E-Mail-Adresse erhoben,
-        optional auch Firmenname. Zus&auml;tzlich speichern wir Zeitstempel, IP-Adresse
-        und User-Agent zur Missbrauchspr&auml;vention.
+        Auf candiq.de bieten wir (a) kostenlose Praxis-Guides (Lead-Magnets) zum
+        Download sowie (b) eine Warteliste fuer Bewerber:innen, die candiq
+        kuenftig selbst zur proaktiven Referenz-Verifikation nutzen wollen
+        (Self-Service, Closed Beta Q4 2026). Vor der Anzeige bzw. Anmeldung werden
+        Vorname und E-Mail-Adresse erhoben, optional Firmenname (Lead-Magnet) bzw.
+        Position/Branche (Bewerber-Waitlist). Zus&auml;tzlich speichern wir
+        Zeitstempel, IP-Adresse und User-Agent zur Missbrauchspr&auml;vention.
       </p>
       <p>
         <strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)

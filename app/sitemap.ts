@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: MetadataRoute.Sitemap = [
     { url: `${BASE_URL}/`, lastModified: now, changeFrequency: 'weekly', priority: 1.0 },
     { url: `${BASE_URL}/en`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: `${BASE_URL}/bewerber`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
 
     // SEO-Pillar + Keyword-Cluster
     { url: `${BASE_URL}/referenzpruefung`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
