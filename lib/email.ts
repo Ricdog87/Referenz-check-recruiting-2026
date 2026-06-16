@@ -248,3 +248,44 @@ export function consentRevokedNotifyHrEmail(opts: {
   const text = `Einwilligung widerrufen — ${opts.candidateName} (${opts.position})\n\nAlle offenen Prüfungen wurden gestoppt.\n\n${opts.candidateUrl}`
   return { subject: `candiq — ${opts.candidateName}: Einwilligung widerrufen`, html, text }
 }
+
+
+// ─────────────────────────────────────────────────────────────────
+// Bewerber-Self-Service Waitlist (Phase 1) — candiq-Layout via shell()
+// ─────────────────────────────────────────────────────────────────
+export function candidateWaitlistConfirmEmail(opts: {
+  firstName: string
+  newsletter?: boolean
+}): { subject: string; html: string; text: string } {
+  const name = escapeHtml(opts.firstName)
+  const html = shell(`
+    <h1>Du stehst auf der Warteliste \u2713</h1>
+    <p>Hallo ${name},</p>
+    <p>danke f\u00fcr dein Interesse \u2014 du bist auf der Warteliste f\u00fcr die <strong>candiq-Bewerber-Plattform</strong> (Closed Beta, geplant Q4 2026). Wir starten klein und sauber mit den ersten 100 Bewerber:innen.</p>
+    <p>Was dich erwartet: Du l\u00e4sst deine Stationen und Referenzen vorab pr\u00fcfen und teilst einen candiq-verifizierten Link mit jeder Bewerbung \u2014 wie eine SCHUFA-Auskunft f\u00fcr deinen Lebenslauf, nur f\u00fcrs Recruiting.</p>
+    <p>Kein Spam. Wir melden uns nur zum Launch.${opts.newsletter ? ' Den Praxis-Newsletter (max. 1\u00d7/Monat) hast du mit angefordert \u2014 Abmeldung jederzeit per 1-Klick.' : ''}</p>
+  `)
+  const text = `Du stehst auf der candiq-Warteliste.\n\nHallo ${opts.firstName}, danke f\u00fcr dein Interesse \u2014 du bist auf der Warteliste f\u00fcr die candiq-Bewerber-Plattform (Closed Beta, geplant Q4 2026). Kein Spam, wir melden uns nur zum Launch.`
+  return { subject: 'Du stehst auf der candiq-Warteliste', html, text }
+}
+
+export function candidateWaitlistNotifyEmail(opts: {
+  firstName: string
+  email: string
+  position?: string | null
+  newsletter?: boolean
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Neue Bewerber-Waitlist-Anmeldung</h1>
+    <p>Neue Anmeldung auf der Bewerber-Warteliste (<strong>/bewerber</strong>):</p>
+    <p>
+      <strong>Name:</strong> ${escapeHtml(opts.firstName)}<br>
+      <strong>E-Mail:</strong> ${escapeHtml(opts.email)}<br>
+      <strong>Position/Branche:</strong> ${escapeHtml(opts.position ?? '\u2014')}<br>
+      <strong>Newsletter:</strong> ${opts.newsletter ? 'ja' : 'nein'}
+    </p>
+    <p style="font-size:13px;color:#475569;">Gespeichert in der DB (LeadMagnetRequest, slug=candidate-self-service) und an HubSpot gesynct.</p>
+  `)
+  const text = `Neue Bewerber-Waitlist-Anmeldung\nName: ${opts.firstName}\nE-Mail: ${opts.email}\nPosition: ${opts.position ?? '\u2014'}\nNewsletter: ${opts.newsletter ? 'ja' : 'nein'}`
+  return { subject: `Neue Bewerber-Waitlist-Anmeldung: ${opts.firstName}`, html, text }
+}

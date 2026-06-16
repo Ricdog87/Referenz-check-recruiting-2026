@@ -127,6 +127,17 @@ export async function POST(req: NextRequest) {
       console.error('candidate_waitlist_hubspot_sync_error', { message: hsErr?.message })
     }
 
+    // Best-effort-Mails (nicht blockierend) im candiq-Layout: Bestaetigung an Bewerber:in + Info an uns.
+    try {
+      const { sendEmail, candidateWaitlistConfirmEmail, candidateWaitlistNotifyEmail } = await import('@/lib/email')
+      const confirm = candidateWaitlistConfirmEmail({ firstName, newsletter })
+      await sendEmail({ to: email, category: 'candidate_waitlist_confirm', subject: confirm.subject, html: confirm.html, text: confirm.text })
+      const notify = candidateWaitlistNotifyEmail({ firstName, email, position, newsletter })
+      await sendEmail({ to: 'hello@candiq.de', category: 'candidate_waitlist_notify', subject: notify.subject, html: notify.html, text: notify.text })
+    } catch (mailErr: any) {
+      console.error('candidate_waitlist_mail_error', { message: mailErr?.message })
+    }
+
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('candidate_waitlist_error', { message: err?.message })

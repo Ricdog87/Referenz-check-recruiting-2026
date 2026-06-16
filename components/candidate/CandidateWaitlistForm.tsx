@@ -66,8 +66,8 @@ export function CandidateWaitlistForm() {
           <div>
             <h3 className="font-bold text-emerald-900 mb-1">Du stehst auf der Liste.</h3>
             <p className="text-sm text-emerald-800 leading-relaxed">
-              Wir melden uns bei dir, sobald die Bewerber-Plattform startet (geplant Q4 2026).
-              Bis dahin: keine automatischen Mails, kein Spam. Versprochen.
+              Du bekommst gleich eine kurze Bestätigung per E-Mail. Danach melden wir uns
+              nur zum Launch (geplant Q4 2026) — kein Spam. Versprochen.
             </p>
           </div>
         </div>
