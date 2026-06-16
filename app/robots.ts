@@ -19,6 +19,15 @@ export default function robots(): MetadataRoute.Robots {
         ],
         disallow: ['/api/', '/dashboard', '/candidates', '/checks', '/analytics', '/settings', '/integrations', '/clients', '/addons', '/login', '/register', '/forgot-password', '/reset-password'],
       },
+      // GEO / AI-Crawler explizit erlauben (Generative Engine Optimization)
+      { userAgent: 'GPTBot', allow: '/' },
+      { userAgent: 'OAI-SearchBot', allow: '/' },
+      { userAgent: 'ChatGPT-User', allow: '/' },
+      { userAgent: 'PerplexityBot', allow: '/' },
+      { userAgent: 'ClaudeBot', allow: '/' },
+      { userAgent: 'Claude-Web', allow: '/' },
+      { userAgent: 'Google-Extended', allow: '/' },
+      { userAgent: 'Applebot-Extended', allow: '/' },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
   }
