@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>candiq — Pitch-Deck für Oliver Saul (Juni 2026)</title>
+<style>
+  /* ─── Brand-Palette aus candiq.de ─────────────────────────────────── */
+  :root {
+    --brand-50:  #eef2ff;
+    --brand-100: #e0e7ff;
+    --brand-200: #c7d2fe;
+    --brand-500: #6366f1;
+    --brand-600: #4f46e5;
+    --brand-700: #4338ca;
+    --violet:    #8b5cf6;
+    --cyan:      #06b6d4;
+    --emerald:   #10b981;
+    --amber:     #f59e0b;
+    --rose:      #f43f5e;
+    --slate-50:  #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --slate-900: #0f172a;
+    --text:      #0f172a;
+    --muted:     #64748b;
+  }
+
+  /* ─── Reset + Print-Setup ────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--slate-100); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.5; }
+  a { color: var(--brand-600); text-decoration: none; }
+
+  /* Jede Slide = 16:9 Karte, A4-landscape-print-fit */
+  .slide {
+    width: 1280px; max-width: 100%; aspect-ratio: 16 / 9;
+    margin: 24px auto; background: #fff;
+    border-radius: 24px; box-shadow: 0 16px 48px -16px rgba(15,23,42,0.18);
+    padding: 64px 80px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+    page-break-after: always;
+  }
+  .slide:last-of-type { page-break-after: auto; }
+
+  /* Print: 1 Slide pro Seite, querformat */
+  @page { size: A4 landscape; margin: 8mm; }
+  @media print {
+    html, body { background: #fff; }
+    .slide { margin: 0; box-shadow: none; border-radius: 0; width: 100%; height: 100vh; }
+  }
+
+  /* ─── Typo ────────────────────────────────────────────────────────── */
+  h1 { font-size: 56px; font-weight: 900; letter-spacing: -1.5px; line-height: 1.05; }
+  h2 { font-size: 40px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+  h3 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+  h4 { font-size: 14px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+  p  { font-size: 17px; color: var(--slate-700); }
+  .lead { font-size: 22px; color: var(--slate-700); line-height: 1.45; }
+  .kicker { font-size: 12px; font-weight: 700; color: var(--brand-700); text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 16px; }
+  .gradient-text {
+    background: linear-gradient(135deg, var(--brand-600), var(--violet));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ─── Generic Layout-Helfer ──────────────────────────────────────── */
+  .row { display: flex; gap: 32px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .center { display: flex; align-items: center; justify-content: center; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    background: var(--brand-50); color: var(--brand-700);
+    border: 1px solid var(--brand-100);
+  }
+  .pill-dark {
+    background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2);
+  }
+  .footer-bar {
+    position: absolute; bottom: 24px; left: 80px; right: 80px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+  }
+  .brand-mark {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-weight: 900; color: var(--brand-700); letter-spacing: -0.3px;
+  }
+  .brand-mark::before {
+    content: ''; width: 22px; height: 22px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--brand-600), var(--violet));
+  }
+  .slide-num { font-variant-numeric: tabular-nums; }
+
+  /* ─── Spezielle Kartentypen ─────────────────────────────────────── */
+  .step-card {
+    background: var(--slate-50); border: 1px solid var(--slate-200);
+    border-radius: 16px; padding: 24px;
+  }
+  .step-card .num {
+    display: inline-flex; width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--brand-500), var(--violet));
+    color: #fff; border-radius: 10px;
+    align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .stat-card {
+    background: var(--slate-50); border: 1px solid var(--slate-200);
+    border-radius: 14px; padding: 18px;
+  }
+  .stat-card .stat-value {
+    font-size: 32px; font-weight: 900; color: var(--text);
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .stat-card .stat-label {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px;
+  }
+  .stat-card .stat-trend { color: var(--emerald); font-weight: 700; font-size: 12px; }
+
+  /* Mock-Dashboard ─────────────────────────────────────────────── */
+  .dash-mock {
+    background: var(--slate-100);
+    border-radius: 16px;
+    padding: 16px;
+    display: grid; grid-template-columns: 200px 1fr; gap: 12px;
+    height: 100%;
+    border: 1px solid var(--slate-200);
+  }
+  .dash-sidebar {
+    background: var(--slate-900); border-radius: 10px;
+    padding: 14px 10px; color: #cbd5e1;
+  }
+  .dash-sidebar .nav-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 500; margin-bottom: 2px;
+  }
+  .dash-sidebar .nav-item.active { background: rgba(99,102,241,0.18); color: #fff; }
+  .dash-sidebar .nav-section { font-size: 9px; font-weight: 700; text-transform: uppercase;
+    color: #475569; letter-spacing: 1.5px; padding: 8px 10px 4px; }
+  .dash-content { background: #fff; border-radius: 10px; padding: 16px; overflow: hidden; }
+  .dash-content h5 { font-size: 16px; font-weight: 800; margin-bottom: 12px; }
+
+  /* Diskrepanz-Annotation */
+  .annot {
+    background: rgba(244,63,94,0.06);
+    border-left: 3px solid var(--rose);
+    padding: 8px 12px; border-radius: 0 8px 8px 0;
+    font-size: 12px;
+  }
+  .annot strong { color: var(--rose); }
+
+  /* Badge Status */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .badge-ok      { background: rgba(16,185,129,0.1); color: #047857; }
+  .badge-warn    { background: rgba(245,158,11,0.1); color: #b45309; }
+  .badge-err     { background: rgba(244,63,94,0.1);  color: #be123c; }
+  .badge-pending { background: var(--slate-100); color: var(--slate-700); }
+
+  /* SVG-Charts: Inline-Strich-Helfer */
+  .chart-area {
+    width: 100%; height: 90px; display: block;
+  }
+
+  /* Cover-Slide */
+  .cover {
+    background: linear-gradient(135deg, var(--slate-900) 0%, #1e1b4b 50%, #312e81 100%);
+    color: #fff;
+  }
+  .cover h1, .cover h3, .cover p { color: #fff; }
+  .cover .kicker { color: var(--cyan); }
+  .cover-mark {
+    color: #fff;
+  }
+  .cover-mark::before {
+    background: linear-gradient(135deg, var(--cyan), var(--brand-500));
+  }
+  .cover-blob {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+    pointer-events: none;
+  }
+
+  /* CTA-Slide */
+  .cta {
+    background: linear-gradient(135deg, var(--brand-600) 0%, var(--violet) 100%);
+    color: #fff;
+  }
+  .cta h2, .cta h3, .cta p { color: #fff; }
+
+  /* Print-Spezial */
+  @media print {
+    .footer-bar { color: var(--slate-500); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 1 — COVER
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide cover">
+  <div class="cover-blob" style="top:-100px;right:-120px;width:400px;height:400px;background:rgba(139,92,246,0.4);"></div>
+  <div class="cover-blob" style="bottom:-100px;left:-100px;width:380px;height:380px;background:rgba(6,182,212,0.3);"></div>
+
+  <div style="position:relative;z-index:1;">
+    <div class="brand-mark cover-mark" style="font-size:18px;">candiq</div>
+  </div>
+
+  <div style="position:relative;z-index:1;max-width:780px;">
+    <div class="kicker">Reference-Check-Plattform · Made in Germany</div>
+    <h1 style="margin-bottom:20px;">Bewerber, die auf dem Papier perfekt aussehen — <span style="color:var(--cyan);">aber sind sie es auch?</span></h1>
+    <p class="lead" style="opacity:0.85;">
+      candiq verifiziert Referenzen, Stationen und Tätigkeiten — DSGVO-konform, in
+      unter 48 Stunden, mit echten Telefonaten geschulter Reviewer und KI-gestützter
+      Dokumentation.
+    </p>
+  </div>
+
+  <div style="position:relative;z-index:1;display:flex;gap:24px;align-items:center;">
+    <div style="opacity:0.65;font-size:12px;">
+      Vorbereitet für <strong style="color:#fff;">Oliver Saul</strong> · 16. Juni 2026
+    </div>
+    <div style="flex:1;"></div>
+    <span class="pill pill-dark">✓ DSGVO by Design</span>
+    <span class="pill pill-dark">✓ Server in Deutschland</span>
+    <span class="pill pill-dark">✓ AVV nach Art. 28</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 2 — PROBLEM (Olivers Zahl!)
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">Das Problem</div>
+    <h2 style="margin-bottom:24px;">Im ChatGPT-Zeitalter sehen Lebensläufe perfekt aus. <span class="gradient-text">Sind sie aber nicht.</span></h2>
+  </div>
+
+  <div class="grid-3" style="margin:24px 0;">
+    <div class="step-card" style="border-left:4px solid var(--rose);">
+      <div style="font-size:48px;font-weight:900;color:var(--rose);line-height:1;font-variant-numeric:tabular-nums;">⅓</div>
+      <h3 style="margin-top:12px;">aller CVs sind nicht korrekt</h3>
+      <p style="font-size:14px;margin-top:8px;">Jobtitel verändert, Positionen weggelassen, Zeiträume „aufgerundet". Studien aus DACH bestätigen die Quote durchgängig.</p>
+    </div>
+    <div class="step-card" style="border-left:4px solid var(--amber);">
+      <div style="font-size:48px;font-weight:900;color:var(--amber);line-height:1;">21–30%</div>
+      <h3 style="margin-top:12px;">Fehlbesetzungs-Rate</h3>
+      <p style="font-size:14px;margin-top:8px;">SHRM- und Bain-Daten: jeder 4. – 5. Hire ist eine Fehlbesetzung. Kosten ca. das 1,5-fache des Jahresgehalts.</p>
+    </div>
+    <div class="step-card" style="border-left:4px solid var(--brand-600);">
+      <div style="font-size:48px;font-weight:900;color:var(--brand-600);line-height:1;">15+ h</div>
+      <h3 style="margin-top:12px;">HR-Zeit pro Hire</h3>
+      <p style="font-size:14px;margin-top:8px;">… für Referenz-Telefonate, Terminvereinbarung, Notizen, Einwilligungs-Dokumentation. Manuell. Fehleranfällig.</p>
+    </div>
+  </div>
+
+  <p class="lead" style="border-top:1px solid var(--slate-200);padding-top:20px;">
+    <strong>Konsequenz:</strong> Interviews werden auf Basis falscher Annahmen geführt.
+    Die teuren Stunden vergehen, ohne dass jemand prüft, was wirklich stimmt.
+  </p>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>02 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 3 — DSGVO IM KERN (direkte Antwort auf Olivers Frage)
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">DSGVO im Kern</div>
+    <h2 style="margin-bottom:16px;">„Für eine Referenz braucht man das Einverständnis des Bewerbenden." <br><span class="gradient-text">Genau richtig — und genau so haben wir es gebaut.</span></h2>
+    <p class="lead" style="max-width:920px;">
+      Bei candiq holt der Bewerbende seine Einwilligung <strong>selbst</strong>.
+      Du klickst nie „der Kandidat hat zugestimmt" stellvertretend an — das wäre
+      rechtlich dünn und stört den Workflow.
+    </p>
+  </div>
+
+  <div class="grid-2" style="margin-top:24px;">
+    <div class="step-card">
+      <h3 style="margin-bottom:12px;">So funktioniert die Einwilligung</h3>
+      <ol style="font-size:14px;color:var(--slate-700);padding-left:18px;line-height:1.75;">
+        <li>Du legst den Kandidaten an → candiq schickt ihm einen <strong>Magic-Link</strong> per E-Mail</li>
+        <li>Er öffnet das Self-Service-Portal, sieht transparent <strong>was geprüft wird</strong></li>
+        <li>Er wählt <strong>granular die Scopes</strong> (Stationen / Referees / CV-Upload)</li>
+        <li>Er <strong>nennt seine Referenzgeber selbst</strong> — niemals durch dich pre-filled</li>
+        <li>Erst nach Klick „Einwilligung erteilt" rufen unsere Reviewer an</li>
+      </ol>
+    </div>
+    <div class="step-card" style="background:linear-gradient(135deg,var(--slate-900),#1e1b4b);color:#fff;border-color:transparent;">
+      <h3 style="margin-bottom:12px;color:#fff;">Was du als Auftraggeber bekommst</h3>
+      <ul style="font-size:14px;color:rgba(255,255,255,0.85);padding-left:18px;line-height:1.75;list-style:none;">
+        <li>✓ Audit-Trail: <strong>wer, wann, was, wo</strong> eingewilligt</li>
+        <li>✓ IP + User-Agent + Consent-Version (Art. 7 Abs. 1)</li>
+        <li>✓ Widerruf jederzeit per Link (Art. 7 Abs. 3)</li>
+        <li>✓ Auto-Löschung nach 6 Monaten (Art. 5 Abs. 1 e)</li>
+        <li>✓ AVV nach Art. 28 — Standard inklusive</li>
+        <li>✓ Server in Deutschland, Vercel EU-Region Frankfurt</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>03 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 4 — BEWERBER-PORTAL MOCKUP
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">Bewerber-Self-Service-Portal</div>
+    <h2 style="margin-bottom:0;">Was der Bewerbende sieht — voll transparent</h2>
+  </div>
+
+  <div class="grid-2" style="gap:40px;align-items:center;margin:24px 0;">
+    <!-- Mock-Browser-Frame -->
+    <div style="background:var(--slate-100);border-radius:14px;padding:16px;border:1px solid var(--slate-200);">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+        <div style="width:12px;height:12px;border-radius:50%;background:#ef4444;"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#eab308;"></div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#22c55e;"></div>
+        <div style="flex:1;background:#fff;border:1px solid var(--slate-200);border-radius:6px;padding:3px 10px;font-size:10px;color:var(--muted);font-family:monospace;margin-left:8px;">candiq.de/candidate/cl9x7p2k…</div>
+      </div>
+      <div style="background:#fff;border-radius:8px;padding:20px;">
+        <div style="font-weight:900;color:var(--brand-700);font-size:14px;margin-bottom:6px;">candiq</div>
+        <h3 style="font-size:18px;margin-bottom:6px;">Hallo Max Mustermann,</h3>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">
+          <strong>Beispiel HR GmbH</strong> möchte deine Referenzen verifizieren —
+          bevor sie passiert, gibst du hier deine Einwilligung.
+        </p>
+
+        <div style="background:var(--slate-50);border-radius:8px;padding:12px;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">Was wir prüfen wollen</div>
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;margin-bottom:6px;">
+            <input type="checkbox" checked style="margin-top:3px;accent-color:var(--brand-600);"/>
+            <span><strong>Stationen verifizieren</strong> — Position, Zeitraum, Tätigkeiten</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;margin-bottom:6px;">
+            <input type="checkbox" checked style="margin-top:3px;accent-color:var(--brand-600);"/>
+            <span><strong>Referenzgeber kontaktieren</strong> — die ich unten selbst nenne</span>
+          </label>
+          <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;">
+            <input type="checkbox" style="margin-top:3px;accent-color:var(--brand-600);"/>
+            <span><strong>CV abgleichen</strong> — Diskrepanzen markieren</span>
+          </label>
+        </div>
+
+        <div style="background:rgba(99,102,241,0.06);border:1px solid var(--brand-100);border-radius:8px;padding:10px;margin-bottom:12px;font-size:11px;color:var(--slate-700);">
+          🛡 <strong>Deine Daten werden spätestens nach 6 Monaten automatisch gelöscht.</strong>
+          Widerruf jederzeit über diesen Link.
+        </div>
+
+        <button style="background:linear-gradient(135deg,var(--brand-600),var(--violet));color:#fff;border:0;padding:10px 16px;border-radius:8px;font-weight:700;font-size:13px;width:100%;cursor:pointer;">
+          ✓ Einwilligung erteilen
+        </button>
+      </div>
+    </div>
+
+    <!-- Erklärung -->
+    <div>
+      <h3 style="margin-bottom:14px;">Warum das anders ist als „HR klickt für den Bewerber"</h3>
+      <ul style="font-size:14px;color:var(--slate-700);padding-left:18px;line-height:1.85;">
+        <li><strong>Bewerber bleibt Herr seiner Daten.</strong> Er sieht jeden Scope, wählt einzeln aus.</li>
+        <li><strong>Referenzgeber-Liste kommt vom Bewerber.</strong> Du weißt nichts über die Personen, bis er sie freigibt.</li>
+        <li><strong>Magic-Link statt Account.</strong> Kein zusätzliches Login, keine Friction.</li>
+        <li><strong>Audit-Eintrag:</strong> Zeit, IP, User-Agent, Consent-Version, Scope-Auswahl — alles revisionssicher.</li>
+        <li><strong>Widerruf-UX</strong> ist genauso einfach wie die Einwilligung — gleiche Page, ein Klick.</li>
+      </ul>
+      <div style="margin-top:18px;background:var(--brand-50);border:1px solid var(--brand-100);border-radius:10px;padding:12px;font-size:13px;color:var(--brand-700);">
+        💡 Compliance-Hinweis: Das Self-Service-Modell setzt § 26 BDSG + Art. 6 Abs. 1 lit. a DSGVO + Planet49-Urteil-konform um. Keine Bundle-Einwilligung.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>04 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 5 — 3-SCHRITT-PROZESS
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">So funktioniert candiq</div>
+    <h2>Drei Schritte. <span class="gradient-text">Verlässliches Signal.</span></h2>
+  </div>
+
+  <div class="grid-3" style="flex:1;align-items:stretch;margin:24px 0;">
+    <div class="step-card">
+      <div class="num">01</div>
+      <h3 style="margin-bottom:8px;">Anfrage in 30 Sekunden</h3>
+      <p style="font-size:13px;">
+        Position und Bewerber-E-Mail eingeben. candiq sendet automatisch einen
+        sicheren, zeitbegrenzten Einladungslink. Sie sind <strong>sofort DSGVO-konform</strong> —
+        die Einwilligung wird <em>vor</em> jeder Verarbeitung dokumentiert.
+      </p>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);">
+        ⏱ &lt; 30 sec · 🔒 Magic-Link mit Token-Hash
+      </div>
+    </div>
+    <div class="step-card" style="border-color:var(--brand-200);background:linear-gradient(180deg,var(--brand-50),#fff);">
+      <div class="num">02</div>
+      <h3 style="margin-bottom:8px;">Bewerber willigt selbst ein</h3>
+      <p style="font-size:13px;">
+        Im Self-Service-Portal: Bewerber liest die Datenschutz-Infos, nennt selbst
+        seine Referenzgeber und erteilt die <strong>granulare Einwilligung</strong>.
+        Jederzeit widerrufbar. <strong>Audit-Trail mit IP und Zeitstempel.</strong>
+      </p>
+      <div style="margin-top:14px;font-size:11px;color:var(--brand-700);font-weight:700;">
+        🔑 Art. 6 (1) a DSGVO · Art. 7 (1) Nachweispflicht
+      </div>
+    </div>
+    <div class="step-card" style="background:linear-gradient(135deg,var(--slate-900),#1e1b4b);color:#fff;border-color:transparent;">
+      <div class="num" style="background:linear-gradient(135deg,var(--violet),var(--cyan));">03</div>
+      <h3 style="margin-bottom:8px;color:#fff;">Reviewer rufen an, KI dokumentiert</h3>
+      <p style="font-size:13px;color:rgba(255,255,255,0.8);">
+        Ein geschulter Reviewer telefoniert die freigegebenen Referenzgeber ab —
+        <strong>standardisierter Fragenkatalog, AGG-konform</strong>. candiq dokumentiert
+        wörtlich, liefert den PDF-Report mit Bewertung pro Station und
+        Diskrepanz-Markierung.
+      </p>
+      <div style="margin-top:14px;font-size:11px;color:var(--cyan);">
+        📞 echter Mensch · 📝 wörtliche Doku · ⏰ Auto-Löschung nach 6 Mo
+      </div>
+    </div>
+  </div>
+
+  <div style="background:var(--slate-50);border-radius:14px;padding:18px 24px;border-left:4px solid var(--brand-600);">
+    <strong style="font-size:14px;color:var(--brand-700);">⚡ Standard-Durchlaufzeit: &lt; 48 h</strong>
+    <span style="font-size:13px;color:var(--slate-700);margin-left:12px;">— vom Anlegen des Kandidaten bis zum fertigen PDF-Report im Dashboard. Express-Slot in 24 h verfügbar.</span>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>05 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 6 — DASHBOARD-MOCKUP
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide" style="padding:48px 60px;">
+  <div>
+    <div class="kicker">Dein Dashboard</div>
+    <h2 style="margin-bottom:0;">Pipeline-Status, KPIs und Aktivität auf einen Blick</h2>
+  </div>
+
+  <div class="dash-mock" style="margin:18px 0;">
+    <!-- Sidebar -->
+    <div class="dash-sidebar">
+      <div style="font-weight:900;color:#fff;font-size:13px;margin-bottom:14px;padding:0 4px;">candiq <span style="font-size:8px;color:var(--brand-500);font-weight:700;letter-spacing:1.5px;">PRO</span></div>
+
+      <div class="nav-section">Workspace</div>
+      <div class="nav-item active">📊 Übersicht</div>
+      <div class="nav-item">👥 Kandidaten <span style="margin-left:auto;background:var(--brand-600);color:#fff;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;">9</span></div>
+      <div class="nav-item">📋 Referenzprüfungen</div>
+      <div class="nav-item">📈 Analytics</div>
+      <div class="nav-item">🛍 Add-ons</div>
+
+      <div class="nav-section">Review</div>
+      <div class="nav-item">🛡 Reviewer-Queue</div>
+
+      <div class="nav-section">Konto</div>
+      <div class="nav-item">📜 Audit-Trail</div>
+      <div class="nav-item">⚙ Einstellungen</div>
+    </div>
+
+    <!-- Content -->
+    <div class="dash-content">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <h5>Willkommen zurück, Lara 👋</h5>
+          <p style="font-size:11px;color:var(--muted);margin-top:2px;">3 Prüfungen warten auf Reviewer · 1 Diskrepanz neu</p>
+        </div>
+        <button style="background:linear-gradient(135deg,var(--brand-600),var(--violet));color:#fff;border:0;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;">+ Kandidat anlegen</button>
+      </div>
+
+      <!-- KPI-Kacheln -->
+      <div class="grid-4" style="gap:8px;margin-bottom:12px;">
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-value" style="font-size:24px;">9</div>
+          <div class="stat-label">Kandidaten</div>
+          <div class="stat-trend">+3 diese Woche</div>
+        </div>
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-value" style="font-size:24px;">21</div>
+          <div class="stat-label">Prüfungen total</div>
+          <div class="stat-trend">15 abgeschlossen</div>
+        </div>
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-value" style="font-size:24px;color:var(--rose);">2</div>
+          <div class="stat-label">Diskrepanzen</div>
+          <div class="stat-trend" style="color:var(--muted);">CV ≠ Auskunft</div>
+        </div>
+        <div class="stat-card" style="padding:10px;">
+          <div class="stat-value" style="font-size:24px;color:var(--emerald);">38 h</div>
+          <div class="stat-label">Ø Durchlauf</div>
+          <div class="stat-trend">⬇ 12 h vs. Vorquartal</div>
+        </div>
+      </div>
+
+      <!-- Charts + Activity -->
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px;">
+        <div class="stat-card" style="padding:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Aktivität · 14 Tage</div>
+          <svg class="chart-area" viewBox="0 0 300 90" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gradArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#6366f1" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,70 L20,60 L40,65 L60,40 L80,45 L100,30 L120,35 L140,20 L160,25 L180,30 L200,15 L220,22 L240,18 L260,10 L280,15 L300,8 L300,90 L0,90 Z" fill="url(#gradArea)"/>
+            <path d="M0,70 L20,60 L40,65 L60,40 L80,45 L100,30 L120,35 L140,20 L160,25 L180,30 L200,15 L220,22 L240,18 L260,10 L280,15 L300,8" stroke="#6366f1" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+        <div class="stat-card" style="padding:10px;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Status-Verteilung</div>
+          <div style="display:flex;align-items:center;gap:12px;height:80px;">
+            <!-- Donut-Mock -->
+            <svg width="70" height="70" viewBox="0 0 36 36" style="flex-shrink:0;">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--slate-200)" stroke-width="6"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--emerald)" stroke-width="6"
+                stroke-dasharray="55 88" transform="rotate(-90 18 18)"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--brand-500)" stroke-width="6"
+                stroke-dasharray="22 88" stroke-dashoffset="-55" transform="rotate(-90 18 18)"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="var(--amber)" stroke-width="6"
+                stroke-dasharray="11 88" stroke-dashoffset="-77" transform="rotate(-90 18 18)"/>
+            </svg>
+            <div style="flex:1;font-size:11px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>✓ Verifiziert</span><strong>15</strong></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>⏳ In Prüfung</span><strong>5</strong></div>
+              <div style="display:flex;justify-content:space-between;"><span>⚠ Diskrepanz</span><strong>2</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>06 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 7 — KANDIDATEN-LISTE + DISKREPANZ
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide" style="padding:48px 60px;">
+  <div>
+    <div class="kicker">Kandidaten-Pipeline</div>
+    <h2 style="margin-bottom:0;">Diskrepanzen sind sofort sichtbar — kein Stochern im Bauchgefühl</h2>
+  </div>
+
+  <!-- Mock-Tabelle -->
+  <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;overflow:hidden;margin:18px 0;flex:1;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead style="background:var(--slate-50);">
+        <tr style="text-align:left;">
+          <th style="padding:12px 18px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;">Kandidat</th>
+          <th style="padding:12px 8px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;">Position</th>
+          <th style="padding:12px 8px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;">Status</th>
+          <th style="padding:12px 8px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;">Prüfungen</th>
+          <th style="padding:12px 8px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;">Ergebnis</th>
+          <th style="padding:12px 18px;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700;">Eingang</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top:1px solid var(--slate-200);">
+          <td style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand-100),rgba(139,92,246,0.2));border:1px solid var(--brand-200);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--brand-700);">AM</div>
+              <div>
+                <div style="font-weight:600;">Anna Mustermann</div>
+                <div style="font-size:11px;color:var(--muted);">a.mustermann@…</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:14px 8px;">Senior Backend Eng</td>
+          <td style="padding:14px 8px;"><span class="badge badge-ok">Abgeschlossen</span></td>
+          <td style="padding:14px 8px;font-weight:700;">3 / 3</td>
+          <td style="padding:14px 8px;"><span class="badge badge-ok">✓ Verifiziert</span></td>
+          <td style="padding:14px 18px;color:var(--muted);">vor 2 Tagen</td>
+        </tr>
+        <tr style="border-top:1px solid var(--slate-200);background:rgba(244,63,94,0.03);">
+          <td style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#fee2e2,rgba(244,63,94,0.2));border:1px solid #fecaca;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#be123c;">MP</div>
+              <div>
+                <div style="font-weight:600;">Max Probemann</div>
+                <div style="font-size:11px;color:var(--muted);">m.probemann@…</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:14px 8px;">Product Manager</td>
+          <td style="padding:14px 8px;"><span class="badge badge-ok">Abgeschlossen</span></td>
+          <td style="padding:14px 8px;font-weight:700;">2 / 2</td>
+          <td style="padding:14px 8px;"><span class="badge badge-err">⚠ Diskrepanz</span></td>
+          <td style="padding:14px 18px;color:var(--muted);">vor 4 Tagen</td>
+        </tr>
+        <tr style="border-top:1px solid var(--slate-200);">
+          <td style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#dbeafe,rgba(59,130,246,0.2));border:1px solid #bfdbfe;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1d4ed8;">LK</div>
+              <div>
+                <div style="font-weight:600;">Lina Kandidat</div>
+                <div style="font-size:11px;color:var(--muted);">l.kandidat@…</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:14px 8px;">Senior Sales Lead</td>
+          <td style="padding:14px 8px;"><span class="badge badge-warn">In Prüfung</span></td>
+          <td style="padding:14px 8px;font-weight:700;">1 / 3</td>
+          <td style="padding:14px 8px;"><span class="badge badge-pending">— ausstehend</span></td>
+          <td style="padding:14px 18px;color:var(--muted);">heute morgen</td>
+        </tr>
+        <tr style="border-top:1px solid var(--slate-200);">
+          <td style="padding:14px 18px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#dcfce7,rgba(16,185,129,0.2));border:1px solid #bbf7d0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#047857;">TB</div>
+              <div>
+                <div style="font-weight:600;">Tim Beispiel</div>
+                <div style="font-size:11px;color:var(--muted);">t.beispiel@…</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:14px 8px;">UX Researcher</td>
+          <td style="padding:14px 8px;"><span class="badge badge-pending">Einwilligung steht aus</span></td>
+          <td style="padding:14px 8px;font-weight:700;">0 / —</td>
+          <td style="padding:14px 8px;color:var(--muted);">— Magic-Link gesendet</td>
+          <td style="padding:14px 18px;color:var(--muted);">vor 3 h</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="annot">
+    <strong>⚠ Diskrepanz bei Max Probemann:</strong> CV nennt „Senior Product Manager" bei BeispielTech (01/2022–08/2024).
+    Verifizierter Arbeitgeber bestätigt „Mid-Level PM" mit Start 04/2022. Tätigkeitsbeschreibung weicht
+    in 2 von 5 Punkten ab. Voller Wortlaut im Report → öffnen.
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>07 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 8 — REPORT-BEISPIEL
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide" style="padding:48px 60px;">
+  <div>
+    <div class="kicker">PDF-Report (Auszug)</div>
+    <h2 style="margin-bottom:0;">Strukturiert, teilbar, audit-ready</h2>
+  </div>
+
+  <div class="grid-2" style="gap:32px;flex:1;align-items:stretch;margin:18px 0;">
+    <!-- Mock-Report -->
+    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(15,23,42,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--slate-200);padding-bottom:16px;margin-bottom:16px;">
+        <div>
+          <div style="font-weight:900;color:var(--brand-700);font-size:14px;">candiq</div>
+          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-top:2px;">Referenzprüfungs-Report</div>
+        </div>
+        <div style="text-align:right;font-size:10px;color:var(--muted);">
+          <div>Report-ID <strong style="color:var(--text);">9F2A-LH8Q-K4M3</strong></div>
+          <div>Erstellt am <strong style="color:var(--text);">14. Juni 2026 · 11:42</strong></div>
+          <div>Auftraggeber <strong style="color:var(--text);">Beispiel HR GmbH</strong></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <div style="font-size:10px;color:var(--brand-700);text-transform:uppercase;letter-spacing:2px;font-weight:800;margin-bottom:4px;">Referenzauskunft</div>
+        <div style="font-size:24px;font-weight:900;letter-spacing:-0.5px;margin-bottom:4px;">Max Probemann</div>
+        <div style="font-size:12px;color:var(--muted);">Bewerbung als <strong style="color:var(--text);">Product Manager</strong> · Department Growth</div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <span class="badge badge-ok">Abgeschlossen</span>
+        <span class="badge badge-err">⚠ Diskrepanz gefunden</span>
+        <span class="badge" style="background:var(--brand-50);color:var(--brand-700);">★ 3 / 5</span>
+      </div>
+
+      <div style="background:var(--slate-50);border-radius:8px;padding:12px;margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Geprüfter Arbeitgeber</div>
+        <div style="font-size:13px;font-weight:600;">BeispielTech GmbH · München</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Kontakt: Frau Müller, Director PM · 089-…</div>
+        <div style="font-size:11px;color:var(--muted);">Kontaktiert: 13. Juni 2026 · 14:20 · Reviewer Steffi K.</div>
+      </div>
+
+      <div style="background:rgba(244,63,94,0.06);border-left:3px solid var(--rose);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;font-size:12px;">
+        <strong style="color:var(--rose);">⚠ Diskrepanz #1 — Position</strong>
+        <div style="font-size:11px;color:var(--slate-700);margin-top:4px;line-height:1.5;">
+          <strong>CV:</strong> Senior Product Manager (Lead-Verantwortung 4 Reports)<br/>
+          <strong>Auskunft:</strong> Mid-Level Product Manager, keine direkten Reports
+        </div>
+      </div>
+      <div style="background:rgba(244,63,94,0.06);border-left:3px solid var(--rose);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;font-size:12px;">
+        <strong style="color:var(--rose);">⚠ Diskrepanz #2 — Zeitraum</strong>
+        <div style="font-size:11px;color:var(--slate-700);margin-top:4px;line-height:1.5;">
+          <strong>CV:</strong> 01/2022 – 08/2024 (32 Monate)<br/>
+          <strong>Auskunft:</strong> 04/2022 – 08/2024 (29 Monate)
+        </div>
+      </div>
+
+      <div style="background:rgba(16,185,129,0.06);border-left:3px solid var(--emerald);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;">
+        <strong style="color:#047857;">✓ Übereinstimmend</strong>
+        <div style="font-size:11px;color:var(--slate-700);margin-top:4px;">
+          Tätigkeiten Produktstrategie + Roadmap-Management bestätigt. Empfehlung als „solide arbeitend" ausgesprochen.
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="margin-bottom:14px;">Was du im Report bekommst</h3>
+      <ul style="font-size:14px;color:var(--slate-700);padding-left:18px;line-height:1.85;">
+        <li><strong>Bewertung pro Station</strong> mit Sterne-Rating</li>
+        <li><strong>Diskrepanz-Markierungen</strong> mit exakter Gegenüberstellung CV ↔ Auskunft</li>
+        <li><strong>Wörtliche Gesprächsnotizen</strong> des Reviewers</li>
+        <li><strong>Audit-Footer</strong>: wer angerufen, wann, von welchem Reviewer</li>
+        <li><strong>PDF-Export</strong> für Hiring Manager, Compliance, Geschäftsführung</li>
+        <li><strong>Auto-Löschung</strong> nach 6 Monaten (DSGVO Art. 5)</li>
+      </ul>
+      <div style="margin-top:16px;background:var(--slate-50);border:1px solid var(--slate-200);border-radius:12px;padding:14px;font-size:13px;">
+        💼 <strong>Sales-Use-Case:</strong> Geschäftsführung sieht den Report und kann
+        kompetent entscheiden — kein „der HR-Mensch hat es ja angeschaut, wird schon stimmen".
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>08 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 9 — REVIEWER-WORKFLOW (Mensch + KI)
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">Mensch + KI — kein „Bot ruft an"</div>
+    <h2 style="margin-bottom:8px;">Ein echter Mensch bürgt für einen echten Menschen.</h2>
+    <p class="lead" style="max-width:900px;">
+      candiq ist <strong>kein KI-Phone-Bot</strong>, der bei deinen Referenzgebern anruft.
+      Das wäre weder rechtssicher noch sales-tauglich. Wir machen es anders:
+    </p>
+  </div>
+
+  <div class="grid-2" style="gap:32px;margin:24px 0;flex:1;">
+    <div class="step-card" style="background:linear-gradient(180deg,#fff,var(--slate-50));">
+      <div style="font-size:36px;margin-bottom:8px;">📞</div>
+      <h3>Mensch ruft an</h3>
+      <p style="font-size:13px;margin-top:8px;">
+        Geschulte Reviewer aus unserem Pool führen das Telefonat. Sie arbeiten mit
+        einem <strong>standardisierten Fragenkatalog</strong>, AGG-konform: keine Stil-,
+        Herkunfts- oder Religionsbewertung. Nur überprüfbare Fakten.
+      </p>
+      <ul style="font-size:12px;color:var(--muted);margin-top:12px;padding-left:18px;line-height:1.6;">
+        <li>Stationen verifizieren (Position, Zeitraum, Aufgaben)</li>
+        <li>Bewertung Soft-Skills auf Skala</li>
+        <li>Rückfrage bei Unklarheit / Diskrepanz</li>
+      </ul>
+    </div>
+    <div class="step-card" style="background:linear-gradient(135deg,var(--slate-900),#1e1b4b);color:#fff;border-color:transparent;">
+      <div style="font-size:36px;margin-bottom:8px;">🤖</div>
+      <h3 style="color:#fff;">KI dokumentiert</h3>
+      <p style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:8px;">
+        Während der Reviewer spricht, transkribiert + strukturiert die KI live.
+        <strong>Kein „aus dem Gedächtnis nachgetippt"</strong>: jede Aussage steht wörtlich im Report,
+        jede Diskrepanz wird gegen den CV automatisch markiert.
+      </p>
+      <ul style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:12px;padding-left:18px;line-height:1.6;">
+        <li>Live-Transkript des Gesprächs</li>
+        <li>Auto-Mapping CV-Felder ↔ Aussage</li>
+        <li>Compliance-konforme Speicherung in der EU</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="background:var(--brand-50);border:1px solid var(--brand-100);border-radius:14px;padding:18px 24px;display:flex;gap:20px;align-items:center;">
+    <div style="font-size:36px;">⚖️</div>
+    <div>
+      <strong style="color:var(--brand-700);font-size:14px;">Wir rufen niemals mit einem Bot bei deinen Referenzgebern an.</strong>
+      <p style="font-size:13px;color:var(--slate-700);margin-top:4px;">
+        Das wäre weder mit § 26 BDSG noch mit der Wahrnehmung der Referenzgeber
+        kompatibel. Mensch fragt, KI dokumentiert. Genau diese Kombination ist
+        unser Differentiator gegenüber „AI-only"-Alternativen.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>09 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 10 — FEATURES-GRID
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">Was alles drin steckt</div>
+    <h2 style="margin-bottom:0;">Mehr als nur Reference Checks</h2>
+  </div>
+
+  <div class="grid-4" style="gap:14px;margin:24px 0;flex:1;">
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">📞</div>
+      <h3 style="font-size:14px;">Mensch ruft an, KI dokumentiert</h3>
+      <p style="font-size:11px;margin-top:6px;">Standardisierter Fragenkatalog, AGG-konform, wörtliche Doku.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">📄</div>
+      <h3 style="font-size:14px;">Strukturierter PDF-Report</h3>
+      <p style="font-size:11px;margin-top:6px;">Sterne-Rating pro Station, Diskrepanz-Markierung, direkt teilbar.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">🛡</div>
+      <h3 style="font-size:14px;">DSGVO by Design</h3>
+      <p style="font-size:11px;margin-top:6px;">Self-Service-Einwilligung, AVV Standard, Auto-Löschung nach 6 Mo.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">📊</div>
+      <h3 style="font-size:14px;">Live-Status pro Kandidat</h3>
+      <p style="font-size:11px;margin-top:6px;">Offen / in Arbeit / abgeschlossen, inkl. Verzögerungs-Hinweis.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">⚡</div>
+      <h3 style="font-size:14px;">Express in 24 h</h3>
+      <p style="font-size:11px;margin-top:6px;">Wenn's pressiert: Express-Slot dazubuchen, sonst &lt; 48 h Standard.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">📈</div>
+      <h3 style="font-size:14px;">Hiring-KPIs im Dashboard</h3>
+      <p style="font-size:11px;margin-top:6px;">Pipeline, Verifizierungsquote, Durchlauf — kein Excel-Hin-und-Her.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">📜</div>
+      <h3 style="font-size:14px;">Audit-Trail</h3>
+      <p style="font-size:11px;margin-top:6px;">Jeder Datenzugriff geloggt. Export für DSGVO Art. 30 + Wirtschaftsprüfer.</p>
+    </div>
+    <div class="step-card" style="padding:18px;">
+      <div style="font-size:24px;margin-bottom:8px;">🎙</div>
+      <h3 style="font-size:14px;">Voice-Demo auf Landing</h3>
+      <p style="font-size:11px;margin-top:6px;">Sprich direkt mit unserem KI-Agenten — siehe candiq.de.</p>
+    </div>
+  </div>
+
+  <div style="background:var(--slate-50);border-radius:12px;padding:14px 20px;font-size:12px;color:var(--slate-700);">
+    💼 <strong>In Roadmap:</strong> Multi-Mandanten für Personaldienstleister · candiq Interview (strukturierte Kompetenz-/Cultural-Fit-Interviews als Service)
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>10 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 11 — ROI + PRICING
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide">
+  <div>
+    <div class="kicker">Rechnet sich ab dem ersten Fehlbesetzungs-Stop</div>
+    <h2 style="margin-bottom:0;">ROI-Beispiel + Pakete</h2>
+  </div>
+
+  <div class="grid-2" style="gap:28px;margin:24px 0;flex:1;align-items:stretch;">
+    <!-- ROI -->
+    <div style="background:linear-gradient(135deg,var(--brand-600),var(--violet));color:#fff;border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;">
+      <div>
+        <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:2px;">📈 Ihr potenzielles Einsparpotenzial</div>
+        <div style="font-size:56px;font-weight:900;letter-spacing:-2px;margin:8px 0;line-height:1;font-variant-numeric:tabular-nums;">179.640 €</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.85);">netto pro Jahr — nach Abzug der candiq-Kosten</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;border-top:1px solid rgba(255,255,255,0.18);padding-top:14px;margin-top:14px;">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.6);font-weight:700;">Vorher</div>
+          <div style="font-size:22px;font-weight:800;">315.000 €</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);">3 Fehlbesetzungen pro Jahr</div>
+        </div>
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.6);font-weight:700;">Mit candiq</div>
+          <div style="font-size:22px;font-weight:800;">126.000 €</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.6);">1.2 Fehlbesetzungen (−60 %)</div>
+        </div>
+      </div>
+
+      <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:14px;">
+        🛡 Annahmen: 20 Hires/Jahr · 70.000 € Ø Gehalt · 15 % Fehlbesetzungs-Quote. Modell basiert auf SHRM- &amp; Bain-Studien.
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div>
+      <h3 style="margin-bottom:14px;">Pakete (Auswahl)</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="step-card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:800;font-size:15px;">Starter</div>
+            <div style="font-size:11px;color:var(--muted);">3 Prüfungen inkl. · 1 Seat · 39 €/extra Check</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900;font-size:20px;color:var(--brand-700);">79 €</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">/ Monat</div>
+          </div>
+        </div>
+        <div class="step-card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;border-color:var(--brand-300);background:var(--brand-50);">
+          <div>
+            <div style="font-weight:800;font-size:15px;">Professional <span style="font-size:9px;background:var(--brand-600);color:#fff;padding:1px 6px;border-radius:8px;margin-left:4px;text-transform:uppercase;letter-spacing:1px;">Beliebt</span></div>
+            <div style="font-size:11px;color:var(--muted);">12 Prüfungen inkl. · 5 Seats · 29 €/extra Check</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900;font-size:20px;color:var(--brand-700);">249 €</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">/ Monat</div>
+          </div>
+        </div>
+        <div class="step-card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:800;font-size:15px;">Business</div>
+            <div style="font-size:11px;color:var(--muted);">35 Prüfungen inkl. · 15 Seats · 22 €/extra Check</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900;font-size:20px;color:var(--brand-700);">599 €</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">/ Monat</div>
+          </div>
+        </div>
+        <div class="step-card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;background:var(--slate-900);color:#fff;border-color:transparent;">
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#fff;">Enterprise</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.6);">SLA, SSO, dediziertes Onboarding</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:900;font-size:14px;color:var(--cyan);">individuell</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:12px;">
+        Alle Preise zzgl. USt. Jährliche Zahlung ~20 % günstiger. Add-ons (Express 24h, Deep-Check, Interview-Service) separat.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <span class="brand-mark">candiq</span>
+    <span>11 / 12 · Pitch für Oliver Saul · candiq.de</span>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════════════
+     SLIDE 12 — CALL TO ACTION
+════════════════════════════════════════════════════════════════════ -->
+<section class="slide cta">
+  <div class="cover-blob" style="top:-100px;right:-100px;width:380px;height:380px;background:rgba(6,182,212,0.3);"></div>
+
+  <div style="position:relative;z-index:1;">
+    <div class="brand-mark cover-mark" style="font-size:18px;color:#fff;">candiq</div>
+  </div>
+
+  <div style="position:relative;z-index:1;max-width:800px;">
+    <div class="kicker" style="color:rgba(255,255,255,0.7);">Wenn das passt — so geht's weiter</div>
+    <h2 style="font-size:48px;color:#fff;margin-bottom:18px;">15 Minuten reichen, um es live zu sehen.</h2>
+    <p class="lead" style="color:rgba(255,255,255,0.9);max-width:680px;">
+      Wir gehen gemeinsam ins echte Dashboard, ich richte deinen persönlichen
+      Testzugang ein und du siehst den Report-Flow live. Kein Self-Service-Trial,
+      keine Marketing-E-Mail-Spirale.
+    </p>
+  </div>
+
+  <div style="position:relative;z-index:1;display:flex;gap:32px;align-items:center;flex-wrap:wrap;">
+    <div style="background:#fff;color:var(--brand-700);padding:16px 24px;border-radius:14px;font-weight:800;font-size:16px;display:inline-flex;align-items:center;gap:10px;">
+      📅 meetings-eu1.hubspot.com/r-serrano/candiq-demo
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <div style="font-size:13px;color:rgba(255,255,255,0.9);"><strong>Ricardo Serrano</strong> — Gründer</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.7);">hello@candiq.de · candiq.de · /en für EN</div>
+    </div>
+    <div style="flex:1;"></div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <span class="pill pill-dark">✓ Pilot-Programm Q3/2026 offen</span>
+      <span class="pill pill-dark">✓ Anonymisierte Case-Study nach 90 Tagen</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
