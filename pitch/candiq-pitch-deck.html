@@ -41,8 +41,12 @@
     width: 1280px; max-width: 100%; aspect-ratio: 16 / 9;
     margin: 24px auto; background: #fff;
     border-radius: 24px; box-shadow: 0 16px 48px -16px rgba(15,23,42,0.18);
-    padding: 64px 80px;
-    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 48px 64px;
+    /* flex-start statt space-between: Content fliesst von oben,
+       Footer wird durch margin-top:auto an den Boden gedrueckt.
+       Verhindert die Footer-/Content-Kollision aus dem 1. Pitch-Deck. */
+    display: flex; flex-direction: column; justify-content: flex-start;
+    gap: 18px;
     position: relative; overflow: hidden;
     page-break-after: always;
   }
@@ -84,7 +88,11 @@
     background: rgba(255,255,255,0.12); color: #fff; border-color: rgba(255,255,255,0.2);
   }
   .footer-bar {
-    position: absolute; bottom: 24px; left: 80px; right: 80px;
+    /* Footer als flex-Child (nicht absolute) — bleibt sauber unter dem
+       Content, kollidiert nie mit dem letzten Element. margin-top: auto
+       drueckt ihn ans Slide-Ende, falls Content kurz ist. */
+    margin-top: auto;
+    padding-top: 16px;
     display: flex; align-items: center; justify-content: space-between;
     font-size: 11px; color: var(--muted);
   }
@@ -461,7 +469,7 @@
 <!-- ════════════════════════════════════════════════════════════════════
      SLIDE 6 — DASHBOARD-MOCKUP
 ════════════════════════════════════════════════════════════════════ -->
-<section class="slide" style="padding:48px 60px;">
+<section class="slide">
   <div>
     <div class="kicker">Dein Dashboard</div>
     <h2 style="margin-bottom:0;">Pipeline-Status, KPIs und Aktivität auf einen Blick</h2>
@@ -570,7 +578,7 @@
 <!-- ════════════════════════════════════════════════════════════════════
      SLIDE 7 — KANDIDATEN-LISTE + DISKREPANZ
 ════════════════════════════════════════════════════════════════════ -->
-<section class="slide" style="padding:48px 60px;">
+<section class="slide">
   <div>
     <div class="kicker">Kandidaten-Pipeline</div>
     <h2 style="margin-bottom:0;">Diskrepanzen sind sofort sichtbar — kein Stochern im Bauchgefühl</h2>
@@ -674,65 +682,62 @@
 <!-- ════════════════════════════════════════════════════════════════════
      SLIDE 8 — REPORT-BEISPIEL
 ════════════════════════════════════════════════════════════════════ -->
-<section class="slide" style="padding:48px 60px;">
+<section class="slide">
   <div>
     <div class="kicker">PDF-Report (Auszug)</div>
     <h2 style="margin-bottom:0;">Strukturiert, teilbar, audit-ready</h2>
   </div>
 
   <div class="grid-2" style="gap:32px;flex:1;align-items:stretch;margin:18px 0;">
-    <!-- Mock-Report -->
-    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:14px;padding:24px;box-shadow:0 4px 16px rgba(15,23,42,0.06);">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--slate-200);padding-bottom:16px;margin-bottom:16px;">
+    <!-- Mock-Report (kompakter Layout — passt sauber in 16:9) -->
+    <div style="background:#fff;border:1px solid var(--slate-200);border-radius:12px;padding:18px 20px;box-shadow:0 4px 16px rgba(15,23,42,0.06);font-size:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--slate-200);padding-bottom:10px;margin-bottom:10px;">
         <div>
-          <div style="font-weight:900;color:var(--brand-700);font-size:14px;">candiq</div>
-          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-top:2px;">Referenzprüfungs-Report</div>
+          <div style="font-weight:900;color:var(--brand-700);font-size:13px;">candiq</div>
+          <div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-top:2px;">Referenzprüfungs-Report</div>
         </div>
-        <div style="text-align:right;font-size:10px;color:var(--muted);">
-          <div>Report-ID <strong style="color:var(--text);">9F2A-LH8Q-K4M3</strong></div>
-          <div>Erstellt am <strong style="color:var(--text);">14. Juni 2026 · 11:42</strong></div>
-          <div>Auftraggeber <strong style="color:var(--text);">Beispiel HR GmbH</strong></div>
+        <div style="text-align:right;font-size:9px;color:var(--muted);line-height:1.5;">
+          Report-ID <strong style="color:var(--text);">9F2A-LH8Q-K4M3</strong><br/>
+          14. Juni 2026 · 11:42<br/>
+          Auftraggeber <strong style="color:var(--text);">Beispiel HR GmbH</strong>
         </div>
       </div>
 
-      <div style="margin-bottom:14px;">
-        <div style="font-size:10px;color:var(--brand-700);text-transform:uppercase;letter-spacing:2px;font-weight:800;margin-bottom:4px;">Referenzauskunft</div>
-        <div style="font-size:24px;font-weight:900;letter-spacing:-0.5px;margin-bottom:4px;">Max Probemann</div>
-        <div style="font-size:12px;color:var(--muted);">Bewerbung als <strong style="color:var(--text);">Product Manager</strong> · Department Growth</div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:9px;color:var(--brand-700);text-transform:uppercase;letter-spacing:2px;font-weight:800;">Referenzauskunft</div>
+        <div style="font-size:20px;font-weight:900;letter-spacing:-0.5px;margin:2px 0;">Max Probemann</div>
+        <div style="font-size:11px;color:var(--muted);">Bewerbung als <strong style="color:var(--text);">Product Manager</strong> · Department Growth</div>
       </div>
 
-      <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
         <span class="badge badge-ok">Abgeschlossen</span>
-        <span class="badge badge-err">⚠ Diskrepanz gefunden</span>
+        <span class="badge badge-err">⚠ Diskrepanz</span>
         <span class="badge" style="background:var(--brand-50);color:var(--brand-700);">★ 3 / 5</span>
       </div>
 
-      <div style="background:var(--slate-50);border-radius:8px;padding:12px;margin-bottom:10px;">
-        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">Geprüfter Arbeitgeber</div>
-        <div style="font-size:13px;font-weight:600;">BeispielTech GmbH · München</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Kontakt: Frau Müller, Director PM · 089-…</div>
-        <div style="font-size:11px;color:var(--muted);">Kontaktiert: 13. Juni 2026 · 14:20 · Reviewer Steffi K.</div>
+      <div style="background:var(--slate-50);border-radius:8px;padding:8px 10px;margin-bottom:8px;">
+        <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px;">Geprüfter Arbeitgeber</div>
+        <div style="font-size:12px;font-weight:600;">BeispielTech GmbH · München</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:1px;">Frau Müller, Director PM · Kontaktiert 13.06.2026 · Reviewer Steffi K.</div>
       </div>
 
-      <div style="background:rgba(244,63,94,0.06);border-left:3px solid var(--rose);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;font-size:12px;">
-        <strong style="color:var(--rose);">⚠ Diskrepanz #1 — Position</strong>
-        <div style="font-size:11px;color:var(--slate-700);margin-top:4px;line-height:1.5;">
-          <strong>CV:</strong> Senior Product Manager (Lead-Verantwortung 4 Reports)<br/>
-          <strong>Auskunft:</strong> Mid-Level Product Manager, keine direkten Reports
+      <div style="background:rgba(244,63,94,0.06);border-left:3px solid var(--rose);border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:6px;font-size:11px;">
+        <strong style="color:var(--rose);font-size:11px;">⚠ Diskrepanz #1 — Position</strong>
+        <div style="color:var(--slate-700);margin-top:2px;line-height:1.4;font-size:10px;">
+          <strong>CV:</strong> Senior PM (Lead, 4 Reports) · <strong>Auskunft:</strong> Mid-Level PM, keine Reports
         </div>
       </div>
-      <div style="background:rgba(244,63,94,0.06);border-left:3px solid var(--rose);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:8px;font-size:12px;">
-        <strong style="color:var(--rose);">⚠ Diskrepanz #2 — Zeitraum</strong>
-        <div style="font-size:11px;color:var(--slate-700);margin-top:4px;line-height:1.5;">
-          <strong>CV:</strong> 01/2022 – 08/2024 (32 Monate)<br/>
-          <strong>Auskunft:</strong> 04/2022 – 08/2024 (29 Monate)
+      <div style="background:rgba(244,63,94,0.06);border-left:3px solid var(--rose);border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:6px;font-size:11px;">
+        <strong style="color:var(--rose);font-size:11px;">⚠ Diskrepanz #2 — Zeitraum</strong>
+        <div style="color:var(--slate-700);margin-top:2px;line-height:1.4;font-size:10px;">
+          <strong>CV:</strong> 01/2022 – 08/2024 (32 Mo) · <strong>Auskunft:</strong> 04/2022 – 08/2024 (29 Mo)
         </div>
       </div>
 
-      <div style="background:rgba(16,185,129,0.06);border-left:3px solid var(--emerald);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;">
-        <strong style="color:#047857;">✓ Übereinstimmend</strong>
-        <div style="font-size:11px;color:var(--slate-700);margin-top:4px;">
-          Tätigkeiten Produktstrategie + Roadmap-Management bestätigt. Empfehlung als „solide arbeitend" ausgesprochen.
+      <div style="background:rgba(16,185,129,0.06);border-left:3px solid var(--emerald);border-radius:0 6px 6px 0;padding:7px 10px;font-size:11px;">
+        <strong style="color:#047857;font-size:11px;">✓ Übereinstimmend</strong>
+        <div style="color:var(--slate-700);margin-top:2px;font-size:10px;line-height:1.4;">
+          Produktstrategie + Roadmap bestätigt · Empfehlung „solide arbeitend"
         </div>
       </div>
     </div>
