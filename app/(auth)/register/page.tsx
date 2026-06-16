@@ -236,8 +236,8 @@ function RegisterForm() {
             </button>
 
             <div className="text-center text-xs text-text-muted pt-2">
-              Lieber zuerst ansehen?{' '}
-              <Link href="/demo" className="text-brand-700 hover:text-brand-800 font-semibold">Demo ohne Konto starten →</Link>
+              Lieber zuerst sprechen?{' '}
+              <Link href="/termin" className="text-brand-700 hover:text-brand-800 font-semibold">15-Min-Termin buchen →</Link>
             </div>
           </div>
         )}

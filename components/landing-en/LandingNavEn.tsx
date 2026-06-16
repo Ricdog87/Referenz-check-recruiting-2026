@@ -42,7 +42,7 @@ export function LandingNavEn() {
           <Link href="/preise" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">
             Pricing
           </Link>
-          <Link href="/demo" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">
+          <Link href="/termin" className="text-sm font-medium text-text-secondary hover:text-text-primary px-3 py-2 rounded-lg transition-colors">
             Live demo
           </Link>
         </div>
@@ -79,7 +79,7 @@ export function LandingNavEn() {
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">
             Pricing
           </Link>
-          <Link href="/demo" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">
+          <Link href="/termin" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">
             Live demo
           </Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">

@@ -120,7 +120,7 @@ export function ComparisonTable({ withHeading = true }: { withHeading?: boolean 
           <Link href={BOOKING_URL} className="btn-primary py-3.5 px-7 inline-flex items-center justify-center gap-2">
             <CalendarCheck className="w-4 h-4" /> 15-Min-Termin buchen
           </Link>
-          <Link href="/demo" className="btn-secondary py-3.5 px-7 inline-flex items-center justify-center gap-2">
+          <Link href="/termin" className="btn-secondary py-3.5 px-7 inline-flex items-center justify-center gap-2">
             <Play className="w-4 h-4 text-brand-600" /> Live-Demo öffnen
           </Link>
         </div>

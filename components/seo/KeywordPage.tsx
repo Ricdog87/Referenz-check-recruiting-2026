@@ -43,7 +43,7 @@ export function KeywordPage({ data }: { data: KeywordPageData }) {
             <Link href={BOOKING_URL} className="btn-primary py-3 px-7 inline-flex items-center gap-2">
               <CalendarCheck className="w-4 h-4" /> 15-Min-Termin buchen
             </Link>
-            <Link href="/demo" className="btn-secondary py-3 px-7">Live-Demo öffnen</Link>
+            <Link href="/termin" className="btn-secondary py-3 px-7">Termin buchen</Link>
           </div>
         </div>
       </section>

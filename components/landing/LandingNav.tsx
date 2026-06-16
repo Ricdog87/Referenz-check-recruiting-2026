@@ -48,10 +48,6 @@ export function LandingNav() {
 
         <div className="hidden lg:flex items-center gap-1.5">
           <LocaleSwitcher />
-          <Link href="/demo" className="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-semibold text-brand-700 hover:text-brand-800 px-2.5 py-2 rounded-full transition-colors hover:bg-brand-50">
-            <Zap className="w-3.5 h-3.5" />
-            Live-Demo
-          </Link>
           <Link href="/login" className="whitespace-nowrap text-sm font-medium text-text-secondary hover:text-text-primary px-2.5 py-2 rounded-full transition-colors">
             Anmelden
           </Link>
@@ -83,9 +79,6 @@ export function LandingNav() {
           <Link href="/preise" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Preise</Link>
           <Link href="/preise#addons" onClick={() => setOpen(false)} className="block py-2 text-sm font-medium text-text-secondary">Add-ons</Link>
           <div className="pt-3 flex flex-col gap-2 border-t border-border">
-            <Link href="/demo" onClick={() => setOpen(false)} className="btn-secondary w-full flex items-center justify-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-brand-600" />Live-Demo
-            </Link>
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>
             <Link
               href={BOOKING_URL}

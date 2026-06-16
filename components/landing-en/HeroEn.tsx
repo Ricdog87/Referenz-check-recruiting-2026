@@ -78,7 +78,7 @@ export function HeroEn() {
               Book a 15-min walkthrough
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
-            <Link href="/demo" className="btn-secondary text-base py-3.5 px-7">
+            <Link href="/termin" className="btn-secondary text-base py-3.5 px-7">
               <Play className="w-4 h-4 text-brand-600" />
               Open live demo
             </Link>

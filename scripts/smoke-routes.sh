@@ -23,7 +23,6 @@ ROUTES=(
   "/"
   "/en"
   "/preise"
-  "/demo"
   "/termin"
   "/waitlist-agency"
   "/bewerber"
@@ -51,8 +50,11 @@ ROUTES=(
   "/impressum"
 )
 
-# Alte Geo-URLs: muessen 301 auf den kanonischen Pfad liefern (H1).
+# Permanent-Redirects: muessen 301 liefern.
+#   - Alte Geo-URLs: /referenzcheck-{stadt} -> /referenzpruefung/{stadt} (H1)
+#   - Demo-Self-Service abgeschafft: /demo -> /termin
 REDIRECTS=(
+  "/demo"
   "/referenzcheck-berlin"
   "/referenzcheck-muenchen"
   "/referenzcheck-hamburg"

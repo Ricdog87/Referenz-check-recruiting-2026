@@ -44,7 +44,7 @@ export function FinalCtaEn() {
               Book a 15-min walkthrough
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
-            <Link href="/demo" className="btn-secondary text-base py-4 px-8">
+            <Link href="/termin" className="btn-secondary text-base py-4 px-8">
               Open live demo
             </Link>
           </div>
