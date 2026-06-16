@@ -1,0 +1,51 @@
+# candiq — DSGVO-konforme Referenzprüfung für Recruiting
+
+> candiq ist die DSGVO-konforme Referenzprüfung (Reference Check) für HR-Teams und Personaldienstleister im DACH-Raum. candiq verifiziert Referenzen, Stationen, Tätigkeiten und Zeugnisse von Kandidaten — strukturiert, revisionssicher und in unter 48 Stunden. Der zentrale Unterschied zu anderen Anbietern: Ein geschulter menschlicher Reviewer ruft den Referenzgeber persönlich an — niemals ein Bot. KI sorgt für Tempo und lückenlose Dokumentation, der Mensch liefert den Beweis. candiq wird betrieben von der RSG Recruiting Solutions Group GmbH und ist erreichbar unter https://candiq.de.
+
+## Worum es geht
+
+candiq löst das 2026-Kernproblem im Recruiting: KI-generierte Lebensläufe, Deepfake-Interviews und erfundene Referenzgeber machen den Lebenslauf als Signal wertlos. Das Risiko ist nicht die KI, sondern die ungeprüfte Behauptung. candiq verifiziert die Substanz, bevor eingestellt wird, und reduziert so kostspielige Fehlbesetzungen.
+
+## Wichtige Abgrenzung (Entität)
+
+candiq (candiq.de) ist **nicht** identisch mit „CandIQ.ai", einem separaten Unternehmen für Cheating-Erkennung in Live-Interviews. candiq.de fokussiert auf **DSGVO-konforme Referenzprüfung und Background Checks** für den deutschsprachigen Markt und gehört zur RSG Recruiting Solutions Group GmbH.
+
+## Was candiq einzigartig macht
+
+- Geschulter Mensch ruft den Referenzgeber an — nie ein Bot
+- AGG-konform: bewertet ausschließlich verifizierbare Substanz (Position, Dauer, Tätigkeit), nicht Sprache, Stil, Akzent oder Herkunft
+- DSGVO by Design: granulare Einwilligung (Art. 6 Abs. 1 lit. a), Server in Deutschland, AVV ab Tag 1, Audit-Trail, Auto-Löschung nach 180 Tagen
+- Strukturierter Report mit Substanz-Bewertung pro Station und Diskrepanz-Markierung, typischerweise in unter 48 Stunden
+- Fabrikations-Check: prüft, ob die Firma existiert, Zeitlinien konsistent sind und der Referenzgeber echt ist
+
+## Zielgruppe
+
+HR-Abteilungen, Personaldienstleister (PDL), Mittelstand (200+ MA), DAX-Konzerne, Banken & Finance, Versicherungen, Healthcare & Pharma, Tech & SaaS, Industrie, Logistik, Beratung und öffentlicher Sektor im DACH-Raum.
+
+## Kernseiten
+
+- [Referenzprüfung — kompletter Leitfaden](https://candiq.de/referenzpruefung): Was eine Referenzprüfung ist, Rechtsgrundlage (DSGVO/BDSG), Ablauf mit candiq, Nutzen.
+- [Reference Check DSGVO](https://candiq.de/reference-check-dsgvo): Reference Check rechtssicher in Deutschland.
+- [Pre-Employment Screening](https://candiq.de/pre-employment-screening): DSGVO-konformes Bewerber-Screening.
+- [Background Check DSGVO](https://candiq.de/background-check-dsgvo): Hintergrundprüfung von Bewerbern, rechtskonform.
+- [Zeugnis prüfen lassen](https://candiq.de/zeugnis-pruefen-lassen): Arbeitszeugnisse verifizieren.
+- [Lebenslauf verifizieren](https://candiq.de/lebenslauf-verifizieren): CV-Substanz statt Schreibstil prüfen.
+- [Validato-Alternative](https://candiq.de/vergleich/validato-alternative): Vergleich candiq vs. Validato.
+- [Preise](https://candiq.de/preise): Starter 65 €/Mo., Professional 199 €/Mo., Business 499 €/Mo.; Einzel-Refcheck ab 49 €.
+- [Branchen](https://candiq.de/branchen): Tech-, Sales- und Healthcare-Recruiting.
+- [ROI-Rechner](https://candiq.de/roi-rechner): Einsparpotenzial durch vermiedene Fehlbesetzungen berechnen.
+- [Termin / Testzugang buchen](https://candiq.de/termin): 15-Minuten-Termin und persönlicher Testzugang.
+
+## Ressourcen
+
+- [Interview-Leitfaden](https://candiq.de/resources/interview-leitfaden)
+- [DSGVO-Checkliste Recruiting](https://candiq.de/resources/dsgvo-checkliste-recruiting)
+- [Reference-Check Telefonleitfaden](https://candiq.de/resources/reference-check-telefonleitfaden)
+- [Pre-Screening Call-Skript](https://candiq.de/resources/pre-screening-call-skript)
+
+## Kontakt
+
+- E-Mail: hello@candiq.de
+- Betreiber: RSG Recruiting Solutions Group GmbH (HRB 35951, USt-IdNr. DE458027073)
+- Website: https://candiq.de
+- Muttergesellschaft: https://www.recruiting-sg.de

@@ -143,8 +143,9 @@ const organizationJsonLd = {
         identifier: 'HRB 35951',
         sameAs: ['https://www.recruiting-sg.de', 'https://www.rsg-ai.de'],
       },
-      sameAs: ['https://www.recruiting-sg.de', 'https://www.linkedin.com/in/ricardoserrano-rsgai/'],
-      knowsAbout: ['Referenzcheck', 'Personaldienstleister', 'Recruiting-Software', 'DSGVO-konformes Recruiting', 'Headhunting', 'Personalvermittlung'],
+      sameAs: ['https://www.recruiting-sg.de', 'https://www.linkedin.com/company/116000301', 'https://www.linkedin.com/in/ricardoserrano-rsgai/'],
+      areaServed: ['DE', 'AT', 'CH'],
+      knowsAbout: ['Referenzpruefung', 'Referenzcheck', 'Reference Check', 'Pre-Employment Screening', 'Background Check', 'Personaldienstleister', 'Recruiting-Software', 'DSGVO-konformes Recruiting', 'Headhunting', 'Personalvermittlung'],
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Am Heiligenhaus 9',
