@@ -257,3 +257,56 @@ model LeadMagnetRequest {
   @@index([email])
   @@index([createdAt])
 }
+
+
+// ─────────────────────────────────────────────────────────────────────────
+// Candidate Self-Service (Phase 2) — Bewerber-Auth, strikt getrennt vom
+// User-Modell (HR). Eigene Tabellen, eigener Auth-Flow, eigener Audit-Trail.
+// Additive-only. Profil/Stationen kommen in Phase 3.
+// ─────────────────────────────────────────────────────────────────────────
+model CandidateAccount {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  phone           String?
+  consentVersion  String    @default("1.0")
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastLoginAt     DateTime?
+  deletedAt       DateTime?
+  resetTokens     CandidatePasswordResetToken[]
+  auditLogs       CandidateAuditLog[]
+
+  @@index([email])
+}
+
+model CandidatePasswordResetToken {
+  id                 String           @id @default(cuid())
+  candidateAccountId String
+  candidateAccount   CandidateAccount @relation(fields: [candidateAccountId], references: [id], onDelete: Cascade)
+  token              String           @unique
+  expiresAt          DateTime
+  usedAt             DateTime?
+  ip                 String?
+  createdAt          DateTime         @default(now())
+
+  @@index([candidateAccountId])
+  @@index([expiresAt])
+}
+
+model CandidateAuditLog {
+  id                 String            @id @default(cuid())
+  candidateAccountId String?
+  candidateAccount   CandidateAccount? @relation(fields: [candidateAccountId], references: [id], onDelete: SetNull)
+  action             String
+  entity             String
+  entityId           String?
+  details            String?
+  ip                 String?
+  createdAt          DateTime          @default(now())
+
+  @@index([candidateAccountId])
+}
