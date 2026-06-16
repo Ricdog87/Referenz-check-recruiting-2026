@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: [
-          '/', '/preise', '/demo', '/waitlist-agency', '/branchen', '/resources',
+          '/', '/preise', '/waitlist-agency', '/branchen', '/resources',
           '/referenzpruefung', '/reference-check-dsgvo', '/zeugnis-pruefen-lassen',
           '/lebenslauf-verifizieren', '/pre-employment-screening', '/background-check-dsgvo',
           '/vergleich', '/fuer',

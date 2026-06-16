@@ -2,31 +2,20 @@
 
 ## Was Tester sofort ausprobieren können
 
-1. **One-Click-Demo** auf `/login` → vorbefülltes Konto mit Daten und Charts
-2. **Eigenes Konto registrieren** auf `/register` → 14 Tage Trial, Welcome-Mail (wenn Resend konfiguriert)
-3. **Beispiel-Daten laden** auf dem Dashboard (für leere Konten) → 4 Demo-Kandidaten + 6 Prüfungen mit einem Klick
-4. **Kandidat anlegen → Referenz prüfen → Report als PDF exportieren** (Druck-Dialog des Browsers, „Als PDF speichern")
-5. **Passwort-Reset** über `/forgot-password` (Token + Mail bei Resend / Audit-Log im Dev-Modus)
-6. **DSGVO-Funktionen**: Datenexport (JSON) und Konto-Löschung in `/settings`
+1. **Eigenes Konto registrieren** auf `/register` → 14 Tage Trial, Welcome-Mail (wenn Resend konfiguriert)
+2. **Beispiel-Daten laden** auf dem Dashboard (für leere Konten) → 4 Demo-Kandidaten + 6 Prüfungen mit einem Klick
+3. **Kandidat anlegen → Referenz prüfen → Report als PDF exportieren** (Druck-Dialog des Browsers, „Als PDF speichern")
+4. **Passwort-Reset** über `/forgot-password` (Token + Mail bei Resend / Audit-Log im Dev-Modus)
+5. **DSGVO-Funktionen**: Datenexport (JSON) und Konto-Löschung in `/settings`
 
 ---
 
-## Test-Zugang (Demo) — sofort nutzbar
+## Test-Zugang
 
-Drei vorbefüllte Demo-Profile, kein Formular, keine E-Mail-Bestätigung:
-
-| Profil       | E-Mail                  | Passwort   | Plan         | Inhalt                          |
-|--------------|-------------------------|------------|--------------|---------------------------------|
-| HR Inhouse   | `demo@candiq.de`        | `demo1234` | Professional | 5 Kandidaten · 7 Prüfungen      |
-| Enterprise   | `enterprise@candiq.de`  | `demo1234` | Business     | 9 Kandidaten · 12 Prüfungen     |
-| Startup      | `boutique@candiq.de`    | `demo1234` | Starter      | 2 Kandidaten · 1 Prüfung        |
-
-**Drei Wege rein:**
-1. **Login-Seite** → Block „Tool sofort testen" → Profil klicken (One-Click)
-2. **`/demo`** → ausführliche Übersicht der Profile mit Highlights
-3. **Direkt anmelden** mit obigen Credentials auf `/login`
-
-Die Demo-Daten werden beim ersten Login per `/api/demo` lazy seedet (idempotent — wiederholtes Klicken setzt nichts zurück).
+Self-Service-Demo-Konten (`demo@/enterprise@/boutique@candiq.de` mit Passwort
+`demo1234`) wurden abgeschafft. **Demos gibt es nur noch nach 15-Min-Termin**
+(Buchung über `/termin`). Für Sales-Comp-Accounts siehe
+`scripts/seed-prospect.ts`.
 
 ---
 
@@ -106,13 +95,10 @@ npm run dev
 # Health-Check
 curl http://localhost:3000/api/health
 
-# Demo-User on-the-fly seeden
-curl -X POST 'http://localhost:3000/api/demo?type=hr'
-# → { ok: true, email: "demo@candiq.de", password: "demo1234", ... }
-
 # Im Browser
-# http://localhost:3000/login        → One-Click-Demo-Buttons
+# http://localhost:3000/login        → Anmelden
 # http://localhost:3000/register     → Eigenes Konto (14 Tage Trial)
+# http://localhost:3000/termin       → 15-Min-Termin fuer Test-Zugang
 # http://localhost:3000/forgot-password
 ```
 

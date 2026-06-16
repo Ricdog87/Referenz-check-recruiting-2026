@@ -44,7 +44,7 @@ export function FinalCta() {
               Termin für Testzugang buchen
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <Link href="/demo" className="btn-secondary text-base py-4 px-8">
+            <Link href="/termin" className="btn-secondary text-base py-4 px-8">
               Live-Demo öffnen
             </Link>
           </div>

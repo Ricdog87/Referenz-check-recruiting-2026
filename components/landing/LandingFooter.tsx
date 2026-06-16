@@ -44,7 +44,6 @@ export function LandingFooter() {
               { label: 'Pilot-Programm', href: '/pilotprogramm' },
               { label: 'Compliance & DSGVO', href: '/compliance' },
               { label: 'Ressourcen', href: '/resources' },
-              { label: 'Live-Demo', href: '/demo' },
               { label: 'Termin buchen', href: BOOKING_URL, external: true },
             ]}
           />

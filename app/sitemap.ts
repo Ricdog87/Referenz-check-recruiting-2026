@@ -31,7 +31,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/vergleich/validato-alternative`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
 
     // Produkt & Branchen
-    { url: `${BASE_URL}/demo`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    // /demo wurde abgeschafft (Self-Service-Demo entfernt). /demo redirected
+    // jetzt 301 auf /termin und wird nicht mehr in der Sitemap gelistet.
     { url: `${BASE_URL}/preise`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
     { url: `${BASE_URL}/roi-rechner`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${BASE_URL}/pilotprogramm`, lastModified: now, changeFrequency: 'weekly', priority: 0.8 },

@@ -20,6 +20,11 @@ const nextConfig = {
       { source: '/referenzcheck-hamburg',   destination: '/referenzpruefung/hamburg',   statusCode: 301 },
       { source: '/referenzcheck-koeln',     destination: '/referenzpruefung/koeln',     statusCode: 301 },
       { source: '/referenzcheck-frankfurt', destination: '/referenzpruefung/frankfurt', statusCode: 301 },
+      // Demo-Self-Service wurde abgeschafft (siehe Commit: "Demo-Profile raus").
+      // Demo gibt es nur noch nach persoenlichem Termin. /demo wird permanent auf
+      // die Termin-Buchungs-Page geleitet — fuer SEO und externe Backlinks.
+      { source: '/demo',     destination: '/termin', statusCode: 301 },
+      { source: '/api/demo', destination: '/termin', statusCode: 301 },
     ]
   },
   async headers() {

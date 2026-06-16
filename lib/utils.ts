@@ -262,28 +262,6 @@ export function getPlanById(id: string) {
   return ALL_PLANS.find((p) => p.id === id) ?? HR_PLANS[0]
 }
 
-// Demo seed credentials — kept in sync with /api/demo route profiles.
-export const DEMO_CREDENTIALS = {
-  hr: {
-    email: 'demo@candiq.de',
-    password: 'demo1234',
-    label: 'HR Inhouse',
-    description: 'Mittelständische HR-Abteilung · Professional-Plan',
-  },
-  enterprise: {
-    email: 'enterprise@candiq.de',
-    password: 'demo1234',
-    label: 'Enterprise',
-    description: 'Konzern-HR · Business-Plan · Multi-Department',
-  },
-  boutique: {
-    email: 'boutique@candiq.de',
-    password: 'demo1234',
-    label: 'Startup',
-    description: 'Boutique-Recruiting · Starter-Plan',
-  },
-} as const
-
 // Helpers for greeting & company branding
 export function getGreeting(now = new Date()) {
   const h = now.getHours()

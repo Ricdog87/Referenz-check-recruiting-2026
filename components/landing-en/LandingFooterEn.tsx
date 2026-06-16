@@ -29,7 +29,6 @@ export function LandingFooterEn() {
             title="Product"
             links={[
               { label: 'Pricing', href: '/preise' },
-              { label: 'Live demo', href: '/demo' },
               { label: 'Book a call', href: BOOKING_URL, external: true },
             ]}
           />
