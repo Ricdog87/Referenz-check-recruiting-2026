@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { Briefcase, Users, ClipboardList, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,8 +21,12 @@ export default async function ClientsPage() {
   // Echte Workspace-Zahlen statt Platzhalter, bis das Mandanten-Schema
   // (eigene Client-Entität) landet. Keine erfundenen Endkunden anzeigen.
   const [candidateCount, completedChecks] = await Promise.all([
-    prisma.candidate.count({ where: { userId: session.user.id } }),
-    prisma.referenceCheck.count({ where: { candidate: { userId: session.user.id }, status: 'COMPLETED' } }),
+    safeQuery(prisma.candidate.count({ where: { userId: session.user.id } }), 0, 'clients.candidateCount'),
+    safeQuery(
+      prisma.referenceCheck.count({ where: { candidate: { userId: session.user.id }, status: 'COMPLETED' } }),
+      0,
+      'clients.completedChecks',
+    ),
   ])
 
   return (
