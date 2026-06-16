@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight, CalendarCheck } from 'lucide-react'
 import { Reveal } from '../Reveal'
 import { BOOKING_URL } from '@/lib/site'
+import { trackConversion } from '@/lib/conversionTracking'
 
 export function FinalCta() {
   return (
@@ -38,6 +39,7 @@ export function FinalCta() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
             <Link
               href={BOOKING_URL}
+              onClick={() => trackConversion('cta_click', { cta_label: 'final_cta_booking' })}
               className="btn-primary text-base py-4 px-8 group"
             >
               <CalendarCheck className="w-4 h-4" />

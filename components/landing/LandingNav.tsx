@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, Zap, CalendarCheck } from 'lucide-react'
 import { BOOKING_URL } from '@/lib/site'
+import { trackConversion } from '@/lib/conversionTracking'
 import { LocaleSwitcher } from '@/components/locale-switcher/LocaleSwitcher'
 
 export function LandingNav() {
@@ -53,6 +54,7 @@ export function LandingNav() {
           </Link>
           <Link
             href={BOOKING_URL}
+            onClick={() => trackConversion('cta_click', { cta_label: 'nav_booking_desktop' })}
             className="btn-primary whitespace-nowrap text-xs py-2 px-3.5 inline-flex items-center gap-1.5"
           >
             <CalendarCheck className="w-3.5 h-3.5" />
@@ -82,7 +84,7 @@ export function LandingNav() {
             <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">Anmelden</Link>
             <Link
               href={BOOKING_URL}
-              onClick={() => setOpen(false)}
+              onClick={() => { setOpen(false); trackConversion('cta_click', { cta_label: 'nav_booking_mobile' }) }}
               className="btn-primary w-full flex items-center justify-center gap-1.5"
             >
               <CalendarCheck className="w-3.5 h-3.5" />
