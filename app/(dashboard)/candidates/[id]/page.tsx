@@ -194,7 +194,17 @@ export default async function CandidateDetailPage({
               icon = <ShieldCheck className="w-4 h-4 text-emerald-600" />
               bgClass = 'bg-emerald-50/40 border-emerald-200'
               title = 'Einwilligung erteilt'
-              detail = `${latestConsent && JSON.parse(latestConsent.refereesJson ?? '[]').length} Referenzgeber freigegeben`
+              // refereesJson ist normalerweise valides JSON aus dem Consent-
+              // Accept-Flow. Defensiv parsen: korrupte/legacy Rows duerfen die
+              // Seite nicht ueber die error.tsx-Boundary crashen.
+              let refereeCount = 0
+              try {
+                const parsed = JSON.parse(latestConsent?.refereesJson ?? '[]')
+                refereeCount = Array.isArray(parsed) ? parsed.length : 0
+              } catch {
+                refereeCount = 0
+              }
+              detail = `${refereeCount} Referenzgeber freigegeben`
               dateText = latestConsent?.acceptedAt ? formatDateTime(latestConsent.acceptedAt) : null
             } else if (consentStatus === 'PENDING_ACCEPT') {
               icon = <ShieldAlert className="w-4 h-4 text-amber-600" />

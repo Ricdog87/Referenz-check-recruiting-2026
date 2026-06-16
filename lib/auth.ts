@@ -116,6 +116,14 @@ export const authOptions: NextAuthOptions = {
         session.user.accountType = (token.accountType as string) ?? 'HR_DEPARTMENT'
         session.user.plan = (token.plan as string) ?? 'STARTER'
         session.user.trialEndsAt = (token.trialEndsAt as string | null) ?? null
+        // name/email werden normalerweise von NextAuth aus dem Token
+        // propagiert. Wir setzen sie hier ABER explizit mit Fallback —
+        // sonst kann `session.user.name` undefined sein (Token aus Seed-/
+        // Demo-/Legacy-Flow ohne name) und Server-Components, die
+        // `session.user.name.split(...)` o.ä. aufrufen, crashen die
+        // komplette Seite ueber die error.tsx-Boundary.
+        session.user.name = (token.name as string) ?? session.user.name ?? ''
+        session.user.email = (token.email as string) ?? session.user.email ?? ''
       }
       return session
     },

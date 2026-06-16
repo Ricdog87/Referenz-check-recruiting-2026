@@ -160,13 +160,17 @@ export default async function DashboardPage() {
     },
   ]
 
-  const firstName = session.user.name.split(' ')[0] ?? session.user.name
+  // Defensiv: session.user.name kann theoretisch leer sein (siehe auch
+  // Root-Cause-Fix im session-Callback in lib/auth.ts). Nie ungeschuetzt
+  // .split() aufrufen.
+  const safeName = session.user.name ?? ''
+  const firstName = safeName.split(' ')[0] || 'Team'
 
   return (
     <>
       <WelcomeBar
         firstName={firstName}
-        fullName={session.user.name}
+        fullName={safeName}
         company={session.user.company}
         planName={planMeta.name}
         stats={{
