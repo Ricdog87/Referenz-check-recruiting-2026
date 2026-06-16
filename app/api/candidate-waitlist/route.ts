@@ -127,6 +127,37 @@ export async function POST(req: NextRequest) {
       console.error('candidate_waitlist_hubspot_sync_error', { message: hsErr?.message })
     }
 
+    // Best-effort-Mails (nicht blockierend): Bestaetigung an Bewerber:in + Info an uns.
+    try {
+      const { sendEmail } = await import('@/lib/email')
+      await sendEmail({
+        to: email,
+        category: 'candidate_waitlist_confirm',
+        subject: 'Du stehst auf der candiq-Warteliste',
+        html: `<p>Hallo ${firstName},</p>
+<p>danke fuer dein Interesse \u2014 <strong>du stehst auf der Warteliste</strong> fuer die candiq-Bewerber-Plattform (Closed Beta, geplant Q4 2026). Wir starten klein und sauber mit den ersten 100 Bewerber:innen.</p>
+<p>Was dich erwartet: Du laesst deine Stationen und Referenzen vorab pruefen und teilst einen candiq-verifizierten Link mit jeder Bewerbung \u2014 wie eine SCHUFA-Auskunft fuer deinen Lebenslauf, nur fuers Recruiting.</p>
+<p>Kein Spam. Wir melden uns nur zum Launch.${newsletter ? ' Den Praxis-Newsletter (max. 1x/Monat) hast du mit angefordert \u2014 Abmeldung jederzeit per 1-Klick.' : ''}</p>
+<p>Rueckfragen? Einfach auf diese Mail antworten oder <a href="mailto:hello@candiq.de">hello@candiq.de</a>.</p>
+<p>Beste Gruesse,<br/>dein candiq-Team</p>`,
+      })
+      await sendEmail({
+        to: 'hello@candiq.de',
+        category: 'candidate_waitlist_notify',
+        subject: `Neue Bewerber-Waitlist-Anmeldung: ${firstName}`,
+        html: `<p>Neue Anmeldung auf der Bewerber-Warteliste (/bewerber):</p>
+<ul>
+<li><strong>Name:</strong> ${firstName}</li>
+<li><strong>E-Mail:</strong> ${email}</li>
+<li><strong>Position/Branche:</strong> ${position ?? '\u2014'}</li>
+<li><strong>Newsletter:</strong> ${newsletter ? 'ja' : 'nein'}</li>
+</ul>
+<p>Gespeichert in der DB (LeadMagnetRequest, slug=candidate-self-service) und an HubSpot gesynct.</p>`,
+      })
+    } catch (mailErr: any) {
+      console.error('candidate_waitlist_mail_error', { message: mailErr?.message })
+    }
+
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('candidate_waitlist_error', { message: err?.message })
