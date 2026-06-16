@@ -47,7 +47,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://candiq.de'
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: 'candiq — Referenzcheck Software für Personaldienstleister',
+    default: 'candiq — Referenzcheck',
     template: '%s · candiq',
   },
   description:
