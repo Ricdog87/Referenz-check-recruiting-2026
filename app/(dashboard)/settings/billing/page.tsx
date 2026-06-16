@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { safeQuery } from '@/lib/safe-query'
 import { Header } from '@/components/layout/Header'
 import { BillingPortalButton } from './BillingPortalButton'
 
@@ -41,23 +42,30 @@ export default async function BillingPage() {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) redirect('/login')
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      plan: true,
-      planStatus: true,
-      billingInterval: true,
-      currentPeriodEnd: true,
-      stripeCustomerId: true,
-    },
-  })
+  const user = await safeQuery(
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: {
+        plan: true,
+        planStatus: true,
+        billingInterval: true,
+        currentPeriodEnd: true,
+        stripeCustomerId: true,
+      },
+    }),
+    null,
+    'billing.user',
+  )
   if (!user) redirect('/login')
 
   const status = STATUS_LABEL[user.planStatus] ?? STATUS_LABEL.INACTIVE
   const isActive = user.planStatus === 'ACTIVE' || user.planStatus === 'TRIALING' || user.planStatus === 'PAST_DUE'
-  const formattedEnd = user.currentPeriodEnd
-    ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(user.currentPeriodEnd)
-    : null
+  // currentPeriodEnd kann durch Driver-Layer in seltenen Faellen kein Date sein.
+  // Defensiv typisieren statt direkt formatieren.
+  const formattedEnd =
+    user.currentPeriodEnd instanceof Date
+      ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'long' }).format(user.currentPeriodEnd)
+      : null
 
   return (
     <>
