@@ -15,7 +15,7 @@ import {
 export const dynamic = 'force-dynamic'
 
 // Reviewer/Admin-Accounts sind candiq-intern und zaehlen NICHT als Kunden.
-const CUSTOMER_FILTER = { role: { notIn: ['REVIEWER', 'ADMIN'] } } as const
+const CUSTOMER_FILTER = { role: { notIn: ['REVIEWER', 'ADMIN'] } }
 
 export default async function AdminCockpitPage() {
   const session = await getServerSession(authOptions)
@@ -80,7 +80,7 @@ export default async function AdminCockpitPage() {
   ])
 
   // MRR aus aktiven Abos (Monats-Listenpreis je Plan).
-  const planPrice = new Map(ALL_PLANS.map((p) => [p.id, p.priceMonthly]))
+  const planPrice = new Map<string, number>(ALL_PLANS.map((p) => [p.id, p.priceMonthly] as [string, number]))
   const mrr = activePlans.reduce((sum, u) => sum + (planPrice.get(u.plan) ?? 0), 0)
 
   // SLA-Auswertung der Reviewer-Queue.
