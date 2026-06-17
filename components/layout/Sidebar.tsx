@@ -6,7 +6,7 @@ import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
   Plug, LogOut, ChevronUp, Sparkles, Briefcase, ShoppingBag, ScrollText, X,
-  CreditCard, ShieldCheck,
+  CreditCard, ShieldCheck, Building2,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
 import { useMobileSidebar } from './MobileSidebarContext'
@@ -23,6 +23,12 @@ const NAV_AGENCY_ONLY = [
   { href: '/clients', label: 'Mandanten', icon: Briefcase },
 ]
 
+// candiq-interner Admin-Bereich — nur fuer role === ADMIN.
+const NAV_ADMIN = [
+  { href: '/admin', label: 'Cockpit', icon: LayoutDashboard },
+  { href: '/admin/customers', label: 'Kunden', icon: Building2 },
+]
+
 const NAV_INTEGRATIONS = [
   { href: '/integrations', label: 'Integrationen', icon: Plug },
   { href: '/audit', label: 'Audit-Trail', icon: ScrollText },
@@ -33,6 +39,7 @@ export function Sidebar() {
   const { data: session } = useSession()
   const { open, setOpen } = useMobileSidebar()
   const isAgency = session?.user?.accountType === 'RECRUITMENT_AGENCY'
+  const isAdmin = session?.user?.role === 'ADMIN'
   const isReviewer = session?.user?.role === 'REVIEWER' || session?.user?.role === 'ADMIN'
 
   const nav = [
@@ -59,7 +66,7 @@ export function Sidebar() {
 
       {/* Logo */}
       <div className="h-16 flex items-center px-5 border-b border-border justify-between">
-        <Link href="/dashboard" className="flex items-center gap-2.5 group" aria-label="candiq Dashboard">
+        <Link href={isAdmin ? '/admin' : '/dashboard'} className="flex items-center gap-2.5 group" aria-label="candiq Dashboard">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/logo-mark.svg"
@@ -70,9 +77,15 @@ export function Sidebar() {
           />
           <div className="min-w-0">
             <div className="text-sm font-bold text-text-primary tracking-tight">candiq</div>
-            <div className="text-[10px] text-text-muted truncate">
-              {session?.user?.accountType ? ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short : ''}
-            </div>
+            {isAdmin ? (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-600">
+                <ShieldCheck className="w-3 h-3" /> ADMIN · INTERN
+              </span>
+            ) : (
+              <div className="text-[10px] text-text-muted truncate">
+                {session?.user?.accountType ? ACCOUNT_TYPES[session.user.accountType as keyof typeof ACCOUNT_TYPES]?.short : ''}
+              </div>
+            )}
           </div>
         </Link>
         <button
@@ -86,6 +99,19 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        {isAdmin && (
+          <div className="mb-1">
+            <div className="px-3 pb-1.5 pt-3">
+              <span className="text-[10px] font-bold text-rose-600 uppercase tracking-widest">Admin · intern</span>
+            </div>
+            <div className="space-y-0.5 rounded-xl border border-rose-100 bg-rose-50/40 p-1">
+              {NAV_ADMIN.map((item) => (
+                <NavItem key={item.href} {...item} pathname={pathname} />
+              ))}
+            </div>
+          </div>
+        )}
+
         <NavSection label="Workspace">
           {nav.map((item) => (
             <NavItem key={item.href} {...item} pathname={pathname} />
@@ -161,8 +187,9 @@ function NavSection({ label, children }: { label: string; children: React.ReactN
 function NavItem({ href, label, icon: Icon, pathname }: { href: string; label: string; icon: any; pathname: string }) {
   // /settings nur bei exakter Übereinstimmung aktiv — /settings/billing hat
   // einen eigenen Nav-Eintrag und würde sonst beide gleichzeitig markieren.
+  // /admin analog: /admin/customers darf /admin nicht mitmarkieren.
   const active = pathname === href
-    || (href !== '/dashboard' && href !== '/settings' && pathname.startsWith(href + '/'))
+    || (href !== '/dashboard' && href !== '/settings' && href !== '/admin' && pathname.startsWith(href + '/'))
   return (
     <Link href={href} className={active ? 'nav-item-active' : 'nav-item'}>
       <Icon className={`w-4 h-4 ${active ? 'text-brand-600' : 'text-text-muted'}`} />
