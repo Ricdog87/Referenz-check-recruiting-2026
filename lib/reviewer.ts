@@ -16,26 +16,31 @@ export function isReviewer(session: Session | null | undefined): boolean {
 }
 
 // ── SLA-Tracking ────────────────────────────────────────────────────────
-// Wir versprechen Kunden 24h fuer Reviewer-Pruefungen. Diese Helper
-// erzeugen Badges + Farben fuer Queue und Dashboard aus dem Abstand
-// zwischen "im Review seit" (= ReferenceCheck.updatedAt) und jetzt.
+// Wir versprechen Kunden 24h fuer Reviewer-Pruefungen — bei Express-24h-
+// Add-on (€29 Aufpreis) wird die Frist halbiert auf 12h. Helper liefern
+// Badge-Farben fuer Queue und Dashboard aus dem Abstand zwischen
+// "im Review seit" (= ReferenceCheck.updatedAt) und jetzt.
 export const SLA_HOURS = 24
 const SLA_WARN_HOURS = 18 // ab dann orange „Achtung"
+export const SLA_HOURS_EXPRESS = 12
+const SLA_WARN_HOURS_EXPRESS = 8
 
 export type SlaState = 'fresh' | 'warn' | 'breached'
 
-export function slaState(updatedAt: Date, now: Date = new Date()): {
-  state: SlaState
-  hoursInQueue: number
-  hoursLeft: number
-} {
+export function slaState(
+  updatedAt: Date,
+  opts: { isExpress?: boolean } = {},
+  now: Date = new Date(),
+): { state: SlaState; hoursInQueue: number; hoursLeft: number; slaHours: number } {
+  const slaHours = opts.isExpress ? SLA_HOURS_EXPRESS : SLA_HOURS
+  const warnHours = opts.isExpress ? SLA_WARN_HOURS_EXPRESS : SLA_WARN_HOURS
   const diffMs = now.getTime() - updatedAt.getTime()
   const hoursInQueue = Math.max(0, diffMs / 3600_000)
-  const hoursLeft = SLA_HOURS - hoursInQueue
+  const hoursLeft = slaHours - hoursInQueue
   let state: SlaState = 'fresh'
-  if (hoursInQueue >= SLA_HOURS) state = 'breached'
-  else if (hoursInQueue >= SLA_WARN_HOURS) state = 'warn'
-  return { state, hoursInQueue, hoursLeft }
+  if (hoursInQueue >= slaHours) state = 'breached'
+  else if (hoursInQueue >= warnHours) state = 'warn'
+  return { state, hoursInQueue, hoursLeft, slaHours }
 }
 
 export function formatHoursShort(h: number): string {

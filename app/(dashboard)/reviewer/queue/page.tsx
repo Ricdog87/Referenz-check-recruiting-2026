@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db'
 import { isReviewer, slaState, formatHoursShort, SLA_HOURS } from '@/lib/reviewer'
 import { Header } from '@/components/layout/Header'
 import { formatDate } from '@/lib/utils'
-import { ClipboardList, ArrowRight, Clock, AlertTriangle } from 'lucide-react'
+import { ClipboardList, ArrowRight, Clock, AlertTriangle, Zap } from 'lucide-react'
 
 // Reviewer-Queue ist immer frisch — kein Caching.
 export const dynamic = 'force-dynamic'
@@ -18,9 +18,10 @@ export default async function ReviewerQueuePage() {
   if (!isReviewer(session)) redirect('/dashboard')
 
   // Bewusst KEIN userId-Filter — Reviewer arbeiten workspace-übergreifend.
+  // Sortier-Prio: Express-Checks (€29 Aufpreis, 12h-SLA) zuerst, dann FIFO.
   const checks = await prisma.referenceCheck.findMany({
     where: { status: 'IN_REVIEW' },
-    orderBy: { updatedAt: 'asc' }, // FIFO: älteste zuerst
+    orderBy: [{ isExpress: 'desc' }, { updatedAt: 'asc' }],
     include: {
       candidate: {
         select: {
@@ -33,12 +34,13 @@ export default async function ReviewerQueuePage() {
       },
     },
   })
+  const expressCount = checks.filter((c) => c.isExpress).length
 
   return (
     <>
       <Header
         title="Reviewer-Queue"
-        subtitle={`${checks.length} Prüfung(en) im Review · SLA-Ziel ${SLA_HOURS}h`}
+        subtitle={`${checks.length} Prüfung(en) im Review · SLA ${SLA_HOURS}h${expressCount > 0 ? ` · ${expressCount}× Express (12h)` : ''}`}
       />
 
       {checks.length === 0 ? (
@@ -54,7 +56,7 @@ export default async function ReviewerQueuePage() {
       ) : (
         <div className="space-y-2">
           {checks.map((check) => {
-            const sla = slaState(check.updatedAt)
+            const sla = slaState(check.updatedAt, { isExpress: check.isExpress })
             const badge =
               sla.state === 'breached'
                 ? {
@@ -77,12 +79,25 @@ export default async function ReviewerQueuePage() {
               <Link
                 key={check.id}
                 href={`/reviewer/check/${check.id}`}
-                className="card-md p-4 flex items-center justify-between hover:border-border-strong transition-all"
+                className={`card-md p-4 flex items-center justify-between hover:border-border-strong transition-all ${
+                  check.isExpress ? 'border-rose-300 bg-rose-50/30' : ''
+                }`}
               >
                 <div className="min-w-0">
-                  <div className="font-semibold text-text-primary truncate">
-                    {check.candidate.firstName} {check.candidate.lastName}
-                    <span className="text-text-muted font-normal"> · {check.candidate.position}</span>
+                  <div className="font-semibold text-text-primary truncate flex items-center gap-2">
+                    {check.isExpress && (
+                      <span
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold uppercase tracking-wider shrink-0"
+                        title="Express-24h gebucht (12h-SLA)"
+                      >
+                        <Zap className="w-3 h-3 fill-white" />
+                        Express
+                      </span>
+                    )}
+                    <span className="truncate">
+                      {check.candidate.firstName} {check.candidate.lastName}
+                      <span className="text-text-muted font-normal"> · {check.candidate.position}</span>
+                    </span>
                   </div>
                   <div className="text-sm text-text-secondary truncate">
                     Arbeitgeber: {check.employerName}
