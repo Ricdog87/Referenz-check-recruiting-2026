@@ -4,6 +4,7 @@ import { loadConsentByToken } from '@/lib/consent-token'
 import { sendEmail, consentAcceptedNotifyHrEmail } from '@/lib/email'
 import { rateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { releaseAllCvsForCandidate } from '@/lib/cv-gate'
 
 const MAX_REFEREES = 5
 const MAX_NAME = 120
@@ -157,6 +158,11 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
       })
     }
 
+    // CV-Consent-Gate: alle aktuell AWAITING_CONSENT-CVs dieses Kandidaten
+    // werden in derselben Transaktion auf RELEASED gehoben — erst jetzt
+    // duerfen Reviewer den Inhalt abrufen.
+    const releaseRes = await releaseAllCvsForCandidate(record.candidateId, tx)
+
     await tx.auditLog.create({
       data: {
         userId: null,
@@ -164,7 +170,7 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
         entity: 'ConsentToken',
         entityId: record.id,
         ip,
-        details: `candidate=${record.candidateId} refereesCount=${referees.length} version=${record.consentVersion} ua=${ua?.slice(0, 100) || 'unknown'}`,
+        details: `candidate=${record.candidateId} refereesCount=${referees.length} cvsReleased=${releaseRes.released} version=${record.consentVersion} ua=${ua?.slice(0, 100) || 'unknown'}`,
       },
     })
   })

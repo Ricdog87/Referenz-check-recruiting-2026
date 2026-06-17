@@ -4,6 +4,7 @@ import { loadConsentByToken } from '@/lib/consent-token'
 import { sendEmail, consentRevokedNotifyHrEmail } from '@/lib/email'
 import { rateLimit } from '@/lib/rate-limit'
 import { logger } from '@/lib/logger'
+import { revokeAllCvsForCandidate } from '@/lib/cv-gate'
 
 /**
  * POST /api/consent/:token/revoke
@@ -42,6 +43,10 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
       data: { status: 'CANCELLED' },
     })
 
+    // CV-Consent-Gate: alle CVs sperren. Files bleiben physisch (Audit /
+    // 6-Monats-Retention), aber Reviewer-Zugriff ist ab sofort versperrt.
+    const revokeRes = await revokeAllCvsForCandidate(record.candidateId, tx)
+
     await tx.auditLog.create({
       data: {
         userId: null,
@@ -49,7 +54,7 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
         entity: 'ConsentToken',
         entityId: record.id,
         ip,
-        details: `candidate=${record.candidateId} previousStatus=${record.status}`,
+        details: `candidate=${record.candidateId} previousStatus=${record.status} cvsRevoked=${revokeRes.revoked}`,
       },
     })
   })

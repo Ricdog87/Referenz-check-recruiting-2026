@@ -73,11 +73,20 @@ model Document {
   size         Int
   path         String
   type         String    @default("CV")
+  // CV-Consent-Gate: jedes Document mit type='CV' startet in AWAITING_CONSENT.
+  // Wechselt zu RELEASED, sobald der Bewerber die Einwilligung erteilt hat
+  // (oder, wenn der Bewerber bereits bei Upload eingewilligt hatte, sofort).
+  // REVOKED bei Widerruf (Art. 7 Abs. 3 DSGVO) — File bleibt fuer Audit
+  // gespeichert, ist aber fuer Reviewer nicht mehr zugaenglich.
+  cvStatus     String    @default("AWAITING_CONSENT")
+  releasedAt   DateTime?
+  revokedAt    DateTime?
   createdAt    DateTime  @default(now())
   candidateId  String
   candidate    Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
 
   @@index([candidateId])
+  @@index([cvStatus])
 }
 
 model ReferenceCheck {
