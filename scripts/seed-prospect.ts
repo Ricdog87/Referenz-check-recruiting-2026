@@ -1,35 +1,32 @@
 /**
  * scripts/seed-prospect.ts
  *
- * Legt einen persoenlichen Test-/Comp-Account fuer einen Sales-Prospect an
- * (Default: André Sola, APSCo). Idempotent: kann mehrfach ausgefuehrt
- * werden, ohne Duplikate zu erzeugen. Ueberschreibt KEIN existierendes
- * Passwort — falls der User sich bereits eingeloggt hat, bleibt sein
- * Passwort unangetastet; ein neuer Reset-Link wird trotzdem ausgegeben.
+ * Legt einen persoenlichen Test-/Comp-Account fuer einen Sales-Prospect an.
+ * Idempotent: kann mehrfach ausgefuehrt werden, ohne Duplikate zu erzeugen.
+ * Ueberschreibt KEIN existierendes Passwort — falls der User sich bereits
+ * eingeloggt hat, bleibt sein Passwort unangetastet; ein neuer Reset-Link
+ * wird trotzdem ausgegeben.
  *
  * REALITY-CHECK gegen das aktuelle Schema:
  *  - candiq nutzt NextAuth Credentials (bcrypt), KEINE Supabase Auth.
  *  - candiq ist single-tenant: jeder `User` IST ein "Workspace".
- *    Es gibt KEINE Workspaces/Organisationen/Memberships-Tabellen.
- *  - Es gibt KEIN dediziertes `is_demo`-Flag. Stattdessen markieren wir
- *    den Comp-Account ueber `plan=ENTERPRISE` + `planStatus=ACTIVE` +
- *    `stripeCustomerId=null` (= effektiv freigeschaltet ohne Billing)
- *    und einen Audit-Log-Entry `action="PROSPECT_COMP_ACCESS"`.
- *  - "Reports" werden NICHT persistiert — sie werden on-demand aus den
- *    `ReferenceCheck`-Records unter `/report/check/<id>` gerendert.
+ *  - Comp-Markierung: plan=ENTERPRISE + planStatus=ACTIVE + Stripe-IDs=null
+ *  - Reports werden on-demand aus ReferenceCheck-Records gerendert.
  *
  * USAGE:
- *   # Lokal/Staging-Test (mit .env oder vorab gesetzten Env-Vars):
- *   DATABASE_URL="postgres://…" NEXTAUTH_URL="http://localhost:3000" \
+ *   # Andre Sola (APSCo) — Default:
+ *   DATABASE_URL=$PROD_DATABASE_URL NEXTAUTH_URL=https://candiq.de \
  *     npx tsx scripts/seed-prospect.ts
  *
- *   # Production-Run (Achtung: schreibt in Live-DB):
- *   DATABASE_URL="$PROD_DATABASE_URL" NEXTAUTH_URL="https://candiq.de" \
+ *   # Oliver Saul (Index Gruppe):
+ *   PROSPECT_KEY=oliver \
+ *     DATABASE_URL=$PROD_DATABASE_URL NEXTAUTH_URL=https://candiq.de \
  *     npx tsx scripts/seed-prospect.ts
  *
- *   # Anderen Prospect via Env ueberschreiben:
- *   PROSPECT_EMAIL=foo@bar.com PROSPECT_NAME="Foo Bar" PROSPECT_COMPANY=Bar \
- *   PROSPECT_WORKSPACE="Bar – Testzugang" \
+ *   # Ad-hoc-Prospect via Env (fuer Onetime-Spike):
+ *   PROSPECT_EMAIL=foo@bar.com PROSPECT_NAME="Foo Bar" \
+ *     PROSPECT_COMPANY=Bar PROSPECT_WORKSPACE="Bar – Testzugang" \
+ *     DATABASE_URL=… NEXTAUTH_URL=… \
  *     npx tsx scripts/seed-prospect.ts
  */
 
@@ -39,15 +36,52 @@ import { randomBytes, createHash } from 'crypto'
 
 const prisma = new PrismaClient()
 
-// ── Prospect-Defaults (via ENV ueberschreibbar) ─────────────────────────
-const PROSPECT_EMAIL =
-  process.env.PROSPECT_EMAIL ?? 'andre.sola@apsco.org'
-const PROSPECT_NAME = process.env.PROSPECT_NAME ?? 'André Sola'
-const PROSPECT_COMPANY = process.env.PROSPECT_COMPANY ?? 'APSCo'
-const PROSPECT_WORKSPACE_NAME =
-  process.env.PROSPECT_WORKSPACE ?? 'APSCo – Testzugang (André Sola)'
+// ── Prospect-Registry ───────────────────────────────────────────────────
+// Eingebaute Prospects per PROSPECT_KEY. Default ist 'andre' (rueckwaerts-
+// kompatibel zu den ersten Runs). Neuer Prospect? Eintrag hier ergaenzen.
+type ProspectProfile = {
+  name: string
+  email: string
+  company: string
+  workspaceName: string
+}
 
-// Reset-Token: 14 Tage gueltig, sodass Andre sich in Ruhe einloggen kann.
+const PROSPECTS: Record<string, ProspectProfile> = {
+  andre: {
+    name: 'André Sola',
+    email: 'andre.sola@apsco.org',
+    company: 'APSCo',
+    workspaceName: 'APSCo – Testzugang (André Sola)',
+  },
+  oliver: {
+    name: 'Oliver Saul',
+    email: 'o.saul@index.de',
+    company: 'Index Gruppe',
+    workspaceName: 'Index Gruppe – Testzugang (Oliver Saul)',
+  },
+}
+
+const PROSPECT_KEY = (process.env.PROSPECT_KEY ?? 'andre').toLowerCase()
+const REGISTRY_PROFILE = PROSPECTS[PROSPECT_KEY]
+
+if (!REGISTRY_PROFILE && !process.env.PROSPECT_EMAIL) {
+  console.error(
+    `❌ Unbekannter PROSPECT_KEY="${PROSPECT_KEY}". Verfuegbar: ${Object.keys(PROSPECTS).join(', ')}`,
+  )
+  console.error(
+    '   Alternativ alle PROSPECT_EMAIL/NAME/COMPANY/WORKSPACE-Env-Vars explizit setzen.',
+  )
+  process.exit(1)
+}
+
+// Env-Vars haben Vorrang vor Registry (fuer Ad-hoc-Overrides).
+const PROSPECT_EMAIL = process.env.PROSPECT_EMAIL ?? REGISTRY_PROFILE!.email
+const PROSPECT_NAME = process.env.PROSPECT_NAME ?? REGISTRY_PROFILE!.name
+const PROSPECT_COMPANY = process.env.PROSPECT_COMPANY ?? REGISTRY_PROFILE!.company
+const PROSPECT_WORKSPACE_NAME =
+  process.env.PROSPECT_WORKSPACE ?? REGISTRY_PROFILE!.workspaceName
+
+// Reset-Token: 14 Tage gueltig, sodass der Prospect sich in Ruhe einloggen kann.
 const RESET_TOKEN_TTL_DAYS = 14
 
 // ── Demo-Daten (fiktiv, aus Pitch-Deck konsistent) ──────────────────────
