@@ -7,6 +7,7 @@ import { isReviewer, slaState, formatHoursShort } from '@/lib/reviewer'
 import { Header } from '@/components/layout/Header'
 import { ArrowLeft, Zap } from 'lucide-react'
 import { ReviewerCheckClient } from './ReviewerCheckClient'
+import { AssignmentDropdown } from './AssignmentDropdown'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,13 @@ export default async function ReviewerCheckPage({ params }: { params: { id: stri
     },
   })
   if (!check) notFound()
+
+  // Reviewer-Liste fuer das Assignment-Dropdown.
+  const reviewers = await prisma.user.findMany({
+    where: { role: { in: ['REVIEWER', 'ADMIN'] } },
+    orderBy: { name: 'asc' },
+    select: { id: true, name: true, email: true },
+  })
 
   const sla = slaState(check.updatedAt, { isExpress: check.isExpress })
 
@@ -50,6 +58,15 @@ export default async function ReviewerCheckPage({ params }: { params: { id: stri
           </div>
         }
       />
+
+      <div className="card-md p-3 mb-4">
+        <AssignmentDropdown
+          checkId={check.id}
+          currentReviewerId={check.assignedReviewerId}
+          reviewers={reviewers}
+          currentUserId={session.user.id}
+        />
+      </div>
 
       <ReviewerCheckClient
         check={{

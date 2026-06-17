@@ -15,6 +15,13 @@ export function isReviewer(session: Session | null | undefined): boolean {
   return role === 'REVIEWER' || role === 'ADMIN'
 }
 
+// Nur ADMINs sehen /admin/** (Kundenliste, Drill-Down).
+// REVIEWER sind absichtlich ausgeschlossen — Kunden-Stammdaten und Plan-Status
+// sind Sales/Support-Daten, kein Reviewer-Anwendungsfall.
+export function isAdmin(session: Session | null | undefined): boolean {
+  return session?.user?.role === 'ADMIN'
+}
+
 // ── SLA-Tracking ────────────────────────────────────────────────────────
 // Wir versprechen Kunden 24h fuer Reviewer-Pruefungen — bei Express-24h-
 // Add-on (€29 Aufpreis) wird die Frist halbiert auf 12h. Helper liefern
