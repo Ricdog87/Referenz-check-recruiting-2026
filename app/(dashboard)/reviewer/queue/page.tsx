@@ -22,7 +22,15 @@ export default async function ReviewerQueuePage() {
     where: { status: 'IN_REVIEW' },
     orderBy: { updatedAt: 'asc' }, // FIFO: älteste zuerst
     include: {
-      candidate: { select: { id: true, firstName: true, lastName: true, position: true } },
+      candidate: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          position: true,
+          user: { select: { name: true, email: true, company: true } },
+        },
+      },
     },
   })
 
@@ -60,8 +68,15 @@ export default async function ReviewerQueuePage() {
                   Arbeitgeber: {check.employerName}
                   {check.employerContact ? ` · ${check.employerContact}` : ''}
                 </div>
-                <div className="text-xs text-text-muted mt-0.5">
-                  Im Review seit {formatDate(check.updatedAt)}
+                <div className="text-xs text-text-muted mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                  <span>
+                    Kunde:{' '}
+                    <span className="text-text-secondary font-medium">
+                      {check.candidate.user.company ?? check.candidate.user.name ?? check.candidate.user.email}
+                    </span>
+                  </span>
+                  <span aria-hidden="true">·</span>
+                  <span>Im Review seit {formatDate(check.updatedAt)}</span>
                 </div>
               </div>
               <ArrowRight className="w-5 h-5 text-text-muted shrink-0 ml-3" />
