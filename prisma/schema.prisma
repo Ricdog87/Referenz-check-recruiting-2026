@@ -35,6 +35,10 @@ model User {
   cvAnalysisReports    CvAnalysisReport[]
   addonOrders          AddonOrder[]
   resetTokens          PasswordResetToken[]
+  // Reverse-Relation: Checks, fuer die dieser User (REVIEWER/ADMIN)
+  // als Bearbeiter zugewiesen ist. Optional — Pool-Modell funktioniert
+  // weiterhin ohne Assignment.
+  assignedChecks       ReferenceCheck[] @relation("ReviewerAssignments")
 }
 
 model Candidate {
@@ -95,6 +99,12 @@ model ReferenceCheck {
   // Halbiert die SLA in der Reviewer-Queue (24h → 12h) und triggert Prio-Sort.
   isExpress           Boolean   @default(false)
   expressActivatedAt  DateTime?
+  // Reviewer-Assignment: optional. Wenn null → Pool-Modus (alle sehen+bearbeiten),
+  // wenn gesetzt → in Queue-Filter "Meine" erscheinbar. SetNull bei User-Loeschung,
+  // damit Checks nie verwaisen.
+  assignedReviewerId  String?
+  assignedReviewer    User?     @relation("ReviewerAssignments", fields: [assignedReviewerId], references: [id], onDelete: SetNull)
+  assignedAt          DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   candidateId     String
@@ -103,6 +113,7 @@ model ReferenceCheck {
 
   @@index([candidateId])
   @@index([isExpress])
+  @@index([assignedReviewerId])
 }
 
 model GdprConsent {

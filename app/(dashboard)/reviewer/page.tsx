@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { isReviewer, slaState, formatHoursShort, SLA_HOURS, type SlaState } from '@/lib/reviewer'
+import { isReviewer, isAdmin, slaState, formatHoursShort, SLA_HOURS, type SlaState } from '@/lib/reviewer'
 import { Header } from '@/components/layout/Header'
 import {
   ClipboardList,
@@ -12,6 +12,7 @@ import {
   Clock,
   AlertTriangle,
   TrendingUp,
+  Users,
 } from 'lucide-react'
 
 // Stats immer frisch — sehr leichte Queries, kein Cache noetig.
@@ -144,20 +145,40 @@ export default async function ReviewerDashboardPage() {
         </div>
       )}
 
-      <Link
-        href="/reviewer/queue"
-        className="card-lg p-5 flex items-center justify-between hover:border-brand-300 transition-colors mb-6"
-      >
-        <div>
-          <div className="font-bold text-text-primary">Reviewer-Queue oeffnen</div>
-          <div className="text-sm text-text-secondary">
-            {openChecks.length === 0
-              ? 'Aktuell keine offenen Pruefungen — alles abgearbeitet.'
-              : `${openChecks.length} Pruefung(en) FIFO sortiert (aelteste zuerst).`}
+      <div className={`grid gap-3 mb-6 ${isAdmin(session) ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+        <Link
+          href="/reviewer/queue"
+          className="card-lg p-5 flex items-center justify-between hover:border-brand-300 transition-colors"
+        >
+          <div>
+            <div className="font-bold text-text-primary">Reviewer-Queue oeffnen</div>
+            <div className="text-sm text-text-secondary">
+              {openChecks.length === 0
+                ? 'Aktuell keine offenen Pruefungen — alles abgearbeitet.'
+                : `${openChecks.length} Pruefung(en) FIFO sortiert (aelteste zuerst).`}
+            </div>
           </div>
-        </div>
-        <ArrowRight className="w-5 h-5 text-text-muted" />
-      </Link>
+          <ArrowRight className="w-5 h-5 text-text-muted" />
+        </Link>
+
+        {isAdmin(session) && (
+          <Link
+            href="/admin/customers"
+            className="card-lg p-5 flex items-center justify-between hover:border-brand-300 transition-colors"
+          >
+            <div className="flex items-start gap-3">
+              <Users className="w-5 h-5 text-text-muted mt-0.5" />
+              <div>
+                <div className="font-bold text-text-primary">Kundenverwaltung</div>
+                <div className="text-sm text-text-secondary">
+                  Alle HR-Kunden, Auftraege, Reviewer-Zuweisungen, Add-on-Orders.
+                </div>
+              </div>
+            </div>
+            <ArrowRight className="w-5 h-5 text-text-muted" />
+          </Link>
+        )}
+      </div>
 
       <div className="card-lg p-5">
         <div className="font-bold text-text-primary mb-1">Top-Reviewer · letzte 30 Tage</div>

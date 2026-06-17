@@ -99,9 +99,15 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const updated = await prisma.referenceCheck.update({ where: { id: params.id }, data })
 
-  // Side-effect: Statuswechsel → IN_REVIEW benachrichtigt das candiq-Reviewer-Team.
-  // Best-effort: Mail-Fehler darf den PATCH nicht crashen — wir loggen still.
+  // Side-effect: Statuswechsel → IN_REVIEW benachrichtigt das candiq-Reviewer-Team
+  // und triggert optional Round-Robin-Auto-Assignment. Beides best-effort:
+  // Mail- oder Assignment-Fehler duerfen den PATCH nicht crashen.
   if (data.status === 'IN_REVIEW' && check.status !== 'IN_REVIEW') {
+    if (process.env.ASSIGNMENT_AUTO === 'round_robin' && !updated.assignedReviewerId) {
+      autoAssignRoundRobin(updated.id).catch((err) =>
+        logger.warn('reviewer_autoassign_failed', err),
+      )
+    }
     notifyReviewerTeam({
       checkId: updated.id,
       customer: check.candidate.user,
@@ -119,6 +125,43 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 
   return NextResponse.json(updated)
+}
+
+// Round-Robin: weist den Check dem Reviewer mit der geringsten Anzahl
+// aktuell offener Zuweisungen zu. Bei Gleichstand alphabetische Reihenfolge.
+async function autoAssignRoundRobin(checkId: string) {
+  const reviewers = await prisma.user.findMany({
+    where: { role: { in: ['REVIEWER', 'ADMIN'] } },
+    select: {
+      id: true,
+      name: true,
+      _count: {
+        select: {
+          assignedChecks: { where: { status: 'IN_REVIEW' } },
+        },
+      },
+    },
+  })
+  if (reviewers.length === 0) return
+  reviewers.sort((a, b) => {
+    const cmp = a._count.assignedChecks - b._count.assignedChecks
+    if (cmp !== 0) return cmp
+    return (a.name ?? '').localeCompare(b.name ?? '')
+  })
+  const target = reviewers[0]
+  await prisma.referenceCheck.update({
+    where: { id: checkId },
+    data: { assignedReviewerId: target.id, assignedAt: new Date() },
+  })
+  await prisma.auditLog.create({
+    data: {
+      userId: target.id,
+      action: 'REVIEW_AUTO_ASSIGNED',
+      entity: 'ReferenceCheck',
+      entityId: checkId,
+      details: JSON.stringify({ method: 'round_robin', queueDepth: target._count.assignedChecks }),
+    },
+  })
 }
 
 async function notifyReviewerTeam(opts: {

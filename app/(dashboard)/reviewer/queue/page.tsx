@@ -11,16 +11,47 @@ import { ClipboardList, ArrowRight, Clock, AlertTriangle, Zap } from 'lucide-rea
 // Reviewer-Queue ist immer frisch — kein Caching.
 export const dynamic = 'force-dynamic'
 
-export default async function ReviewerQueuePage() {
+type Filter = 'all' | 'mine' | 'unassigned'
+
+export default async function ReviewerQueuePage({
+  searchParams,
+}: {
+  searchParams: { filter?: string }
+}) {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
   // Rollen-Gate (zusätzlich zur Middleware): CLIENT landet zurück im Dashboard.
   if (!isReviewer(session)) redirect('/dashboard')
 
-  // Bewusst KEIN userId-Filter — Reviewer arbeiten workspace-übergreifend.
-  // Sortier-Prio: Express-Checks (€29 Aufpreis, 12h-SLA) zuerst, dann FIFO.
-  const checks = await prisma.referenceCheck.findMany({
+  const filter: Filter =
+    searchParams.filter === 'mine'
+      ? 'mine'
+      : searchParams.filter === 'unassigned'
+      ? 'unassigned'
+      : 'all'
+
+  const assignmentWhere =
+    filter === 'mine'
+      ? { assignedReviewerId: session.user.id }
+      : filter === 'unassigned'
+      ? { assignedReviewerId: null }
+      : {}
+
+  // Counters fuer die Tab-Labels — eine Query mit groupBy.
+  const allOpenChecks = await prisma.referenceCheck.findMany({
     where: { status: 'IN_REVIEW' },
+    select: { id: true, isExpress: true, assignedReviewerId: true },
+  })
+  const counts = {
+    all: allOpenChecks.length,
+    mine: allOpenChecks.filter((c) => c.assignedReviewerId === session.user.id).length,
+    unassigned: allOpenChecks.filter((c) => c.assignedReviewerId === null).length,
+  }
+
+  // Bewusst KEIN userId-Filter (auf Candidate.userId) — Reviewer arbeiten
+  // workspace-übergreifend. Sortier-Prio: Express zuerst, dann FIFO.
+  const checks = await prisma.referenceCheck.findMany({
+    where: { status: 'IN_REVIEW', ...assignmentWhere },
     orderBy: [{ isExpress: 'desc' }, { updatedAt: 'asc' }],
     include: {
       candidate: {
@@ -32,6 +63,7 @@ export default async function ReviewerQueuePage() {
           user: { select: { name: true, email: true, company: true } },
         },
       },
+      assignedReviewer: { select: { id: true, name: true, email: true } },
     },
   })
   const expressCount = checks.filter((c) => c.isExpress).length
@@ -40,8 +72,14 @@ export default async function ReviewerQueuePage() {
     <>
       <Header
         title="Reviewer-Queue"
-        subtitle={`${checks.length} Prüfung(en) im Review · SLA ${SLA_HOURS}h${expressCount > 0 ? ` · ${expressCount}× Express (12h)` : ''}`}
+        subtitle={`${checks.length} Prüfung(en) · SLA ${SLA_HOURS}h${expressCount > 0 ? ` · ${expressCount}× Express (12h)` : ''}`}
       />
+
+      <div className="flex items-center gap-1 mb-4 border-b border-border">
+        <FilterTab href="/reviewer/queue" active={filter === 'all'} label="Alle" count={counts.all} />
+        <FilterTab href="/reviewer/queue?filter=mine" active={filter === 'mine'} label="Meine" count={counts.mine} />
+        <FilterTab href="/reviewer/queue?filter=unassigned" active={filter === 'unassigned'} label="Nicht zugewiesen" count={counts.unassigned} />
+      </div>
 
       {checks.length === 0 ? (
         <div className="card-lg text-center py-16">
@@ -111,6 +149,18 @@ export default async function ReviewerQueuePage() {
                       </span>
                     </span>
                     <span aria-hidden="true">·</span>
+                    {check.assignedReviewer ? (
+                      <span>
+                        Reviewer:{' '}
+                        <span className="text-text-secondary font-medium">
+                          {check.assignedReviewer.name ?? check.assignedReviewer.email}
+                          {check.assignedReviewer.id === session.user.id ? ' (ich)' : ''}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-amber-700 font-medium">offen — nicht zugewiesen</span>
+                    )}
+                    <span aria-hidden="true">·</span>
                     <span>seit {formatDate(check.updatedAt)}</span>
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-semibold ${badge.cls}`}
@@ -128,6 +178,41 @@ export default async function ReviewerQueuePage() {
         </div>
       )}
     </>
+  )
+}
+
+function FilterTab({
+  href,
+  active,
+  label,
+  count,
+}: {
+  href: string
+  active: boolean
+  label: string
+  count: number
+}) {
+  return (
+    <Link
+      href={href}
+      className={`relative px-3 py-2 text-sm font-semibold transition-colors ${
+        active
+          ? 'text-text-primary'
+          : 'text-text-muted hover:text-text-primary'
+      }`}
+    >
+      {label}
+      <span
+        className={`ml-1.5 text-xs ${
+          active ? 'text-brand-700 font-bold' : 'text-text-muted'
+        }`}
+      >
+        {count}
+      </span>
+      {active && (
+        <span className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-brand-600" />
+      )}
+    </Link>
   )
 }
 
