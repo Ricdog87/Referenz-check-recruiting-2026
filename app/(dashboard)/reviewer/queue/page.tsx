@@ -3,10 +3,10 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { isReviewer } from '@/lib/reviewer'
+import { isReviewer, slaState, formatHoursShort, SLA_HOURS } from '@/lib/reviewer'
 import { Header } from '@/components/layout/Header'
 import { formatDate } from '@/lib/utils'
-import { ClipboardList, ArrowRight } from 'lucide-react'
+import { ClipboardList, ArrowRight, Clock, AlertTriangle } from 'lucide-react'
 
 // Reviewer-Queue ist immer frisch — kein Caching.
 export const dynamic = 'force-dynamic'
@@ -38,7 +38,7 @@ export default async function ReviewerQueuePage() {
     <>
       <Header
         title="Reviewer-Queue"
-        subtitle={`${checks.length} Prüfung(en) im Review`}
+        subtitle={`${checks.length} Prüfung(en) im Review · SLA-Ziel ${SLA_HOURS}h`}
       />
 
       {checks.length === 0 ? (
@@ -53,35 +53,63 @@ export default async function ReviewerQueuePage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {checks.map((check) => (
-            <Link
-              key={check.id}
-              href={`/reviewer/check/${check.id}`}
-              className="card-md p-4 flex items-center justify-between hover:border-border-strong transition-all"
-            >
-              <div className="min-w-0">
-                <div className="font-semibold text-text-primary truncate">
-                  {check.candidate.firstName} {check.candidate.lastName}
-                  <span className="text-text-muted font-normal"> · {check.candidate.position}</span>
-                </div>
-                <div className="text-sm text-text-secondary truncate">
-                  Arbeitgeber: {check.employerName}
-                  {check.employerContact ? ` · ${check.employerContact}` : ''}
-                </div>
-                <div className="text-xs text-text-muted mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
-                  <span>
-                    Kunde:{' '}
-                    <span className="text-text-secondary font-medium">
-                      {check.candidate.user.company ?? check.candidate.user.name ?? check.candidate.user.email}
+          {checks.map((check) => {
+            const sla = slaState(check.updatedAt)
+            const badge =
+              sla.state === 'breached'
+                ? {
+                    cls: 'bg-rose-50 text-rose-700 border-rose-200',
+                    icon: <AlertTriangle className="w-3 h-3" />,
+                    label: `SLA + ${formatHoursShort(Math.abs(sla.hoursLeft))}`,
+                  }
+                : sla.state === 'warn'
+                ? {
+                    cls: 'bg-amber-50 text-amber-700 border-amber-200',
+                    icon: <Clock className="w-3 h-3" />,
+                    label: `SLA in ${formatHoursShort(sla.hoursLeft)}`,
+                  }
+                : {
+                    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    icon: <Clock className="w-3 h-3" />,
+                    label: `${formatHoursShort(sla.hoursInQueue)} alt`,
+                  }
+            return (
+              <Link
+                key={check.id}
+                href={`/reviewer/check/${check.id}`}
+                className="card-md p-4 flex items-center justify-between hover:border-border-strong transition-all"
+              >
+                <div className="min-w-0">
+                  <div className="font-semibold text-text-primary truncate">
+                    {check.candidate.firstName} {check.candidate.lastName}
+                    <span className="text-text-muted font-normal"> · {check.candidate.position}</span>
+                  </div>
+                  <div className="text-sm text-text-secondary truncate">
+                    Arbeitgeber: {check.employerName}
+                    {check.employerContact ? ` · ${check.employerContact}` : ''}
+                  </div>
+                  <div className="text-xs text-text-muted mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span>
+                      Kunde:{' '}
+                      <span className="text-text-secondary font-medium">
+                        {check.candidate.user.company ?? check.candidate.user.name ?? check.candidate.user.email}
+                      </span>
                     </span>
-                  </span>
-                  <span aria-hidden="true">·</span>
-                  <span>Im Review seit {formatDate(check.updatedAt)}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>seit {formatDate(check.updatedAt)}</span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-semibold ${badge.cls}`}
+                      title={`Im Review seit ${formatHoursShort(sla.hoursInQueue)}`}
+                    >
+                      {badge.icon}
+                      {badge.label}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <ArrowRight className="w-5 h-5 text-text-muted shrink-0 ml-3" />
-            </Link>
-          ))}
+                <ArrowRight className="w-5 h-5 text-text-muted shrink-0 ml-3" />
+              </Link>
+            )
+          })}
         </div>
       )}
     </>

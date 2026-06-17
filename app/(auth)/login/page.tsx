@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, ShieldCheck, Eye, EyeOff } from 'lucide-react'
@@ -12,7 +12,10 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const registered = searchParams.get('registered')
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  // Wir behalten den expliziten callbackUrl separat im Auge: nur wenn KEINER
+  // gesetzt ist, redirecten wir role-basiert (Reviewer/Admin → /reviewer,
+  // sonst /dashboard). Mit Deep-Link bleibt die Ziel-URL exakt erhalten.
+  const explicitCallbackUrl = searchParams.get('callbackUrl')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -47,7 +50,13 @@ function LoginForm() {
         setLoading(false)
         return
       }
-      router.push(callbackUrl)
+      let target = explicitCallbackUrl ?? '/dashboard'
+      if (!explicitCallbackUrl) {
+        const session = await getSession()
+        const role = session?.user?.role
+        if (role === 'REVIEWER' || role === 'ADMIN') target = '/reviewer'
+      }
+      router.push(target)
       router.refresh()
     } catch {
       setError('Anmeldung fehlgeschlagen. Bitte erneut versuchen.')
