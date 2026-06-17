@@ -111,7 +111,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       },
       employer: {
         name: updated.employerName,
-        contact: updated.employerContact,
+        contact: updated.employerContact ?? '—',
         phone: updated.employerPhone,
         email: updated.employerEmail,
       },

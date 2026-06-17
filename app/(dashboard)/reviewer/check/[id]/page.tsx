@@ -3,9 +3,9 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { isReviewer } from '@/lib/reviewer'
+import { isReviewer, slaState, formatHoursShort } from '@/lib/reviewer'
 import { Header } from '@/components/layout/Header'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Zap } from 'lucide-react'
 import { ReviewerCheckClient } from './ReviewerCheckClient'
 
 export const dynamic = 'force-dynamic'
@@ -26,15 +26,28 @@ export default async function ReviewerCheckPage({ params }: { params: { id: stri
   })
   if (!check) notFound()
 
+  const sla = slaState(check.updatedAt, { isExpress: check.isExpress })
+
   return (
     <>
       <Header
         title={`Review: ${check.candidate.firstName} ${check.candidate.lastName}`}
         subtitle={`${check.candidate.position} · Arbeitgeber: ${check.employerName}`}
         action={
-          <Link href="/reviewer/queue" className="btn-secondary">
-            <ArrowLeft className="w-4 h-4" /> Zur Queue
-          </Link>
+          <div className="flex items-center gap-2">
+            {check.isExpress && (
+              <span
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-600 text-white text-xs font-bold uppercase tracking-wider"
+                title={`Express-24h (12h-SLA). Aktuell ${formatHoursShort(sla.hoursInQueue)} im Review.`}
+              >
+                <Zap className="w-3 h-3 fill-white" />
+                Express · {sla.state === 'breached' ? 'SLA verletzt' : `${formatHoursShort(Math.max(0, sla.hoursLeft))} verbleibend`}
+              </span>
+            )}
+            <Link href="/reviewer/queue" className="btn-secondary">
+              <ArrowLeft className="w-4 h-4" /> Zur Queue
+            </Link>
+          </div>
         }
       />
 

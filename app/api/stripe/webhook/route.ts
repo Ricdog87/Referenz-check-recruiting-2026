@@ -78,6 +78,26 @@ export async function POST(req: NextRequest) {
             break
           }
 
+          // Optional: Express-24h ist pro Check buchbar — checkId kommt
+          // aus Stripe-Checkout-Metadata (siehe app/api/addons/route.ts).
+          // Wir verifizieren, dass der Check dem zahlenden User gehoert,
+          // bevor wir Express markieren.
+          const metaCheckId = (cs.metadata?.checkId ?? '') as string
+          let linkedCheckId: string | null = null
+          if (metaCheckId) {
+            const owned = await prisma.referenceCheck.findFirst({
+              where: { id: metaCheckId, candidate: { userId } },
+              select: { id: true },
+            })
+            if (owned) linkedCheckId = owned.id
+            else
+              console.warn('stripe_addon_checkid_mismatch', {
+                sessionId: cs.id,
+                checkId: metaCheckId,
+                userId,
+              })
+          }
+
           // Idempotenter Insert: Unique-Constraint auf stripeSessionId
           // verhindert Doppel-Order bei Webhook-Retries.
           try {
@@ -94,9 +114,20 @@ export async function POST(req: NextRequest) {
                 totalAmount,
                 status: 'CONFIRMED',
                 stripeSessionId: cs.id,
-                notes: `Stripe-Checkout · ${addon.name}`,
+                referenceCheckId: linkedCheckId,
+                notes: linkedCheckId
+                  ? `Stripe-Checkout · ${addon.name} · Check ${linkedCheckId}`
+                  : `Stripe-Checkout · ${addon.name}`,
               },
             })
+
+            // Express-24h: markiere Check sofort, halbiert SLA in Queue.
+            if (sku === 'EXPRESS_24H' && linkedCheckId) {
+              await prisma.referenceCheck.update({
+                where: { id: linkedCheckId },
+                data: { isExpress: true, expressActivatedAt: new Date() },
+              })
+            }
 
             await prisma.auditLog.create({
               data: {
@@ -108,6 +139,7 @@ export async function POST(req: NextRequest) {
                   sku: addon.sku,
                   amountCents: totalAmount,
                   sessionId: cs.id,
+                  checkId: linkedCheckId,
                 }),
               },
             })

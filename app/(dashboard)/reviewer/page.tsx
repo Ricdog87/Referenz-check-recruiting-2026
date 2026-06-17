@@ -31,7 +31,7 @@ export default async function ReviewerDashboardPage() {
   const [openChecks, releasedToday, releasedLast7d, topReviewersRaw] = await Promise.all([
     prisma.referenceCheck.findMany({
       where: { status: 'IN_REVIEW' },
-      select: { id: true, updatedAt: true },
+      select: { id: true, updatedAt: true, isExpress: true },
     }),
     prisma.auditLog.count({
       where: { action: 'REVIEW_RELEASE', createdAt: { gte: startOfToday } },
@@ -65,10 +65,13 @@ export default async function ReviewerDashboardPage() {
   const reviewerMap = new Map(reviewerUsers.map((u) => [u.id, u]))
 
   // Aelteste offene Pruefung + Anzahl SLA-Verletzungen.
+  // Bei Express-Checks gilt 12h-SLA statt 24h.
   let oldest: { hoursInQueue: number; state: SlaState } | null = null
   let breachedCount = 0
+  let expressCount = 0
   for (const c of openChecks) {
-    const sla = slaState(c.updatedAt, now)
+    if (c.isExpress) expressCount++
+    const sla = slaState(c.updatedAt, { isExpress: c.isExpress }, now)
     if (sla.state === 'breached') breachedCount++
     if (!oldest || sla.hoursInQueue > oldest.hoursInQueue) {
       oldest = { hoursInQueue: sla.hoursInQueue, state: sla.state }
@@ -79,7 +82,7 @@ export default async function ReviewerDashboardPage() {
     <>
       <Header
         title="Reviewer-Dashboard"
-        subtitle={`SLA-Ziel ${SLA_HOURS}h · ${openChecks.length} offene Pruefung(en) in Queue`}
+        subtitle={`SLA ${SLA_HOURS}h · ${openChecks.length} offen${expressCount > 0 ? ` · ${expressCount}× Express (12h)` : ''}`}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">

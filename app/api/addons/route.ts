@@ -41,20 +41,24 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // SKU aus JSON oder form-data lesen
+  // SKU + optional checkId aus JSON oder form-data lesen.
+  // checkId ist nur fuer pro-Check-Add-ons relevant (z.B. EXPRESS_24H).
   const contentType = req.headers.get('content-type') ?? ''
   let sku = ''
+  let checkId = ''
   let wantsRedirect = false
   if (contentType.includes('application/json')) {
     try {
-      const body = (await req.json()) as { sku?: string }
+      const body = (await req.json()) as { sku?: string; checkId?: string }
       sku = body.sku ?? ''
+      checkId = body.checkId ?? ''
     } catch {
       return NextResponse.json({ error: 'Ungültige Anfrage' }, { status: 400 })
     }
   } else {
     const form = await req.formData()
     sku = String(form.get('sku') ?? '')
+    checkId = String(form.get('checkId') ?? '')
     wantsRedirect = true
   }
 
@@ -65,6 +69,26 @@ export async function POST(req: NextRequest) {
   const addon = getAddon(sku)
   if (!addon) {
     return NextResponse.json({ error: 'Unbekannte SKU' }, { status: 400 })
+  }
+
+  // Wenn checkId gesetzt: Eigentum verifizieren — Verhindert, dass jemand
+  // einen fremden Check Express-markiert ueber manipulierte Requests.
+  let verifiedCheckId: string | null = null
+  if (checkId) {
+    const owned = await prisma.referenceCheck.findFirst({
+      where: { id: checkId, candidate: { userId: session.user.id } },
+      select: { id: true, isExpress: true },
+    })
+    if (!owned) {
+      return NextResponse.json({ error: 'Check nicht gefunden.' }, { status: 404 })
+    }
+    if (owned.isExpress && addon.sku === 'EXPRESS_24H') {
+      return NextResponse.json(
+        { error: 'Express-24h ist fuer diese Pruefung bereits aktiv.' },
+        { status: 409 },
+      )
+    }
+    verifiedCheckId = owned.id
   }
 
   const priceId = STRIPE_ADDON_PRICES[addon.sku]
@@ -112,16 +136,24 @@ export async function POST(req: NextRequest) {
       // Adresse für DE/EU USt-Reverse-Charge / Rechnungs-Compliance
       billing_address_collection: 'required',
       tax_id_collection: { enabled: true },
-      // Metadata wird vom Webhook gelesen → daraus wird die AddonOrder gebaut
+      // Metadata wird vom Webhook gelesen → daraus wird die AddonOrder gebaut.
+      // checkId nur bei pro-Check-Add-ons (Express-24h) gesetzt.
       metadata: {
         type: 'addon',
         sku: addon.sku,
         userId: session.user.id,
         quantity: String(addon.quantity),
         unitPriceCents: String(addon.price * 100),
+        ...(verifiedCheckId ? { checkId: verifiedCheckId } : {}),
       },
-      success_url: `${origin}/dashboard/addons?ok=1&sku=${encodeURIComponent(addon.sku)}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/dashboard/addons?cancel=1`,
+      // Bei Express: Erfolgs-Redirect zurueck auf den Check (ohne checkId
+      // bleibt der bestehende /dashboard/addons-Flow erhalten).
+      success_url: verifiedCheckId
+        ? `${origin}/checks/${verifiedCheckId}?express=ok&session_id={CHECKOUT_SESSION_ID}`
+        : `${origin}/dashboard/addons?ok=1&sku=${encodeURIComponent(addon.sku)}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: verifiedCheckId
+        ? `${origin}/checks/${verifiedCheckId}?express=cancel`
+        : `${origin}/dashboard/addons?cancel=1`,
       locale: 'de',
       // Audit-Trail für AGB-Akzeptanz bei Pflicht-Käufen
       consent_collection: { terms_of_service: 'required' },

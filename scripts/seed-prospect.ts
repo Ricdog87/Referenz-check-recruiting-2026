@@ -109,12 +109,13 @@ type CheckSeed = {
   position: string
   startDate: string
   endDate: string
-  status: 'OPEN' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'FAILED'
+  status: 'OPEN' | 'IN_PROGRESS' | 'IN_REVIEW' | 'COMPLETED' | 'CANCELLED' | 'FAILED'
   result?: 'VERIFIED' | 'DISCREPANCY_FOUND' | 'UNREACHABLE' | 'DECLINED'
   rating?: number
   callNotes?: string
   discrepancies?: string
   calledAt?: Date
+  isExpress?: boolean
 }
 
 const PROSPECT_CANDIDATES: CandidateSeed[] = [
@@ -240,7 +241,10 @@ const PROSPECT_CANDIDATES: CandidateSeed[] = [
         position: 'Account Executive',
         startDate: '03/2018',
         endDate: '04/2021',
-        status: 'IN_PROGRESS',
+        // Demo: liegt im Reviewer-Pool mit Express-Markierung — zeigt im
+        // Onboarding sofort die 12h-SLA-Pipeline live in /reviewer/queue.
+        status: 'IN_REVIEW',
+        isExpress: true,
       },
       {
         employerName: 'StartSales AG',
@@ -400,6 +404,8 @@ async function seedCandidatesAndChecks(userId: string) {
           callNotes: chk.callNotes,
           discrepancies: chk.discrepancies,
           calledAt: chk.calledAt,
+          isExpress: chk.isExpress ?? false,
+          expressActivatedAt: chk.isExpress ? new Date() : null,
         },
       })
       createdCh++

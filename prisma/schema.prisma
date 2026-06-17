@@ -91,12 +91,18 @@ model ReferenceCheck {
   discrepancies   String?
   rating          Int?
   calledAt        DateTime?
+  // Express-24h-Add-on: gesetzt vom Stripe-Webhook bei Buchung.
+  // Halbiert die SLA in der Reviewer-Queue (24h → 12h) und triggert Prio-Sort.
+  isExpress           Boolean   @default(false)
+  expressActivatedAt  DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   candidateId     String
   candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  addonOrders     AddonOrder[]
 
   @@index([candidateId])
+  @@index([isExpress])
 }
 
 model GdprConsent {
@@ -153,11 +159,16 @@ model AddonOrder {
   notes       String?
   // Stripe-Checkout-Session-ID — Idempotency fuer Webhook-Replays.
   // Unique sodass derselbe Stripe-Event keine doppelte Order anlegt.
-  stripeSessionId String? @unique
+  stripeSessionId   String? @unique
+  // Optionale Verknuepfung zu einem konkreten Check (z.B. Express-24h).
+  // Wird per Stripe-Checkout-Metadata gesetzt + im Webhook aufgeloest.
+  referenceCheckId  String?
+  referenceCheck    ReferenceCheck? @relation(fields: [referenceCheckId], references: [id], onDelete: SetNull)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+  @@index([referenceCheckId])
 }
 
 model CvAnalysisReport {
