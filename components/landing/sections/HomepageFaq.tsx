@@ -114,6 +114,63 @@ const FAQS: Faq[] = [
       </>
     ),
   },
+  {
+    q: 'Was passiert mit dem CV, den wir hochladen?',
+    a: (
+      <>
+        Der CV ist ein personenbezogenes Datum des Bewerbers. Ihr seid Verantwortlicher,
+        candiq Auftragsverarbeiter (AVV nach Art. 28). Wir verarbeiten den CV nur
+        weisungsgebunden in eurem Auftrag, auf Servern in Deutschland, und löschen
+        ihn automatisch nach spätestens 6 Monaten.
+      </>
+    ),
+  },
+  {
+    q: 'Dürfen wir als Kunde den CV hochladen, oder muss das der Bewerber tun?',
+    a: (
+      <>
+        Beides geht. Der Bewerber kann seinen CV selbst im Self-Service-Portal
+        hochladen, oder ihr ladet ihn hoch. In beiden Fällen gilt dieselbe Regel:
+        Geprüft wird erst, nachdem der Bewerber eingewilligt hat. Lädt der Kunde
+        den CV hoch, geht automatisch ein Einladungslink an den Bewerber – erst
+        nach seiner Freigabe bekommt ein Reviewer Zugriff.
+      </>
+    ),
+  },
+  {
+    q: 'Brauchen wir eine Einwilligung des Bewerbers?',
+    a: (
+      <>
+        Ja, und candiq holt sie strukturiert ein. Der Bewerber erteilt die
+        Einwilligung selbst über einen Magic-Link, sieht transparent, was geprüft
+        wird, wählt die Scopes (Stationen / Referenzgeber / CV-Abgleich) granular
+        und nennt seine Referenzgeber selbst. Ihr klickt nie stellvertretend
+        &bdquo;der Kandidat hat zugestimmt&ldquo;. Audit-Trail mit Zeit, IP und
+        Consent-Version inklusive (Art. 7 Abs. 1).
+      </>
+    ),
+  },
+  {
+    q: 'Was, wenn der CV ein Foto, Religion oder Gesundheitsdaten enthält?',
+    a: (
+      <>
+        Unsere Reviewer prüfen ausschließlich nachprüfbare Fakten – Position,
+        Zeitraum, Aufgaben. Geschützte Merkmale (Herkunft, Religion, Gesundheit
+        etc.) werden für die Prüfung nicht bewertet, AGG-konform. Besondere
+        Kategorien aus dem CV fließen nicht in die Bewertung ein.
+      </>
+    ),
+  },
+  {
+    q: 'Wo liegen die Daten und wie lange?',
+    a: (
+      <>
+        Server in Deutschland (EU-Region Frankfurt). Auto-Löschung nach spätestens
+        6 Monaten (Art. 5 Abs. 1 e). Widerruf jederzeit per Link (Art. 7 Abs. 3).
+        AVV nach Art. 28 standardmäßig inklusive.
+      </>
+    ),
+  },
 ]
 
 export function HomepageFaq() {
@@ -135,7 +192,7 @@ export function HomepageFaq() {
             Was Sie vor dem ersten Termin wissen sollten
           </h2>
           <p className="text-text-secondary">
-            Direkte Antworten auf die acht Fragen, die uns am häufigsten gestellt werden.
+            Direkte Antworten auf die häufigsten Fragen — Datenschutz, Consent, CV-Handling.
           </p>
         </motion.div>
 
