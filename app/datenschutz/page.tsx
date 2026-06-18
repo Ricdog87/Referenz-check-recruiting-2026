@@ -48,9 +48,50 @@ export default function DatenschutzPage() {
       <h2>5. Datenspeicherung & Hosting</h2>
       <p>
         Personenbezogene Daten werden in Rechenzentren innerhalb der Europäischen Union, vorrangig in
-        Deutschland, verarbeitet. Eine Übermittlung personenbezogener Daten in Drittländer findet
-        ausschließlich im Rahmen der Zahlungsabwicklung über Stripe statt (siehe Punkt 8) und beruht
-        auf den EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO.
+        Deutschland (Frankfurt am Main), verarbeitet. Drittland-Übermittlungen finden ausschließlich
+        in den unten genannten, klar abgegrenzten Verarbeitungsfällen statt und beruhen auf den
+        EU-Standardvertragsklauseln nach Art. 46 Abs. 2 lit. c DSGVO sowie — soweit anwendbar — auf
+        der Selbstzertifizierung des Empfängers im Rahmen des EU-U.S. Data Privacy Framework.
+      </p>
+      <p>
+        <strong>Übersicht der Drittland-Subprozessoren:</strong>
+      </p>
+      <ul>
+        <li>
+          <strong>Stripe Inc. (USA)</strong> — Zahlungsabwicklung. Details siehe Punkt 8.
+        </li>
+        <li>
+          <strong>Vercel Inc. (USA)</strong> — Application-Hosting und Storage für CV-Uploads
+          (Vercel Blob, EU-Region). Hosting siehe Punkt 9, Datenübermittlung kann gelegentlich
+          an US-Mutter erfolgen (SCC + DPF).
+        </li>
+        <li>
+          <strong>Resend Inc. (USA)</strong> — Transaktions-E-Mails (Einladungslinks, Reports,
+          Notifications). Empfänger-Adresse und Mail-Inhalt werden zur Zustellung übertragen.
+          AVV und SCC-Anhang im Onboarding inklusive.
+        </li>
+        <li>
+          <strong>Anthropic Inc. (USA)</strong> — KI-gestützte CV-Plausibilitätsprüfung und
+          Diskrepanz-Erkennung (modell: Claude). Verarbeitung nur, wenn Sie die KI-Analyse
+          explizit anstoßen; keine Trainings-Nutzung Ihrer Daten lt. API-Vertrag.
+        </li>
+        <li>
+          <strong>ElevenLabs Inc. (USA)</strong> — Live-Sprachagent in der Hero-Demo. Details
+          siehe Punkt 12.
+        </li>
+        <li>
+          <strong>Google LLC (USA)</strong> — Analytics nur nach expliziter Cookie-Einwilligung.
+          Details siehe Punkt 10.
+        </li>
+        <li>
+          <strong>HubSpot Inc. (USA)</strong> — Termin-Buchung (Meetings-Embed auf /termin) und
+          CRM-Sync von Lead-Magnet-Anfragen. SCC + DPF.
+        </li>
+      </ul>
+      <p>
+        Eine aktuelle Subprozessor-Liste mit Verarbeitungsstandort und Rechtsgrundlage stellen wir
+        zusammen mit dem AVV im Onboarding und auf Anfrage an{' '}
+        <a href="mailto:hello@candiq.de">hello@candiq.de</a> bereit.
       </p>
 
       <h2>6. Verschlüsselung</h2>

@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { safeQuery } from '@/lib/safe-query'
+import { isReviewer, isAdmin } from '@/lib/reviewer'
+import { redirect } from 'next/navigation'
 import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
 import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
@@ -16,6 +18,13 @@ import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) return null
+
+  // Role-Routing: candiq-internes Personal (ADMIN/REVIEWER) hat eigene
+  // Cockpits — das Kunden-Dashboard ist fuer sie inhaltlich irrelevant
+  // (keine eigenen Kandidaten, keine Pipeline-Health, keine Add-on-Buchungen).
+  // ADMIN → Kundenliste; REVIEWER → Stats-Dashboard.
+  if (isAdmin(session)) redirect('/admin/customers')
+  if (isReviewer(session)) redirect('/reviewer')
 
   const userId = session.user.id
   const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
