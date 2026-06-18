@@ -102,6 +102,60 @@ export default async function AdminCustomersPage({
   // checkAgg currently unused, kept for future global-counters display
   void checkAgg
 
+  // Aktivitäts-Telemetrie: zwei effiziente groupBy-Queries auf AuditLog
+  //  - lastLoginByUser:    letzte LOGIN-Action pro User (= "zuletzt online")
+  //  - lastActivityByUser: letzte BELIEBIGE Action pro User (= letzte Aktion im SaaS)
+  //  - actionsCount30dByUser: Aktivitäts-Volumen pro User in 30 Tagen
+  const now = new Date()
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400e3)
+
+  const [loginRows, anyActivityRows, actions30dRows] = userIds.length
+    ? await Promise.all([
+        prisma.auditLog.groupBy({
+          by: ['userId'],
+          where: { action: 'LOGIN', userId: { in: userIds } },
+          _max: { createdAt: true },
+        }),
+        prisma.auditLog.groupBy({
+          by: ['userId'],
+          where: { userId: { in: userIds } },
+          _max: { createdAt: true },
+        }),
+        prisma.auditLog.groupBy({
+          by: ['userId'],
+          where: { userId: { in: userIds }, createdAt: { gte: thirtyDaysAgo } },
+          _count: { _all: true },
+        }),
+      ])
+    : [[], [], []]
+
+  const lastLoginByUser = new Map<string, Date>()
+  for (const r of loginRows) {
+    if (r.userId && r._max.createdAt) lastLoginByUser.set(r.userId, r._max.createdAt)
+  }
+  const lastActivityByUser = new Map<string, Date>()
+  for (const r of anyActivityRows) {
+    if (r.userId && r._max.createdAt) lastActivityByUser.set(r.userId, r._max.createdAt)
+  }
+  const actions30dByUser = new Map<string, number>()
+  for (const r of actions30dRows) {
+    if (r.userId) actions30dByUser.set(r.userId, r._count._all)
+  }
+
+  function timeAgo(d: Date | null | undefined): { label: string; tone: string } {
+    if (!d) return { label: '—', tone: 'text-text-muted' }
+    const diffMs = now.getTime() - d.getTime()
+    const min = diffMs / 60_000
+    const h = min / 60
+    const days = h / 24
+    if (min < 5) return { label: 'gerade eben', tone: 'text-emerald-700 font-semibold' }
+    if (min < 60) return { label: `vor ${Math.round(min)} Min`, tone: 'text-emerald-700' }
+    if (h < 24) return { label: `vor ${Math.round(h)} h`, tone: 'text-text-primary' }
+    if (days < 7) return { label: `vor ${Math.round(days)} T`, tone: 'text-text-secondary' }
+    if (days < 30) return { label: `vor ${Math.round(days / 7)} Wo`, tone: 'text-text-muted' }
+    return { label: `vor ${Math.round(days / 30)} Mo`, tone: 'text-rose-600' }
+  }
+
   return (
     <>
       <Header
@@ -147,6 +201,9 @@ export default async function AdminCustomersPage({
                 <th className="px-4 py-3">Plan</th>
                 <th className="px-4 py-3">Kandidaten</th>
                 <th className="px-4 py-3">Checks</th>
+                <th className="px-4 py-3 hidden lg:table-cell">Zuletzt online</th>
+                <th className="px-4 py-3 hidden lg:table-cell">Letzte Aktion</th>
+                <th className="px-4 py-3 hidden xl:table-cell">Aktivität 30T</th>
                 <th className="px-4 py-3 hidden md:table-cell">Angelegt</th>
                 <th className="px-4 py-3 w-10"></th>
               </tr>
@@ -207,6 +264,25 @@ export default async function AdminCustomersPage({
                         )}
                       </div>
                     </td>
+                    <td className="px-4 py-3 text-xs hidden lg:table-cell">
+                      {(() => {
+                        const t = timeAgo(lastLoginByUser.get(u.id))
+                        return <span className={t.tone}>{t.label}</span>
+                      })()}
+                    </td>
+                    <td className="px-4 py-3 text-xs hidden lg:table-cell">
+                      {(() => {
+                        const t = timeAgo(lastActivityByUser.get(u.id))
+                        return <span className={t.tone}>{t.label}</span>
+                      })()}
+                    </td>
+                    <td className="px-4 py-3 text-xs hidden xl:table-cell">
+                      {(() => {
+                        const n = actions30dByUser.get(u.id) ?? 0
+                        const cls = n === 0 ? 'text-text-muted' : n < 5 ? 'text-text-secondary' : 'text-emerald-700 font-semibold'
+                        return <span className={cls}>{n} Aktion{n === 1 ? '' : 'en'}</span>
+                      })()}
+                    </td>
                     <td className="px-4 py-3 text-xs text-text-muted hidden md:table-cell">
                       {formatDate(u.createdAt)}
                     </td>
@@ -229,6 +305,7 @@ export default async function AdminCustomersPage({
 
       <p className="text-xs text-text-muted mt-3">
         Max. 200 Ergebnisse. Reviewer/Admin-Konten sind ausgeblendet. ↻ offen · ⏱ im Review · ✓ abgeschlossen · ⚡ Express.
+        Aktivitäts-Daten aus dem Audit-Trail (alle Logins, Uploads, Übergaben, Add-on-Buchungen — live).
       </p>
     </>
   )
