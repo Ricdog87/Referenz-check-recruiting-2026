@@ -58,7 +58,7 @@ export function TopBar({ name, company, accountType, plan, role }: TopBarProps) 
           )}
         </div>
 
-        {/* Suchleiste nur fuer Kunden — interne Cockpits haben eigene Listen-Filter */}
+        {/* Suchleiste nur für Kunden — interne Cockpits haben eigene Listen-Filter */}
         {!isInternal && (
           <div className="hidden md:flex items-center gap-2 flex-1 max-w-md mx-auto">
             <div className="relative w-full">
@@ -72,7 +72,7 @@ export function TopBar({ name, company, accountType, plan, role }: TopBarProps) 
           </div>
         )}
 
-        {/* Upgrade-CTA nur fuer Kunden. ADMIN/REVIEWER haben keinen Plan. */}
+        {/* Upgrade-CTA nur für Kunden. ADMIN/REVIEWER haben keinen Plan. */}
         {!isInternal && (
           <Link
             href="/preise"

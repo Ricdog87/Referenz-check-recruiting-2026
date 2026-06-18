@@ -9,19 +9,19 @@ export const dynamic = 'force-dynamic'
 const MAX_PILOT_SLOTS = parseInt(process.env.PILOT_PROGRAM_MAX_SLOTS ?? '10', 10)
 
 /**
- * Bewerbung fuers candiq Pilot-Programm Q3/2026.
+ * Bewerbung fürs candiq Pilot-Programm Q3/2026.
  *
  * Body: { company, firstName, lastName, email, hiresPerYear }
  *
  * - Rate-Limit pro IP: max 3 pro Stunde (Spam-Schutz)
  * - Validierung: alle Felder Pflicht, E-Mail-Format
- * - Pruefung: wenn schon MAX_PILOT_SLOTS ACCEPTED-Eintraege → 409 (Programm voll)
+ * - Prüfung: wenn schon MAX_PILOT_SLOTS ACCEPTED-Eintraege → 409 (Programm voll)
  * - Speichert PilotApplication mit Status PENDING
  * - Schreibt AuditLog (entity=PilotApplication)
- * - Sendet 2 E-Mails (Bestaetigung an Bewerber + Notification an Sales)
+ * - Sendet 2 E-Mails (Bestätigung an Bewerber + Notification an Sales)
  */
 export async function POST(req: NextRequest) {
-  // IP fuer Rate-Limit + Auditing
+  // IP für Rate-Limit + Auditing
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
     req.headers.get('x-real-ip') ??
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   const rl = rateLimit(`pilot:${ip}`, 3, 60 * 60 * 1000)
   if (!rl.ok) {
     return NextResponse.json(
-      { error: 'Zu viele Anfragen. Bitte spaeter erneut versuchen.' },
+      { error: 'Zu viele Anfragen. Bitte später erneut versuchen.' },
       { status: 429 },
     )
   }
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Ungueltige Anfrage' }, { status: 400 })
+    return NextResponse.json({ error: 'Ungültige Anfrage' }, { status: 400 })
   }
 
   const company = body.company?.trim() ?? ''
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   if (!company || !firstName || !lastName || !email || !hiresPerYear) {
     return NextResponse.json(
-      { error: 'Bitte alle Pflichtfelder ausfuellen.' },
+      { error: 'Bitte alle Pflichtfelder ausfüllen.' },
       { status: 400 },
     )
   }
@@ -70,10 +70,10 @@ export async function POST(req: NextRequest) {
     )
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: 'Ungueltige E-Mail-Adresse.' }, { status: 400 })
+    return NextResponse.json({ error: 'Ungültige E-Mail-Adresse.' }, { status: 400 })
   }
 
-  // Programm-Slots pruefen (ACCEPTED, nicht PENDING — Pending zaehlt nicht)
+  // Programm-Slots prüfen (ACCEPTED, nicht PENDING — Pending zaehlt nicht)
   const accepted = await prisma.pilotApplication.count({ where: { status: 'ACCEPTED' } })
   if (accepted >= MAX_PILOT_SLOTS) {
     return NextResponse.json(
@@ -153,10 +153,10 @@ export async function POST(req: NextRequest) {
       const { sendEmail } = await import('@/lib/email')
       await sendEmail({
         to: email,
-        subject: 'Ihre Bewerbung fuer das candiq Pilot-Programm Q3/2026',
+        subject: 'Ihre Bewerbung für das candiq Pilot-Programm Q3/2026',
         html: `<p>Hallo ${firstName},</p>
-<p>vielen Dank fuer Ihre Bewerbung fuer das candiq Pilot-Programm Q3/2026.</p>
-<p>Wir pruefen Ihre Anmeldung und melden uns innerhalb von 2 Werktagen mit den naechsten Schritten — typischerweise ein 30-Min-Kennenlern-Termin und die Discount-Bestaetigung.</p>
+<p>vielen Dank für Ihre Bewerbung für das candiq Pilot-Programm Q3/2026.</p>
+<p>Wir prüfen Ihre Anmeldung und melden uns innerhalb von 2 Werktagen mit den nächsten Schritten — typischerweise ein 30-Min-Kennenlern-Termin und die Discount-Bestätigung.</p>
 <p>Bei Rueckfragen: einfach auf diese Mail antworten oder an <a href="mailto:hello@candiq.de">hello@candiq.de</a> schreiben.</p>
 <p>Bis gleich,<br/>candiq</p>`,
       })
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
   <li><strong>IP:</strong> ${ip}</li>
   <li><strong>Aktuell akzeptiert:</strong> ${accepted} von ${MAX_PILOT_SLOTS}</li>
 </ul>
-<p>Anwendung pruefen im Admin-Bereich (sobald gebaut) oder direkt in Supabase.</p>`,
+<p>Anwendung prüfen im Admin-Bereich (sobald gebaut) oder direkt in Supabase.</p>`,
       })
     } catch (mailErr: any) {
       console.error('pilot_application_mail_error', { message: mailErr?.message })
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error('pilot_application_create_error', { message: err?.message })
     return NextResponse.json(
-      { error: 'Bewerbung konnte nicht gespeichert werden. Bitte spaeter erneut versuchen.' },
+      { error: 'Bewerbung konnte nicht gespeichert werden. Bitte später erneut versuchen.' },
       { status: 500 },
     )
   }

@@ -9,7 +9,7 @@ const MAX_PILOT_SLOTS = parseInt(process.env.PILOT_PROGRAM_MAX_SLOTS ?? '10', 10
 /**
  * GET /api/pilot-application/slots
  *
- * Oeffentlicher Read-Only-Endpunkt fuer den Scarcity-Counter auf der
+ * Oeffentlicher Read-Only-Endpunkt für den Scarcity-Counter auf der
  * Pilot-Programm-Seite. Antwortet mit der aktuellen Slot-Belegung:
  *
  * { max: 10, used: 3, remaining: 7, full: false }
@@ -24,7 +24,7 @@ export async function GET() {
   let pipeline = 0
   try {
     // Zwei Queries parallel: ACCEPTED (belegte Slots) + PENDING (Pipeline,
-    // optionaler Trust-Signal fuer die Marketing-Page).
+    // optionaler Trust-Signal für die Marketing-Page).
     const [usedCount, pipelineCount] = await Promise.all([
       prisma.pilotApplication.count({ where: { status: 'ACCEPTED' } }),
       prisma.pilotApplication.count({ where: { status: 'PENDING' } }),
@@ -34,7 +34,7 @@ export async function GET() {
   } catch (err) {
     // DB-Ausfall: konservativer Default (Programm offen, Counter neutral).
     // Pilot-Seite zeigt dann nur den Max-Wert ohne aktuelle Belegung —
-    // weniger Conversion-Signal, aber kein 500 fuer den Besucher.
+    // weniger Conversion-Signal, aber kein 500 für den Besucher.
     console.error('pilot_slots_count_failed', err)
     return NextResponse.json(
       { max: MAX_PILOT_SLOTS, used: 0, remaining: MAX_PILOT_SLOTS, full: false, pipeline: 0, degraded: true },

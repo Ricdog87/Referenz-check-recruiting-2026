@@ -6,8 +6,8 @@ import { Upload, Phone, ShieldCheck, FileCheck2 } from 'lucide-react'
 import { Reveal } from '../Reveal'
 
 // Akteur-Labels machen sichtbar, wer in welchem Schritt aktiv wird —
-// wichtig fuer Kunden-Verstaendnis, dass candiq KEIN Self-Service-Tool
-// fuer Bewerber ist und KEIN Bot, der HR-Aufgaben uebernimmt.
+// wichtig für Kunden-Verständnis, dass candiq KEIN Self-Service-Tool
+// für Bewerber ist und KEIN Bot, der HR-Aufgaben uebernimmt.
 type Actor = 'Kunde' | 'Bewerber' | 'candiq'
 
 const ACTOR_STYLES: Record<Actor, string> = {
@@ -81,7 +81,7 @@ export function HowItWorks() {
               Vier Schritte. <span className="text-gradient-brand">Klare Verantwortung.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Wer macht was — und warum die Einwilligung des Bewerbers immer vor der Pruefung steht. Vom Auftrag bis zum Report typischerweise in unter 48 Stunden.
+              Wer macht was — und warum die Einwilligung des Bewerbers immer vor der Prüfung steht. Vom Auftrag bis zum Report typischerweise in unter 48 Stunden.
             </p>
           </div>
         </Reveal>
@@ -149,7 +149,7 @@ export function HowItWorks() {
                     {s.n}
                   </div>
 
-                  {/* Spacer fuers Layout */}
+                  {/* Spacer fürs Layout */}
                   <div className="flex-1 hidden md:block" />
                 </div>
               </Reveal>

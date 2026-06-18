@@ -1,9 +1,9 @@
 /**
  * scripts/seed-reviewer.ts
  *
- * Legt einen Login fuer das candiq-Reviewer-Team an. Reviewer arbeiten
+ * Legt einen Login für das candiq-Reviewer-Team an. Reviewer arbeiten
  * workspace-uebergreifend (siehe lib/reviewer.ts + app/(dashboard)/reviewer/**) —
- * sie sehen ALLE eingehenden Pruefungen mit status='IN_REVIEW' in einer Queue.
+ * sie sehen ALLE eingehenden Prüfungen mit status='IN_REVIEW' in einer Queue.
  *
  * Default: ein Pool-Account `reviewer@candiq.de`, an dem mehrere Reviewer
  * gemeinsam arbeiten koennen. Zusaetzliche Konten via PROSPECT-Registry-Pattern.
@@ -37,12 +37,12 @@ const prisma = new PrismaClient()
 type ReviewerProfile = {
   name: string
   email: string
-  // role gesteuert ueber REVIEWER (Queue + PATCH) oder ADMIN (alles).
+  // role gesteuert über REVIEWER (Queue + PATCH) oder ADMIN (alles).
   role: 'REVIEWER' | 'ADMIN'
 }
 
 const REVIEWERS: Record<string, ReviewerProfile> = {
-  // Gemeinsamer Pool-Account fuer das Reviewer-Team. Mehrere Personen
+  // Gemeinsamer Pool-Account für das Reviewer-Team. Mehrere Personen
   // teilen sich diesen Login — die Queue ist die geteilte Inbox.
   team: {
     name: 'candiq Reviewer-Team',
@@ -196,7 +196,7 @@ async function main() {
 
   console.log('')
   console.log('═════════════════════════════════════════════════════════════')
-  console.log('  ✅ FERTIG — Zugang fuer Reviewer-Team')
+  console.log('  ✅ FERTIG — Zugang für Reviewer-Team')
   console.log('═════════════════════════════════════════════════════════════')
   console.log('')
   console.log(`  Login-URL:        ${baseUrl}/login`)
@@ -211,19 +211,19 @@ async function main() {
     console.log(`                       Passwort unangetastet.)`)
   }
   console.log('')
-  console.log(`  Password-Reset-Link (${RESET_TOKEN_TTL_DAYS} Tage gueltig):`)
+  console.log(`  Password-Reset-Link (${RESET_TOKEN_TTL_DAYS} Tage gültig):`)
   console.log(`  ${resetUrl}`)
   console.log('')
   console.log('  Was der Reviewer-Account sieht:')
-  console.log('   · Alle Pruefungen mit Status IN_REVIEW (workspace-uebergreifend)')
+  console.log('   · Alle Prüfungen mit Status IN_REVIEW (workspace-uebergreifend)')
   console.log('   · Pro Eintrag: Kunde (Company), Kandidat, Position, Arbeitgeber, Kontakt')
-  console.log('   · FIFO-Sortierung (aelteste zuerst) — SLA-Ziel 24h')
+  console.log('   · FIFO-Sortierung (älteste zuerst) — SLA-Ziel 24h')
   console.log('   · Detail-View: callNotes / discrepancies / rating / result speichern')
   console.log('   · "Freigeben" triggert PDF-Report + Mail an HR-Kunde')
   console.log('')
-  console.log('  E-Mail-Benachrichtigung bei neuen Pruefungen:')
+  console.log('  E-Mail-Benachrichtigung bei neuen Prüfungen:')
   console.log(`   Env-Var REVIEWER_NOTIFICATION_EMAIL (default hello@candiq.de)`)
-  console.log(`   Komma-separierte Liste fuer mehrere Empfaenger moeglich.`)
+  console.log(`   Komma-separierte Liste für mehrere Empfänger möglich.`)
   console.log('')
   console.log('═════════════════════════════════════════════════════════════')
 }

@@ -27,7 +27,7 @@ export default async function ReviewerCheckPage({ params }: { params: { id: stri
   })
   if (!check) notFound()
 
-  // Reviewer-Liste fuer das Assignment-Dropdown.
+  // Reviewer-Liste für das Assignment-Dropdown.
   const reviewers = await prisma.user.findMany({
     where: { role: { in: ['REVIEWER', 'ADMIN'] } },
     orderBy: { name: 'asc' },

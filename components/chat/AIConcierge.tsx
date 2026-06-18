@@ -136,7 +136,7 @@ export function AIConcierge() {
         ),
       )
 
-      // Fire-and-forget Sales-Intent-Analyse. Ergebnis ist fuer den
+      // Fire-and-forget Sales-Intent-Analyse. Ergebnis ist für den
       // Visitor unsichtbar — bei Hot-Lead (Score >= 60) wird intern
       // gealertet. Fehler schlucken: darf das Chat-UX nie blocken.
       const intentPayload = [...history, { role: assistantMsg.role, content: acc }]

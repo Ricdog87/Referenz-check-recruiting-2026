@@ -39,8 +39,8 @@ export default async function SettingsPage() {
     ),
   ])
 
-  // User-Record kann fehlen, wenn das Konto in einem anderen Tab geloescht
-  // wurde (GDPR-Delete), die Session aber noch gueltig ist. Sauber ausloggen
+  // User-Record kann fehlen, wenn das Konto in einem anderen Tab gelöscht
+  // wurde (GDPR-Delete), die Session aber noch gültig ist. Sauber ausloggen
   // statt mit `user!` die Seite zu crashen.
   if (!user) redirect('/login')
 

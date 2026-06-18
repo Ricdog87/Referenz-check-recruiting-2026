@@ -7,12 +7,12 @@ export const metadata: Metadata = pageMeta({
   absoluteTitle: 'Arbeitszeugnis prüfen lassen: echt oder geschönt? | candiq',
   description:
     'Arbeitszeugnisse auf Echtheit und Aussage prüfen lassen — per Rückfrage beim Aussteller, DSGVO-konform. Klarer Report statt Rätselraten.',
-  path: '/zeugnis-pruefen-lassen',
+  path: '/zeugnis-prüfen-lassen',
 })
 
 const data: KeywordPageData = {
   breadcrumbName: 'Arbeitszeugnis prüfen',
-  path: '/zeugnis-pruefen-lassen',
+  path: '/zeugnis-prüfen-lassen',
   hero: {
     eyebrow: 'Zeugnis-Verifizierung',
     h1: 'Arbeitszeugnis prüfen lassen — echt, geschönt oder erfunden?',

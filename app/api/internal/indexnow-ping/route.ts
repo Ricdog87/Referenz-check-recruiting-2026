@@ -14,7 +14,7 @@ const MAX_URLS = 100
  *
  * Per Vercel-Cron getriggert: liest die aktuelle sitemap.xml, extrahiert die
  * URLs und meldet sie an IndexNow (Bing, Yandex, Naver via api.indexnow.org),
- * statt auf den naechsten Crawl zu warten.
+ * statt auf den nächsten Crawl zu warten.
  *
  * Schutz: Vercel-Cron schickt automatisch `Authorization: Bearer $CRON_SECRET`,
  * wenn CRON_SECRET in den Project-Env-Vars gesetzt ist (gleiches Muster wie

@@ -4,7 +4,7 @@ import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
-// Cleanup darf laenger laufen als der Default — bei groesseren Volumina bis 60 s.
+// Cleanup darf länger laufen als der Default — bei groesseren Volumina bis 60 s.
 export const maxDuration = 60
 
 /**
@@ -79,7 +79,7 @@ async function handleCleanup(req: NextRequest) {
       })
       const candidateIds = candidatesToDelete.map((c) => c.id)
 
-      // 3) Vor dem Delete: Anzahl der mitgerissenen Records zaehlen (fuer Audit-Trail).
+      // 3) Vor dem Delete: Anzahl der mitgerissenen Records zaehlen (für Audit-Trail).
       const [documentsAffected, checksAffected, tokensViaCascade] =
         candidateIds.length > 0
           ? await Promise.all([
@@ -104,7 +104,7 @@ async function handleCleanup(req: NextRequest) {
       }
     })
 
-    // 5) Audit-Log-Entry — IMMER schreiben, auch bei 0 Loeschungen.
+    // 5) Audit-Log-Entry — IMMER schreiben, auch bei 0 Löschungen.
     //    Damit ist nachweisbar, dass der Cron-Job gelaufen ist.
     const totalTokens = result.tokensExpiredStandalone + result.tokensViaCandidateCascade
     await prisma.auditLog.create({
@@ -133,6 +133,6 @@ async function handleCleanup(req: NextRequest) {
   }
 }
 
-// Vercel Cron uses GET by default; POST wird fuer manuelles Triggern unterstuetzt.
+// Vercel Cron uses GET by default; POST wird für manuelles Triggern unterstützt.
 export const GET = handleCleanup
 export const POST = handleCleanup

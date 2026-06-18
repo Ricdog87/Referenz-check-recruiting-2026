@@ -22,7 +22,7 @@ export default async function AdminCustomersPage({
   const q = (searchParams.q ?? '').trim().toLowerCase()
 
   // Nur echte HR-Kunden — Reviewer/Admin-Accounts werden ausgeblendet.
-  // Reviewer-Konten sind candiq-intern und gehoeren nicht in die Kundenliste.
+  // Reviewer-Konten sind candiq-intern und gehören nicht in die Kundenliste.
   const baseWhere = { role: { notIn: ['REVIEWER', 'ADMIN'] } }
   const where = q
     ? {
@@ -214,7 +214,7 @@ export default async function AdminCustomersPage({
                       <Link
                         href={`/admin/customers/${u.id}`}
                         className="text-text-muted hover:text-text-primary"
-                        aria-label="Detail oeffnen"
+                        aria-label="Detail öffnen"
                       >
                         <ArrowRight className="w-4 h-4" />
                       </Link>

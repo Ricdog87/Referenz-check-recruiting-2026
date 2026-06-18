@@ -34,7 +34,7 @@ function RegisterForm() {
   const params = useSearchParams()
   const planId = params.get('plan') ?? 'PROFESSIONAL'
   const requestedType = (params.get('type') as AccountType | null) ?? 'HR_DEPARTMENT'
-  // PDL-Registrierung ist Closed Beta — kommt ueber dedizierten Sales-Flow
+  // PDL-Registrierung ist Closed Beta — kommt über dedizierten Sales-Flow
   // (siehe /waitlist-agency). Falls jemand mit ?type=RECRUITMENT_AGENCY
   // hier landet, fallen wir auf HR_DEPARTMENT zurueck.
   const initialType: AccountType = requestedType === 'RECRUITMENT_AGENCY' ? 'HR_DEPARTMENT' : requestedType
@@ -45,7 +45,7 @@ function RegisterForm() {
   const [form, setForm] = useState({ name: '', company: '', email: '', password: '', passwordConfirm: '' })
   const [showPw, setShowPw] = useState(false)
   // DSGVO: granulare Einwilligungen — AGB (Vertragsschluss) und Datenschutz
-  // (Informationspflicht) duerfen nicht gebuendelt werden (Planet49-Urteil).
+  // (Informationspflicht) dürfen nicht gebuendelt werden (Planet49-Urteil).
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [acceptPrivacy, setAcceptPrivacy] = useState(false)
   const [error, setError] = useState('')
@@ -322,7 +322,7 @@ function RegisterForm() {
               </div>
             </div>
 
-            {/* DSGVO Art. 7 + Planet49-Urteil: AGB und Datenschutz duerfen nicht
+            {/* DSGVO Art. 7 + Planet49-Urteil: AGB und Datenschutz dürfen nicht
                 in einer Checkbox gebuendelt werden. Zwei separate Pflicht-Felder. */}
             <div className="space-y-2.5">
               <label className="flex items-start gap-3 cursor-pointer p-4 rounded-xl bg-brand-50/40 border border-brand-100">

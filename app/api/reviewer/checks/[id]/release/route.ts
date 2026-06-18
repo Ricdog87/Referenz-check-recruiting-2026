@@ -17,15 +17,15 @@ export const maxDuration = 60
  * dann automatisch PDF-Report erzeugen (Vercel Blob) + HR-Auftraggeber mailen.
  *
  * Pflicht-Body: { aggConfirmed: true } — § 11 AGG verlangt dokumentierte
- * Bestaetigung, dass die Bewertung ohne diskriminierende Merkmale erfolgte.
+ * Bestätigung, dass die Bewertung ohne diskriminierende Merkmale erfolgte.
  */
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
   if (!isReviewer(session)) return NextResponse.json({ error: 'Reviewer-Rolle erforderlich.' }, { status: 403 })
 
-  // AGG-Pflichtfeld parsen. Defensive: leerer/ungueltiger Body wird als
-  // „nicht bestaetigt" gewertet — Release blockt, statt still durchzulassen.
+  // AGG-Pflichtfeld parsen. Defensive: leerer/ungültiger Body wird als
+  // „nicht bestätigt" gewertet — Release blockt, statt still durchzulassen.
   let body: { aggConfirmed?: boolean } = {}
   try {
     const text = await req.text()
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json(
       {
         error:
-          'AGG-Bestaetigung erforderlich: Die Bewertung muss explizit als diskriminierungsfrei bestaetigt werden (§ 1 AGG).',
+          'AGG-Bestätigung erforderlich: Die Bewertung muss explizit als diskriminierungsfrei bestätigt werden (§ 1 AGG).',
       },
       { status: 400 },
     )

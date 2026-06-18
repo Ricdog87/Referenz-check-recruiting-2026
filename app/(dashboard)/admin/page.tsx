@@ -20,7 +20,7 @@ const CUSTOMER_FILTER = { role: { notIn: ['REVIEWER', 'ADMIN'] } }
 export default async function AdminCockpitPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect('/login')
-  // Hartes Rollen-Gate (zusaetzlich zur Middleware): nur ADMIN.
+  // Hartes Rollen-Gate (zusätzlich zur Middleware): nur ADMIN.
   if (!isAdmin(session)) redirect('/dashboard')
 
   const [

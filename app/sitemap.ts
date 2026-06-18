@@ -21,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // SEO-Pillar + Keyword-Cluster
     { url: `${BASE_URL}/referenzpruefung`, lastModified: now, changeFrequency: 'weekly', priority: 0.95 },
     { url: `${BASE_URL}/reference-check-dsgvo`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/zeugnis-pruefen-lassen`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/zeugnis-prüfen-lassen`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/lebenslauf-verifizieren`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/pre-employment-screening`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
     { url: `${BASE_URL}/background-check-dsgvo`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
@@ -43,8 +43,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/branchen/healthcare-recruiting`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
 
     // Zielgruppen-Seiten
-    { url: `${BASE_URL}/fuer/hr-abteilungen`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
-    { url: `${BASE_URL}/fuer/mittelstand`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${BASE_URL}/für/hr-abteilungen`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${BASE_URL}/für/mittelstand`, lastModified: now, changeFrequency: 'monthly', priority: 0.85 },
     { url: `${BASE_URL}/waitlist-agency`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
 
     // Ressourcen
@@ -59,7 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
 
     // Termin-Buchungs-Page (candiq-Branded HubSpot-Wrapper) — sollte
-    // fuer Brand-Suche indexierbar sein.
+    // für Brand-Suche indexierbar sein.
     { url: `${BASE_URL}/termin`, lastModified: now, changeFrequency: 'monthly', priority: 0.75 },
 
     // Rechtliches

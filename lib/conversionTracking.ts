@@ -1,10 +1,10 @@
 /**
- * Conversion-Tracking — GA4-Custom-Events fuer alle wichtigen Funnel-
+ * Conversion-Tracking — GA4-Custom-Events für alle wichtigen Funnel-
  * Aktionen. Eine einzelne Datei statt verstreute gtag-Calls, damit
- * Event-Namen und Parameter zentral aenderbar sind.
+ * Event-Namen und Parameter zentral änderbar sind.
  *
  * Events landen unter event_name=conversion_step und tragen step+context
- * als Parameter. GA4-Custom-Dimensions fuer step und context muessen im
+ * als Parameter. GA4-Custom-Dimensions für step und context muessen im
  * GA4-Admin als Event-Parameter registriert sein — sonst tauchen sie
  * in den Reports nicht auf.
  *
@@ -14,7 +14,7 @@
  *  - fabrication_demo     — Live-CV-Check ausprobiert (clean | fake)
  *  - roi_calculator       — ROI-Slider bewegt (debounced)
  *  - pilot_form_submit    — Pilot-Bewerbung abgeschickt
- *  - pilot_form_success   — Server-Bestaetigung erhalten
+ *  - pilot_form_success   — Server-Bestätigung erhalten
  *  - cta_click            — Click auf einen CTA mit Label (cta_label)
  *
  * Bestehende Hero-A/B-Events (hero_engagement) bleiben separat in
@@ -49,8 +49,8 @@ export function trackConversion(
 }
 
 /**
- * Debounce-Wrapper fuer Slider-Events (ROI-Rechner). Vermeidet 50
- * Events pro Drag — nur das finale Ergebnis zaehlt fuer den Funnel.
+ * Debounce-Wrapper für Slider-Events (ROI-Rechner). Vermeidet 50
+ * Events pro Drag — nur das finale Ergebnis zaehlt für den Funnel.
  */
 let sliderDebounceTimer: ReturnType<typeof setTimeout> | null = null
 export function trackConversionDebounced(

@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
  * PATCH /api/reviewer/checks/:id/assign
  *
  * Weist einen Check einem konkreten Reviewer zu (oder hebt die Zuweisung auf).
- * Erlaubt fuer alle REVIEWER/ADMIN — bewusst kein Admin-only, damit
+ * Erlaubt für alle REVIEWER/ADMIN — bewusst kein Admin-only, damit
  * Reviewer Aufgaben untereinander tauschen koennen.
  *
  * Body: { reviewerId: string | null }
@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Ungueltige Anfrage.' }, { status: 400 })
+    return NextResponse.json({ error: 'Ungültige Anfrage.' }, { status: 400 })
   }
 
   // null oder leerer String → Zuweisung aufheben

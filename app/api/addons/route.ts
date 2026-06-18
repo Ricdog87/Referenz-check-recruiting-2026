@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
   }
 
   // SKU + optional checkId aus JSON oder form-data lesen.
-  // checkId ist nur fuer pro-Check-Add-ons relevant (z.B. EXPRESS_24H).
+  // checkId ist nur für pro-Check-Add-ons relevant (z.B. EXPRESS_24H).
   const contentType = req.headers.get('content-type') ?? ''
   let sku = ''
   let checkId = ''
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Wenn checkId gesetzt: Eigentum verifizieren — Verhindert, dass jemand
-  // einen fremden Check Express-markiert ueber manipulierte Requests.
+  // einen fremden Check Express-markiert über manipulierte Requests.
   let verifiedCheckId: string | null = null
   if (checkId) {
     const owned = await prisma.referenceCheck.findFirst({
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
     if (owned.isExpress && addon.sku === 'EXPRESS_24H') {
       return NextResponse.json(
-        { error: 'Express-24h ist fuer diese Pruefung bereits aktiv.' },
+        { error: 'Express-24h ist für diese Prüfung bereits aktiv.' },
         { status: 409 },
       )
     }

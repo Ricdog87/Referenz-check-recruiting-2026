@@ -1,8 +1,8 @@
 /**
  * scripts/seed-prospect.ts
  *
- * Legt einen persoenlichen Test-/Comp-Account fuer einen Sales-Prospect an.
- * Idempotent: kann mehrfach ausgefuehrt werden, ohne Duplikate zu erzeugen.
+ * Legt einen persönlichen Test-/Comp-Account für einen Sales-Prospect an.
+ * Idempotent: kann mehrfach ausgeführt werden, ohne Duplikate zu erzeugen.
  * Ueberschreibt KEIN existierendes Passwort — falls der User sich bereits
  * eingeloggt hat, bleibt sein Passwort unangetastet; ein neuer Reset-Link
  * wird trotzdem ausgegeben.
@@ -23,7 +23,7 @@
  *     DATABASE_URL=$PROD_DATABASE_URL NEXTAUTH_URL=https://candiq.de \
  *     npx tsx scripts/seed-prospect.ts
  *
- *   # Ad-hoc-Prospect via Env (fuer Onetime-Spike):
+ *   # Ad-hoc-Prospect via Env (für Onetime-Spike):
  *   PROSPECT_EMAIL=foo@bar.com PROSPECT_NAME="Foo Bar" \
  *     PROSPECT_COMPANY=Bar PROSPECT_WORKSPACE="Bar – Testzugang" \
  *     DATABASE_URL=… NEXTAUTH_URL=… \
@@ -74,14 +74,14 @@ if (!REGISTRY_PROFILE && !process.env.PROSPECT_EMAIL) {
   process.exit(1)
 }
 
-// Env-Vars haben Vorrang vor Registry (fuer Ad-hoc-Overrides).
+// Env-Vars haben Vorrang vor Registry (für Ad-hoc-Overrides).
 const PROSPECT_EMAIL = process.env.PROSPECT_EMAIL ?? REGISTRY_PROFILE!.email
 const PROSPECT_NAME = process.env.PROSPECT_NAME ?? REGISTRY_PROFILE!.name
 const PROSPECT_COMPANY = process.env.PROSPECT_COMPANY ?? REGISTRY_PROFILE!.company
 const PROSPECT_WORKSPACE_NAME =
   process.env.PROSPECT_WORKSPACE ?? REGISTRY_PROFILE!.workspaceName
 
-// Reset-Token: 14 Tage gueltig, sodass der Prospect sich in Ruhe einloggen kann.
+// Reset-Token: 14 Tage gültig, sodass der Prospect sich in Ruhe einloggen kann.
 const RESET_TOKEN_TTL_DAYS = 14
 
 // ── Demo-Daten (fiktiv, aus Pitch-Deck konsistent) ──────────────────────
@@ -140,7 +140,7 @@ const PROSPECT_CANDIDATES: CandidateSeed[] = [
         result: 'VERIFIED',
         rating: 5,
         callNotes:
-          'Frau Schmidt bestaetigt alle Stationen und Taetigkeiten wie im CV angegeben. Anna war fuehrend bei der Microservices-Migration und hat ein 4-koepfiges Team gementort. Empfehlung ohne Vorbehalt.',
+          'Frau Schmidt bestätigt alle Stationen und Taetigkeiten wie im CV angegeben. Anna war führend bei der Microservices-Migration und hat ein 4-koepfiges Team gementort. Empfehlung ohne Vorbehalt.',
         calledAt: new Date(Date.now() - 5 * 86400e3),
       },
       {
@@ -154,7 +154,7 @@ const PROSPECT_CANDIDATES: CandidateSeed[] = [
         result: 'VERIFIED',
         rating: 4,
         callNotes:
-          'Position und Zeitraum bestaetigt. Solide Engineering-Leistung, hat das Payment-Modul mitentwickelt. Verlaesslich, gut im Team.',
+          'Position und Zeitraum bestätigt. Solide Engineering-Leistung, hat das Payment-Modul mitentwickelt. Verlaesslich, gut im Team.',
         calledAt: new Date(Date.now() - 6 * 86400e3),
       },
       {
@@ -232,7 +232,7 @@ const PROSPECT_CANDIDATES: CandidateSeed[] = [
         result: 'VERIFIED',
         rating: 5,
         callNotes:
-          'Frau Becker bestaetigt Position und Top-Performance. Lina hat 130% der Quote uebertroffen und 3 Junior-Reps gementort.',
+          'Frau Becker bestätigt Position und Top-Performance. Lina hat 130% der Quote uebertroffen und 3 Junior-Reps gementort.',
         calledAt: new Date(Date.now() - 2 * 86400e3),
       },
       {
@@ -459,7 +459,7 @@ async function main() {
   console.log('')
 
   if (isProd) {
-    // 2-Sekunden-Bedenkzeit fuer Production-Runs.
+    // 2-Sekunden-Bedenkzeit für Production-Runs.
     console.log('  ⚠  Production-Modus erkannt. Schreibe in 2s…')
     await new Promise((r) => setTimeout(r, 2000))
   }
@@ -506,7 +506,7 @@ async function main() {
     console.log(`                       Passwort des Users unangetastet)`)
   }
   console.log('')
-  console.log(`  Password-Reset-Link (${RESET_TOKEN_TTL_DAYS} Tage gueltig, EMPFOHLEN):`)
+  console.log(`  Password-Reset-Link (${RESET_TOKEN_TTL_DAYS} Tage gültig, EMPFOHLEN):`)
   console.log(`  ${resetUrl}`)
   console.log('')
   console.log('  Demo-Daten im Konto:')

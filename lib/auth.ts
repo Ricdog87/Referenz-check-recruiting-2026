@@ -121,7 +121,7 @@ export const authOptions: NextAuthOptions = {
         // sonst kann `session.user.name` undefined sein (Token aus Seed-/
         // Demo-/Legacy-Flow ohne name) und Server-Components, die
         // `session.user.name.split(...)` o.ä. aufrufen, crashen die
-        // komplette Seite ueber die error.tsx-Boundary.
+        // komplette Seite über die error.tsx-Boundary.
         session.user.name = (token.name as string) ?? session.user.name ?? ''
         session.user.email = (token.email as string) ?? session.user.email ?? ''
       }

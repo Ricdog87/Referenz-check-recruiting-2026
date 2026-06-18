@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
  * Legacy-Alias auf /api/documents/:id. Ehemals 302-Redirect zur
  * Vercel-Blob-URL → URL leakte an Client. Jetzt: delegiert an die
  * neue Streaming-Route mit Consent-Gate (lib/cv-gate). Behaelt das
- * alte URL-Schema fuer bestehende UI-Links bei.
+ * alte URL-Schema für bestehende UI-Links bei.
  *
  * Neue Codes sollen direkt /api/documents/:id verwenden.
  */
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
 }
 
 // Optional: explizit „Download erzwingen"-Variante. Bestaendiger Link
-// fuer „Download"-Buttons, der attachment-Header setzt.
+// für „Download"-Buttons, der attachment-Header setzt.
 export async function POST() {
   return NextResponse.json({ error: 'Methode nicht erlaubt.' }, { status: 405 })
 }

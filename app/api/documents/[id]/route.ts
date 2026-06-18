@@ -13,8 +13,8 @@ export const dynamic = 'force-dynamic'
  *
  * Server-seitiger CV-Consent-Gate + Storage-Proxy. Streamt den Inhalt
  * direkt durch — die Vercel-Blob-URL wird NICHT an den Client geleakt
- * (kein 302-Redirect mehr). Damit ist die Datei nur ueber diese Route
- * mit gueltiger Session + Gate-Check erreichbar.
+ * (kein 302-Redirect mehr). Damit ist die Datei nur über diese Route
+ * mit gültiger Session + Gate-Check erreichbar.
  *
  * Reviewer brauchen cvStatus=RELEASED. HR-Owner sehen eigene Uploads
  * jederzeit. Public/anonym → 401.
@@ -74,7 +74,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   // STREAMING-PROXY statt Redirect:
   // Wir holen die Datei serverseitig von Vercel Blob und streamen sie zum
   // Client zurueck. Die Blob-URL wird NIE im Browser/Response gezeigt
-  // (keine Location-Header), damit niemand die URL abgreifen + spaeter
+  // (keine Location-Header), damit niemand die URL abgreifen + später
   // ohne Auth abrufen kann.
   const upstream = await fetch(doc.path)
   if (!upstream.ok || !upstream.body) {

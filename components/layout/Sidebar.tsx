@@ -20,12 +20,12 @@ const NAV_CLIENT_BASE = [
   { href: '/addons', label: 'Add-ons', icon: ShoppingBag },
 ]
 
-// Nur fuer RECRUITMENT_AGENCY: Mandanten-Liste (Roadmap, aber Page existiert).
+// Nur für RECRUITMENT_AGENCY: Mandanten-Liste (Roadmap, aber Page existiert).
 const NAV_AGENCY_ONLY = [
   { href: '/clients', label: 'Mandanten', icon: Briefcase },
 ]
 
-// Kunden-Konto-Sektion. Wird NICHT fuer ADMIN/REVIEWER gerendert — die haben
+// Kunden-Konto-Sektion. Wird NICHT für ADMIN/REVIEWER gerendert — die haben
 // keinen Kundenplan und keine Add-ons.
 const NAV_CLIENT_ACCOUNT = [
   { href: '/integrations', label: 'Integrationen', icon: Plug },
@@ -34,7 +34,7 @@ const NAV_CLIENT_ACCOUNT = [
   { href: '/settings/billing', label: 'Abrechnung', icon: CreditCard },
 ]
 
-// candiq-interne Navigation. ADMIN bekommt zusaetzlich das Cockpit (KPIs/MRR
+// candiq-interne Navigation. ADMIN bekommt zusätzlich das Cockpit (KPIs/MRR
 // aus PR #128) und die Kundenverwaltung. REVIEWER nur Review-Sektion.
 const NAV_REVIEW = [
   { href: '/reviewer', label: 'Reviewer-Dashboard', icon: ShieldHalf },
@@ -109,7 +109,7 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* Nav — getrennte Shells fuer Kunde vs. candiq-intern */}
+        {/* Nav — getrennte Shells für Kunde vs. candiq-intern */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {isInternal ? (
             // ── candiq-interne Shell (ADMIN/REVIEWER) ─────────────────
@@ -151,7 +151,7 @@ export function Sidebar() {
                 ))}
               </NavSection>
 
-              {/* Upgrade-Card nur fuer Kunden mit Starter/AgencyBasic */}
+              {/* Upgrade-Card nur für Kunden mit Starter/AgencyBasic */}
               {session?.user?.plan && (session.user.plan === 'STARTER' || session.user.plan === 'AGENCY_BASIC') && (
                 <div className="mt-6 px-3">
                   <div

@@ -208,8 +208,8 @@ export default async function CandidateDetailPage({
               bgClass = 'bg-emerald-50/40 border-emerald-200'
               title = 'Einwilligung erteilt'
               // refereesJson ist normalerweise valides JSON aus dem Consent-
-              // Accept-Flow. Defensiv parsen: korrupte/legacy Rows duerfen die
-              // Seite nicht ueber die error.tsx-Boundary crashen.
+              // Accept-Flow. Defensiv parsen: korrupte/legacy Rows dürfen die
+              // Seite nicht über die error.tsx-Boundary crashen.
               let refereeCount = 0
               try {
                 const parsed = JSON.parse(latestConsent?.refereesJson ?? '[]')

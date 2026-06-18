@@ -40,7 +40,7 @@ const PAGES: Page[] = [
  * andere als die aktuell besuchte Seite, sortiert nach Marketing-
  * Relevanz. SEO-Effekt: interne Link-Dichte erhoeht das Ranking-Signal
  * dieser Hub-Seiten, plus klassischer Conversion-Effekt (wer den ROI
- * berechnet hat, ist warm fuer Pilot- oder Preis-Klick).
+ * berechnet hat, ist warm für Pilot- oder Preis-Klick).
  */
 export function RelatedPagesStrip({ currentHref }: { currentHref: string }) {
   const others = PAGES.filter((p) => p.href !== currentHref).slice(0, 3)

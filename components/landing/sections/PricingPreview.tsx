@@ -196,7 +196,7 @@ export function PricingPreview() {
               Pay-as-you-go Add-ons
             </h3>
             <p className="text-xs text-text-secondary mt-1">
-              Aufpreise pro Pruefung, kein Abo nötig — auch ohne Plan buchbar.
+              Aufpreise pro Prüfung, kein Abo nötig — auch ohne Plan buchbar.
             </p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

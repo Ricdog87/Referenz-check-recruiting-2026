@@ -170,7 +170,7 @@ export async function generateAndDeliverCheckReport(
         // DSGVO: KEIN public Blob-Link in der Mail (der Report enthaelt die
         // Bewertung des Bewerbers). Stattdessen Link auf die auth- +
         // ownership-geschuetzte Report-Seite. Nur eingeloggte HR-User des
-        // eigenen Workspace sehen den Report. Das PDF-Blob bleibt fuer
+        // eigenen Workspace sehen den Report. Das PDF-Blob bleibt für
         // interne Records, ist aber nicht mehr direkt verlinkt.
         checkUrl: `${BASE_URL}/report/check/${check.id}`,
       })

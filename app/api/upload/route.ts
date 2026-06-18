@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       })
       doc.cvStatus = CV_STATUS.RELEASED
     } else {
-      // 2) Keine ACCEPTED-Consent → pruefen, ob schon ein PENDING-Invite
+      // 2) Keine ACCEPTED-Consent → prüfen, ob schon ein PENDING-Invite
       // existiert. Wenn nein, Magic-Link automatisch ausloesen (best-effort,
       // Mail-Fehler crashen den Upload nicht).
       const pending = await prisma.consentToken.findFirst({
@@ -137,8 +137,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Bewusst KEIN `path` (Vercel-Blob-URL) im Response — der Client
-  // erfaehrt die Storage-URL nie direkt. Downloads laufen ausschliesslich
-  // ueber /api/documents/:id mit Consent-Gate.
+  // erfaehrt die Storage-URL nie direkt. Downloads laufen ausschließlich
+  // über /api/documents/:id mit Consent-Gate.
   return NextResponse.json(
     {
       id: doc.id,

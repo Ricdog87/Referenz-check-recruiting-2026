@@ -42,7 +42,7 @@ const ENDPOINTS = [
   {
     method: 'POST',
     path: '/api/candidates/:id/invite',
-    desc: 'Magic-Link-Einwilligungs-Mail an den Bewerber senden (Token 14 Tage gueltig).',
+    desc: 'Magic-Link-Einwilligungs-Mail an den Bewerber senden (Token 14 Tage gültig).',
   },
   {
     method: 'POST',
@@ -52,7 +52,7 @@ const ENDPOINTS = [
   {
     method: 'PATCH',
     path: '/api/checks/:id',
-    desc: 'Check-Status aendern. Body: { status: "IN_REVIEW" } triggert die Reviewer-Pipeline.',
+    desc: 'Check-Status ändern. Body: { status: "IN_REVIEW" } triggert die Reviewer-Pipeline.',
   },
   {
     method: 'GET',
@@ -100,7 +100,7 @@ export default async function ApiDocsPage() {
             <div className="text-sm text-text-secondary leading-relaxed">
               <strong className="text-text-primary">Heute verfuegbar:</strong>{' '}
               Vollstaendige JSON-API mit denselben Funktionen wie das Dashboard.
-              Authentifizierung ueber NextAuth-Session-Cookie. Ideal fuer Browser-
+              Authentifizierung über NextAuth-Session-Cookie. Ideal für Browser-
               und Server-zu-Server-Aufrufe innerhalb derselben Origin.
             </div>
           </div>
@@ -114,8 +114,8 @@ export default async function ApiDocsPage() {
             </div>
             <div className="text-sm text-text-secondary leading-relaxed">
               <strong className="text-text-primary">Roadmap Q4 2026 — API-Keys &amp; OAuth:</strong>{' '}
-              Bearer-Token fuer headless Server-Integrationen ohne Session-Cookie,
-              fein-granular pro Scope. Bis dahin koennt ihr fuer Server-zu-Server
+              Bearer-Token für headless Server-Integrationen ohne Session-Cookie,
+              fein-granular pro Scope. Bis dahin koennt ihr für Server-zu-Server
               einen Service-Account-Login per Cookie-Header simulieren.
               Bei Fragen:{' '}
               <a href="mailto:hello@candiq.de" className="text-brand-700 font-semibold">
@@ -133,7 +133,7 @@ export default async function ApiDocsPage() {
           </h2>
           <div className="card-md font-mono text-xs leading-relaxed text-text-primary">
             <div className="text-text-muted mb-2"># 1. Session-Cookie aus Browser-DevTools kopieren</div>
-            <div className="text-text-muted mb-2"># 2. Cookie-Header bei curl uebergeben</div>
+            <div className="text-text-muted mb-2"># 2. Cookie-Header bei curl übergeben</div>
             <pre className="overflow-x-auto bg-bg-secondary rounded-lg p-3 text-[11px]">
 {`curl https://candiq.de/api/candidates \\
   -H "Cookie: next-auth.session-token=YOUR_SESSION_TOKEN"`}
@@ -214,10 +214,10 @@ curl -X POST https://candiq.de/api/candidates/cm123.../invite \\
           </div>
         </section>
 
-        {/* Beispiel: Pruefung an Reviewer uebergeben */}
+        {/* Beispiel: Prüfung an Reviewer übergeben */}
         <section>
           <h2 className="text-sm font-bold text-text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
-            <Code2 className="w-4 h-4 text-brand-600" /> Beispiel: Pruefung an Reviewer uebergeben
+            <Code2 className="w-4 h-4 text-brand-600" /> Beispiel: Prüfung an Reviewer übergeben
           </h2>
           <div className="card-md font-mono text-xs leading-relaxed text-text-primary">
             <pre className="overflow-x-auto bg-bg-secondary rounded-lg p-3 text-[11px]">
@@ -264,7 +264,7 @@ curl https://candiq.de/api/documents/DOC_ID \\
             <p>
               <strong className="text-text-primary">CSRF:</strong> Mutationen
               (POST/PATCH/DELETE) brauchen denselben Origin. Server-zu-Server-Calls
-              via Cookie sind ueber TLS+SameSite gesichert.
+              via Cookie sind über TLS+SameSite gesichert.
             </p>
             <p>
               <strong className="text-text-primary">Audit:</strong> Jeder API-Call
@@ -276,11 +276,11 @@ curl https://candiq.de/api/documents/DOC_ID \\
             </p>
             <p>
               <strong className="text-text-primary">Versionierung:</strong> Aktuell
-              v1 (implizit). Breaking-Changes werden ueber{' '}
+              v1 (implizit). Breaking-Changes werden über{' '}
               <a href="mailto:hello@candiq.de" className="text-brand-700 font-semibold">
                 hello@candiq.de
               </a>{' '}
-              mit 30 Tagen Vorlauf angekuendigt.
+              mit 30 Tagen Vorlauf angekündigt.
             </p>
           </div>
         </section>
@@ -288,9 +288,9 @@ curl https://candiq.de/api/documents/DOC_ID \\
         {/* OpenAPI-Hinweis */}
         <div className="card-md flex items-center justify-between gap-4 bg-gradient-to-br from-brand-50/60 to-white border-brand-100">
           <div>
-            <div className="text-sm font-semibold text-text-primary">OpenAPI-Spec gewuenscht?</div>
+            <div className="text-sm font-semibold text-text-primary">OpenAPI-Spec gewünscht?</div>
             <div className="text-xs text-text-secondary">
-              Wir generieren ein OpenAPI 3.1-Dokument fuer dich (inkl. Postman-Import).
+              Wir generieren ein OpenAPI 3.1-Dokument für dich (inkl. Postman-Import).
             </div>
           </div>
           <a

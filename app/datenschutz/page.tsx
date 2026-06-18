@@ -330,7 +330,7 @@ export default function DatenschutzPage() {
       <h2>14. Lead-Magnet-Anfragen &amp; Bewerber-Waitlist</h2>
       <p>
         Auf candiq.de bieten wir (a) kostenlose Praxis-Guides (Lead-Magnets) zum
-        Download sowie (b) eine Warteliste fuer Bewerber:innen, die candiq
+        Download sowie (b) eine Warteliste für Bewerber:innen, die candiq
         kuenftig selbst zur proaktiven Referenz-Verifikation nutzen wollen
         (Self-Service, Closed Beta Q4 2026). Vor der Anzeige bzw. Anmeldung werden
         Vorname und E-Mail-Adresse erhoben, optional Firmenname (Lead-Magnet) bzw.

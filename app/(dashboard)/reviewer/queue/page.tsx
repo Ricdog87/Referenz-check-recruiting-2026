@@ -37,7 +37,7 @@ export default async function ReviewerQueuePage({
       ? { assignedReviewerId: null }
       : {}
 
-  // Counters fuer die Tab-Labels — eine Query mit groupBy.
+  // Counters für die Tab-Labels — eine Query mit groupBy.
   const allOpenChecks = await prisma.referenceCheck.findMany({
     where: { status: 'IN_REVIEW' },
     select: { id: true, isExpress: true, assignedReviewerId: true },

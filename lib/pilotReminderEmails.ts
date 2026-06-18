@@ -179,7 +179,7 @@ die monatlichen Strategie-Calls mit unserem Gründer-Team echte
 Zeit-Investition sind.
 
 Wenn Sie sich noch reinmelden wollen, antworten Sie einfach mit
-einem Termin-Vorschlag (15 Min). Sonst — alles Gute fuer Ihr
+einem Termin-Vorschlag (15 Min). Sonst — alles Gute für Ihr
 Hiring 2026.
 
 Beste Grüße,
