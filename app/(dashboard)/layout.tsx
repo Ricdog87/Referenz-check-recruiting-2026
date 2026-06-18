@@ -6,6 +6,7 @@ import { authOptions } from '@/lib/auth'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions)
+  const role = session?.user.role ?? 'CLIENT'
 
   return (
     <MobileSidebarProvider>
@@ -17,6 +18,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             company={session?.user.company ?? ''}
             accountType={session?.user.accountType ?? 'HR_DEPARTMENT'}
             plan={session?.user.plan ?? 'STARTER'}
+            role={role}
           />
           <div className="px-4 sm:px-6 lg:px-10 pb-12">
             {children}

@@ -188,6 +188,33 @@ export function PricingPreview() {
           </motion.div>
         )}
 
+        {/* Add-on-Preise inline — damit Budget-Planung ohne Klick funktioniert.
+            Vollständige Doku unter /preise#addons */}
+        <div className="mt-10 max-w-3xl mx-auto">
+          <div className="text-center mb-4">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-text-muted">
+              Pay-as-you-go Add-ons
+            </h3>
+            <p className="text-xs text-text-secondary mt-1">
+              Aufpreise pro Pruefung, kein Abo nötig — auch ohne Plan buchbar.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <AddonPill name="Einzelcheck" price="49 €" sub="ohne Bundle" />
+            <AddonPill name="Express 24h" price="+29 €" sub="garantiert &lt; 24 h" highlight />
+            <AddonPill name="Deep-Check" price="249 €" sub="60-Min-Interview" />
+            <AddonPill name="Zeugnis prüfen" price="+19 €" sub="ergänzend zum Check" />
+          </div>
+          <div className="text-center mt-3">
+            <Link
+              href="/preise#addons"
+              className="text-xs text-text-muted hover:text-brand-700 underline"
+            >
+              Alle 6 Add-ons im Detail
+            </Link>
+          </div>
+        </div>
+
         <div className="text-center mt-10">
           <Link href="/preise" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 hover:text-brand-800 group">
             Alle Pakete & Enterprise-Optionen vergleichen
@@ -196,5 +223,36 @@ export function PricingPreview() {
         </div>
       </div>
     </section>
+  )
+}
+
+function AddonPill({
+  name,
+  price,
+  sub,
+  highlight,
+}: {
+  name: string
+  price: string
+  sub: string
+  highlight?: boolean
+}) {
+  return (
+    <div
+      className={`rounded-xl border p-3 text-center transition-colors ${
+        highlight
+          ? 'bg-rose-50 border-rose-200'
+          : 'bg-white border-border hover:border-brand-200'
+      }`}
+    >
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
+        {name}
+      </div>
+      <div
+        className={`text-base font-bold mt-0.5 ${highlight ? 'text-rose-700' : 'text-text-primary'}`}
+        dangerouslySetInnerHTML={{ __html: price }}
+      />
+      <div className="text-[10px] text-text-muted mt-0.5" dangerouslySetInnerHTML={{ __html: sub }} />
+    </div>
   )
 }

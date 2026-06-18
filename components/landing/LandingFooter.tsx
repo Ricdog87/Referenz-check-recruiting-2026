@@ -93,7 +93,7 @@ export function LandingFooter() {
               { label: 'Datenschutz', href: '/datenschutz' },
               { label: 'AGB', href: '/agb' },
               { label: 'Impressum', href: '/impressum' },
-              { label: 'AVV (Auftragsverarbeitung)', href: '/datenschutz#avv' },
+              { label: 'AVV (Auftragsverarbeitung)', href: '/avv' },
               { label: 'KI-Lösungen: rsg-ai.de', href: 'https://rsg-ai.de', external: true },
               { label: 'Personalvermittlung: recruiting-sg.de', href: 'https://recruiting-sg.de', external: true },
             ]}
