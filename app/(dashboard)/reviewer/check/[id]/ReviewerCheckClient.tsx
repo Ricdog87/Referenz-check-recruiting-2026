@@ -27,6 +27,22 @@ const RESULTS = [
   { value: 'DECLINED', label: 'Auskunft verweigert' },
 ]
 
+// Robuste Fehler-Extraktion: ein leerer/kein-JSON-Body (z. B. 500/502/504
+// ohne Body, etwa bei DB-Pool-Erschoepfung) darf NICHT in einem kryptischen
+// "Unexpected end of JSON input" enden. Wir parsen defensiv und fallen sonst
+// auf eine verstaendliche Meldung inkl. HTTP-Status zurueck.
+async function errorFromResponse(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = await res.json()
+    if (data && typeof data.error === 'string' && data.error) return data.error
+  } catch {
+    /* leerer oder nicht-JSON Body */
+  }
+  return res.status >= 500
+    ? `${fallback} (Serverfehler ${res.status} – bitte in ~1 Min erneut versuchen)`
+    : `${fallback} (HTTP ${res.status})`
+}
+
 export function ReviewerCheckClient({ check }: { check: CheckData }) {
   const router = useRouter()
   const [callNotes, setCallNotes] = useState(check.callNotes ?? '')
@@ -51,7 +67,7 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
           result: result || null,
         }),
       })
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Speichern fehlgeschlagen.')
+      if (!res.ok) throw new Error(await errorFromResponse(res, 'Speichern fehlgeschlagen.'))
       setMsg({ type: 'ok', text: 'Gespeichert.' })
       router.refresh()
     } catch (e: any) {
@@ -77,10 +93,10 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
           result: result || null,
         }),
       })
-      if (!saveRes.ok) throw new Error((await saveRes.json()).error ?? 'Speichern fehlgeschlagen.')
+      if (!saveRes.ok) throw new Error(await errorFromResponse(saveRes, 'Speichern fehlgeschlagen.'))
 
       const res = await fetch(`/api/reviewer/checks/${check.id}/release`, { method: 'POST' })
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Freigabe fehlgeschlagen.')
+      if (!res.ok) throw new Error(await errorFromResponse(res, 'Freigabe fehlgeschlagen.'))
       setMsg({ type: 'ok', text: 'Freigegeben. HR-Auftraggeber wurde benachrichtigt.' })
       router.push('/reviewer/queue')
       router.refresh()

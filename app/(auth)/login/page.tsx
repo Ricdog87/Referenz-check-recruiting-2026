@@ -54,7 +54,8 @@ function LoginForm() {
       if (!explicitCallbackUrl) {
         const session = await getSession()
         const role = session?.user?.role
-        if (role === 'REVIEWER' || role === 'ADMIN') target = '/reviewer'
+        if (role === 'ADMIN') target = '/admin'
+        else if (role === 'REVIEWER') target = '/reviewer'
       }
       router.push(target)
       router.refresh()
