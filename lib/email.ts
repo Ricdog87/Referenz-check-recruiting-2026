@@ -125,36 +125,44 @@ function shell(content: string): string {
   return `<!doctype html><html><head><meta charset="utf-8"><style>${BASE_STYLES}</style></head><body><div class="wrap"><div class="logo">candiq</div><div class="card">${content}<div class="meta">Diese E-Mail wurde automatisch versendet. Antworten Sie an <a href="mailto:${REPLY_TO}">${REPLY_TO}</a>.</div></div></div></body></html>`
 }
 
+// Professionelle Anrede mit vollem Namen — neutral ohne Geschlecht-Annahme.
+// „Sehr geehrte/r {Voller Name}," ist die deutsche Business-Etikette wenn
+// das Geschlecht nicht zuverlaessig bekannt ist. Fallback: nur „Sehr geehrte
+// Damen und Herren," falls Name leer.
+function salutation(fullName: string | null | undefined): string {
+  const name = (fullName ?? '').trim()
+  if (!name) return 'Sehr geehrte Damen und Herren'
+  return `Sehr geehrte/r ${name}`
+}
+
 export function welcomeEmail(opts: { name: string; email: string; loginUrl: string }): { subject: string; html: string; text: string } {
-  const firstName = opts.name.split(' ')[0] ?? opts.name
   const html = shell(`
-    <h1>Willkommen bei candiq, ${escapeHtml(firstName)} 👋</h1>
-    <p>Ihr candiq-Account ist bereit. Sie können jetzt Kandidaten anlegen, Referenzprüfungen starten und das gesamte DSGVO-konforme Recruiting-Workflow nutzen.</p>
+    <h1>Willkommen bei candiq</h1>
+    <p>${salutation(opts.name)},</p>
+    <p>Ihr candiq-Account ist bereit. Sie können jetzt Kandidaten anlegen, Referenzprüfungen starten und den gesamten DSGVO-konformen Recruiting-Workflow nutzen.</p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.loginUrl}">Zum Dashboard</a></p>
     <p><strong>Erste Schritte:</strong></p>
     <p>1. Ersten Kandidaten anlegen<br>2. Referenzprüfung starten<br>3. PDF-Report exportieren</p>
     <p>Fragen? Antworten Sie einfach auf diese E-Mail — wir helfen gern.</p>
   `)
-  const text = `Willkommen bei candiq, ${firstName}!\n\nIhr candiq-Account ist bereit: ${opts.loginUrl}\n\nFragen? Antworten Sie einfach auf diese E-Mail.`
+  const text = `Willkommen bei candiq\n\n${salutation(opts.name)},\n\nIhr candiq-Account ist bereit: ${opts.loginUrl}\n\nFragen? Antworten Sie einfach auf diese E-Mail.`
   return { subject: 'Willkommen bei candiq — Ihr Account ist bereit', html, text }
 }
 
 export function passwordResetEmail(opts: { name: string; resetUrl: string; expiresInMinutes: number }): { subject: string; html: string; text: string } {
-  const firstName = opts.name.split(' ')[0] ?? opts.name
   const html = shell(`
     <h1>Passwort zurücksetzen</h1>
-    <p>Hallo ${escapeHtml(firstName)},</p>
+    <p>${salutation(opts.name)},</p>
     <p>wir haben eine Anfrage erhalten, das Passwort für Ihr candiq-Konto zurückzusetzen. Klicken Sie auf den Button, um ein neues Passwort zu wählen:</p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.resetUrl}">Neues Passwort festlegen</a></p>
     <p>Der Link ist <strong>${opts.expiresInMinutes} Minuten</strong> gültig. Wenn Sie keinen Reset angefordert haben, können Sie diese E-Mail einfach ignorieren — Ihr Passwort bleibt unverändert.</p>
     <p style="font-size: 12px; color: #94a3b8;">Sicherheitshinweis: Geben Sie diesen Link niemals an Dritte weiter.</p>
   `)
-  const text = `Passwort zurücksetzen\n\nHallo ${firstName},\n\nLink (${opts.expiresInMinutes} Min. gültig): ${opts.resetUrl}\n\nWenn Sie keinen Reset angefordert haben, ignorieren Sie diese E-Mail.`
+  const text = `Passwort zurücksetzen\n\n${salutation(opts.name)},\n\nLink (${opts.expiresInMinutes} Min. gültig): ${opts.resetUrl}\n\nWenn Sie keinen Reset angefordert haben, ignorieren Sie diese E-Mail.`
   return { subject: 'candiq — Passwort zurücksetzen', html, text }
 }
 
 export function checkCompletedEmail(opts: { name: string; candidateName: string; employerName: string; result: string; checkUrl: string }): { subject: string; html: string; text: string } {
-  const firstName = opts.name.split(' ')[0] ?? opts.name
   const resultLabels: Record<string, string> = {
     VERIFIED: 'verifiziert ✓',
     DISCREPANCY_FOUND: 'Unstimmigkeit gefunden ⚠',
@@ -164,12 +172,12 @@ export function checkCompletedEmail(opts: { name: string; candidateName: string;
   const resultLabel = resultLabels[opts.result] ?? opts.result
   const html = shell(`
     <h1>Referenzprüfung abgeschlossen</h1>
-    <p>Hallo ${escapeHtml(firstName)},</p>
+    <p>${salutation(opts.name)},</p>
     <p>die Prüfung für <strong>${escapeHtml(opts.candidateName)}</strong> bei <strong>${escapeHtml(opts.employerName)}</strong> ist abgeschlossen.</p>
     <p>Ergebnis: <strong>${escapeHtml(resultLabel)}</strong></p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.checkUrl}">Report ansehen</a></p>
   `)
-  const text = `Referenzprüfung abgeschlossen — ${opts.candidateName} bei ${opts.employerName}\nErgebnis: ${resultLabel}\n${opts.checkUrl}`
+  const text = `Referenzprüfung abgeschlossen — ${opts.candidateName} bei ${opts.employerName}\n\n${salutation(opts.name)},\n\nErgebnis: ${resultLabel}\n${opts.checkUrl}`
   return { subject: `candiq — Prüfung abgeschlossen: ${opts.candidateName}`, html, text }
 }
 
@@ -181,7 +189,8 @@ function escapeHtml(s: string): string {
 // Bewerber-Einladung zum Self-Service-Consent-Portal
 // ─────────────────────────────────────────────────────────────────
 export function candidateConsentInviteEmail(opts: {
-  candidateFirstName: string
+  /** Voller Name (Vor- + Nachname) — fuer professionelle Anrede. */
+  candidateFullName: string
   hiringCompany: string
   position: string
   portalUrl: string
@@ -189,7 +198,7 @@ export function candidateConsentInviteEmail(opts: {
 }): { subject: string; html: string; text: string } {
   const html = shell(`
     <h1>Einwilligung zur Referenzprüfung</h1>
-    <p>Hallo ${escapeHtml(opts.candidateFirstName)},</p>
+    <p>${salutation(opts.candidateFullName)},</p>
     <p><strong>${escapeHtml(opts.hiringCompany)}</strong> möchte für Ihre Bewerbung als <strong>${escapeHtml(opts.position)}</strong> eine professionelle Referenzprüfung durchführen.</p>
     <p>Bei candiq haben <strong>Sie die volle Kontrolle</strong>: Sie sehen vor jeder Prüfung, welche Daten verarbeitet werden, Sie nennen selbst die Referenzgeber, die kontaktiert werden dürfen, und Sie können Ihre Einwilligung jederzeit widerrufen.</p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.portalUrl}">Einwilligungs-Portal öffnen</a></p>
@@ -203,7 +212,20 @@ export function candidateConsentInviteEmail(opts: {
     </p>
     <p style="font-size: 12px; color: #94a3b8;">Falls Sie sich nicht beworben haben oder die Anfrage nicht erkennen, können Sie diese E-Mail einfach ignorieren — es passiert dann nichts.</p>
   `)
-  const text = `Einwilligung zur Referenzprüfung\n\nHallo ${opts.candidateFirstName},\n\n${opts.hiringCompany} möchte für Ihre Bewerbung als ${opts.position} eine Referenzprüfung durchführen.\n\nSie haben die volle Kontrolle: Sie nennen selbst die Referenzgeber und können jederzeit widerrufen.\n\nPortal öffnen (${opts.expiresInDays} Tage gültig):\n${opts.portalUrl}\n\nRechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO · Server in Deutschland · Auto-Löschung nach 6 Monaten\n\nFalls Sie sich nicht beworben haben, ignorieren Sie diese E-Mail.`
+  const text = `Einwilligung zur Referenzprüfung
+
+${salutation(opts.candidateFullName)},
+
+${opts.hiringCompany} möchte für Ihre Bewerbung als ${opts.position} eine professionelle Referenzprüfung durchführen.
+
+Sie haben die volle Kontrolle: Sie nennen selbst die Referenzgeber und können Ihre Einwilligung jederzeit widerrufen.
+
+Portal öffnen (${opts.expiresInDays} Tage gültig):
+${opts.portalUrl}
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. a DSGVO · Server in Deutschland · Auto-Löschung nach 6 Monaten
+
+Falls Sie sich nicht beworben haben, ignorieren Sie diese E-Mail.`
   return { subject: `Einwilligung zur Referenzprüfung — ${opts.hiringCompany}`, html, text }
 }
 
@@ -211,7 +233,8 @@ export function candidateConsentInviteEmail(opts: {
 // HR-Notification: Bewerber hat Einwilligung erteilt
 // ─────────────────────────────────────────────────────────────────
 export function consentAcceptedNotifyHrEmail(opts: {
-  hrFirstName: string
+  /** Voller HR-Name (Vor- + Nachname) — fuer professionelle Anrede. */
+  hrFullName: string
   candidateName: string
   position: string
   refereesCount: number
@@ -219,33 +242,50 @@ export function consentAcceptedNotifyHrEmail(opts: {
 }): { subject: string; html: string; text: string } {
   const html = shell(`
     <h1>Einwilligung erhalten ✓</h1>
-    <p>Hallo ${escapeHtml(opts.hrFirstName)},</p>
+    <p>${salutation(opts.hrFullName)},</p>
     <p><strong>${escapeHtml(opts.candidateName)}</strong> (${escapeHtml(opts.position)}) hat die Einwilligung zur Referenzprüfung erteilt und <strong>${opts.refereesCount} Referenzgeber</strong> freigegeben.</p>
     <p>Sie können jetzt die Prüfung starten — die Reviewer kontaktieren ausschließlich die vom Bewerber genannten Personen.</p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.candidateUrl}">Kandidat öffnen</a></p>
     <p style="font-size: 12px; color: #94a3b8;">Audit-Trail dokumentiert: Zeitpunkt, IP, User-Agent und akzeptierte Datenschutzversion.</p>
   `)
-  const text = `Einwilligung erhalten ✓\n\n${opts.candidateName} (${opts.position}) hat eingewilligt und ${opts.refereesCount} Referenzgeber freigegeben.\n\nJetzt prüfung starten: ${opts.candidateUrl}`
-  return { subject: `candiq — ${opts.candidateName}: Einwilligung erteilt (${opts.refereesCount} Referenzen)`, html, text }
+  const text = `Einwilligung erhalten ✓
+
+${salutation(opts.hrFullName)},
+
+${opts.candidateName} (${opts.position}) hat eingewilligt und ${opts.refereesCount} ${opts.refereesCount === 1 ? 'Referenz' : 'Referenzen'} freigegeben.
+
+Jetzt Prüfung starten: ${opts.candidateUrl}`
+  return {
+    subject: `candiq — ${opts.candidateName}: Einwilligung erteilt (${opts.refereesCount} ${opts.refereesCount === 1 ? 'Referenz' : 'Referenzen'})`,
+    html,
+    text,
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────
 // HR-Notification: Bewerber hat Einwilligung widerrufen
 // ─────────────────────────────────────────────────────────────────
 export function consentRevokedNotifyHrEmail(opts: {
-  hrFirstName: string
+  /** Voller HR-Name (Vor- + Nachname) — fuer professionelle Anrede. */
+  hrFullName: string
   candidateName: string
   position: string
   candidateUrl: string
 }): { subject: string; html: string; text: string } {
   const html = shell(`
     <h1>⚠️ Einwilligung widerrufen</h1>
-    <p>Hallo ${escapeHtml(opts.hrFirstName)},</p>
+    <p>${salutation(opts.hrFullName)},</p>
     <p><strong>${escapeHtml(opts.candidateName)}</strong> (${escapeHtml(opts.position)}) hat die zuvor erteilte Einwilligung zur Referenzprüfung widerrufen (Art. 7 Abs. 3 DSGVO).</p>
     <p>Alle offenen Referenzprüfungen wurden automatisch gestoppt. Bitte informieren Sie das Recruiting-Team.</p>
     <p style="margin: 24px 0;"><a class="btn" href="${opts.candidateUrl}">Kandidat öffnen</a></p>
   `)
-  const text = `Einwilligung widerrufen — ${opts.candidateName} (${opts.position})\n\nAlle offenen Prüfungen wurden gestoppt.\n\n${opts.candidateUrl}`
+  const text = `Einwilligung widerrufen — ${opts.candidateName} (${opts.position})
+
+${salutation(opts.hrFullName)},
+
+${opts.candidateName} hat die zuvor erteilte Einwilligung zur Referenzprüfung widerrufen (Art. 7 Abs. 3 DSGVO). Alle offenen Prüfungen wurden gestoppt.
+
+${opts.candidateUrl}`
   return { subject: `candiq — ${opts.candidateName}: Einwilligung widerrufen`, html, text }
 }
 
@@ -298,7 +338,7 @@ export function reviewerHandoffNotificationEmail(opts: {
           <div style="font-size:11px;color:#94a3b8;">Referenz ${i + 1} von ${n} · ${escapeHtml(c.candidatePosition)}</div>
           <div style="font-weight:700;margin-top:2px;">${escapeHtml(c.employerName)} &mdash; ${escapeHtml(c.employerContact)}</div>
           ${contactExtras ? `<div style="font-size:13px;color:#475569;">${contactExtras}</div>` : ''}
-          <div style="margin-top:8px;"><a href="${c.reviewerCheckUrl}" style="color:#4f46e5;font-weight:600;font-size:13px;">Pruefung oeffnen &rarr;</a></div>
+          <div style="margin-top:8px;"><a href="${c.reviewerCheckUrl}" style="color:#4f46e5;font-weight:600;font-size:13px;">Prüfung öffnen &rarr;</a></div>
         </div>`
     })
     .join('')
@@ -308,8 +348,8 @@ export function reviewerHandoffNotificationEmail(opts: {
     : ''
 
   const html = shell(`
-    <h1>${multiple ? `${n} neue Pruefungen` : 'Neue Pruefung'} in der Reviewer-Queue</h1>
-    <p>Ein Kunde hat ${multiple ? `${n} Referenzpruefungen` : 'eine Referenzpruefung'} an euch uebergeben. Bearbeitung idealerweise innerhalb <strong>24 Stunden</strong>.</p>
+    <h1>${multiple ? `${n} neue Prüfungen` : 'Neue Prüfung'} in der Reviewer-Queue</h1>
+    <p>Ein Kunde hat ${multiple ? `${n} Referenzprüfungen` : 'eine Referenzprüfung'} an euch übergeben. Bearbeitung idealerweise innerhalb <strong>24 Stunden</strong>.</p>
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kunde</strong></p>
     <p style="margin-top:0;">${escapeHtml(opts.customerName)}<br>${companyLine}</p>
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kandidat</strong></p>
@@ -317,17 +357,17 @@ export function reviewerHandoffNotificationEmail(opts: {
     ${assignedLine}
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>${multiple ? 'Referenzen' : 'Referenz'}</strong></p>
     ${checkBlocks}
-    <p style="font-size:12px;color:#94a3b8;margin-top:16px;">Alle offenen Pruefungen: <a href="${opts.queueUrl}">${opts.queueUrl}</a></p>
+    <p style="font-size:12px;color:#94a3b8;margin-top:16px;">Alle offenen Prüfungen: <a href="${opts.queueUrl}">${opts.queueUrl}</a></p>
   `)
 
   const textChecks = opts.checks
     .map((c, i) => `  ${i + 1}. ${c.employerName} — ${c.employerContact} (${c.candidatePosition})\n     ${c.reviewerCheckUrl}`)
     .join('\n')
-  const text = `${multiple ? `${n} neue Pruefungen` : 'Neue Pruefung'} in der Reviewer-Queue\n\nKunde: ${opts.customerName} (${opts.customerCompany ?? opts.customerEmail})\nKandidat: ${opts.candidateName}${opts.assignedTo ? `\nZugewiesen an: ${opts.assignedTo}` : ''}\n\n${multiple ? 'Referenzen:' : 'Referenz:'}\n${textChecks}\n\nQueue: ${opts.queueUrl}\nSLA-Ziel: 24h.`
+  const text = `${multiple ? `${n} neue Prüfungen` : 'Neue Prüfung'} in der Reviewer-Queue\n\nKunde: ${opts.customerName} (${opts.customerCompany ?? opts.customerEmail})\nKandidat: ${opts.candidateName}${opts.assignedTo ? `\nZugewiesen an: ${opts.assignedTo}` : ''}\n\n${multiple ? 'Referenzen:' : 'Referenz:'}\n${textChecks}\n\nQueue: ${opts.queueUrl}\nSLA-Ziel: 24h.`
 
   return {
     subject: multiple
-      ? `Reviewer-Queue: ${n} Pruefungen — ${opts.candidateName} (${opts.customerCompany ?? opts.customerName})`
+      ? `Reviewer-Queue: ${n} Prüfungen — ${opts.candidateName} (${opts.customerCompany ?? opts.customerName})`
       : `Reviewer-Queue: ${opts.candidateName} (${opts.customerCompany ?? opts.customerName})`,
     html,
     text,
@@ -393,26 +433,34 @@ export function refereeArt14NotificationEmail(opts: {
     <h1>Information nach Art. 14 DSGVO</h1>
     <p>Guten Tag ${escapeHtml(opts.refereeName)},</p>
     <p>
-      <strong>${escapeHtml(opts.candidateName)}</strong> hat Sie als Referenz fuer eine
+      <strong>${escapeHtml(opts.candidateName)}</strong> hat Sie als Referenz f\u00fcr eine
       Bewerbung als <strong>${escapeHtml(opts.candidatePosition)}</strong> bei
       <strong>${escapeHtml(opts.hiringCompany)}</strong> benannt und uns gebeten, mit Ihnen
-      Kontakt aufzunehmen. Sie erhalten in den kommenden Tagen einen kurzen telefonischen
-      oder schriftlichen Kontakt von einem geschulten candiq-Reviewer.
+      Kontakt aufzunehmen. In den kommenden Tagen meldet sich ein geschulter candiq-Reviewer
+      kurz telefonisch oder schriftlich bei Ihnen.
     </p>
 
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Wer wir sind</strong></p>
     <p style="margin-top:0;font-size:13px;color:#475569;">
-      candiq ist eine DSGVO-konforme Plattform fuer professionelle Referenzpruefungen,
+      candiq ist eine DSGVO-konforme Plattform f\u00fcr professionelle Referenzpr\u00fcfungen,
       betrieben von der RSG Recruiting Solutions Group GmbH, Am Heiligenhaus 9, 65207
       Wiesbaden. Wir handeln im Auftrag von <strong>${escapeHtml(opts.hiringCompany)}</strong>
       (Verantwortlicher i.S.d. Art. 4 Nr. 7 DSGVO).
     </p>
 
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Mensch oder Bot?</strong></p>
+    <p style="margin-top:0;font-size:13px;color:#475569;">
+      Das Gespr\u00e4ch f\u00fchrt <strong>immer ein Mensch</strong> \u2014 ein geschulter candiq-Reviewer.
+      KI-Werkzeuge nutzen wir ausschlie\u00dflich intern zur Dokumentation Ihrer Antworten und
+      zum Abgleich mit dem Lebenslauf des Bewerbers, niemals f\u00fcr den Anruf selbst.
+    </p>
+
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Welche Daten wir verarbeiten</strong></p>
     <p style="margin-top:0;font-size:13px;color:#475569;">
       Name, ggf. Unternehmen (<strong>${escapeHtml(opts.refereeCompany)}</strong>), Funktion
-      und Kontaktdaten \u2014 vom Bewerber freiwillig angegeben. Plus Ihre Antworten zu
-      Position, Beschaeftigungszeitraum und Aufgaben des Bewerbers.
+      und Kontaktdaten \u2014 vom Bewerber freiwillig angegeben. Plus Ihre Antworten zu Position,
+      Besch\u00e4ftigungszeitraum und Aufgaben des Bewerbers. Wir fragen ausschlie\u00dflich nachpr\u00fcfbare
+      Fakten ab \u2014 keine gesch\u00fctzten Merkmale (Herkunft, Religion, Gesundheit etc.), AGG-konform.
     </p>
 
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Zweck und Rechtsgrundlage</strong></p>
@@ -424,27 +472,42 @@ export function refereeArt14NotificationEmail(opts: {
 
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Ihre Rechte</strong></p>
     <p style="margin-top:0;font-size:13px;color:#475569;">
-      Auskunft (Art. 15), Berichtigung (Art. 16), Loeschung (Art. 17), Einschraenkung
-      (Art. 18), Widerspruch (Art. 21). Auto-Loeschung Ihrer Antworten spaetestens
-      6 Monate nach Abschluss des Bewerbungsverfahrens. Beschwerderecht bei der zustaendigen
-      Aufsichtsbehoerde.
+      Auskunft (Art. 15), Berichtigung (Art. 16), L\u00f6schung (Art. 17), Einschr\u00e4nkung (Art. 18),
+      Widerspruch (Art. 21). Auto-L\u00f6schung Ihrer Antworten sp\u00e4testens 6 Monate nach Abschluss
+      des Bewerbungsverfahrens. Beschwerderecht bei der zust\u00e4ndigen Aufsichtsbeh\u00f6rde.
     </p>
 
-    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kein Kontakt erwuenscht?</strong></p>
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kein Kontakt erw\u00fcnscht?</strong></p>
     <p style="margin-top:0;font-size:13px;color:#475569;">
       Antworten Sie einfach kurz auf diese Mail mit &bdquo;Bitte nicht kontaktieren&ldquo;
-      \u2014 wir loeschen Ihre Daten dann unverzueglich und der Bewerber wird gebeten, eine
+      \u2014 wir l\u00f6schen Ihre Daten dann unverz\u00fcglich und der Bewerber wird gebeten, eine
       andere Referenz zu nennen.
     </p>
 
     <p style="font-size:12px;color:#94a3b8;margin-top:18px;">
-      Datenschutzerklaerung: <a href="https://candiq.de/datenschutz">candiq.de/datenschutz</a> \u00b7
+      Datenschutzerkl\u00e4rung: <a href="https://candiq.de/datenschutz">candiq.de/datenschutz</a> \u00b7
       Auftragsverarbeitungsvertrag: <a href="https://candiq.de/avv">candiq.de/avv</a> \u00b7
       Verantwortlicher i.S.d. DSGVO ist <strong>${escapeHtml(opts.hiringCompany)}</strong>.
     </p>
   `)
 
-  const text = `Information nach Art. 14 DSGVO\n\nGuten Tag ${opts.refereeName},\n\n${opts.candidateName} hat Sie als Referenz fuer eine Bewerbung als ${opts.candidatePosition} bei ${opts.hiringCompany} benannt. Ein candiq-Reviewer wird sich in den kommenden Tagen kurz bei Ihnen melden.\n\nWir handeln im Auftrag von ${opts.hiringCompany} (Verantwortlicher). Verarbeitete Daten: Name, Unternehmen (${opts.refereeCompany}), Funktion, Kontaktdaten \u2014 vom Bewerber freiwillig genannt. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO. Auto-Loeschung nach max. 6 Monaten.\n\nKein Kontakt erwuenscht? Antworten Sie auf diese Mail mit "Bitte nicht kontaktieren" \u2014 wir loeschen dann unverzueglich.\n\nDatenschutzerklaerung: https://candiq.de/datenschutz\nAVV: https://candiq.de/avv`
+  const text = `Information nach Art. 14 DSGVO
+
+Guten Tag ${opts.refereeName},
+
+${opts.candidateName} hat Sie als Referenz f\u00fcr eine Bewerbung als ${opts.candidatePosition} bei ${opts.hiringCompany} benannt. In den kommenden Tagen meldet sich ein geschulter candiq-Reviewer kurz bei Ihnen.
+
+MENSCH ODER BOT?
+Das Gespr\u00e4ch f\u00fchrt immer ein Mensch (geschulter candiq-Reviewer). KI-Werkzeuge nutzen wir nur intern zur Dokumentation und zum Abgleich mit dem CV, niemals f\u00fcr den Anruf selbst.
+
+WIR HANDELN IM AUFTRAG von ${opts.hiringCompany} (Verantwortlicher). Verarbeitete Daten: Name, Unternehmen (${opts.refereeCompany}), Funktion, Kontaktdaten \u2014 vom Bewerber freiwillig genannt. Wir fragen ausschlie\u00dflich nachpr\u00fcfbare Fakten ab (AGG-konform).
+
+RECHTSGRUNDLAGE: Art. 6 Abs. 1 lit. f DSGVO. Auto-L\u00f6schung nach max. 6 Monaten.
+
+KEIN KONTAKT ERW\u00dcNSCHT? Antworten Sie auf diese Mail mit "Bitte nicht kontaktieren" \u2014 wir l\u00f6schen dann unverz\u00fcglich.
+
+Datenschutzerkl\u00e4rung: https://candiq.de/datenschutz
+AVV: https://candiq.de/avv`
 
   return {
     subject: `${opts.candidateName} hat Sie als Referenz benannt \u2014 Info nach Art. 14 DSGVO`,

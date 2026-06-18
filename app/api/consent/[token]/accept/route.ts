@@ -186,7 +186,7 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
     if (candidate) {
       const baseUrl = process.env.NEXTAUTH_URL || 'https://candiq.de'
       const mail = consentAcceptedNotifyHrEmail({
-        hrFirstName: hrUser.name?.split(' ')[0] || 'Team',
+        hrFullName: hrUser.name || hrUser.email || '',
         candidateName: `${candidate.firstName} ${candidate.lastName}`,
         position: candidate.position,
         refereesCount: referees.length,
