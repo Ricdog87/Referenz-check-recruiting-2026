@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db'
 import { isAdmin, slaState, formatHoursShort } from '@/lib/reviewer'
 import { Header } from '@/components/layout/Header'
 import { formatDate, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
-import { ArrowLeft, Mail, Building2, CreditCard, Zap, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Mail, Building2, CreditCard, Zap } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -205,12 +205,9 @@ export default async function AdminCustomerDetailPage({
                     {formatDate(cand.createdAt)}
                   </div>
                 </div>
-                <Link
-                  href={`/candidates/${cand.id}`}
-                  className="text-xs text-brand-700 hover:text-brand-800 font-semibold whitespace-nowrap"
-                >
-                  öffnen <ExternalLink className="inline w-3 h-3" />
-                </Link>
+                {/* Kein Link zu /candidates/:id — die Route ist owner-gated
+                    (filterft auf session.user.id), Admin würde 404 sehen.
+                    Admin sieht alle Kandidaten-Details inline auf dieser Seite. */}
               </div>
               {cand.checks.length === 0 ? (
                 <div className="text-xs text-text-muted">Keine Checks angelegt.</div>
@@ -238,16 +235,19 @@ export default async function AdminCustomerDetailPage({
                                 aria-label="Express"
                               />
                             )}
-                            <Link
-                              href={
-                                chk.status === 'IN_REVIEW'
-                                  ? `/reviewer/check/${chk.id}`
-                                  : `/checks/${chk.id}`
-                              }
-                              className="hover:text-brand-700 font-medium"
-                            >
-                              {chk.employerName}
-                            </Link>
+                            {chk.status === 'IN_REVIEW' ? (
+                              // Reviewer-Route ist Admin-zugänglich (kein userId-Filter)
+                              <Link
+                                href={`/reviewer/check/${chk.id}`}
+                                className="hover:text-brand-700 font-medium"
+                              >
+                                {chk.employerName}
+                              </Link>
+                            ) : (
+                              // OPEN/COMPLETED Routen sind owner-gated → würden 404 werfen.
+                              // Admin sieht alle Daten bereits inline; kein Link nötig.
+                              <span className="font-medium">{chk.employerName}</span>
+                            )}
                             {chk.employerContact && (
                               <span className="text-text-muted">
                                 {' '}
