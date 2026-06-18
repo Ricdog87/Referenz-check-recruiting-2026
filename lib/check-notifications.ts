@@ -1,10 +1,10 @@
 /**
  * lib/check-notifications.ts
  *
- * Geteilte Benachrichtigungs- + Assignment-Logik fuer den Reviewer-Handoff.
- * Wird von BEIDEN Uebergabe-Pfaden genutzt:
- *  - app/api/checks/[id]/route.ts (Einzeluebergabe via PATCH status=IN_REVIEW)
- *  - app/api/candidates/[id]/handover/route.ts (Sammeluebergabe)
+ * Geteilte Benachrichtigungs- + Assignment-Logik für den Reviewer-Handoff.
+ * Wird von BEIDEN Übergabe-Pfaden genutzt:
+ *  - app/api/checks/[id]/route.ts (Einzelübergabe via PATCH status=IN_REVIEW)
+ *  - app/api/candidates/[id]/handover/route.ts (Sammelübergabe)
  *
  * Dadurch: identisches Verhalten, eine Quelle der Wahrheit.
  */
@@ -30,7 +30,7 @@ export type AssignedReviewer = {
  * Round-Robin-Assignment (opt-in via ASSIGNMENT_AUTO=round_robin).
  * Weist den Check dem Reviewer mit der geringsten Anzahl offener
  * Zuweisungen zu und gibt ihn zurueck — damit der Aufrufer die
- * Handoff-Mail zusaetzlich an diesen Reviewer schicken kann (Finding 3).
+ * Handoff-Mail zusätzlich an diesen Reviewer schicken kann (Finding 3).
  *
  * Gibt null zurueck, wenn Auto-Assignment deaktiviert ist oder kein
  * Reviewer existiert.
@@ -77,8 +77,8 @@ export async function assignRoundRobinIfEnabled(
 }
 
 /**
- * Sendet die Reviewer-Team-Benachrichtigung. Unterstuetzt 1..N Pruefungen
- * (Sammeluebergabe → EINE Mail). Empfaenger: REVIEWER_NOTIFICATION_EMAIL
+ * Sendet die Reviewer-Team-Benachrichtigung. Unterstützt 1..N Prüfungen
+ * (Sammelübergabe → EINE Mail). Empfänger: REVIEWER_NOTIFICATION_EMAIL
  * (default hello@candiq.de) UND — falls vorhanden — der per Round-Robin
  * zugewiesene Reviewer (Finding 3).
  */
@@ -95,7 +95,7 @@ export async function notifyReviewerHandoff(opts: {
     .map((s) => s.trim())
     .filter(Boolean)
 
-  // Zugewiesenen Reviewer als Empfaenger ergaenzen (dedupe).
+  // Zugewiesenen Reviewer als Empfänger ergaenzen (dedupe).
   const recipientSet = new Set(teamRecipients)
   if (opts.assignedReviewer?.email) recipientSet.add(opts.assignedReviewer.email)
   const recipients = Array.from(recipientSet)

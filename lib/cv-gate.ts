@@ -1,7 +1,7 @@
 /**
  * lib/cv-gate.ts
  *
- * Server-seitiger Consent-Gate fuer CV-Inhalte.
+ * Server-seitiger Consent-Gate für CV-Inhalte.
  *
  * WICHTIG — Architektur-Realitaet:
  * candiq verbindet sich via Prisma als Postgres-Owner-User mit der DB.
@@ -9,7 +9,7 @@
  * grundsaetzlich, weil der verbundene Rolle ROW-LEVEL-SECURITY-BYPASS hat.
  * Eine Supabase-RLS-Policy waere damit Scheinsicherheit.
  *
- * Der Schutz wird stattdessen ausschliesslich auf Application-Layer
+ * Der Schutz wird stattdessen ausschließlich auf Application-Layer
  * erzwungen. Diese Datei ist die EINZIGE Entscheidungsstelle. Jede Route,
  * jeder Service, jedes UI-Code-Pfad, der CV-Content ausliefert, MUSS
  * `hasCvAccess()` aufrufen — sonst wird die DSGVO-Pflicht verletzt.
@@ -28,7 +28,7 @@ export type CvStatus = (typeof CV_STATUS)[keyof typeof CV_STATUS]
 
 /**
  * Wer fragt den CV an?
- *  - owner:    HR-User, dem der Kandidat gehoert (eigener Upload)
+ *  - owner:    HR-User, dem der Kandidat gehört (eigener Upload)
  *  - reviewer: candiq-internes Personal (REVIEWER / ADMIN)
  *  - public:   anonym
  */
@@ -44,12 +44,12 @@ type DocLike = Pick<Document, 'type' | 'cvStatus'> & {
 }
 
 /**
- * Single Source of Truth fuer CV-Zugriffsentscheidungen.
+ * Single Source of Truth für CV-Zugriffsentscheidungen.
  *
  * Logik:
  *  - Non-CV-Dokumente (CERTIFICATE/REFERENCE/OTHER): nicht von diesem
  *    Gate erfasst. Andere Routen muessen ihre eigene Autorisierung halten.
- *  - HR-Owner: darf eigenen Upload immer sehen. Schliesslich hat sie ihn
+ *  - HR-Owner: darf eigenen Upload immer sehen. Schließlich hat sie ihn
  *    selbst hochgeladen. Ein Sperren waere kontraproduktiv und kein DSGVO-
  *    Gewinn (die Daten sind bereits beim Kunden eingegangen).
  *  - Reviewer: BRAUCHT cvStatus = RELEASED. Bei AWAITING_CONSENT oder
@@ -104,7 +104,7 @@ export async function releaseAllCvsForCandidate(
 /**
  * Sperrt alle CV-Documents eines Kandidaten. Wird aus dem Consent-Revoke
  * heraus aufgerufen. Die Files bleiben physisch gespeichert (Audit /
- * 6-Monats-Retention), sind aber fuer Reviewer nicht mehr zugaenglich.
+ * 6-Monats-Retention), sind aber für Reviewer nicht mehr zugaenglich.
  */
 export async function revokeAllCvsForCandidate(
   candidateId: string,

@@ -169,8 +169,8 @@ export async function runSchemaSync() {
     END $$
   `)
 
-  // PilotApplication-Reminder-Felder fuer die Email-Drip-Sequence.
-  // Idempotent — IF NOT EXISTS, falls auf Prod schon ueber db push
+  // PilotApplication-Reminder-Felder für die Email-Drip-Sequence.
+  // Idempotent — IF NOT EXISTS, falls auf Prod schon über db push
   // bei Schema-Sync angelegt.
   await prisma.$executeRawUnsafe(
     `ALTER TABLE "PilotApplication" ADD COLUMN IF NOT EXISTS "lastReminderSent" INTEGER`,

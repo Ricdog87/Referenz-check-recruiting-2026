@@ -7,8 +7,8 @@ import Link from 'next/link'
 
 // Status-Politik (Stand 2026-06):
 // - REST-API ist heute live: alle Dashboard-Aktionen sind via /api/**
-//   ueber Session-Cookie ansprechbar (Doku unter /integrations/api).
-// - Incoming-Webhooks fuer Stripe sind live (Billing-Events).
+//   über Session-Cookie ansprechbar (Doku unter /integrations/api).
+// - Incoming-Webhooks für Stripe sind live (Billing-Events).
 // - ATS-/HRIS-Integrationen (Personio, SAP SF, Workday, Greenhouse,
 //   Workable, Recruitee) sind in Vorbereitung; Roadmap-Ziel: Q4 2026.
 // - Collaboration (Slack, Teams, Zapier): kommt nach den ATS-Konnektoren.
@@ -31,7 +31,7 @@ const CANDIQ_PLATFORM: Integration[] = [
   {
     name: 'REST-API',
     cat: 'Developer',
-    desc: 'Alle Dashboard-Funktionen via JSON-API: Kandidaten, Pruefungen, Reports, Audit-Trail. Doku mit curl-Beispielen.',
+    desc: 'Alle Dashboard-Funktionen via JSON-API: Kandidaten, Prüfungen, Reports, Audit-Trail. Doku mit curl-Beispielen.',
     status: 'available',
     href: '/integrations/api',
   },
@@ -100,14 +100,14 @@ const COLLAB: Integration[] = [
   {
     name: 'Slack',
     cat: 'Notifications',
-    desc: 'Echtzeit-Updates bei Statuswechseln, Diskrepanzen, Abschluessen.',
+    desc: 'Echtzeit-Updates bei Statuswechseln, Diskrepanzen, Abschlüssen.',
     status: 'roadmap',
     note: 'Q4 2026',
   },
   {
     name: 'Microsoft Teams',
     cat: 'Notifications',
-    desc: 'Adaptive Cards fuer Hiring Manager direkt im Teams-Kanal.',
+    desc: 'Adaptive Cards für Hiring Manager direkt im Teams-Kanal.',
     status: 'roadmap',
     note: 'Q1 2027',
   },
@@ -158,8 +158,8 @@ export default async function IntegrationsPage() {
             </div>
             <div className="text-xs text-text-secondary leading-relaxed">
               <strong className="text-text-primary">Heute nutzbar:</strong>{' '}
-              REST-API mit voller Funktionsabdeckung (Kandidaten, Pruefungen,
-              Reports, Audit) und Live-Stripe-Webhooks fuer Abrechnung.
+              REST-API mit voller Funktionsabdeckung (Kandidaten, Prüfungen,
+              Reports, Audit) und Live-Stripe-Webhooks für Abrechnung.
               <br />
               <strong className="text-text-primary">In Vorbereitung (Q4 2026):</strong>{' '}
               Native ATS-Konnektoren — Personio &amp; Greenhouse zuerst. Welches
@@ -184,13 +184,13 @@ export default async function IntegrationsPage() {
             <div>
               <div className="text-sm font-semibold text-text-primary">Eigene Integration entwickeln?</div>
               <div className="text-xs text-text-secondary">
-                Heute via REST-API + Session-Cookie. API-Key-System fuer headless
+                Heute via REST-API + Session-Cookie. API-Key-System für headless
                 Calls ist auf der Roadmap.
               </div>
             </div>
           </div>
           <Link href="/integrations/api" className="btn-secondary text-xs whitespace-nowrap">
-            <Code2 className="w-3.5 h-3.5" /> API-Doku oeffnen
+            <Code2 className="w-3.5 h-3.5" /> API-Doku öffnen
           </Link>
         </div>
       </div>
@@ -249,7 +249,7 @@ function IntegrationCard({ item }: { item: Integration }) {
           href={item.href}
           className="block w-full text-xs font-semibold py-2 rounded-full transition-all bg-emerald-600 hover:bg-emerald-700 text-white text-center"
         >
-          Oeffnen
+          Öffnen
         </Link>
       ) : (
         <button
@@ -291,7 +291,7 @@ function PlanGate({ currentPlan }: { currentPlan: string }) {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-emerald-500 font-bold mt-0.5">✓</span>
-              <span>Stripe-Webhook fuer Abrechnung</span>
+              <span>Stripe-Webhook für Abrechnung</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-slate-400 font-bold mt-0.5">○</span>

@@ -9,9 +9,9 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: [
           '/', '/preise', '/waitlist-agency', '/branchen', '/resources',
-          '/referenzpruefung', '/reference-check-dsgvo', '/zeugnis-pruefen-lassen',
+          '/referenzpruefung', '/reference-check-dsgvo', '/zeugnis-prüfen-lassen',
           '/lebenslauf-verifizieren', '/pre-employment-screening', '/background-check-dsgvo',
-          '/vergleich', '/fuer',
+          '/vergleich', '/für',
           // Detail-Seiten (PR #86) + Termin-Page (PR #89)
           '/roi-rechner', '/pilotprogramm', '/compliance', '/termin',
           // Bewerber-Self-Service Phase 1 (Waitlist)

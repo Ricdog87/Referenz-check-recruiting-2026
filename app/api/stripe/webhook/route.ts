@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
 
           // Optional: Express-24h ist pro Check buchbar — checkId kommt
           // aus Stripe-Checkout-Metadata (siehe app/api/addons/route.ts).
-          // Wir verifizieren, dass der Check dem zahlenden User gehoert,
+          // Wir verifizieren, dass der Check dem zahlenden User gehört,
           // bevor wir Express markieren.
           const metaCheckId = (cs.metadata?.checkId ?? '') as string
           let linkedCheckId: string | null = null
@@ -239,7 +239,7 @@ export async function POST(req: NextRequest) {
         const inv = event.data.object as Stripe.Invoice
         const customerId = typeof inv.customer === 'string' ? inv.customer : inv.customer?.id
         // Stripe API "dahlia" hat invoice.subscription entfernt; subId
-        // koennen wir nicht mehr direkt vom Invoice-Objekt lesen. Fuer
+        // koennen wir nicht mehr direkt vom Invoice-Objekt lesen. Für
         // den Status-Update reicht customerId — der User hat nur eine
         // aktive Subscription gleichzeitig.
         console.warn('stripe_invoice_payment_failed', {
@@ -278,7 +278,7 @@ export async function POST(req: NextRequest) {
         }).catch((e) => console.error('stripe_payment_failed_audit_log_error', e))
 
         // Best-effort: User per Mail benachrichtigen. Resend liefert via
-        // lib/email; ohne RESEND_API_KEY laeuft das in den AuditLog
+        // lib/email; ohne RESEND_API_KEY läuft das in den AuditLog
         // (Dev-Modus).
         try {
           const { sendEmail } = await import('@/lib/email')

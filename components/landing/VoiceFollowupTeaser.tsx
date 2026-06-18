@@ -22,7 +22,7 @@ import { trackConversion } from '@/lib/conversionTracking'
  *
  * Marketing-Logik: erster Wow = "die KI nimmt ab". Zweiter Wow = "und
  * du siehst das strukturiert in deinem Dashboard". Der Wow-Bogen
- * schliesst sich vom Erlebnis zum Produkt-Nutzen.
+ * schließt sich vom Erlebnis zum Produkt-Nutzen.
  */
 const SESSION_KEY = 'candiq_voice_followup_shown'
 const DELAY_MS = 8000
@@ -40,7 +40,7 @@ export function VoiceFollowupTeaser() {
     const origGtag = window.gtag
     const hookedGtag: typeof window.gtag = (cmd, event, params) => {
       if (cmd === 'event' && event === 'conversion_step' && params?.step === 'voice_demo_start') {
-        // Erstes Mic-Klick erkannt — Timer fuer Followup starten.
+        // Erstes Mic-Klick erkannt — Timer für Followup starten.
         setTimeout(() => {
           if (!sessionStorage.getItem(SESSION_KEY)) {
             sessionStorage.setItem(SESSION_KEY, '1')

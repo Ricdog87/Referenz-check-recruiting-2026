@@ -11,7 +11,7 @@ export function TrustBar() {
         <Reveal>
           {/* Akt 1: Live-Vertrauenssignale (echte Datenpunkte, kein Fake-Logo-Wall).
               Bei leerer DB blenden die zwei Live-Stats automatisch aus —
-              keine irrefuehrenden Nullen. */}
+              keine irreführenden Nullen. */}
           <TrustStats />
         </Reveal>
 
@@ -27,7 +27,7 @@ export function TrustBar() {
 }
 
 {/*
-  TODO fuer Marketing (Claude Cowork oder manuell):
+  TODO für Marketing (Claude Cowork oder manuell):
   - Sobald 3+ echte Pilot-Kunden Logo-Freigabe geben, ein
     PressLogosStrip darunter einfuegen mit:
     components/landing/PressLogosStrip.tsx
@@ -36,5 +36,5 @@ export function TrustBar() {
     Crosswater Job Guide, Recruiting Insights), MediaMentionsStrip
     ergaenzen — Zitat-Karten mit Quelle.
   - Beides bewusst NICHT mit Platzhaltern bauen — Marketing-
-    Glaubwuerdigkeit ist groesser als Whitespace.
+    Glaubwürdigkeit ist groesser als Whitespace.
 */}

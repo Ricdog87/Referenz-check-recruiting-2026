@@ -1,7 +1,7 @@
 /**
  * lib/consent-invite.ts
  *
- * Geteilter Helper fuer den Magic-Link-Versand an den Bewerber.
+ * Geteilter Helper für den Magic-Link-Versand an den Bewerber.
  * Wird aufgerufen aus:
  *  - app/api/candidates/[id]/invite/route.ts (HR triggert manuell)
  *  - app/api/upload/route.ts (Auto-Trigger beim HR-CV-Upload)
@@ -21,11 +21,11 @@ export type InviteResult =
 /**
  * Sendet einen Consent-Invite-Link an den Bewerber. Idempotent: existierende
  * PENDING_ACCEPT-Tokens werden auf EXPIRED gesetzt, damit immer nur ein
- * Magic-Link gleichzeitig gueltig ist.
+ * Magic-Link gleichzeitig gültig ist.
  *
- * Best-effort fuer den Auto-Trigger (HR-Upload): wenn der Versand fehlschlaegt,
+ * Best-effort für den Auto-Trigger (HR-Upload): wenn der Versand fehlschlaegt,
  * landen Document und ConsentToken trotzdem in der DB. Der Aufrufer kann den
- * Versand bei Bedarf manuell ueber den UI-Button re-triggern.
+ * Versand bei Bedarf manuell über den UI-Button re-triggern.
  */
 export async function inviteCandidate(opts: {
   candidateId: string

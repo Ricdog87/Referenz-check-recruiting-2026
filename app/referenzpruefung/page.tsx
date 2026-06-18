@@ -50,7 +50,7 @@ const ABLAUF = [
 
 const INTERNAL_LINKS = [
   { href: '/reference-check-dsgvo', label: 'Reference-Check-Software aus Deutschland', desc: 'Produkt-Überblick, Consent-Portal, Reviewer, Report' },
-  { href: '/zeugnis-pruefen-lassen', label: 'Arbeitszeugnis prüfen lassen', desc: 'Echtheits-Check und Decoding der Zeugnis-Geheimcodes' },
+  { href: '/zeugnis-prüfen-lassen', label: 'Arbeitszeugnis prüfen lassen', desc: 'Echtheits-Check und Decoding der Zeugnis-Geheimcodes' },
   { href: '/lebenslauf-verifizieren', label: 'Lebenslauf verifizieren', desc: 'Stationen und Tätigkeiten gegen die Realität prüfen' },
   { href: '/pre-employment-screening', label: 'Pre-Employment Screening', desc: 'Was in Deutschland erlaubt ist — und was nicht' },
   { href: '/background-check-dsgvo', label: 'Background Check DSGVO-konform', desc: 'Die rechtlichen Grenzen in Deutschland' },

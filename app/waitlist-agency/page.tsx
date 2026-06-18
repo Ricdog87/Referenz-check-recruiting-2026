@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 
 /**
- * Die Closed-Beta-Warteliste fuer Personaldienstleister ist seit
+ * Die Closed-Beta-Warteliste für Personaldienstleister ist seit
  * 06/2026 obsolet — PDL-Konten sind ab sofort regulaer registrierbar.
  * Diese Seite leitet daher 308-permanent auf das Registrierungs-
  * Formular mit vor-ausgewaehltem PDL-Typ um.

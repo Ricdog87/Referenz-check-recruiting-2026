@@ -163,7 +163,7 @@ export default function CompliancePage() {
 
         {/* Sichtbare FAQ — gleicher Content wie der FAQPage-JsonLd oben.
             Strukturierte Daten + sichtbarer Text ist die Google-konforme
-            Variante; nur strukturiert ohne sichtbar wuerde als spam-naher
+            Variante; nur strukturiert ohne sichtbar würde als spam-naher
             "hidden content" gewertet. */}
         <section className="py-16 px-6">
           <div className="max-w-3xl mx-auto">

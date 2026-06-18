@@ -86,9 +86,9 @@ export default function AvvPage() {
             <li>Verarbeitung nur auf dokumentierte Weisung (= Konfiguration im Dashboard)</li>
             <li>Vertraulichkeitsverpflichtung aller beteiligten Personen</li>
             <li>Technische und organisatorische Maßnahmen (TOMs, siehe Anhang)</li>
-            <li>Subprozessoren werden vorher angekuendigt; Widerspruchsrecht des Verantwortlichen</li>
+            <li>Subprozessoren werden vorher angekündigt; Widerspruchsrecht des Verantwortlichen</li>
             <li>
-              Unterstuetzung bei Betroffenenrechten (Art. 15–22), Datenschutz-Folgenabschaetzung
+              Unterstützung bei Betroffenenrechten (Art. 15–22), Datenschutz-Folgenabschaetzung
               (Art. 35), Meldung von Verletzungen (Art. 33)
             </li>
             <li>Löschung oder Rückgabe nach Vertragsende</li>
@@ -139,7 +139,7 @@ export default function AvvPage() {
               </tr>
               <tr>
                 <td>Anthropic Inc.</td>
-                <td>KI-gestuetzte CV-Plausibilitaetspruefung</td>
+                <td>KI-gestuetzte CV-Plausibilitätsprüfung</td>
                 <td>US</td>
                 <td>SCC + DPF, keine Trainings-Nutzung</td>
               </tr>

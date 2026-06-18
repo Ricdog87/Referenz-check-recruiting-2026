@@ -23,9 +23,9 @@ export function isAdmin(session: Session | null | undefined): boolean {
 }
 
 // ── SLA-Tracking ────────────────────────────────────────────────────────
-// Wir versprechen Kunden 24h fuer Reviewer-Pruefungen — bei Express-24h-
+// Wir versprechen Kunden 24h für Reviewer-Prüfungen — bei Express-24h-
 // Add-on (€29 Aufpreis) wird die Frist halbiert auf 12h. Helper liefern
-// Badge-Farben fuer Queue und Dashboard aus dem Abstand zwischen
+// Badge-Farben für Queue und Dashboard aus dem Abstand zwischen
 // "im Review seit" (= ReferenceCheck.updatedAt) und jetzt.
 export const SLA_HOURS = 24
 const SLA_WARN_HOURS = 18 // ab dann orange „Achtung"

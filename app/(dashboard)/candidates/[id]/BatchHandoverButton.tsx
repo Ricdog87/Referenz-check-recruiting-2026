@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation'
 import { ShieldCheck, Loader2 } from 'lucide-react'
 
 /**
- * Sammeluebergabe aller offenen Pruefungen eines Kandidaten an den
- * Reviewer-Pool. Ein Klick statt N Einzeluebergaben auf N Check-Seiten.
- * Wird nur angezeigt, wenn es >=1 offene Pruefung (OPEN/IN_PROGRESS) gibt.
+ * Sammelübergabe aller offenen Prüfungen eines Kandidaten an den
+ * Reviewer-Pool. Ein Klick statt N Einzelübergaben auf N Check-Seiten.
+ * Wird nur angezeigt, wenn es >=1 offene Prüfung (OPEN/IN_PROGRESS) gibt.
  */
 export function BatchHandoverButton({
   candidateId,
@@ -25,7 +25,7 @@ export function BatchHandoverButton({
   async function handover() {
     if (
       !confirm(
-        `${openCount} offene Referenz${openCount > 1 ? 'en' : ''} an den Reviewer-Pool uebergeben? Ein geschulter Reviewer uebernimmt Gespraech & Freigabe.`,
+        `${openCount} offene Referenz${openCount > 1 ? 'en' : ''} an den Reviewer-Pool übergeben? Ein geschulter Reviewer uebernimmt Gespraech & Freigabe.`,
       )
     )
       return
@@ -35,11 +35,11 @@ export function BatchHandoverButton({
       const res = await fetch(`/api/candidates/${candidateId}/handover`, { method: 'POST' })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(body?.error ?? `Uebergabe fehlgeschlagen (HTTP ${res.status}).`)
+        throw new Error(body?.error ?? `Übergabe fehlgeschlagen (HTTP ${res.status}).`)
       }
       router.refresh()
     } catch (e: any) {
-      setErr(e?.message ?? 'Uebergabe fehlgeschlagen.')
+      setErr(e?.message ?? 'Übergabe fehlgeschlagen.')
     } finally {
       setLoading(false)
     }

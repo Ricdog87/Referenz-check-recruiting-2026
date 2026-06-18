@@ -15,8 +15,8 @@ export const dynamic = 'force-dynamic'
  * - Validierung + Rate-Limit (3/IP/h)
  * - Speichert LeadMagnetRequest (DSGVO Art. 6 Abs. 1 lit. a, dokumentiert)
  * - Schreibt AuditLog LEAD_MAGNET_REQUESTED
- * - Sendet Bestaetigungs-E-Mail mit Link auf die Resource
- * - Newsletter ist Double-Opt-In: optionale Bestaetigungs-Mail mit
+ * - Sendet Bestätigungs-E-Mail mit Link auf die Resource
+ * - Newsletter ist Double-Opt-In: optionale Bestätigungs-Mail mit
  *   eigenem Link (separater Schritt, hier nur Speicherung der Absicht)
  */
 export async function POST(req: NextRequest) {
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   const rl = rateLimit(`leadmagnet:${ip}`, 3, 60 * 60 * 1000)
   if (!rl.ok) {
     return NextResponse.json(
-      { error: 'Zu viele Anfragen. Bitte spaeter erneut versuchen.' },
+      { error: 'Zu viele Anfragen. Bitte später erneut versuchen.' },
       { status: 429 },
     )
   }
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Ungueltige Anfrage' }, { status: 400 })
+    return NextResponse.json({ error: 'Ungültige Anfrage' }, { status: 400 })
   }
 
   const slug = body.slug?.trim() ?? ''
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   const newsletter = body.newsletter === true
 
   if (!slug || !firstName || !email) {
-    return NextResponse.json({ error: 'Bitte Pflichtfelder ausfuellen.' }, { status: 400 })
+    return NextResponse.json({ error: 'Bitte Pflichtfelder ausfüllen.' }, { status: 400 })
   }
   if (!consent) {
     return NextResponse.json(
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     )
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: 'Ungueltige E-Mail-Adresse.' }, { status: 400 })
+    return NextResponse.json({ error: 'Ungültige E-Mail-Adresse.' }, { status: 400 })
   }
 
   const magnet = getLeadMagnet(slug)
@@ -125,10 +125,10 @@ export async function POST(req: NextRequest) {
         to: email,
         subject: `Ihr Link: ${magnet.title}`,
         html: `<p>Hallo ${firstName},</p>
-<p>vielen Dank fuer Ihr Interesse — hier der Link zu <strong>${magnet.title}</strong>:</p>
+<p>vielen Dank für Ihr Interesse — hier der Link zu <strong>${magnet.title}</strong>:</p>
 <p><a href="${url}">${url}</a></p>
 <p>Im Browser koennen Sie den Inhalt direkt als PDF speichern (Browser-Druckdialog &rarr; Ziel: PDF).</p>
-${newsletter ? `<hr/><p>Sie haben den candiq Praxis-Newsletter mit angefordert. Wir senden Ihnen in Kuerze eine separate <strong>Bestaetigungs-Mail (Double-Opt-In)</strong>. Erst nach Klick auf den Link in dieser Mail werden Sie zum Newsletter hinzugefuegt.</p>` : ''}
+${newsletter ? `<hr/><p>Sie haben den candiq Praxis-Newsletter mit angefordert. Wir senden Ihnen in Kuerze eine separate <strong>Bestätigungs-Mail (Double-Opt-In)</strong>. Erst nach Klick auf den Link in dieser Mail werden Sie zum Newsletter hinzugefuegt.</p>` : ''}
 <p>Bei Rueckfragen: <a href="mailto:hello@candiq.de">hello@candiq.de</a>.</p>
 <p>Beste Gruesse,<br/>candiq</p>`,
       })

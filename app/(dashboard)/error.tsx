@@ -21,7 +21,7 @@ export default function DashboardError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Surface das Detail in der Browser-Console fuer Support-Tickets;
+    // Surface das Detail in der Browser-Console für Support-Tickets;
     // der digest ist die Server-seitige Korrelations-ID.
     console.error('[dashboard:error]', error, { digest: error.digest })
   }, [error])

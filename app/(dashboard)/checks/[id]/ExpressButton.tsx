@@ -10,7 +10,7 @@ type Props = {
   status: string
 }
 
-// Express-24h ist nicht mehr buchbar, wenn die Pruefung schon final ist —
+// Express-24h ist nicht mehr buchbar, wenn die Prüfung schon final ist —
 // dann waere der Aufpreis wirkungslos.
 const TERMINAL_STATUSES = ['COMPLETED', 'FAILED']
 

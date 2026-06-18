@@ -2,14 +2,14 @@
  * Hero-Variant-A/B-Setup — minimal & SSR-sicher.
  *
  * Beide Varianten machen klar: candiq verifiziert Referenzen — die
- * eigentliche Pruefung wird von geschulten Reviewern am Telefon
- * gefuehrt, NICHT von einer KI mit dem Kandidaten. Die Voice-Demo
+ * eigentliche Prüfung wird von geschulten Reviewern am Telefon
+ * geführt, NICHT von einer KI mit dem Kandidaten. Die Voice-Demo
  * rechts ist eine interaktive Produktdemo, kein Teil des produktiven
- * Pruefungs-Flows.
+ * Prüfungs-Flows.
  *
  * Variante wird per env-var NEXT_PUBLIC_HERO_VARIANT gesetzt:
  *  - 'A' (default): "Referenzen verifiziert." — outcome-orientiert
- *  - 'B':           "Wir pruefen, wer wirklich was war." — substanz-orientiert
+ *  - 'B':           "Wir prüfen, wer wirklich was war." — substanz-orientiert
  *
  * Tracking-Events landen im GA4 als 'hero_engagement' mit Parametern
  * action + variant + experiment_id.
@@ -81,7 +81,7 @@ declare global {
 }
 
 /**
- * Schickt ein GA4-Custom-Event fuers Hero-Experiment. No-op wenn gtag
+ * Schickt ein GA4-Custom-Event fürs Hero-Experiment. No-op wenn gtag
  * nicht initialisiert ist (z. B. ohne Consent-Banner-Zustimmung) — der
  * Aufrufer braucht sich nicht um Consent-State zu kuemmern.
  */

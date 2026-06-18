@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic'
 /**
  * POST /api/candidates/:id/handover
  *
- * Sammeluebergabe: setzt ALLE offenen Pruefungen (OPEN / IN_PROGRESS) eines
+ * Sammelübergabe: setzt ALLE offenen Prüfungen (OPEN / IN_PROGRESS) eines
  * Kandidaten in einem Schritt auf IN_REVIEW. Statt N Einzelklicks auf N
  * Check-Detailseiten — ein Klick auf der Kandidaten-Seite.
  *
@@ -49,15 +49,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   if (candidate.checks.length === 0) {
     return NextResponse.json(
-      { error: 'Keine offenen Pruefungen zum Uebergeben. Bereits alle im Review oder abgeschlossen.' },
+      { error: 'Keine offenen Prüfungen zum Uebergeben. Bereits alle im Review oder abgeschlossen.' },
       { status: 400 },
     )
   }
 
-  // DSGVO-Gate: Uebergabe nur mit erteilter Bewerber-Einwilligung.
+  // DSGVO-Gate: Übergabe nur mit erteilter Bewerber-Einwilligung.
   if (!candidate.gdprConsent) {
     return NextResponse.json(
-      { error: 'Einwilligung des Bewerbers fehlt — Uebergabe an Reviewer nicht moeglich.' },
+      { error: 'Einwilligung des Bewerbers fehlt — Übergabe an Reviewer nicht möglich.' },
       { status: 409 },
     )
   }
@@ -72,10 +72,10 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   const candidateName = `${candidate.firstName} ${candidate.lastName}`.trim()
 
   // Side-Effects best-effort: Status ist bereits persistiert, Mail-/Assignment-
-  // Fehler duerfen die Antwort nicht crashen.
+  // Fehler dürfen die Antwort nicht crashen.
   ;(async () => {
     // Round-Robin pro Check (jeder Check kann an einen anderen Reviewer gehen).
-    // Fuer die Team-Mail nehmen wir den ersten zugewiesenen Reviewer als Hinweis.
+    // Für die Team-Mail nehmen wir den ersten zugewiesenen Reviewer als Hinweis.
     let firstAssigned = null
     for (const c of candidate.checks) {
       const a = await assignRoundRobinIfEnabled(c.id, null)

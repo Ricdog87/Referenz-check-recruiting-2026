@@ -88,7 +88,7 @@ export function Hero() {
 
           {/* Headline — KEIN initial-opacity-0, weil das LCP-Element ist.
               Framer-Motion-Fade verzoegert den Render um delay+duration
-              und macht LCP unnoetig spaet (gemessen 2.4s, Schwelle 2.5s). */}
+              und macht LCP unnoetig spät (gemessen 2.4s, Schwelle 2.5s). */}
           <h1 className="text-[clamp(40px,6.5vw,72px)] font-bold leading-[1.02] tracking-tightest mb-6 text-text-primary">
             <span className="block">{copy.headline.line1}</span>
             <span className="block"><span className="text-gradient-brand">{copy.headline.line2}</span></span>

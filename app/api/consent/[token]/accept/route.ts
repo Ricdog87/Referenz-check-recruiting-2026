@@ -160,7 +160,7 @@ export async function POST(req: NextRequest, { params }: { params: { token: stri
 
     // CV-Consent-Gate: alle aktuell AWAITING_CONSENT-CVs dieses Kandidaten
     // werden in derselben Transaktion auf RELEASED gehoben — erst jetzt
-    // duerfen Reviewer den Inhalt abrufen.
+    // dürfen Reviewer den Inhalt abrufen.
     const releaseRes = await releaseAllCvsForCandidate(record.candidateId, tx)
 
     await tx.auditLog.create({

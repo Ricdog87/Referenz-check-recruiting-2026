@@ -189,7 +189,7 @@ function escapeHtml(s: string): string {
 // Bewerber-Einladung zum Self-Service-Consent-Portal
 // ─────────────────────────────────────────────────────────────────
 export function candidateConsentInviteEmail(opts: {
-  /** Voller Name (Vor- + Nachname) — fuer professionelle Anrede. */
+  /** Voller Name (Vor- + Nachname) — für professionelle Anrede. */
   candidateFullName: string
   hiringCompany: string
   position: string
@@ -233,7 +233,7 @@ Falls Sie sich nicht beworben haben, ignorieren Sie diese E-Mail.`
 // HR-Notification: Bewerber hat Einwilligung erteilt
 // ─────────────────────────────────────────────────────────────────
 export function consentAcceptedNotifyHrEmail(opts: {
-  /** Voller HR-Name (Vor- + Nachname) — fuer professionelle Anrede. */
+  /** Voller HR-Name (Vor- + Nachname) — für professionelle Anrede. */
   hrFullName: string
   candidateName: string
   position: string
@@ -266,7 +266,7 @@ Jetzt Prüfung starten: ${opts.candidateUrl}`
 // HR-Notification: Bewerber hat Einwilligung widerrufen
 // ─────────────────────────────────────────────────────────────────
 export function consentRevokedNotifyHrEmail(opts: {
-  /** Voller HR-Name (Vor- + Nachname) — fuer professionelle Anrede. */
+  /** Voller HR-Name (Vor- + Nachname) — für professionelle Anrede. */
   hrFullName: string
   candidateName: string
   position: string
@@ -291,9 +291,9 @@ ${opts.candidateUrl}`
 
 
 // ─────────────────────────────────────────────────────────────────
-// Reviewer-Team-Notification: Kunde hat einen Check an Reviewer uebergeben
+// Reviewer-Team-Notification: Kunde hat einen Check an Reviewer übergeben
 // Triggert auf PATCH /api/checks/:id mit status=IN_REVIEW.
-// Empfaenger: REVIEWER_NOTIFICATION_EMAIL (default hello@candiq.de).
+// Empfänger: REVIEWER_NOTIFICATION_EMAIL (default hello@candiq.de).
 // ─────────────────────────────────────────────────────────────────
 export type ReviewerHandoffCheck = {
   candidatePosition: string
@@ -305,8 +305,8 @@ export type ReviewerHandoffCheck = {
 }
 
 /**
- * Reviewer-Team-Benachrichtigung bei Uebergabe. Unterstuetzt 1..N Pruefungen
- * (Sammeluebergabe): bei N>1 wird EINE Mail mit allen Referenzen gesendet
+ * Reviewer-Team-Benachrichtigung bei Übergabe. Unterstützt 1..N Prüfungen
+ * (Sammelübergabe): bei N>1 wird EINE Mail mit allen Referenzen gesendet
  * statt N Einzel-Mails. Optional `assignedTo` (Name des per Round-Robin
  * zugewiesenen Reviewers) wird im Betreff + Body hervorgehoben.
  */

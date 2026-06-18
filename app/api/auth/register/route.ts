@@ -20,7 +20,7 @@ const MAX_EMAIL_LEN = 254
 const MAX_PASSWORD_LEN = 128
 const MIN_PASSWORD_LEN = 8
 
-// Aktuell gueltige Versionen der jeweiligen Rechtsdokumente. Bei Aenderung der
+// Aktuell gültige Versionen der jeweiligen Rechtsdokumente. Bei Änderung der
 // Texte muss hier hochgezogen werden, damit revisionssicher nachweisbar bleibt,
 // welche Fassung der User beim Signup akzeptiert hat (DSGVO Art. 7 Abs. 1).
 const TERMS_VERSION = '1.0'
@@ -49,9 +49,9 @@ export async function POST(req: NextRequest) {
   const cleanEmail = String(email ?? '').trim().toLowerCase().slice(0, MAX_EMAIL_LEN)
   const rawPassword = typeof password === 'string' ? password : ''
 
-  // PDL-Registrierung: standardmaessig GESCHLOSSEN — PDL-Pakete sind in
-  // Vorbereitung und werden spaeter ueber den dedizierten Sales-Flow
-  // freigegeben. Falls geoeffnet werden soll, in Vercel-Env explizit:
+  // PDL-Registrierung: standardmäßig GESCHLOSSEN — PDL-Pakete sind in
+  // Vorbereitung und werden später über den dedizierten Sales-Flow
+  // freigegeben. Falls geöffnet werden soll, in Vercel-Env explizit:
   // PDL_REGISTRATION_OPEN=true setzen.
   const pdlOpen = (process.env.PDL_REGISTRATION_OPEN ?? 'false').toLowerCase() === 'true'
   if (accountType === 'RECRUITMENT_AGENCY' && !pdlOpen) {
@@ -76,9 +76,9 @@ export async function POST(req: NextRequest) {
   if (rawPassword.length > MAX_PASSWORD_LEN) {
     return NextResponse.json({ error: `Passwort darf maximal ${MAX_PASSWORD_LEN} Zeichen haben.` }, { status: 400 })
   }
-  // DSGVO Art. 7 + Planet49: AGB und Datenschutz duerfen nicht gebuendelt
+  // DSGVO Art. 7 + Planet49: AGB und Datenschutz dürfen nicht gebuendelt
   // akzeptiert werden. Beide Felder werden hier einzeln und mit klarer
-  // Fehlermeldung geprueft.
+  // Fehlermeldung geprüft.
   if (acceptTerms !== true) {
     return NextResponse.json(
       { error: 'Bitte akzeptieren Sie die AGB.', field: 'acceptTerms' },
@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
           plan: cleanPlan,
           trialEndsAt,
           // Zwei getrennte Consent-Records, einer pro Rechtsdokument-Version.
-          // Bei einer Aenderung von AGB oder Datenschutz wird beim naechsten
+          // Bei einer Änderung von AGB oder Datenschutz wird beim nächsten
           // Touchpoint die neue Version erneut angefragt — Audit-Trail bleibt.
           gdprConsents: {
             create: [

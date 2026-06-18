@@ -81,7 +81,7 @@ export const CAPTURE_LEAD_TOOL = {
       summary: {
         type: 'string',
         description:
-          '1-2 Saetze, was der Visitor will. Konkret, ohne Marketing-Sprech. Beispiel: "Tech-Recruiter mit ~40 Mitarbeitern fragt nach Bulk-CV-Verifizierung fuer Q3-Hiring-Welle. Vergleicht mit HRForecast."',
+          '1-2 Saetze, was der Visitor will. Konkret, ohne Marketing-Sprech. Beispiel: "Tech-Recruiter mit ~40 Mitarbeitern fragt nach Bulk-CV-Verifizierung für Q3-Hiring-Welle. Vergleicht mit HRForecast."',
       },
       language: {
         type: 'string',
@@ -106,7 +106,7 @@ export const CAPTURE_LEAD_TOOL = {
       timing_hint: {
         type: 'string',
         description:
-          'Falls genannt: Zeitfenster fuer Entscheidung/Start. Beispiele: "ASAP", "Q3/2026", "in 2-3 Wochen", "noch offen". Leer lassen wenn nicht erkennbar.',
+          'Falls genannt: Zeitfenster für Entscheidung/Start. Beispiele: "ASAP", "Q3/2026", "in 2-3 Wochen", "noch offen". Leer lassen wenn nicht erkennbar.',
       },
       email_provided: {
         type: 'string',
@@ -122,7 +122,7 @@ export const CAPTURE_LEAD_TOOL = {
       recommended_next_action: {
         type: 'string',
         description:
-          'Konkrete naechste Sales-Aktion in 1 Satz. Beispiele: "Calendly-Termin direkt nachschicken", "Pilot-One-Pager + Case-Study senden", "Reply mit Bulk-CV-Preisbeispiel", "Kein Follow-up, reine Wissensfrage".',
+          'Konkrete nächste Sales-Aktion in 1 Satz. Beispiele: "Calendly-Termin direkt nachschicken", "Pilot-One-Pager + Case-Study senden", "Reply mit Bulk-CV-Preisbeispiel", "Kein Follow-up, reine Wissensfrage".',
       },
     },
     required: ['score', 'intent', 'summary', 'language', 'key_signals'],
@@ -132,10 +132,10 @@ export const CAPTURE_LEAD_TOOL = {
 export type ChatMessage = { role: 'user' | 'assistant'; content: string }
 
 /**
- * System-Prompt fuer den Scoring-Sub-Agent (Haiku).
+ * System-Prompt für den Scoring-Sub-Agent (Haiku).
  * Bewusst KURZ — die Aufgabe ist nur Klassifikation, keine Generierung.
  */
-export const INTENT_SYSTEM_PROMPT = `Du bist ein Sales-Intent-Klassifikator fuer die SaaS candiq (DSGVO-konforme Reference-Checks fuer DACH-Recruiting).
+export const INTENT_SYSTEM_PROMPT = `Du bist ein Sales-Intent-Klassifikator für die SaaS candiq (DSGVO-konforme Reference-Checks für DACH-Recruiting).
 
 Du bekommst eine Konversation zwischen einem Website-Visitor und dem candiq-AI-Concierge. Deine einzige Aufgabe: rufe das Tool \`capture_lead\` mit einem BANT-Score 0-100 und strukturierten Feldern auf.
 
@@ -143,19 +143,19 @@ Strenge Regeln:
 - IMMER das Tool aufrufen — auch bei Score 0.
 - Keine Halluzinationen — nur was wirklich in der Konversation steht.
 - Score-Inflation vermeiden: hoeflicher Smalltalk != Kauf-Intent.
-- Disqualifikatoren erkennen: "nur recherchieren", "fuer die Uni", "bin Mitbewerber" -> Score <= 10, intent = "irrelevant" oder "research".
+- Disqualifikatoren erkennen: "nur recherchieren", "für die Uni", "bin Mitbewerber" -> Score <= 10, intent = "irrelevant" oder "research".
 - E-Mail nur extrahieren, wenn sie der Visitor selbst genannt hat.
 - summary in der Sprache des Visitors.`
 
 /**
- * Heuristische Klammer fuer Hot-Lead-Schwelle.
+ * Heuristische Klammer für Hot-Lead-Schwelle.
  * 60 ist die operative Grenze: ab hier lohnt ein sofortiger Alert an den
  * Founder, weil das BANT-Profil zumindest 2 starke Signale enthaelt.
  */
 export const HOT_LEAD_THRESHOLD = 60
 
 /**
- * Empfaenger fuer den internen Hot-Lead-Alert.
+ * Empfänger für den internen Hot-Lead-Alert.
  * Per Env override-bar — Default ist der Gruender (siehe Briefing).
  */
 export const LEAD_ALERT_RECIPIENT =
@@ -303,7 +303,7 @@ export function buildLeadAlertEmail(ctx: LeadAlertContext): {
         <div>${transcript}</div>
 
         <p style="margin:24px 0 0;font-size:11px;color:#94a3b8;line-height:1.6;">
-          Automatisch generiert vom candiq AI-Concierge · Score-Threshold >= ${HOT_LEAD_THRESHOLD} · DSGVO Art. 6 Abs. 1 lit. f (berechtigtes Interesse — Vertragsanbahnung) · Conversation wurde NICHT persistent gespeichert, sondern nur fuer diesen Alert verarbeitet.
+          Automatisch generiert vom candiq AI-Concierge · Score-Threshold >= ${HOT_LEAD_THRESHOLD} · DSGVO Art. 6 Abs. 1 lit. f (berechtigtes Interesse — Vertragsanbahnung) · Conversation wurde NICHT persistent gespeichert, sondern nur für diesen Alert verarbeitet.
         </p>
       </div>
     </div>

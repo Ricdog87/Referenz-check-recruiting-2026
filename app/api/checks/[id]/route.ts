@@ -109,7 +109,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     const candidateName = `${check.candidate.firstName} ${check.candidate.lastName}`.trim()
 
     ;(async () => {
-      // Round-Robin zuerst — Ergebnis fliesst in die Mail-Empfaenger (Finding 3).
+      // Round-Robin zuerst — Ergebnis fliesst in die Mail-Empfänger (Finding 3).
       const assigned = await assignRoundRobinIfEnabled(updated.id, updated.assignedReviewerId)
 
       await notifyReviewerHandoff({

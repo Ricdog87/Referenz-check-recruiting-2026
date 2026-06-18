@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   }
 
   // Ownership-Check noch hier — wir wollen nicht, dass HR-User X einen
-  // Invite fuer den Kandidaten von User Y triggert.
+  // Invite für den Kandidaten von User Y triggert.
   const owned = await prisma.candidate.findFirst({
     where: { id: params.id, userId: session.user.id },
     select: { id: true },

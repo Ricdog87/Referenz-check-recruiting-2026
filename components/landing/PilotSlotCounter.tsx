@@ -6,7 +6,7 @@ import { Sparkles, Users, CheckCircle2 } from 'lucide-react'
 type Slots = { max: number; used: number; remaining: number; full: boolean; degraded?: boolean }
 
 /**
- * Scarcity-Counter fuer das Pilot-Programm. Liest die echte Slot-Belegung
+ * Scarcity-Counter für das Pilot-Programm. Liest die echte Slot-Belegung
  * aus /api/pilot-application/slots und rendert je nach Stand drei
  * visuell unterschiedliche Zustaende:
  *

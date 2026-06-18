@@ -1,5 +1,5 @@
 /**
- * Per-query Fehler-Catch fuer Server-Components mit Promise.all().
+ * Per-query Fehler-Catch für Server-Components mit Promise.all().
  *
  * Hintergrund: Wenn EINE Prisma-Query in einem Promise.all() throwt
  * (Driver-Hick-Up, nicht migrierte Spalte, leere Relation, Timeout),

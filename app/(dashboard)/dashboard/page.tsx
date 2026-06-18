@@ -20,7 +20,7 @@ export default async function DashboardPage() {
   if (!session) return null
 
   // Role-Routing: candiq-internes Personal (ADMIN/REVIEWER) hat eigene
-  // Cockpits — das Kunden-Dashboard ist fuer sie inhaltlich irrelevant
+  // Cockpits — das Kunden-Dashboard ist für sie inhaltlich irrelevant
   // (keine eigenen Kandidaten, keine Pipeline-Health, keine Add-on-Buchungen).
   // ADMIN → Kundenliste; REVIEWER → Stats-Dashboard.
   if (isAdmin(session)) redirect('/admin/customers')
@@ -31,7 +31,7 @@ export default async function DashboardPage() {
 
   // Jede einzelne Query so wrappen, dass ein Fehler NIE das gesamte Dashboard
   // auf error.tsx schickt. Pro Query gibt es einen typsicheren Fallback.
-  // Siehe lib/safe-query.ts fuer Rationale.
+  // Siehe lib/safe-query.ts für Rationale.
 
   const [
     totalCandidates,
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
     const dayChecks = allChecks.filter((c) => {
       // updatedAt ist im Schema non-null, aber in Prisma-Sicht ist der
       // Driver-Layer nicht zu 100% trauenswert (Edge-Cases bei nicht
-      // migrierten Spalten o.ae.). Defensiv pruefen.
+      // migrierten Spalten o.ae.). Defensiv prüfen.
       if (!c?.updatedAt || typeof (c.updatedAt as Date).getTime !== 'function') return false
       const t = (c.updatedAt as Date).getTime()
       return t >= d.getTime() && t < next.getTime()
@@ -148,7 +148,7 @@ export default async function DashboardPage() {
       ? 0
       : Math.round(dc.reduce((acc, c) => acc + (c.calledAt.getTime() - c.createdAt.getTime()) / 36e5, 0) / dc.length)
     // Array-Index defensiv: getDay() liefert immer 0-6, dayLabels hat 7 Eintraege.
-    // Trotzdem Fallback fuer Engine-Edge-Cases (z. B. Timezone-Verschiebungen).
+    // Trotzdem Fallback für Engine-Edge-Cases (z. B. Timezone-Verschiebungen).
     const dayLabel = dayLabels[d.getDay() === 0 ? 6 : d.getDay() - 1] ?? '—'
     turnaround.push({ day: dayLabel, hours: avgH })
   }

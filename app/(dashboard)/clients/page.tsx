@@ -50,7 +50,7 @@ export default async function ClientsPage() {
             </div>
             <p className="text-xs text-text-secondary leading-relaxed max-w-2xl">
               Endkunden mit eigenen Workflows, White-Label-Branding und isolierten Reports
-              sind in Vorbereitung. Heute laufen alle Kandidaten und Pruefungen im selben
+              sind in Vorbereitung. Heute laufen alle Kandidaten und Prüfungen im selben
               Workspace — Reports tragen das candiq-Branding.
               <br />
               Fruehzugang oder Mitsprache bei der Spec? Mail an{' '}

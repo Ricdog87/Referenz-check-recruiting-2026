@@ -5,8 +5,8 @@ import { motion } from 'framer-motion'
 
 /**
  * Client-Component: HubSpot Booking Widget mit explizitem CSP-Nonce
- * vom Server-Wrapper. Ohne diesen Nonce wuerde 'strict-dynamic' in der
- * CSP die URL-Allowlist fuer hsappstatic.net ignorieren — Script-Tag
+ * vom Server-Wrapper. Ohne diesen Nonce würde 'strict-dynamic' in der
+ * CSP die URL-Allowlist für hsappstatic.net ignorieren — Script-Tag
  * waere dann von der Policy blockiert.
  */
 export function TerminBookingEmbed({ nonce }: { nonce: string | undefined }) {

@@ -17,11 +17,11 @@ export const maxDuration = 60
  * Workflow:
  *  - Findet alle PilotApplication mit status='PENDING'
  *  - Pro Bewerbung: passender Reminder-Step ist der mit dem groessten
- *    day, fuer den (createdAt + day) <= now UND (lastReminderSent
+ *    day, für den (createdAt + day) <= now UND (lastReminderSent
  *    < step.day ODER lastReminderSent NULL)
  *  - Sendet die Mail, setzt lastReminderSent + lastReminderAt
  *  - Best-effort: Mail-Fehler stoppen die Schleife nicht, aber werden
- *    geloggt — am naechsten Tag wird der gleiche Step erneut versucht
+ *    geloggt — am nächsten Tag wird der gleiche Step erneut versucht
  *
  * Schreibt am Ende EINEN AuditLog-Eintrag mit Aggregat-Stats.
  */
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 
   for (const c of candidates) {
     const ageDays = Math.floor((now - c.createdAt.getTime()) / dayMs)
-    // hoechster Step, fuer den die Bewerbung alt genug ist UND der noch
+    // höchster Step, für den die Bewerbung alt genug ist UND der noch
     // nicht gesendet wurde
     const dueStep = sortedSteps.find(
       (s) => ageDays >= s.day && (c.lastReminderSent ?? 0) < s.day,

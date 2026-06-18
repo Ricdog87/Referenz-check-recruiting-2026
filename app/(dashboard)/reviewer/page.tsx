@@ -15,7 +15,7 @@ import {
   Users,
 } from 'lucide-react'
 
-// Stats immer frisch — sehr leichte Queries, kein Cache noetig.
+// Stats immer frisch — sehr leichte Queries, kein Cache nötig.
 export const dynamic = 'force-dynamic'
 
 export default async function ReviewerDashboardPage() {
@@ -53,7 +53,7 @@ export default async function ReviewerDashboardPage() {
     }),
   ])
 
-  // User-Details nur fuer die Top-Reviewer nachladen — 1 zusaetzliche Query.
+  // User-Details nur für die Top-Reviewer nachladen — 1 zusaetzliche Query.
   const reviewerIds = topReviewersRaw
     .map((g) => g.userId)
     .filter((id): id is string => id !== null)
@@ -65,7 +65,7 @@ export default async function ReviewerDashboardPage() {
     : []
   const reviewerMap = new Map(reviewerUsers.map((u) => [u.id, u]))
 
-  // Aelteste offene Pruefung + Anzahl SLA-Verletzungen.
+  // Älteste offene Prüfung + Anzahl SLA-Verletzungen.
   // Bei Express-Checks gilt 12h-SLA statt 24h.
   let oldest: { hoursInQueue: number; state: SlaState } | null = null
   let breachedCount = 0
@@ -94,7 +94,7 @@ export default async function ReviewerDashboardPage() {
           accent="brand"
         />
         <StatCard
-          label="Aelteste Pruefung"
+          label="Älteste Prüfung"
           value={oldest ? formatHoursShort(oldest.hoursInQueue) : '—'}
           icon={
             oldest?.state === 'breached' ? (
@@ -130,7 +130,7 @@ export default async function ReviewerDashboardPage() {
           <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
           <div className="min-w-0">
             <div className="font-semibold text-rose-800">
-              {breachedCount} Pruefung(en) ueber {SLA_HOURS}h in der Queue
+              {breachedCount} Prüfung(en) über {SLA_HOURS}h in der Queue
             </div>
             <div className="text-sm text-rose-700 mt-0.5">
               SLA verletzt — bitte priorisiert abarbeiten.
@@ -151,11 +151,11 @@ export default async function ReviewerDashboardPage() {
           className="card-lg p-5 flex items-center justify-between hover:border-brand-300 transition-colors"
         >
           <div>
-            <div className="font-bold text-text-primary">Reviewer-Queue oeffnen</div>
+            <div className="font-bold text-text-primary">Reviewer-Queue öffnen</div>
             <div className="text-sm text-text-secondary">
               {openChecks.length === 0
-                ? 'Aktuell keine offenen Pruefungen — alles abgearbeitet.'
-                : `${openChecks.length} Pruefung(en) FIFO sortiert (aelteste zuerst).`}
+                ? 'Aktuell keine offenen Prüfungen — alles abgearbeitet.'
+                : `${openChecks.length} Prüfung(en) FIFO sortiert (älteste zuerst).`}
             </div>
           </div>
           <ArrowRight className="w-5 h-5 text-text-muted" />
@@ -171,7 +171,7 @@ export default async function ReviewerDashboardPage() {
               <div>
                 <div className="font-bold text-text-primary">Kundenverwaltung</div>
                 <div className="text-sm text-text-secondary">
-                  Alle HR-Kunden, Auftraege, Reviewer-Zuweisungen, Add-on-Orders.
+                  Alle HR-Kunden, Aufträge, Reviewer-Zuweisungen, Add-on-Orders.
                 </div>
               </div>
             </div>

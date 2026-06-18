@@ -56,7 +56,7 @@ function checkRateLimit(ip: string): boolean {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Pro IP Score-Memoization fuer 5 Minuten — verhindert doppelte
+// Pro IP Score-Memoization für 5 Minuten — verhindert doppelte
 // Hot-Lead-Mails, wenn der Visitor mehrfach scrollt/sendet.
 // ─────────────────────────────────────────────────────────────────
 const lastAlertMap = new Map<string, { score: number; sentAt: number }>()
@@ -312,7 +312,7 @@ export async function POST(req: Request) {
 
       // HubSpot-Sync: bei Hot-Lead mit erkannter E-Mail, Contact upserten
       // mit Score-Metadaten. Best-effort — Fehler stoppen den Flow nicht.
-      // Brauchbar fuer Sales-Folgeprozess in HubSpot (Pipeline-View,
+      // Brauchbar für Sales-Folgeprozess in HubSpot (Pipeline-View,
       // Sequenzen, Aufgaben).
       if (lead.email_provided) {
         try {

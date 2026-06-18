@@ -10,20 +10,20 @@ export const dynamic = 'force-dynamic'
  * POST /api/candidate-waitlist — Bewerber-Self-Service Phase-1 Waitlist
  *
  * Erfasst Interesse von Bewerber:innen, die candiq selbst nutzen wollen,
- * um ihre Bewerbungen vorab zu verifizieren (Schufa-Analogon fuer
+ * um ihre Bewerbungen vorab zu verifizieren (Schufa-Analogon für
  * Recruiting). Phase 1 ist reines Interesse-Capture — kein Account,
  * kein Dashboard, kein Auth. Der echte Bewerber-Self-Service-Flow folgt
  * in Phase 2-4.
  *
  * Storage-Reuse: Wir schreiben in `LeadMagnetRequest` mit dem fixen
  * `slug = 'candidate-self-service'`. Damit nullen wir das Schema-Risiko,
- * der bestehende DSGVO-Auto-Loeschungs-Cron (180 Tage) greift, und der
- * HubSpot-Sync laeuft ueber den bekannten Pfad mit eigenem source-Tag.
+ * der bestehende DSGVO-Auto-Löschungs-Cron (180 Tage) greift, und der
+ * HubSpot-Sync läuft über den bekannten Pfad mit eigenem source-Tag.
  *
  * Body: { firstName, email, position?, consent, newsletter? }
  * - firstName + email + consent: Pflicht
  * - position: optional (Job-Titel/-Bereich des Bewerbers)
- * - newsletter: optional (Double-Opt-In im naechsten Schritt — fuer
+ * - newsletter: optional (Double-Opt-In im nächsten Schritt — für
  *   Phase 1 bewusst noch nicht versendet, nur Intent gespeichert)
  *
  * Rate-Limit: 5/h pro IP (haerter als Lead-Magnet — Form ist nur EIN
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         firstName,
         email,
         // `position` koennen wir in das company-Feld kippen — wir nutzen
-        // den Slot zweckentfremdet, weil sich das Modell nicht aendern
+        // den Slot zweckentfremdet, weil sich das Modell nicht ändern
         // soll. Phase-2-Migration trennt das sauber.
         company: position,
         consent,
@@ -107,12 +107,12 @@ export async function POST(req: NextRequest) {
     })
 
     // HubSpot CRM-Sync (best-effort, nicht blockierend) — unterscheidbar
-    // von HR-Leads ueber candiq_source = candidate_self_service_waitlist.
+    // von HR-Leads über candiq_source = candidate_self_service_waitlist.
     try {
       const sync = await upsertContact({
         email,
         firstname: firstName,
-        // company-Slot fuer position (s.o.) — fuer HubSpot mappen wir
+        // company-Slot für position (s.o.) — für HubSpot mappen wir
         // das als jobtitle, nicht company.
         jobtitle: position ?? undefined,
         lifecyclestage: 'subscriber',
@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
       console.error('candidate_waitlist_hubspot_sync_error', { message: hsErr?.message })
     }
 
-    // Best-effort-Mails (nicht blockierend) im candiq-Layout: Bestaetigung an Bewerber:in + Info an uns.
+    // Best-effort-Mails (nicht blockierend) im candiq-Layout: Bestätigung an Bewerber:in + Info an uns.
     try {
       const { sendEmail, candidateWaitlistConfirmEmail, candidateWaitlistNotifyEmail } = await import('@/lib/email')
       const confirm = candidateWaitlistConfirmEmail({ firstName, newsletter })

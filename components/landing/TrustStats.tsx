@@ -22,7 +22,7 @@ type Slots = {
  * Zahl als ehrliches "Knappheit + Traction"-Signal.
  *
  * Bei DB-Ausfall (degraded) blenden wir die Live-Stats aus, statt
- * irrefuehrende Nullen zu zeigen.
+ * irreführende Nullen zu zeigen.
  */
 export function TrustStats() {
   const [slots, setSlots] = useState<Slots | null>(null)

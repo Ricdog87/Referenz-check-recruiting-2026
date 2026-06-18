@@ -61,14 +61,14 @@ export default async function AdminCustomerDetailPage({
     },
   })
 
-  // Add-on-Orders fuer Billing-Kontext.
+  // Add-on-Orders für Billing-Kontext.
   const recentOrders = await prisma.addonOrder.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
     take: 10,
   })
 
-  // Letzte Audit-Events fuer Sales/Support-Kontext.
+  // Letzte Audit-Events für Sales/Support-Kontext.
   const recentAudit = await prisma.auditLog.findMany({
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },

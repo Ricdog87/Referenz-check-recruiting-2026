@@ -1,11 +1,11 @@
 /**
  * scripts/backfill-cv-status.ts
  *
- * Einmal-Migration nach dem Schema-Push, der den CV-Gate einfuehrt
+ * Einmal-Migration nach dem Schema-Push, der den CV-Gate einführt
  * (PR #126 / Document.cvStatus).
  *
  * Logik:
- *  - Alle Documents mit type='CV', wo der zugehoerige Candidate bereits
+ *  - Alle Documents mit type='CV', wo der zugehörige Candidate bereits
  *    gdprConsent=true hat → cvStatus='RELEASED', releasedAt=now()
  *  - Alle anderen bleiben auf default 'AWAITING_CONSENT'.
  *
@@ -55,7 +55,7 @@ async function main() {
   console.log(`  ✓ ${res.count} CV-Document(s) auf RELEASED gehoben`)
   console.log('')
   console.log('  Restliche AWAITING_CONSENT-CVs sind Documents von Kandidaten,')
-  console.log('  die noch nicht eingewilligt haben — bleiben gesperrt fuer Reviewer.')
+  console.log('  die noch nicht eingewilligt haben — bleiben gesperrt für Reviewer.')
   console.log('═════════════════════════════════════════════════════════════')
 }
 

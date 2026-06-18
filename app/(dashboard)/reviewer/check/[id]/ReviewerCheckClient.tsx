@@ -30,7 +30,7 @@ const RESULTS = [
 // Robuste Fehler-Extraktion: ein leerer/kein-JSON-Body (z. B. 500/502/504
 // ohne Body, etwa bei DB-Pool-Erschoepfung) darf NICHT in einem kryptischen
 // "Unexpected end of JSON input" enden. Wir parsen defensiv und fallen sonst
-// auf eine verstaendliche Meldung inkl. HTTP-Status zurueck.
+// auf eine verständliche Meldung inkl. HTTP-Status zurueck.
 async function errorFromResponse(res: Response, fallback: string): Promise<string> {
   try {
     const data = await res.json()
@@ -82,7 +82,7 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
     if (!aggConfirmed) {
       setMsg({
         type: 'err',
-        text: 'Bitte AGG-Bestaetigung anhaken — Pflicht vor jeder Freigabe.',
+        text: 'Bitte AGG-Bestätigung anhaken — Pflicht vor jeder Freigabe.',
       })
       return
     }
@@ -210,14 +210,14 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
               <span className="text-xs text-text-secondary leading-relaxed">
                 <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
                   <ShieldAlert className="w-3.5 h-3.5" />
-                  AGG-Bestaetigung (Pflicht vor Freigabe)
+                  AGG-Bestätigung (Pflicht vor Freigabe)
                 </span>
                 <br />
-                Ich bestaetige, dass diese Bewertung ausschliesslich auf nachpruefbaren
+                Ich bestätige, dass diese Bewertung ausschließlich auf nachprüfbaren
                 Fakten (Position, Beschaeftigungszeitraum, Aufgaben, Verhalten am Arbeitsplatz)
                 beruht — <strong>ohne</strong> Beruecksichtigung von Foto, Herkunft, Religion,
                 Geschlecht, Alter, sexueller Identitaet, Behinderung oder Gesundheitsdaten
-                (§ 1 AGG). Die Bestaetigung wird mit User-ID und Zeitstempel im Audit-Trail
+                (§ 1 AGG). Die Bestätigung wird mit User-ID und Zeitstempel im Audit-Trail
                 dokumentiert.
               </span>
             </label>
@@ -231,7 +231,7 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
               onClick={release}
               disabled={saving || releasing || !aggConfirmed}
               className="btn-primary disabled:opacity-50"
-              title={!aggConfirmed ? 'AGG-Bestaetigung erforderlich' : ''}
+              title={!aggConfirmed ? 'AGG-Bestätigung erforderlich' : ''}
             >
               {releasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Freigeben
             </button>
