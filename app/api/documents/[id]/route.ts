@@ -11,16 +11,17 @@ export const dynamic = 'force-dynamic'
 /**
  * GET /api/documents/:id
  *
- * Server-seitiger CV-Consent-Gate. Liefert KEIN File direkt aus; redirected
- * (302) zum Vercel-Blob, wenn der Aufrufer berechtigt ist.
+ * Server-seitiger CV-Consent-Gate + Storage-Proxy. Streamt den Inhalt
+ * direkt durch — die Vercel-Blob-URL wird NICHT an den Client geleakt
+ * (kein 302-Redirect mehr). Damit ist die Datei nur ueber diese Route
+ * mit gueltiger Session + Gate-Check erreichbar.
  *
- * Wichtig: Reviewer bekommen 403, wenn cvStatus !== RELEASED. HR-Owner
- * duerfen eigene Uploads jederzeit sehen (eigene Daten). Public → 401.
+ * Reviewer brauchen cvStatus=RELEASED. HR-Owner sehen eigene Uploads
+ * jederzeit. Public/anonym → 401.
  *
- * Jede Anfrage wird auditiert (CV_ACCESS_GRANTED / CV_ACCESS_DENIED),
- * unabhaengig vom Ergebnis.
+ * Jede Anfrage auditiert (CV_ACCESS_GRANTED / CV_ACCESS_DENIED).
  */
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   if (!session) {
     return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
@@ -34,9 +35,6 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 })
   }
 
-  // Actor-Bestimmung: Wenn Reviewer ZUFAELLIG auch HR-Owner ist
-  // (z.B. ADMIN, der selbst Kandidaten in eigenem Workspace hat), bevorzugen
-  // wir Owner-Pfad — der ist guenstiger und korrekt (eigene Daten).
   const isOwner = doc.candidate?.userId === session.user.id
   const actor: CvAccessActor = isOwner
     ? { kind: 'owner', userId: session.user.id }
@@ -46,7 +44,6 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
   const gate = hasCvAccess(doc, actor)
 
-  // Audit jede Anfrage — auch denied → forensisch wichtig bei DSGVO-Klagen.
   await prisma.auditLog
     .create({
       data: {
@@ -74,5 +71,31 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     )
   }
 
-  return NextResponse.redirect(doc.path, { status: 302 })
+  // STREAMING-PROXY statt Redirect:
+  // Wir holen die Datei serverseitig von Vercel Blob und streamen sie zum
+  // Client zurueck. Die Blob-URL wird NIE im Browser/Response gezeigt
+  // (keine Location-Header), damit niemand die URL abgreifen + spaeter
+  // ohne Auth abrufen kann.
+  const upstream = await fetch(doc.path)
+  if (!upstream.ok || !upstream.body) {
+    return NextResponse.json({ error: 'Storage-Fehler.' }, { status: 502 })
+  }
+
+  // ?download=1 erzwingt Attachment-Disposition (statt Inline-Preview).
+  const wantsAttachment = new URL(req.url).searchParams.get('download') === '1'
+  const disposition = wantsAttachment ? 'attachment' : 'inline'
+  const safeName = encodeURIComponent(doc.originalName)
+
+  const headers = new Headers()
+  headers.set(
+    'Content-Type',
+    upstream.headers.get('content-type') ?? doc.mimeType ?? 'application/octet-stream',
+  )
+  const len = upstream.headers.get('content-length')
+  if (len) headers.set('Content-Length', len)
+  headers.set('Content-Disposition', `${disposition}; filename="${safeName}"`)
+  headers.set('Cache-Control', 'private, no-store, max-age=0')
+  headers.set('X-Content-Type-Options', 'nosniff')
+
+  return new NextResponse(upstream.body, { status: 200, headers })
 }

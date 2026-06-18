@@ -36,16 +36,28 @@ export default async function ClientsPage() {
         subtitle="Übersicht aller Endkunden Ihrer Vermittlung"
       />
 
-      <div className="card-md mb-6 bg-gradient-to-br from-brand-50/60 to-violet/5 border-brand-100">
+      <div className="card-md mb-6 bg-gradient-to-br from-amber-50/80 to-white border-amber-200">
         <div className="flex items-start gap-4">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-violet flex items-center justify-center text-white shadow-card flex-shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 flex-shrink-0">
             <Briefcase className="w-5 h-5" />
           </div>
           <div>
-            <div className="text-sm font-semibold text-text-primary mb-1">Multi-Mandanten-Workflow</div>
+            <div className="text-sm font-semibold text-text-primary mb-1">
+              Multi-Mandanten-Workflow{' '}
+              <span className="ml-1 px-1.5 py-0.5 rounded bg-amber-200 text-amber-900 text-[10px] font-bold uppercase tracking-wider align-middle">
+                Roadmap Q4 2026
+              </span>
+            </div>
             <p className="text-xs text-text-secondary leading-relaxed max-w-2xl">
-              Verwalten Sie Endkunden mit eigenen Workflows, Branding und Reports. Verfügbar ab Agency Pro.
-              Beta — schreiben Sie an <a href="mailto:hello@candiq.de" className="text-brand-700 font-semibold">hello@candiq.de</a> für Frühzugang.
+              Endkunden mit eigenen Workflows, White-Label-Branding und isolierten Reports
+              sind in Vorbereitung. Heute laufen alle Kandidaten und Pruefungen im selben
+              Workspace — Reports tragen das candiq-Branding.
+              <br />
+              Fruehzugang oder Mitsprache bei der Spec? Mail an{' '}
+              <a href="mailto:hello@candiq.de" className="text-brand-700 font-semibold">
+                hello@candiq.de
+              </a>
+              .
             </p>
           </div>
         </div>
