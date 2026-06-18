@@ -334,3 +334,82 @@ export function candidateWaitlistNotifyEmail(opts: {
   const text = `Neue Bewerber-Waitlist-Anmeldung\nName: ${opts.firstName}\nE-Mail: ${opts.email}\nPosition: ${opts.position ?? '\u2014'}\nNewsletter: ${opts.newsletter ? 'ja' : 'nein'}`
   return { subject: `Neue Bewerber-Waitlist-Anmeldung: ${opts.firstName}`, html, text }
 }
+
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Art. 14 DSGVO \u2014 Info-Mail an Referenzgeber
+// Pflicht-Info, weil candiq personenbezogene Daten des Referenzgebers
+// nicht direkt von ihm erhebt (sondern vom Bewerber), bevor wir ihn
+// kontaktieren. Wird beim Statuswechsel zu IN_REVIEW automatisch
+// versendet, sofern eine E-Mail-Adresse hinterlegt ist.
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+export function refereeArt14NotificationEmail(opts: {
+  refereeName: string
+  refereeCompany: string
+  candidateName: string
+  candidatePosition: string
+  hiringCompany: string
+  optOutUrl?: string
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Information nach Art. 14 DSGVO</h1>
+    <p>Guten Tag ${escapeHtml(opts.refereeName)},</p>
+    <p>
+      <strong>${escapeHtml(opts.candidateName)}</strong> hat Sie als Referenz fuer eine
+      Bewerbung als <strong>${escapeHtml(opts.candidatePosition)}</strong> bei
+      <strong>${escapeHtml(opts.hiringCompany)}</strong> benannt und uns gebeten, mit Ihnen
+      Kontakt aufzunehmen. Sie erhalten in den kommenden Tagen einen kurzen telefonischen
+      oder schriftlichen Kontakt von einem geschulten candiq-Reviewer.
+    </p>
+
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Wer wir sind</strong></p>
+    <p style="margin-top:0;font-size:13px;color:#475569;">
+      candiq ist eine DSGVO-konforme Plattform fuer professionelle Referenzpruefungen,
+      betrieben von der RSG Recruiting Solutions Group GmbH, Am Heiligenhaus 9, 65207
+      Wiesbaden. Wir handeln im Auftrag von <strong>${escapeHtml(opts.hiringCompany)}</strong>
+      (Verantwortlicher i.S.d. Art. 4 Nr. 7 DSGVO).
+    </p>
+
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Welche Daten wir verarbeiten</strong></p>
+    <p style="margin-top:0;font-size:13px;color:#475569;">
+      Name, ggf. Unternehmen (<strong>${escapeHtml(opts.refereeCompany)}</strong>), Funktion
+      und Kontaktdaten \u2014 vom Bewerber freiwillig angegeben. Plus Ihre Antworten zu
+      Position, Beschaeftigungszeitraum und Aufgaben des Bewerbers.
+    </p>
+
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Zweck und Rechtsgrundlage</strong></p>
+    <p style="margin-top:0;font-size:13px;color:#475569;">
+      Verifizierung der Bewerberangaben im Recruiting-Prozess. Rechtsgrundlage: berechtigte
+      Interessen (Art. 6 Abs. 1 lit. f DSGVO) des potenziellen Arbeitgebers. Ihre Antwort
+      ist freiwillig.
+    </p>
+
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Ihre Rechte</strong></p>
+    <p style="margin-top:0;font-size:13px;color:#475569;">
+      Auskunft (Art. 15), Berichtigung (Art. 16), Loeschung (Art. 17), Einschraenkung
+      (Art. 18), Widerspruch (Art. 21). Auto-Loeschung Ihrer Antworten spaetestens
+      6 Monate nach Abschluss des Bewerbungsverfahrens. Beschwerderecht bei der zustaendigen
+      Aufsichtsbehoerde.
+    </p>
+
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kein Kontakt erwuenscht?</strong></p>
+    <p style="margin-top:0;font-size:13px;color:#475569;">
+      Antworten Sie einfach kurz auf diese Mail mit &bdquo;Bitte nicht kontaktieren&ldquo;
+      \u2014 wir loeschen Ihre Daten dann unverzueglich und der Bewerber wird gebeten, eine
+      andere Referenz zu nennen.
+    </p>
+
+    <p style="font-size:12px;color:#94a3b8;margin-top:18px;">
+      Datenschutzerklaerung: <a href="https://candiq.de/datenschutz">candiq.de/datenschutz</a> \u00b7
+      Auftragsverarbeitungsvertrag: <a href="https://candiq.de/avv">candiq.de/avv</a> \u00b7
+      Verantwortlicher i.S.d. DSGVO ist <strong>${escapeHtml(opts.hiringCompany)}</strong>.
+    </p>
+  `)
+
+  const text = `Information nach Art. 14 DSGVO\n\nGuten Tag ${opts.refereeName},\n\n${opts.candidateName} hat Sie als Referenz fuer eine Bewerbung als ${opts.candidatePosition} bei ${opts.hiringCompany} benannt. Ein candiq-Reviewer wird sich in den kommenden Tagen kurz bei Ihnen melden.\n\nWir handeln im Auftrag von ${opts.hiringCompany} (Verantwortlicher). Verarbeitete Daten: Name, Unternehmen (${opts.refereeCompany}), Funktion, Kontaktdaten \u2014 vom Bewerber freiwillig genannt. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO. Auto-Loeschung nach max. 6 Monaten.\n\nKein Kontakt erwuenscht? Antworten Sie auf diese Mail mit "Bitte nicht kontaktieren" \u2014 wir loeschen dann unverzueglich.\n\nDatenschutzerklaerung: https://candiq.de/datenschutz\nAVV: https://candiq.de/avv`
+
+  return {
+    subject: `${opts.candidateName} hat Sie als Referenz benannt \u2014 Info nach Art. 14 DSGVO`,
+    html,
+    text,
+  }
+}
