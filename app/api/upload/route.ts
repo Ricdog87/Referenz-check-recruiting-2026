@@ -136,5 +136,22 @@ export async function POST(req: NextRequest) {
     }).catch(() => {})
   }
 
-  return NextResponse.json(doc, { status: 201 })
+  // Bewusst KEIN `path` (Vercel-Blob-URL) im Response — der Client
+  // erfaehrt die Storage-URL nie direkt. Downloads laufen ausschliesslich
+  // ueber /api/documents/:id mit Consent-Gate.
+  return NextResponse.json(
+    {
+      id: doc.id,
+      name: doc.name,
+      originalName: doc.originalName,
+      mimeType: doc.mimeType,
+      size: doc.size,
+      type: doc.type,
+      cvStatus: doc.cvStatus,
+      candidateId: doc.candidateId,
+      createdAt: doc.createdAt,
+      downloadUrl: `/api/documents/${doc.id}`,
+    },
+    { status: 201 },
+  )
 }

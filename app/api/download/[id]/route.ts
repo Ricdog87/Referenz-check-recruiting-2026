@@ -1,17 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/db'
+import { GET as documentsGet } from '@/app/api/documents/[id]/route'
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
-  const doc = await prisma.document.findFirst({
-    where: { id: params.id, candidate: { userId: session.user.id } },
-  })
-  if (!doc) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 })
+/**
+ * GET /api/download/:id
+ *
+ * Legacy-Alias auf /api/documents/:id. Ehemals 302-Redirect zur
+ * Vercel-Blob-URL → URL leakte an Client. Jetzt: delegiert an die
+ * neue Streaming-Route mit Consent-Gate (lib/cv-gate). Behaelt das
+ * alte URL-Schema fuer bestehende UI-Links bei.
+ *
+ * Neue Codes sollen direkt /api/documents/:id verwenden.
+ */
+export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
+  return documentsGet(req, ctx)
+}
 
-  // path stores the Vercel Blob URL — redirect with auth check complete
-  return NextResponse.redirect(doc.path)
+// Optional: explizit „Download erzwingen"-Variante. Bestaendiger Link
+// fuer „Download"-Buttons, der attachment-Header setzt.
+export async function POST() {
+  return NextResponse.json({ error: 'Methode nicht erlaubt.' }, { status: 405 })
 }

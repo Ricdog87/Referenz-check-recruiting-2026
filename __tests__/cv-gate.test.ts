@@ -132,8 +132,31 @@ describe('GET /api/documents/[id] — Route mit Gate-Enforcement', () => {
   }
 
   function makeReq() {
-    return { headers: new Map() } as unknown as Request
+    return {
+      headers: new Map(),
+      url: 'https://candiq.de/api/documents/doc_1',
+    } as unknown as Request
   }
+
+  // Mock global fetch fuer den Stream-Proxy: liefert „Datei-Inhalt".
+  const fetchMock = vi.fn()
+  beforeEach(() => {
+    fetchMock.mockReset()
+    fetchMock.mockResolvedValue({
+      ok: true,
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new Uint8Array([0x25, 0x50, 0x44, 0x46])) // %PDF
+          controller.close()
+        },
+      }),
+      headers: new Map([
+        ['content-type', 'application/pdf'],
+        ['content-length', '4'],
+      ]),
+    })
+    ;(globalThis as any).fetch = fetchMock
+  })
 
   it('401, wenn nicht eingeloggt', async () => {
     mockGetServerSession.mockResolvedValue(null)
@@ -168,7 +191,7 @@ describe('GET /api/documents/[id] — Route mit Gate-Enforcement', () => {
     expect(audit?.data.action).toBe('CV_ACCESS_DENIED')
   })
 
-  it('302-Redirect zum Blob fuer Reviewer bei cvStatus=RELEASED', async () => {
+  it('200-Stream (kein Blob-URL-Leak!) fuer Reviewer bei cvStatus=RELEASED', async () => {
     mockGetServerSession.mockResolvedValue({
       user: { id: 'reviewer_1', role: 'REVIEWER' },
     })
@@ -177,17 +200,24 @@ describe('GET /api/documents/[id] — Route mit Gate-Enforcement', () => {
       type: 'CV',
       cvStatus: 'RELEASED',
       path: 'https://blob.example/x.pdf',
+      mimeType: 'application/pdf',
+      originalName: 'cv.pdf',
       candidate: { userId: 'hr_owner_1' },
     })
     const handler = await importHandler()
     const res = await handler(makeReq() as any, { params: { id: 'doc_1' } })
-    expect(res.status).toBe(302)
-    expect(res.headers.get('location')).toBe('https://blob.example/x.pdf')
+    expect(res.status).toBe(200)
+    // KRITISCH: KEIN Location-Header, der die Blob-URL leaken wuerde
+    expect(res.headers.get('location')).toBeNull()
+    expect(res.headers.get('content-type')).toContain('application/pdf')
+    expect(res.headers.get('cache-control')).toContain('private')
+    // Stream wurde vom upstream Vercel-Blob gezogen
+    expect(fetchMock).toHaveBeenCalledWith('https://blob.example/x.pdf')
     const audit = mockAuditCreate.mock.calls[0]?.[0]
     expect(audit?.data.action).toBe('CV_ACCESS_GRANTED')
   })
 
-  it('302-Redirect fuer HR-Owner SELBST bei AWAITING_CONSENT (eigener Upload)', async () => {
+  it('200-Stream fuer HR-Owner SELBST bei AWAITING_CONSENT (eigener Upload)', async () => {
     mockGetServerSession.mockResolvedValue({
       user: { id: 'hr_owner_1', role: 'CLIENT' },
     })
@@ -196,11 +226,14 @@ describe('GET /api/documents/[id] — Route mit Gate-Enforcement', () => {
       type: 'CV',
       cvStatus: 'AWAITING_CONSENT',
       path: 'https://blob.example/x.pdf',
+      mimeType: 'application/pdf',
+      originalName: 'cv.pdf',
       candidate: { userId: 'hr_owner_1' },
     })
     const handler = await importHandler()
     const res = await handler(makeReq() as any, { params: { id: 'doc_1' } })
-    expect(res.status).toBe(302)
+    expect(res.status).toBe(200)
+    expect(res.headers.get('location')).toBeNull()
   })
 
   it('403 fuer FREMDEN HR-User selbst bei RELEASED (cross-tenant)', async () => {

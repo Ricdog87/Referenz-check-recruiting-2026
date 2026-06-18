@@ -255,7 +255,8 @@ export default async function CandidateDetailPage({
             ) : (
               <div className="space-y-2">
                 {candidate.documents.map((doc) => (
-                  <a key={doc.id} href={`/api/download/${doc.id}`}
+                  <a key={doc.id} href={`/api/documents/${doc.id}`}
+                    target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-3 p-2.5 rounded-xl bg-bg-secondary hover:bg-white border border-transparent hover:border-border transition-all group">
                     <FileText className="w-4 h-4 text-brand-600 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
