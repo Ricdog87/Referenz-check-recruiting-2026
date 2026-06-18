@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { formatDate, formatDateTime, formatFileSize, CANDIDATE_STATUS, CHECK_STATUS, CHECK_RESULT } from '@/lib/utils'
 import { CandidateActions } from './CandidateActions'
 import { InviteButton } from './InviteButton'
+import { BatchHandoverButton } from './BatchHandoverButton'
 import { Phone, Plus, ShieldCheck, ShieldAlert, FileText, Download, Mail } from 'lucide-react'
 
 export default async function CandidateDetailPage({
@@ -134,11 +135,23 @@ export default async function CandidateDetailPage({
 
           {/* Reference checks */}
           <div className="card-md">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 gap-3">
               <h2 className="section-title">Referenzprüfungen</h2>
-              <Link href={`/checks/new?candidateId=${candidate.id}`} className="text-xs text-brand-700 hover:text-brand-800 font-semibold">
-                + Neue Prüfung
-              </Link>
+              <div className="flex items-center gap-3">
+                {candidate.gdprConsent && (
+                  <BatchHandoverButton
+                    candidateId={candidate.id}
+                    openCount={
+                      candidate.checks.filter(
+                        (c) => c.status === 'OPEN' || c.status === 'IN_PROGRESS',
+                      ).length
+                    }
+                  />
+                )}
+                <Link href={`/checks/new?candidateId=${candidate.id}`} className="text-xs text-brand-700 hover:text-brand-800 font-semibold whitespace-nowrap">
+                  + Neue Prüfung
+                </Link>
+              </div>
             </div>
 
             {candidate.checks.length === 0 ? (
