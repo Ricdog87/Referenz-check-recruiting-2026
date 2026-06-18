@@ -3,10 +3,10 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import {
-  sendEmail,
-  reviewerHandoffNotificationEmail,
-  refereeArt14NotificationEmail,
-} from '@/lib/email'
+  assignRoundRobinIfEnabled,
+  notifyReviewerHandoff,
+  notifyRefereeArt14,
+} from '@/lib/check-notifications'
 import { logger } from '@/lib/logger'
 
 const VALID_STATUSES = ['OPEN', 'IN_PROGRESS', 'IN_REVIEW', 'COMPLETED', 'FAILED']
@@ -103,181 +103,49 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
   const updated = await prisma.referenceCheck.update({ where: { id: params.id }, data })
 
-  // Side-effect: Statuswechsel → IN_REVIEW benachrichtigt das candiq-Reviewer-Team
-  // und triggert optional Round-Robin-Auto-Assignment. Beides best-effort:
-  // Mail- oder Assignment-Fehler duerfen den PATCH nicht crashen.
+  // Side-effect: Statuswechsel → IN_REVIEW. Best-effort, async, blockt PATCH nicht.
   if (data.status === 'IN_REVIEW' && check.status !== 'IN_REVIEW') {
-    if (process.env.ASSIGNMENT_AUTO === 'round_robin' && !updated.assignedReviewerId) {
-      autoAssignRoundRobin(updated.id).catch((err) =>
-        logger.warn('reviewer_autoassign_failed', err),
-      )
-    }
-    notifyReviewerTeam({
-      checkId: updated.id,
-      customer: check.candidate.user,
-      candidate: {
-        name: `${check.candidate.firstName} ${check.candidate.lastName}`.trim(),
-        position: check.candidate.position,
-      },
-      employer: {
-        name: updated.employerName,
-        contact: updated.employerContact ?? '—',
-        phone: updated.employerPhone,
-        email: updated.employerEmail,
-      },
-    }).catch((err) => logger.warn('reviewer_notify_failed', err))
+    const baseUrl = process.env.NEXTAUTH_URL ?? 'https://candiq.de'
+    const candidateName = `${check.candidate.firstName} ${check.candidate.lastName}`.trim()
 
-    // DSGVO Art. 14: Referenzgeber-Daten wurden NICHT von ihm direkt erhoben.
-    // Wir muessen ihn proaktiv informieren, bevor wir ihn kontaktieren. Mail
-    // nur, wenn (a) E-Mail-Adresse vorhanden und (b) noch nicht informiert
-    // (Idempotenz via AuditLog). Best-effort: Fehler blockt PATCH nicht.
-    if (updated.employerEmail) {
-      notifyRefereeArt14({
-        checkId: updated.id,
-        refereeName: updated.employerContact ?? 'Sehr geehrte Damen und Herren',
-        refereeCompany: updated.employerName,
-        refereeEmail: updated.employerEmail,
-        candidateName: `${check.candidate.firstName} ${check.candidate.lastName}`.trim(),
-        candidatePosition: check.candidate.position,
-        hiringCompany:
-          check.candidate.user.company ?? check.candidate.user.name ?? 'der Auftraggeber',
-        triggeredByUserId: session.user.id,
-      }).catch((err) => logger.warn('referee_art14_notify_failed', err))
-    }
+    ;(async () => {
+      // Round-Robin zuerst — Ergebnis fliesst in die Mail-Empfaenger (Finding 3).
+      const assigned = await assignRoundRobinIfEnabled(updated.id, updated.assignedReviewerId)
+
+      await notifyReviewerHandoff({
+        customer: check.candidate.user,
+        candidateName,
+        checks: [
+          {
+            candidatePosition: check.candidate.position,
+            employerName: updated.employerName,
+            employerContact: updated.employerContact ?? '—',
+            employerPhone: updated.employerPhone,
+            employerEmail: updated.employerEmail,
+            reviewerCheckUrl: `${baseUrl}/reviewer/check/${updated.id}`,
+          },
+        ],
+        assignedReviewer: assigned,
+      })
+
+      // DSGVO Art. 14: Referenzgeber proaktiv informieren (idempotent).
+      if (updated.employerEmail) {
+        await notifyRefereeArt14({
+          checkId: updated.id,
+          refereeName: updated.employerContact ?? 'Sehr geehrte Damen und Herren',
+          refereeCompany: updated.employerName,
+          refereeEmail: updated.employerEmail,
+          candidateName,
+          candidatePosition: check.candidate.position,
+          hiringCompany:
+            check.candidate.user.company ?? check.candidate.user.name ?? 'der Auftraggeber',
+          triggeredByUserId: session.user.id,
+        })
+      }
+    })().catch((err) => logger.warn('handover_side_effect_failed', err))
   }
 
   return NextResponse.json(updated)
-}
-
-async function notifyRefereeArt14(opts: {
-  checkId: string
-  refereeName: string
-  refereeCompany: string
-  refereeEmail: string
-  candidateName: string
-  candidatePosition: string
-  hiringCompany: string
-  triggeredByUserId: string
-}) {
-  // Idempotenz: pruefe, ob fuer diesen Check bereits eine Art-14-Mail im
-  // Audit-Trail steht. Verhindert doppelte Mails bei mehrfachem Statuswechsel.
-  const existing = await prisma.auditLog.findFirst({
-    where: {
-      action: 'REFEREE_ART14_NOTIFIED',
-      entity: 'ReferenceCheck',
-      entityId: opts.checkId,
-    },
-    select: { id: true },
-  })
-  if (existing) return
-
-  const tpl = refereeArt14NotificationEmail({
-    refereeName: opts.refereeName,
-    refereeCompany: opts.refereeCompany,
-    candidateName: opts.candidateName,
-    candidatePosition: opts.candidatePosition,
-    hiringCompany: opts.hiringCompany,
-  })
-
-  const result = await sendEmail({
-    to: opts.refereeEmail,
-    subject: tpl.subject,
-    html: tpl.html,
-    text: tpl.text,
-    category: 'referee_art14_info',
-    userId: opts.triggeredByUserId,
-  })
-
-  if (!result.ok) {
-    logger.warn('referee_art14_send_failed', { checkId: opts.checkId, error: result.error })
-    return
-  }
-
-  await prisma.auditLog.create({
-    data: {
-      userId: opts.triggeredByUserId,
-      action: 'REFEREE_ART14_NOTIFIED',
-      entity: 'ReferenceCheck',
-      entityId: opts.checkId,
-      details: JSON.stringify({
-        refereeEmail: opts.refereeEmail,
-        provider: result.provider,
-      }),
-    },
-  })
-}
-
-// Round-Robin: weist den Check dem Reviewer mit der geringsten Anzahl
-// aktuell offener Zuweisungen zu. Bei Gleichstand alphabetische Reihenfolge.
-async function autoAssignRoundRobin(checkId: string) {
-  const reviewers = await prisma.user.findMany({
-    where: { role: { in: ['REVIEWER', 'ADMIN'] } },
-    select: {
-      id: true,
-      name: true,
-      _count: {
-        select: {
-          assignedChecks: { where: { status: 'IN_REVIEW' } },
-        },
-      },
-    },
-  })
-  if (reviewers.length === 0) return
-  reviewers.sort((a, b) => {
-    const cmp = a._count.assignedChecks - b._count.assignedChecks
-    if (cmp !== 0) return cmp
-    return (a.name ?? '').localeCompare(b.name ?? '')
-  })
-  const target = reviewers[0]
-  await prisma.referenceCheck.update({
-    where: { id: checkId },
-    data: { assignedReviewerId: target.id, assignedAt: new Date() },
-  })
-  await prisma.auditLog.create({
-    data: {
-      userId: target.id,
-      action: 'REVIEW_AUTO_ASSIGNED',
-      entity: 'ReferenceCheck',
-      entityId: checkId,
-      details: JSON.stringify({ method: 'round_robin', queueDepth: target._count.assignedChecks }),
-    },
-  })
-}
-
-async function notifyReviewerTeam(opts: {
-  checkId: string
-  customer: { id: string; name: string | null; email: string; company: string | null }
-  candidate: { name: string; position: string }
-  employer: { name: string; contact: string; phone: string | null; email: string | null }
-}) {
-  const recipients = (process.env.REVIEWER_NOTIFICATION_EMAIL ?? 'hello@candiq.de')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-  if (recipients.length === 0) return
-
-  const baseUrl = process.env.NEXTAUTH_URL ?? 'https://candiq.de'
-  const tpl = reviewerHandoffNotificationEmail({
-    customerName: opts.customer.name ?? opts.customer.email,
-    customerCompany: opts.customer.company,
-    customerEmail: opts.customer.email,
-    candidateName: opts.candidate.name,
-    candidatePosition: opts.candidate.position,
-    employerName: opts.employer.name,
-    employerContact: opts.employer.contact,
-    employerPhone: opts.employer.phone,
-    employerEmail: opts.employer.email,
-    reviewerCheckUrl: `${baseUrl}/reviewer/check/${opts.checkId}`,
-    queueUrl: `${baseUrl}/reviewer/queue`,
-  })
-  await sendEmail({
-    to: recipients,
-    subject: tpl.subject,
-    html: tpl.html,
-    text: tpl.text,
-    category: 'reviewer_handoff',
-    userId: opts.customer.id,
-  })
 }
 
 export async function DELETE(_: NextRequest, { params }: { params: { id: string } }) {

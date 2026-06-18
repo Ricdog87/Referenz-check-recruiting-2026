@@ -167,7 +167,12 @@ export async function generateAndDeliverCheckReport(
         candidateName: data.candidateName,
         employerName: data.employerName,
         result: resultLabel ?? 'Abgeschlossen',
-        checkUrl: blob.url, // Direktlink auf das PDF
+        // DSGVO: KEIN public Blob-Link in der Mail (der Report enthaelt die
+        // Bewertung des Bewerbers). Stattdessen Link auf die auth- +
+        // ownership-geschuetzte Report-Seite. Nur eingeloggte HR-User des
+        // eigenen Workspace sehen den Report. Das PDF-Blob bleibt fuer
+        // interne Records, ist aber nicht mehr direkt verlinkt.
+        checkUrl: `${BASE_URL}/report/check/${check.id}`,
       })
       const r = await sendEmail({
         to: hr.email,

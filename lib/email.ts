@@ -255,41 +255,80 @@ export function consentRevokedNotifyHrEmail(opts: {
 // Triggert auf PATCH /api/checks/:id mit status=IN_REVIEW.
 // Empfaenger: REVIEWER_NOTIFICATION_EMAIL (default hello@candiq.de).
 // ─────────────────────────────────────────────────────────────────
-export function reviewerHandoffNotificationEmail(opts: {
-  customerName: string
-  customerCompany: string | null
-  customerEmail: string
-  candidateName: string
+export type ReviewerHandoffCheck = {
   candidatePosition: string
   employerName: string
   employerContact: string
   employerPhone?: string | null
   employerEmail?: string | null
   reviewerCheckUrl: string
+}
+
+/**
+ * Reviewer-Team-Benachrichtigung bei Uebergabe. Unterstuetzt 1..N Pruefungen
+ * (Sammeluebergabe): bei N>1 wird EINE Mail mit allen Referenzen gesendet
+ * statt N Einzel-Mails. Optional `assignedTo` (Name des per Round-Robin
+ * zugewiesenen Reviewers) wird im Betreff + Body hervorgehoben.
+ */
+export function reviewerHandoffNotificationEmail(opts: {
+  customerName: string
+  customerCompany: string | null
+  customerEmail: string
+  candidateName: string
+  checks: ReviewerHandoffCheck[]
   queueUrl: string
+  assignedTo?: string | null
 }): { subject: string; html: string; text: string } {
   const companyLine = opts.customerCompany
     ? `${escapeHtml(opts.customerCompany)} · ${escapeHtml(opts.customerEmail)}`
     : escapeHtml(opts.customerEmail)
-  const contactExtras = [
-    opts.employerPhone ? `Tel: ${escapeHtml(opts.employerPhone)}` : null,
-    opts.employerEmail ? `Mail: ${escapeHtml(opts.employerEmail)}` : null,
-  ].filter(Boolean).join(' · ')
+  const n = opts.checks.length
+  const multiple = n > 1
+
+  const checkBlocks = opts.checks
+    .map((c, i) => {
+      const contactExtras = [
+        c.employerPhone ? `Tel: ${escapeHtml(c.employerPhone)}` : null,
+        c.employerEmail ? `Mail: ${escapeHtml(c.employerEmail)}` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
+      return `
+        <div style="border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px;">
+          <div style="font-size:11px;color:#94a3b8;">Referenz ${i + 1} von ${n} · ${escapeHtml(c.candidatePosition)}</div>
+          <div style="font-weight:700;margin-top:2px;">${escapeHtml(c.employerName)} &mdash; ${escapeHtml(c.employerContact)}</div>
+          ${contactExtras ? `<div style="font-size:13px;color:#475569;">${contactExtras}</div>` : ''}
+          <div style="margin-top:8px;"><a href="${c.reviewerCheckUrl}" style="color:#4f46e5;font-weight:600;font-size:13px;">Pruefung oeffnen &rarr;</a></div>
+        </div>`
+    })
+    .join('')
+
+  const assignedLine = opts.assignedTo
+    ? `<p style="margin-top:0;font-size:13px;color:#475569;"><strong>Zugewiesen an:</strong> ${escapeHtml(opts.assignedTo)}</p>`
+    : ''
+
   const html = shell(`
-    <h1>Neue Pruefung in der Reviewer-Queue</h1>
-    <p>Ein Kunde hat eine Referenzpruefung an euch uebergeben. Bearbeitung idealerweise innerhalb <strong>24 Stunden</strong>.</p>
+    <h1>${multiple ? `${n} neue Pruefungen` : 'Neue Pruefung'} in der Reviewer-Queue</h1>
+    <p>Ein Kunde hat ${multiple ? `${n} Referenzpruefungen` : 'eine Referenzpruefung'} an euch uebergeben. Bearbeitung idealerweise innerhalb <strong>24 Stunden</strong>.</p>
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kunde</strong></p>
     <p style="margin-top:0;">${escapeHtml(opts.customerName)}<br>${companyLine}</p>
     <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Kandidat</strong></p>
-    <p style="margin-top:0;">${escapeHtml(opts.candidateName)} &mdash; ${escapeHtml(opts.candidatePosition)}</p>
-    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>Referenz</strong></p>
-    <p style="margin-top:0;">${escapeHtml(opts.employerName)} &mdash; ${escapeHtml(opts.employerContact)}${contactExtras ? `<br><span style="font-size:13px;color:#475569;">${contactExtras}</span>` : ''}</p>
-    <p style="margin: 28px 0 14px;"><a class="btn" href="${opts.reviewerCheckUrl}">Pruefung oeffnen</a></p>
-    <p style="font-size:12px;color:#94a3b8;">Oder alle offenen Pruefungen: <a href="${opts.queueUrl}">${opts.queueUrl}</a></p>
+    <p style="margin-top:0;">${escapeHtml(opts.candidateName)}</p>
+    ${assignedLine}
+    <p style="font-size:13px;color:#475569;margin-top:18px;"><strong>${multiple ? 'Referenzen' : 'Referenz'}</strong></p>
+    ${checkBlocks}
+    <p style="font-size:12px;color:#94a3b8;margin-top:16px;">Alle offenen Pruefungen: <a href="${opts.queueUrl}">${opts.queueUrl}</a></p>
   `)
-  const text = `Neue Pruefung in der Reviewer-Queue\n\nKunde: ${opts.customerName} (${opts.customerCompany ?? opts.customerEmail})\nKandidat: ${opts.candidateName} — ${opts.candidatePosition}\nReferenz: ${opts.employerName} — ${opts.employerContact}${contactExtras ? ` · ${contactExtras.replace(/<[^>]+>/g, '')}` : ''}\n\nDirektlink: ${opts.reviewerCheckUrl}\nQueue:      ${opts.queueUrl}\n\nSLA-Ziel: 24h.`
+
+  const textChecks = opts.checks
+    .map((c, i) => `  ${i + 1}. ${c.employerName} — ${c.employerContact} (${c.candidatePosition})\n     ${c.reviewerCheckUrl}`)
+    .join('\n')
+  const text = `${multiple ? `${n} neue Pruefungen` : 'Neue Pruefung'} in der Reviewer-Queue\n\nKunde: ${opts.customerName} (${opts.customerCompany ?? opts.customerEmail})\nKandidat: ${opts.candidateName}${opts.assignedTo ? `\nZugewiesen an: ${opts.assignedTo}` : ''}\n\n${multiple ? 'Referenzen:' : 'Referenz:'}\n${textChecks}\n\nQueue: ${opts.queueUrl}\nSLA-Ziel: 24h.`
+
   return {
-    subject: `Reviewer-Queue: ${opts.candidateName} (${opts.customerCompany ?? opts.customerName})`,
+    subject: multiple
+      ? `Reviewer-Queue: ${n} Pruefungen — ${opts.candidateName} (${opts.customerCompany ?? opts.customerName})`
+      : `Reviewer-Queue: ${opts.candidateName} (${opts.customerCompany ?? opts.customerName})`,
     html,
     text,
   }
