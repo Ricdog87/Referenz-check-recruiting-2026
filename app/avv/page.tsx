@@ -7,7 +7,7 @@ import { Mail, FileText, ShieldCheck } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Auftragsverarbeitungsvertrag (AVV) — candiq',
   description:
-    'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Standardvorlage zum Download, individuelle Anpassungen jederzeit moeglich.',
+    'Auftragsverarbeitungsvertrag nach Art. 28 DSGVO. Standardvorlage zum Download, individuelle Anpassungen jederzeit möglich.',
   alternates: { canonical: 'https://candiq.de/avv' },
   robots: { index: false, follow: true },
 }
@@ -45,8 +45,8 @@ export default function AvvPage() {
               </div>
               <p className="text-xs text-text-secondary leading-relaxed mb-3">
                 Wir schicken Ihnen die vollstaendige Standardvorlage (inkl.
-                Subprozessor-Anhang, TOMs, SCCs fuer Drittland-Subdienstleister) als PDF zur
-                internen Pruefung — typisch innerhalb von 24h.
+                Subprozessor-Anhang, TOMs, SCCs für Drittland-Subdienstleister) als PDF zur
+                internen Prüfung — typisch innerhalb von 24h.
               </p>
               <a
                 href="mailto:hello@candiq.de?subject=AVV-Vorlage%20anfragen&body=Hallo%20candiq-Team%2C%20bitte%20schickt%20mir%20die%20AVV-Vorlage%20fuer%20unseren%20DPO-Review.%20Firma%3A%20"
@@ -60,7 +60,7 @@ export default function AvvPage() {
           <h2>1. Gegenstand und Dauer der Verarbeitung</h2>
           <p>
             candiq verarbeitet personenbezogene Daten von Bewerbern (Kandidaten) und deren
-            Referenzgebern ausschliesslich im Auftrag und nach Weisung des Verantwortlichen, zum
+            Referenzgebern ausschließlich im Auftrag und nach Weisung des Verantwortlichen, zum
             Zweck der digitalen Referenzpruefung im Recruiting-Prozess. Die Dauer richtet sich
             nach dem Hauptvertrag (Subscription) plus gesetzliche Aufbewahrungsfristen.
           </p>
@@ -70,7 +70,7 @@ export default function AvvPage() {
             <li>Stammdaten der Bewerber (Name, E-Mail, optional Telefon, Position, Abteilung)</li>
             <li>Bewerbungsunterlagen (CV als PDF/DOC, optional weitere Dokumente)</li>
             <li>Referenzgeber-Kontaktdaten (Name, Firma, Position, E-Mail oder Telefon)</li>
-            <li>Pruefungsergebnisse (Notizen, Bewertungen, Diskrepanz-Markierungen)</li>
+            <li>Prüfungsergebnisse (Notizen, Bewertungen, Diskrepanz-Markierungen)</li>
             <li>Audit-Trail (Login-Events, Datenzugriffe, Consent-Akzeptanz mit IP+UA)</li>
           </ul>
 
@@ -85,13 +85,13 @@ export default function AvvPage() {
           <ul>
             <li>Verarbeitung nur auf dokumentierte Weisung (= Konfiguration im Dashboard)</li>
             <li>Vertraulichkeitsverpflichtung aller beteiligten Personen</li>
-            <li>Technische und organisatorische Massnahmen (TOMs, siehe Anhang)</li>
+            <li>Technische und organisatorische Maßnahmen (TOMs, siehe Anhang)</li>
             <li>Subprozessoren werden vorher angekuendigt; Widerspruchsrecht des Verantwortlichen</li>
             <li>
               Unterstuetzung bei Betroffenenrechten (Art. 15–22), Datenschutz-Folgenabschaetzung
               (Art. 35), Meldung von Verletzungen (Art. 33)
             </li>
-            <li>Loeschung oder Rueckgabe nach Vertragsende</li>
+            <li>Löschung oder Rückgabe nach Vertragsende</li>
           </ul>
 
           <h2>5. Subprozessoren</h2>
@@ -99,7 +99,7 @@ export default function AvvPage() {
             candiq setzt heute folgende Subprozessoren ein. Eine aktuelle Liste mit Verarbeitungs-
             zweck, Standort und Rechtsgrundlage finden Sie auch in der{' '}
             <Link href="/datenschutz" className="text-brand-700 font-semibold">
-              Datenschutzerklaerung
+              Datenschutzerklärung
             </Link>
             .
           </p>
@@ -152,16 +152,16 @@ export default function AvvPage() {
             </tbody>
           </table>
 
-          <h2>6. Technische und organisatorische Massnahmen (TOMs)</h2>
+          <h2>6. Technische und organisatorische Maßnahmen (TOMs)</h2>
           <ul>
-            <li>Verschluesselte Datenuebertragung (TLS 1.3)</li>
+            <li>Verschlüsselte Datenübertragung (TLS 1.3)</li>
             <li>Passwoerter bcrypt-gehasht, NEXTAUTH_SECRET als Server-Geheimnis</li>
             <li>
               Consent-Token: HMAC-SHA256-signiert, SHA-256-Hash in DB, Single-Use,
               14-Tage-TTL, timing-safe-equal Vergleich
             </li>
             <li>
-              CV-Consent-Gate: Server-seitige Pruefung (lib/cv-gate.ts) erzwingt, dass Reviewer
+              CV-Consent-Gate: Server-seitige Prüfung (lib/cv-gate.ts) erzwingt, dass Reviewer
               CVs nur nach erteilter Bewerber-Einwilligung sehen. Jeder Zugriff (granted +
               denied) wird im Audit-Log dokumentiert.
             </li>
@@ -169,10 +169,10 @@ export default function AvvPage() {
               Rollen-Modell: CLIENT (HR), REVIEWER (candiq-intern), ADMIN. Workspace-Isolation
               auf Application-Layer in jeder Mutation.
             </li>
-            <li>Audit-Trail unveraenderlich (Append-Only, AuditLog-Tabelle)</li>
+            <li>Audit-Trail unveränderlich (Append-Only, AuditLog-Tabelle)</li>
             <li>Backup-Strategie: tagliche Snapshots der Postgres-DB, 30-Tage-Retention</li>
             <li>
-              Auto-Loeschung der Bewerberdaten 180 Tage nach Abschluss (Status COMPLETED /
+              Auto-Löschung der Bewerberdaten 180 Tage nach Abschluss (Status COMPLETED /
               REJECTED / CONSENT_REVOKED). Audit-Logs bleiben gem. § 257 HGB.
             </li>
             <li>Rate-Limiting auf allen Auth- und Upload-Endpoints</li>
@@ -180,17 +180,17 @@ export default function AvvPage() {
 
           <h2>7. Betroffenenrechte</h2>
           <p>
-            Auskunft (Art. 15), Berichtigung (Art. 16), Loeschung (Art. 17), Einschraenkung
-            (Art. 18), Datenuebertragbarkeit (Art. 20), Widerspruch (Art. 21) und Widerruf (Art. 7
+            Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung
+            (Art. 18), Datenübertragbarkeit (Art. 20), Widerspruch (Art. 21) und Widerruf (Art. 7
             Abs. 3) sind im Dashboard als Self-Service-Funktionen verfuegbar. Bewerber koennen
-            zusaetzlich ihre Einwilligung jederzeit ueber den Magic-Link in ihrer Einladungs-Mail
+            zusätzlich ihre Einwilligung jederzeit über den Magic-Link in ihrer Einladungs-Mail
             widerrufen.
           </p>
 
           <h2>8. Anpassungen</h2>
           <p>
-            Individuelle Anpassungen (z.B. zusaetzliche TOMs, abweichende Subprozessor-Vorgaben,
-            Pruefrechte) verhandeln wir gern direkt im Vertragsentwurf. Bitte melden Sie sich an{' '}
+            Individuelle Anpassungen (z.B. zusätzliche TOMs, abweichende Subprozessor-Vorgaben,
+            Prüfrechte) verhandeln wir gern direkt im Vertragsentwurf. Bitte melden Sie sich an{' '}
             <a href="mailto:hello@candiq.de">hello@candiq.de</a>.
           </p>
 

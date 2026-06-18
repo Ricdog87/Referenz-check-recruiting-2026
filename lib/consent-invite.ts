@@ -69,7 +69,7 @@ export async function inviteCandidate(opts: {
 
   const portalUrl = `${process.env.NEXTAUTH_URL || 'https://candiq.de'}/candidate/${encodeURIComponent(token)}`
   const mail = candidateConsentInviteEmail({
-    candidateFirstName: candidate.firstName,
+    candidateFullName: `${candidate.firstName} ${candidate.lastName}`.trim(),
     hiringCompany:
       candidate.user.company || candidate.user.name || 'Ihr potenzieller Arbeitgeber',
     position: candidate.position,
