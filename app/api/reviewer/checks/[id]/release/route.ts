@@ -12,13 +12,36 @@ export const maxDuration = 60
 
 /**
  * POST /api/reviewer/checks/:id/release
+ *
  * Freigabe durch geschulten Reviewer: Status -> COMPLETED, Audit-Log,
  * dann automatisch PDF-Report erzeugen (Vercel Blob) + HR-Auftraggeber mailen.
+ *
+ * Pflicht-Body: { aggConfirmed: true } — § 11 AGG verlangt dokumentierte
+ * Bestaetigung, dass die Bewertung ohne diskriminierende Merkmale erfolgte.
  */
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
   if (!isReviewer(session)) return NextResponse.json({ error: 'Reviewer-Rolle erforderlich.' }, { status: 403 })
+
+  // AGG-Pflichtfeld parsen. Defensive: leerer/ungueltiger Body wird als
+  // „nicht bestaetigt" gewertet — Release blockt, statt still durchzulassen.
+  let body: { aggConfirmed?: boolean } = {}
+  try {
+    const text = await req.text()
+    if (text) body = JSON.parse(text)
+  } catch {
+    /* unparseable body → aggConfirmed bleibt undefined → blockt */
+  }
+  if (body.aggConfirmed !== true) {
+    return NextResponse.json(
+      {
+        error:
+          'AGG-Bestaetigung erforderlich: Die Bewertung muss explizit als diskriminierungsfrei bestaetigt werden (§ 1 AGG).',
+      },
+      { status: 400 },
+    )
+  }
 
   const check = await prisma.referenceCheck.findUnique({ where: { id: params.id } })
   if (!check) return NextResponse.json({ error: 'Nicht gefunden.' }, { status: 404 })
@@ -43,6 +66,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         candidateId: check.candidateId,
         rating: check.rating ?? null,
         result: check.result ?? null,
+        // AGG-Nachweis (§ 11 AGG): explizit dokumentiert, dass diese Bewertung
+        // diskriminierungsfrei erfolgte. Wert kommt aus dem Reviewer-UI und
+        // wird hier strikt validiert (oben).
+        aggConfirmed: true,
+        aggConfirmedBy: session.user.id,
+        aggConfirmedAt: new Date().toISOString(),
+        criteriaScope: ['position', 'tenure', 'tasks', 'work_behavior'],
+        excludedScope: [
+          'photo',
+          'origin',
+          'religion',
+          'gender',
+          'age',
+          'sexual_identity',
+          'disability',
+          'health',
+        ],
       }),
       ip: getClientIp(req),
     },

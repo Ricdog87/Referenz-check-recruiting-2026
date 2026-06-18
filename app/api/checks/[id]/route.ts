@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { sendEmail, reviewerHandoffNotificationEmail } from '@/lib/email'
+import {
+  sendEmail,
+  reviewerHandoffNotificationEmail,
+  refereeArt14NotificationEmail,
+} from '@/lib/email'
 import { logger } from '@/lib/logger'
 
 const VALID_STATUSES = ['OPEN', 'IN_PROGRESS', 'IN_REVIEW', 'COMPLETED', 'FAILED']
@@ -122,9 +126,85 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
         email: updated.employerEmail,
       },
     }).catch((err) => logger.warn('reviewer_notify_failed', err))
+
+    // DSGVO Art. 14: Referenzgeber-Daten wurden NICHT von ihm direkt erhoben.
+    // Wir muessen ihn proaktiv informieren, bevor wir ihn kontaktieren. Mail
+    // nur, wenn (a) E-Mail-Adresse vorhanden und (b) noch nicht informiert
+    // (Idempotenz via AuditLog). Best-effort: Fehler blockt PATCH nicht.
+    if (updated.employerEmail) {
+      notifyRefereeArt14({
+        checkId: updated.id,
+        refereeName: updated.employerContact ?? 'Sehr geehrte Damen und Herren',
+        refereeCompany: updated.employerName,
+        refereeEmail: updated.employerEmail,
+        candidateName: `${check.candidate.firstName} ${check.candidate.lastName}`.trim(),
+        candidatePosition: check.candidate.position,
+        hiringCompany:
+          check.candidate.user.company ?? check.candidate.user.name ?? 'der Auftraggeber',
+        triggeredByUserId: session.user.id,
+      }).catch((err) => logger.warn('referee_art14_notify_failed', err))
+    }
   }
 
   return NextResponse.json(updated)
+}
+
+async function notifyRefereeArt14(opts: {
+  checkId: string
+  refereeName: string
+  refereeCompany: string
+  refereeEmail: string
+  candidateName: string
+  candidatePosition: string
+  hiringCompany: string
+  triggeredByUserId: string
+}) {
+  // Idempotenz: pruefe, ob fuer diesen Check bereits eine Art-14-Mail im
+  // Audit-Trail steht. Verhindert doppelte Mails bei mehrfachem Statuswechsel.
+  const existing = await prisma.auditLog.findFirst({
+    where: {
+      action: 'REFEREE_ART14_NOTIFIED',
+      entity: 'ReferenceCheck',
+      entityId: opts.checkId,
+    },
+    select: { id: true },
+  })
+  if (existing) return
+
+  const tpl = refereeArt14NotificationEmail({
+    refereeName: opts.refereeName,
+    refereeCompany: opts.refereeCompany,
+    candidateName: opts.candidateName,
+    candidatePosition: opts.candidatePosition,
+    hiringCompany: opts.hiringCompany,
+  })
+
+  const result = await sendEmail({
+    to: opts.refereeEmail,
+    subject: tpl.subject,
+    html: tpl.html,
+    text: tpl.text,
+    category: 'referee_art14_info',
+    userId: opts.triggeredByUserId,
+  })
+
+  if (!result.ok) {
+    logger.warn('referee_art14_send_failed', { checkId: opts.checkId, error: result.error })
+    return
+  }
+
+  await prisma.auditLog.create({
+    data: {
+      userId: opts.triggeredByUserId,
+      action: 'REFEREE_ART14_NOTIFIED',
+      entity: 'ReferenceCheck',
+      entityId: opts.checkId,
+      details: JSON.stringify({
+        refereeEmail: opts.refereeEmail,
+        provider: result.provider,
+      }),
+    },
+  })
 }
 
 // Round-Robin: weist den Check dem Reviewer mit der geringsten Anzahl

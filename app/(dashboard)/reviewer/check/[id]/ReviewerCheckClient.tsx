@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Save, CheckCircle2, Loader2 } from 'lucide-react'
+import { Save, CheckCircle2, Loader2, ShieldAlert } from 'lucide-react'
 
 type CheckData = {
   id: string
@@ -49,6 +49,7 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
   const [discrepancies, setDiscrepancies] = useState(check.discrepancies ?? '')
   const [rating, setRating] = useState<number | ''>(check.rating ?? '')
   const [result, setResult] = useState(check.result ?? '')
+  const [aggConfirmed, setAggConfirmed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [releasing, setReleasing] = useState(false)
   const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
@@ -78,6 +79,13 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
   }
 
   async function release() {
+    if (!aggConfirmed) {
+      setMsg({
+        type: 'err',
+        text: 'Bitte AGG-Bestaetigung anhaken — Pflicht vor jeder Freigabe.',
+      })
+      return
+    }
     if (!confirm('Prüfung freigeben? Status wird auf „Abgeschlossen" gesetzt und der HR-Auftraggeber benachrichtigt.')) return
     setReleasing(true)
     setMsg(null)
@@ -95,7 +103,11 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
       })
       if (!saveRes.ok) throw new Error(await errorFromResponse(saveRes, 'Speichern fehlgeschlagen.'))
 
-      const res = await fetch(`/api/reviewer/checks/${check.id}/release`, { method: 'POST' })
+      const res = await fetch(`/api/reviewer/checks/${check.id}/release`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aggConfirmed: true }),
+      })
       if (!res.ok) throw new Error(await errorFromResponse(res, 'Freigabe fehlgeschlagen.'))
       setMsg({ type: 'ok', text: 'Freigegeben. HR-Auftraggeber wurde benachrichtigt.' })
       router.push('/reviewer/queue')
@@ -185,14 +197,46 @@ export function ReviewerCheckClient({ check }: { check: CheckData }) {
           <CheckCircle2 className="w-4 h-4" /> Diese Prüfung ist bereits freigegeben (abgeschlossen).
         </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
-          <button onClick={save} disabled={saving || releasing} className="btn-secondary">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Speichern
-          </button>
-          <button onClick={release} disabled={saving || releasing} className="btn-primary">
-            {releasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Freigeben
-          </button>
-        </div>
+        <>
+          {/* AGG-Compliance-Pflichtfeld vor Release (§ 1 AGG, § 11 Abs. 1 AGG) */}
+          <div className="card-md p-4 border-amber-200 bg-amber-50/50">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={aggConfirmed}
+                onChange={(e) => setAggConfirmed(e.target.checked)}
+                className="mt-0.5 w-4 h-4 accent-emerald-600 cursor-pointer"
+              />
+              <span className="text-xs text-text-secondary leading-relaxed">
+                <span className="inline-flex items-center gap-1 font-semibold text-amber-800">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  AGG-Bestaetigung (Pflicht vor Freigabe)
+                </span>
+                <br />
+                Ich bestaetige, dass diese Bewertung ausschliesslich auf nachpruefbaren
+                Fakten (Position, Beschaeftigungszeitraum, Aufgaben, Verhalten am Arbeitsplatz)
+                beruht — <strong>ohne</strong> Beruecksichtigung von Foto, Herkunft, Religion,
+                Geschlecht, Alter, sexueller Identitaet, Behinderung oder Gesundheitsdaten
+                (§ 1 AGG). Die Bestaetigung wird mit User-ID und Zeitstempel im Audit-Trail
+                dokumentiert.
+              </span>
+            </label>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button onClick={save} disabled={saving || releasing} className="btn-secondary">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Speichern
+            </button>
+            <button
+              onClick={release}
+              disabled={saving || releasing || !aggConfirmed}
+              className="btn-primary disabled:opacity-50"
+              title={!aggConfirmed ? 'AGG-Bestaetigung erforderlich' : ''}
+            >
+              {releasing ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Freigeben
+            </button>
+          </div>
+        </>
       )}
     </div>
   )
