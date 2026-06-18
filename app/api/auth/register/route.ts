@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { ensureSchema, withDbRecovery } from '@/lib/db-init'
 import { sendEmail, welcomeEmail } from '@/lib/email'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -182,8 +183,23 @@ export async function POST(req: NextRequest) {
     // gerade eingegeben hat.
     const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
     const tpl = welcomeEmail({ name: cleanName, email: cleanEmail, loginUrl: `${baseUrl}/login` })
-    sendEmail({ to: cleanEmail, subject: tpl.subject, html: tpl.html, text: tpl.text, userId: user.id, category: 'welcome' })
-      .catch((err) => console.error('welcome_email_warn', err))
+    // await statt fire-and-forget: Fehler landen im Log und sind in Vercel sichtbar.
+    // Mail-Fehler crashen den Register-Flow NICHT (try/catch).
+    try {
+      const emailResult = await sendEmail({
+        to: cleanEmail,
+        subject: tpl.subject,
+        html: tpl.html,
+        text: tpl.text,
+        userId: user.id,
+        category: 'welcome',
+      })
+      if (!emailResult.ok) {
+        logger.warn('welcome_email_failed', { error: emailResult.error, to: cleanEmail })
+      }
+    } catch (err) {
+      logger.warn('welcome_email_exception', { error: (err as any)?.message, to: cleanEmail })
+    }
 
     return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })
   } catch (error) {
