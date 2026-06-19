@@ -6,7 +6,7 @@ import { isReviewer, isAdmin } from '@/lib/reviewer'
 import { redirect } from 'next/navigation'
 import { WelcomeBar } from '@/components/dashboard/WelcomeBar'
 import Link from 'next/link'
-import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, ACCOUNT_TYPES } from '@/lib/utils'
+import { CANDIDATE_STATUS, CHECK_STATUS, getPlanById, trialDaysLeft, ACCOUNT_TYPES } from '@/lib/utils'
 import {
   Users, AlertTriangle, TrendingUp, ArrowUpRight,
   Plus, Sparkles, Clock, CheckCircle2, AlertCircle,
@@ -28,6 +28,14 @@ export default async function DashboardPage() {
 
   const userId = session.user.id
   const isAgency = session.user.accountType === 'RECRUITMENT_AGENCY'
+
+  // Trial-Status für Banner
+  const trialUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { planStatus: true, trialEndsAt: true }
+  })
+  const daysLeft = trialDaysLeft(trialUser?.trialEndsAt)
+  const showTrialBanner = trialUser?.planStatus === 'TRIALING' && daysLeft > 0
 
   // Jede einzelne Query so wrappen, dass ein Fehler NIE das gesamte Dashboard
   // auf error.tsx schickt. Pro Query gibt es einen typsicheren Fallback.
@@ -213,6 +221,11 @@ export default async function DashboardPage() {
   const firstName = safeName.split(' ')[0] || 'Team'
 
   return (
+    {showTrialBanner && (
+      <div className="mx-4 mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        ⏳ Testphase: noch {daysLeft} Tag(e) übrig. <a href="/settings/billing" className="font-medium underline">Jetzt upgraden →</a>
+      </div>
+    )}
     <>
       <WelcomeBar
         firstName={firstName}
