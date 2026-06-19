@@ -221,12 +221,12 @@ export default async function DashboardPage() {
   const firstName = safeName.split(' ')[0] || 'Team'
 
   return (
-    {showTrialBanner && (
-      <div className="mx-4 mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        ⏳ Testphase: noch {daysLeft} Tag(e) übrig. <a href="/settings/billing" className="font-medium underline">Jetzt upgraden →</a>
-      </div>
-    )}
     <>
+      {showTrialBanner && (
+        <div className="mx-4 mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          ⏳ Testphase: noch {daysLeft} Tag(e) übrig. <a href="/settings/billing" className="font-medium underline">Jetzt upgraden →</a>
+        </div>
+      )}
       <WelcomeBar
         firstName={firstName}
         fullName={safeName}
