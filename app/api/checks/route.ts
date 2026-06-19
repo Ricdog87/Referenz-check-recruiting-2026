@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { getPlanById, trialDaysLeft } from '@/lib/utils'
 
 const MAX_NAME_LEN = 160
 const MAX_EMAIL_LEN = 254
@@ -28,6 +29,27 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
+
+  // Quota-Guard
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { planStatus: true, planId: true, trialEndsAt: true }
+  })
+  const plan = getPlanById(user?.planId || 'STARTER')
+  const daysLeft = trialDaysLeft(user?.trialEndsAt)
+  const isActive = (user?.planStatus === 'TRIALING' && daysLeft > 0) || user?.planStatus === 'ACTIVE'
+  if (!isActive) {
+    return NextResponse.json({ error: 'Kein aktiver Plan. Bitte abonnieren Sie einen Plan.' }, { status: 402 })
+  }
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+  const monthlyCount = await prisma.referenceCheck.count({
+    where: { userId: session.user.id, createdAt: { gte: startOfMonth } }
+  })
+  if (monthlyCount >= plan.includedChecks) {
+    return NextResponse.json({
+      error: `Monatslimit erreicht: ${plan.includedChecks} Checks/Monat in Ihrem ${plan.name}-Plan.`
+    }, { status: 402 })
+  }
 
   let body: any
   try {
