@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     select: { planStatus: true, trialEndsAt: true }
   })
   const daysLeft = trialDaysLeft(trialUser?.trialEndsAt)
-  const showTrialBanner = trialUser?.planStatus === 'TRIALING' && daysLeft > 0
+  const showTrialBanner = trialUser?.planStatus === 'TRIALING' && (daysLeft ?? 0) > 0
 
   // Jede einzelne Query so wrappen, dass ein Fehler NIE das gesamte Dashboard
   // auf error.tsx schickt. Pro Query gibt es einen typsicheren Fallback.
