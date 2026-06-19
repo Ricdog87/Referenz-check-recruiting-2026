@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
   // Quota-Guard
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { planStatus: true, planId: true, trialEndsAt: true }
+    select: { planStatus: true, plan: true, trialEndsAt: true }
   })
-  const plan = getPlanById(user?.planId || 'STARTER')
+  const plan = getPlanById(user?.plan || 'STARTER')
   const daysLeft = trialDaysLeft(user?.trialEndsAt)
   const isActive = (user?.planStatus === 'TRIALING' && daysLeft > 0) || user?.planStatus === 'ACTIVE'
   if (!isActive) {
