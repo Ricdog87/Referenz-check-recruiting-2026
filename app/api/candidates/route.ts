@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   })
   const plan = getPlanById(user?.plan || 'STARTER')
   const daysLeft = trialDaysLeft(user?.trialEndsAt)
-  const isActive = (user?.planStatus === 'TRIALING' && daysLeft > 0) || user?.planStatus === 'ACTIVE'
+  const isActive = (user?.planStatus === 'TRIALING' && (daysLeft ?? 0) > 0) || user?.planStatus === 'ACTIVE'
   if (!isActive) {
     return NextResponse.json({ error: 'Kein aktiver Plan. Bitte abonnieren Sie einen Plan.' }, { status: 402 })
   }
