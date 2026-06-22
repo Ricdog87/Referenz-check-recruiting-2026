@@ -6,7 +6,7 @@ import { signOut, useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Users, ClipboardList, Settings, BarChart3,
   Plug, LogOut, Sparkles, Briefcase, ShoppingBag, ScrollText, X,
-  CreditCard, ShieldCheck, ShieldHalf, UserCircle2,
+  CreditCard, ShieldCheck, ShieldHalf, UserCircle2, Handshake,
 } from 'lucide-react'
 import { ACCOUNT_TYPES } from '@/lib/utils'
 import { useMobileSidebar } from './MobileSidebarContext'
@@ -44,6 +44,10 @@ const NAV_REVIEW = [
 const NAV_ADMIN = [
   { href: '/admin', label: 'Cockpit', icon: LayoutDashboard },
   { href: '/admin/customers', label: 'Kundenverwaltung', icon: Users },
+  // Partner-Approval-Queue. Link liegt unconditional — wenn das Feature-Flag
+  // PARTNER_PROGRAM_ENABLED=false ist, liefert die Seite 404 (notFound()).
+  // Soft-Launch-Pattern: kein zweites NEXT_PUBLIC_-Flag nötig.
+  { href: '/admin/partners', label: 'Partner-Approval', icon: Handshake },
   { href: '/audit', label: 'Audit-Trail', icon: ScrollText },
 ]
 
