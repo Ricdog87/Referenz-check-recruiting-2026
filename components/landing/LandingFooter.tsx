@@ -51,8 +51,8 @@ export function LandingFooter() {
           <FooterCol
             title="Für wen"
             links={[
-              { label: 'HR-Abteilungen', href: '/für/hr-abteilungen' },
-              { label: 'Mittelstand 200+ MA', href: '/für/mittelstand' },
+              { label: 'HR-Abteilungen', href: '/fuer/hr-abteilungen' },
+              { label: 'Mittelstand 200+ MA', href: '/fuer/mittelstand' },
               { label: 'Personaldienstleister', href: '/register?type=RECRUITMENT_AGENCY' },
               { label: 'Bewerber:innen (Beta Q4 2026)', href: '/bewerber' },
               { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
@@ -66,7 +66,7 @@ export function LandingFooter() {
             links={[
               { label: 'Referenzprüfung (Leitfaden)', href: '/referenzpruefung' },
               { label: 'Reference-Check DSGVO', href: '/reference-check-dsgvo' },
-              { label: 'Arbeitszeugnis prüfen', href: '/zeugnis-prüfen-lassen' },
+              { label: 'Arbeitszeugnis prüfen', href: '/zeugnis-pruefen-lassen' },
               { label: 'Lebenslauf verifizieren', href: '/lebenslauf-verifizieren' },
               { label: 'Pre-Employment Screening', href: '/pre-employment-screening' },
               { label: 'Background Check DSGVO', href: '/background-check-dsgvo' },

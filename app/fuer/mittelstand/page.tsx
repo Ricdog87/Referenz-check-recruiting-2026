@@ -7,12 +7,12 @@ export const metadata: Metadata = pageMeta({
   absoluteTitle: 'Referenzprüfung für den Mittelstand | candiq',
   description:
     'Mittelstand 200+ MA: candiq verifiziert Referenzen, Zeugnisse und CVs DSGVO-konform — Server in Deutschland, Audit-Trail für Wirtschaftsprüfer, kein Lock-in. Ab 65 €/Monat.',
-  path: '/für/mittelstand',
+  path: '/fuer/mittelstand',
 })
 
 const data: KeywordPageData = {
   breadcrumbName: 'Für Mittelstand',
-  path: '/für/mittelstand',
+  path: '/fuer/mittelstand',
   hero: {
     eyebrow: 'Für Mittelstand 200+ MA',
     h1: 'Referenzprüfung für den deutschen Mittelstand',
@@ -54,7 +54,7 @@ const data: KeywordPageData = {
   related: [
     { href: '/referenzpruefung', label: 'Referenzprüfung — der komplette Leitfaden' },
     { href: '/pre-employment-screening', label: 'Pre-Employment Screening' },
-    { href: '/für/hr-abteilungen', label: 'Für HR-Abteilungen' },
+    { href: '/fuer/hr-abteilungen', label: 'Für HR-Abteilungen' },
     { href: '/preise', label: 'Preise & Pakete' },
   ],
   ctaHeadline: 'Ein Fehl-Hire weniger pro Jahr — und candiq hat sich amortisiert',
