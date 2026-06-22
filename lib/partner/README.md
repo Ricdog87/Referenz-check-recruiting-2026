@@ -66,23 +66,48 @@ EK-Preise dürfen **nie** im Client-Bundle landen. Drei Schutzschichten:
    anonym und mit `PENDING`-Partner auf und erwartet 401/403 sowie
    leeres HTML ohne EK-Strings.
 
-## Lokales Setup
+## Lokales Setup (Supabase)
+
+candiq nutzt **Supabase Postgres** (EU-Region). `.env` braucht beide URLs:
+`DATABASE_URL` (Pooler, Port 6543) für Runtime, `DIRECT_URL` (Port 5432) für
+Prisma-Migrations. Siehe `.env.example`.
 
 ```bash
 # 1. Branch & Flag aktivieren
 git checkout feat/partner-program
 echo 'PARTNER_PROGRAM_ENABLED="true"' >> .env
 
-# 2. Schema-Sync (nach Phase 1)
-npx prisma generate
-npx prisma db push
+# 2. Schema-Sync auf Supabase
+#    Variante A — über Prisma (lokal, mit eigenen DIRECT_URL/DATABASE_URL):
+npm install
+DATABASE_URL=$SUPABASE_DATABASE_URL DIRECT_URL=$SUPABASE_DIRECT_URL \
+  npx prisma migrate deploy            # spielt prisma/migrations/* sauber ab
 
-# 3. Seed: Plan-Preise spiegeln, Tier-Defaults setzen
-npm run seed:partner-pricing
+#    Variante B — Migration via Supabase CLI:
+supabase db push --include-all          # spielt alle prisma/migrations/* an
 
-# 4. Tests
+#    Variante C — Migration via Supabase MCP (für AI-Assistant):
+#    apply_migration(name='partner_program_phase1', query=<SQL aus migration.sql>)
+
+# 3. Seeds (Prisma-Client; brauchen DATABASE_URL, kein DIRECT_URL nötig)
+DATABASE_URL=$SUPABASE_DATABASE_URL npm run seed:partner-tiers
+DATABASE_URL=$SUPABASE_DATABASE_URL npm run seed:partner-pricing
+
+# 4. Verifikation
+#    - Supabase Dashboard → Table Editor → 6 neue Tabellen sichtbar (Partner*)
+#    - get_advisors (MCP) sollte keine RLS-Warnung für diese Tabellen werfen,
+#      weil wir bewusst KEIN RLS einsetzen — Enforcement ist App-Layer.
+
+# 5. Tests
 npm test partner
 ```
+
+> **Hinweis zu RLS:** Supabase wirft im Dashboard standardmäßig eine
+> Warnung „table is public, no RLS policy". Für die Partner-Tabellen ist
+> das gewollt — das Service-Role-Key-Pattern via Prisma umgeht RLS sowieso,
+> und Enforcement passiert in `withPartnerScope()` im App-Layer (siehe
+> Abschnitt "Gating" oben). Die Warnung kann man im Advisor-Filter
+> ausblenden.
 
 ## Co-Branding-Regel
 
