@@ -7,12 +7,12 @@ export const metadata: Metadata = pageMeta({
   absoluteTitle: 'Referenzprüfung für HR-Abteilungen | candiq',
   description:
     'Inhouse-HR ohne Zeit für Telefonate? candiq übernimmt die DSGVO-konforme Referenzprüfung — Personio-Integration, Audit-Trail, Report in unter 48 h. Ab 65 €/Monat, monatlich kündbar.',
-  path: '/für/hr-abteilungen',
+  path: '/fuer/hr-abteilungen',
 })
 
 const data: KeywordPageData = {
   breadcrumbName: 'Für HR-Abteilungen',
-  path: '/für/hr-abteilungen',
+  path: '/fuer/hr-abteilungen',
   hero: {
     eyebrow: 'Für HR-Abteilungen',
     h1: 'Referenzprüfung für HR-Teams — ohne dass jemand bei Ihnen telefonieren muss',
@@ -59,7 +59,7 @@ const data: KeywordPageData = {
   related: [
     { href: '/referenzpruefung', label: 'Referenzprüfung — der komplette Leitfaden' },
     { href: '/reference-check-dsgvo', label: 'Reference-Check-Software aus Deutschland' },
-    { href: '/für/mittelstand', label: 'Für den Mittelstand 200+ MA' },
+    { href: '/fuer/mittelstand', label: 'Für den Mittelstand 200+ MA' },
     { href: '/preise', label: 'Preise & Pakete' },
   ],
   ctaHeadline: 'Geben Sie die Telefonate ab, behalten Sie die Entscheidung',
