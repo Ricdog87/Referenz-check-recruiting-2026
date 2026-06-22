@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Ungültige Anfrage.' }, { status: 400 })
   }
 
-  const { name, company, email, password, acceptTerms, acceptPrivacy, accountType, plan } = body ?? {}
+  const { name, company, email, password, acceptTerms, acceptPrivacy, accountType, plan, via } = body ?? {}
   const cleanName = String(name ?? '').trim().slice(0, MAX_NAME_LEN)
   const cleanCompany = String(company ?? '').trim().slice(0, MAX_COMPANY_LEN)
   const cleanEmail = String(email ?? '').trim().toLowerCase().slice(0, MAX_EMAIL_LEN)
@@ -171,6 +171,35 @@ export async function POST(req: NextRequest) {
       })
     } catch (auditErr) {
       console.error('register_audit_warn', auditErr)
+    }
+
+    // Partner-Conversion-Tracking — wenn der User über einen
+    // PartnerCustomer-Referral-Link (?via=<id>) kam, vermerken wir die
+    // Conversion in PartnerAuditLog. Der Partner sieht das im Dashboard
+    // — bekommt aber WEDER die User-ID noch sonstige HR-Daten zu sehen,
+    // nur das Boolean "konvertiert ja/nein".
+    if (typeof via === 'string' && via.length > 0 && via.length < 50) {
+      try {
+        const ref = await prisma.partnerCustomer.findUnique({
+          where: { id: via },
+          select: { id: true, partnerAccountId: true, contactEmail: true },
+        })
+        if (ref) {
+          await prisma.partnerAuditLog.create({
+            data: {
+              partnerAccountId: ref.partnerAccountId,
+              action: 'PARTNER_CUSTOMER_CONVERTED',
+              entity: 'PartnerCustomer',
+              entityId: ref.id,
+              // userId bewusst NICHT mitloggen — Cross-Domain-Grenze
+              details: `email_matches=${ref.contactEmail.toLowerCase() === cleanEmail ? 'true' : 'false'}`,
+              ip,
+            },
+          })
+        }
+      } catch (err) {
+        console.warn('partner_conversion_audit_warn', err)
+      }
     }
 
     // Welcome-Mail (graceful: scheitert nicht den Request, wenn Provider fehlt).

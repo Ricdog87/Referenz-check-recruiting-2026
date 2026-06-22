@@ -33,6 +33,10 @@ function RegisterForm() {
   const router = useRouter()
   const params = useSearchParams()
   const planId = params.get('plan') ?? 'PROFESSIONAL'
+  // Partner-Referral-Token (PartnerCustomer.id). Wenn gesetzt, wird die
+  // Conversion im Backend in PartnerAuditLog vermerkt — der werbende
+  // Partner sieht im Dashboard "konvertiert ✓".
+  const via = params.get('via')
   const requestedType = (params.get('type') as AccountType | null) ?? 'HR_DEPARTMENT'
   // PDL-Registrierung ist Closed Beta — kommt über dedizierten Sales-Flow
   // (siehe /waitlist-agency). Falls jemand mit ?type=RECRUITMENT_AGENCY
@@ -94,6 +98,7 @@ function RegisterForm() {
           plan: planId,
           acceptTerms,
           acceptPrivacy,
+          via: via ?? undefined,
         }),
       })
 

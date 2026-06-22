@@ -5,6 +5,8 @@ import { isPartnerProgramEnabled } from '@/lib/flags'
 import { getPartnerSession } from '@/lib/partner/session'
 import { withPartnerScope } from '@/lib/partner/scope'
 import { resolveEk, type BillingCycle } from '@/lib/partner/pricing'
+import { sendEmail, partnerCustomerWelcomeEmail } from '@/lib/email'
+import { getPlanById } from '@/lib/utils'
 import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
@@ -114,6 +116,40 @@ export async function POST(req: NextRequest) {
         },
       })
       .catch((err) => logger.warn('partner_customer_audit_warn', err))
+
+    // ── Co-Branded Welcome-Mail an den End-Mandanten ───────────────
+    // Best-effort: scheitert NIE den Request. Partner-Logo aus DB,
+    // Signup-Link mit ?via=<customerId> für Conversion-Tracking.
+    void (async () => {
+      try {
+        const [partnerRecord, plan] = await Promise.all([
+          prisma.partnerAccount.findUnique({
+            where: { id: session.id },
+            select: { company: true, logoUrl: true },
+          }),
+          Promise.resolve(getPlanById(planKey)),
+        ])
+        const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
+        const signupUrl = `${baseUrl}/register?via=${created.id}`
+        const tpl = partnerCustomerWelcomeEmail({
+          partnerName: partnerRecord?.company ?? session.name ?? 'Ihr Partner',
+          partnerLogoUrl: partnerRecord?.logoUrl ?? null,
+          customerContactName: `${contactFirstName} ${contactLastName}`.trim(),
+          customerCompany: company,
+          planName: plan?.name ?? planKey,
+          signupUrl,
+        })
+        await sendEmail({
+          to: contactEmail,
+          subject: tpl.subject,
+          html: tpl.html,
+          text: tpl.text,
+          category: 'partner-customer-welcome',
+        })
+      } catch (err) {
+        logger.warn('partner_customer_welcome_warn', err)
+      }
+    })()
 
     return NextResponse.json({ id: created.id }, { status: 201 })
   } catch (err) {

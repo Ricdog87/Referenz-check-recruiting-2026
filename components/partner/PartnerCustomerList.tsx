@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Plus, Loader2, AlertCircle, Pause, Play, X, Save, Edit3, CheckCircle2,
+  Plus, Loader2, AlertCircle, Pause, Play, X, Save, Edit3, CheckCircle2, UserCheck,
 } from 'lucide-react'
 
 type Customer = {
@@ -20,6 +20,9 @@ type Customer = {
   status: 'ACTIVE' | 'PAUSED' | 'CHURNED'
   notes: string | null
   activatedAt: string
+  // True wenn der Mandant den /register-Link aus der Welcome-Mail
+  // genutzt hat (PartnerAuditLog PARTNER_CUSTOMER_CONVERTED).
+  converted: boolean
 }
 
 type PlanOption = {
@@ -347,6 +350,15 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
             <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase border ${statusMeta[customer.status]}`}>
               {statusLabel[customer.status]}
             </span>
+            {customer.converted && (
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase border bg-indigo-50 text-indigo-800 border-indigo-200"
+                title="Mandant hat den Workspace-Aktivierungs-Link genutzt"
+              >
+                <UserCheck className="w-3 h-3" />
+                Aktiviert
+              </span>
+            )}
           </div>
           <div className="text-xs text-text-secondary mt-1">
             {customer.contactFirstName} {customer.contactLastName} ·{' '}

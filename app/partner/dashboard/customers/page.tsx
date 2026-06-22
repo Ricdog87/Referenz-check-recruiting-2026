@@ -23,13 +23,26 @@ export default async function PartnerCustomersPage() {
   const partner = await requireApprovedPartner()
   const scope = withPartnerScope(partner.id)
 
-  const [customers, pricing] = await Promise.all([
+  const [customers, pricing, conversions] = await Promise.all([
     prisma.partnerCustomer.findMany({
       where: scope,
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
     }),
     resolveAllEkForPartner({ partnerAccountId: partner.id, partnerTier: partner.tier }),
+    // Welche Mandanten haben ihren /register-Link genutzt? Lookup im
+    // PartnerAuditLog — gibt uns ein Set der konvertierten Customer-IDs.
+    prisma.partnerAuditLog.findMany({
+      where: {
+        partnerAccountId: partner.id,
+        action: 'PARTNER_CUSTOMER_CONVERTED',
+      },
+      select: { entityId: true, createdAt: true },
+    }),
   ])
+
+  const convertedIds = new Set(
+    conversions.map((c) => c.entityId).filter((id): id is string => id !== null),
+  )
 
   // Plan-Metadaten (Name + EK) für die "Neu anlegen"-Form.
   // EK darf hier auf den Client — Partner ist approved, eingeloggt.
@@ -86,6 +99,7 @@ export default async function PartnerCustomersPage() {
           status: c.status as 'ACTIVE' | 'PAUSED' | 'CHURNED',
           notes: c.notes,
           activatedAt: c.activatedAt.toISOString(),
+          converted: convertedIds.has(c.id),
         }))}
         planOptions={planOptions}
       />
