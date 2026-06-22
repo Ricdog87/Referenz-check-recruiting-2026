@@ -341,3 +341,82 @@ model CandidateAuditLog {
 
   @@index([candidateAccountId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// zvoove-Integration (feat/zvoove-integration · default off)
+//
+// Bidirektionale Anbindung an zvoove Recruit (ATS) für PDL-Kunden:
+//  - candiq importiert zur Prüfung markierte Bewerber aus zvoove
+//  - candiq schreibt nach Abschluss Verifikations-Status + Report-Link zurück
+//
+// Tenant-Modell heute: `workspaceId` = `User.id` (single-tenant pro User).
+// Sobald echte Mandanten-Trennung (Q4 2026) kommt, wird der FK umgestellt —
+// kein Schema-Bruch, nur Foreign-Key-Wechsel.
+//
+// Sicherheit:
+//  - apiKeyEnc ist AES-256-GCM-verschlüsselt (lib/crypto/aes-gcm.ts),
+//    Klartext-Key verlässt nie das Server-Memory.
+//  - Application-Layer-Enforcement (kein RLS — siehe README).
+//  - Consent-Gate (lib/cv-gate.ts) wird NIEMALS umgangen — importierte
+//    Kandidaten starten zwingend in cvStatus=AWAITING_CONSENT.
+// ─────────────────────────────────────────────────────────────────────────
+
+model ZvooveConnection {
+  id            String   @id @default(cuid())
+  // workspaceId = User.id (heute single-tenant). Q4 2026: echte Workspace-FK.
+  workspaceId   String   @unique
+  // Tenant-spezifische zvoove-Base-URL (jede zvoove-Recruit-Installation hat
+  // eigene Subdomain, z.B. https://kunde.europersonal.com)
+  baseUrl       String
+  // AES-256-GCM-Envelope (iv.tag.ciphertext, base64). NIE Klartext.
+  apiKeyEnc     String
+  // Fingerprint (z.B. "abc1…xyz9") fuer UI-Anzeige + Audit-Log.
+  apiKeyFp      String
+  // PENDING_VALIDATION | ACTIVE | DISABLED | ERROR
+  status        String   @default("PENDING_VALIDATION")
+  lastError     String?
+  lastValidated DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+}
+
+model ZvooveCandidateMap {
+  id                 String   @id @default(cuid())
+  workspaceId        String
+  // zvoove-seitige ID (string, weil je Tenant unterschiedliche Schemata moeglich)
+  zvooveCandidateId  String
+  candiqCandidateId  String   @unique
+  // Hash der zuletzt gesehenen zvoove-Profildaten (SHA-256 ueber relevante
+  // Felder). Wir resyncen nur, wenn sich der Hash aendert — idempotent.
+  externalHash       String
+  // PENDING | SYNCED | IMPORT_ERROR | PUSH_ERROR
+  syncState          String   @default("PENDING")
+  lastSyncedAt       DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([workspaceId, zvooveCandidateId])
+  @@index([workspaceId])
+  @@index([syncState])
+}
+
+model ZvooveSyncLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  // import_candidate | push_result | validate_connection | webhook_received
+  action      String
+  // OK | FAILED | SKIPPED
+  status      String
+  // Optionale Referenz auf den candiq-Kandidaten / -Check, falls zutreffend.
+  candidateId String?
+  checkId     String?
+  // Strukturierte Details (Fehler-Klasse, HTTP-Status, etc.) als JSON-String.
+  details     String?
+  createdAt   DateTime @default(now())
+
+  @@index([workspaceId, createdAt])
+  @@index([action])
+  @@index([status])
+}
