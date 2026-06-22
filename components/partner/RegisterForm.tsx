@@ -122,7 +122,7 @@ export function PartnerRegisterForm() {
           onChange={(v) => setForm({ ...form, acceptCoBranding: v })}
           label={
             <>
-              Ich verstehe, dass das Siegel <strong>„verifiziert durch candiq"</strong> auf
+              Ich verstehe, dass das Siegel <strong>{'„'}verifiziert durch candiq{'"'}</strong> auf
               allen Reports sichtbarer Pflichtbestandteil bleibt und nicht entfernbar ist.
             </>
           }

@@ -119,7 +119,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
       <>
         Sie. Der Endkunde unterschreibt mit Ihnen, zahlt an Sie, kennt
         Sie als Anbieter. candiq erscheint ausschließlich als
-        „verifizierende Instanz" auf dem Report — das ist die
+        {'„'}verifizierende Instanz{'"'} auf dem Report — das ist die
         Vertrauensschicht, kein konkurrierendes Branding.
       </>
     ),
@@ -153,7 +153,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     q: 'Kann ich das candiq-Siegel entfernen?',
     a: (
       <>
-        Nein. Das Siegel „verifiziert durch candiq" ist nicht entfernbar
+        Nein. Das Siegel {'„'}verifiziert durch candiq{'"'} ist nicht entfernbar
         — es ist genau das Asset, das Ihre Kunden bei Ihnen kaufen
         wollen. Wer ein vollständiges Pure-Whitelabel ohne candiq-Bezug
         sucht, ist im Partner-Programm falsch.
@@ -326,7 +326,7 @@ export function PartnerLanding() {
             ))}
           </div>
           <p className="text-center text-xs text-text-muted mt-8">
-            „Aktiv" = Mandant mit Status <code>ACTIVE</code> im Dashboard.
+            {'„'}Aktiv{'"'} = Mandant mit Status <code>ACTIVE</code> im Dashboard.
             Tier-Berechnung läuft monatlich, neue Stufe wirkt im nächsten
             Abrechnungszyklus.
           </p>

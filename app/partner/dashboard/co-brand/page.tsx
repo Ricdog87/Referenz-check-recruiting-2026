@@ -37,7 +37,7 @@ export default async function PartnerCoBrandPage() {
         <ShieldCheck className="w-5 h-5 text-indigo-700 flex-shrink-0 mt-0.5" />
         <div className="text-sm text-indigo-900 leading-relaxed">
           <div className="font-semibold mb-1">candiq-Siegel ist pflicht-mountet.</div>
-          „verifiziert durch candiq" erscheint sichtbar im Footer aller Reports
+          {'„'}verifiziert durch candiq{'"'} erscheint sichtbar im Footer aller Reports
           und kann nicht entfernt werden. Ihr Logo wird im Header zusätzlich
           eingebunden — Ihre Marke prominent, das Siegel als Vertrauens-Anker.
         </div>

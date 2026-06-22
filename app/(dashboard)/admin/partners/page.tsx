@@ -123,7 +123,7 @@ export default async function AdminPartnersPage({
           <div className="card-md text-center py-16">
             <Handshake className="w-10 h-10 text-text-muted mx-auto mb-3" />
             <p className="text-sm text-text-secondary">
-              Keine Partner im Status „{activeFilter === 'ALL' ? 'beliebig' : STATUS_LABELS[activeFilter]?.label}".
+              Keine Partner im Status {'„'}{activeFilter === 'ALL' ? 'beliebig' : STATUS_LABELS[activeFilter]?.label}{'"'}.
             </p>
           </div>
         ) : (
@@ -171,7 +171,7 @@ export default async function AdminPartnersPage({
                             </div>
                             {p.suspendReason && (p.status === 'SUSPENDED' || p.status === 'REJECTED') && (
                               <div className="text-xs text-red-700 mt-1.5 italic">
-                                „{p.suspendReason}"
+                                {'„'}{p.suspendReason}{'"'}
                               </div>
                             )}
                           </div>
