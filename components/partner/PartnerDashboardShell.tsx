@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import {
-  LayoutDashboard, Briefcase, Tag, Image as ImageIcon, LogOut, ShieldCheck, Menu, X,
+  LayoutDashboard, Briefcase, Tag, Image as ImageIcon, LogOut, ShieldCheck, Menu, X, Wallet,
 } from 'lucide-react'
 import type { PartnerSession } from '@/lib/partner/session'
 
@@ -13,6 +13,7 @@ const NAV = [
   { href: '/partner/dashboard/customers',  label: 'Mandanten',    icon: Briefcase },
   { href: '/partner/dashboard/pricing',    label: 'Konditionen',  icon: Tag },
   { href: '/partner/dashboard/co-brand',   label: 'Co-Branding',  icon: ImageIcon },
+  { href: '/partner/dashboard/payouts',    label: 'Abrechnung',   icon: Wallet },
 ]
 
 const TIER_LABELS: Record<string, string> = {

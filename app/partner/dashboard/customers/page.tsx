@@ -6,6 +6,7 @@ import { withPartnerScope } from '@/lib/partner/scope'
 import { resolveAllEkForPartner } from '@/lib/partner/pricing'
 import { HR_PLANS, AGENCY_PLANS } from '@/lib/utils'
 import { PartnerCustomerList } from '@/components/partner/PartnerCustomerList'
+import { Download } from 'lucide-react'
 
 export const metadata: Metadata = pageMeta({
   title: 'Partner — Mandanten',
@@ -49,13 +50,25 @@ export default async function PartnerCustomersPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <header className="mb-8">
-        <h1 className="text-2xl font-bold text-text-primary tracking-tightest">Mandanten</h1>
-        <p className="text-sm text-text-secondary mt-1">
-          Legen Sie End-Mandanten an, setzen Sie Ihren Verkaufspreis pro Mandant
-          und sehen Sie die Marge live. EK wird beim Anlegen aus Ihrer aktuellen
-          Tier-Kondition eingefroren.
-        </p>
+      <header className="mb-8 flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tightest">Mandanten</h1>
+          <p className="text-sm text-text-secondary mt-1">
+            Legen Sie End-Mandanten an, setzen Sie Ihren Verkaufspreis pro Mandant
+            und sehen Sie die Marge live. EK wird beim Anlegen aus Ihrer aktuellen
+            Tier-Kondition eingefroren.
+          </p>
+        </div>
+        {customers.length > 0 && (
+          <a
+            href="/api/partner/customers/export.csv"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-border-default text-text-secondary text-sm font-semibold hover:bg-surface-subtle transition-colors flex-shrink-0"
+            download
+          >
+            <Download className="w-4 h-4" />
+            CSV-Export
+          </a>
+        )}
       </header>
 
       <PartnerCustomerList
