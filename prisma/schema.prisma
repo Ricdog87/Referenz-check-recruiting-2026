@@ -341,3 +341,146 @@ model CandidateAuditLog {
 
   @@index([candidateAccountId])
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Partner-/Reseller-Programm (Phase 1 — Datenmodell)
+//
+// Strikt getrennt von User/Candidate. PartnerAccount kennt NIE candidate-,
+// consent- oder client-Daten. Enforcement ist App-Layer (withPartnerScope),
+// kein RLS. Feature-Flag PARTNER_PROGRAM_ENABLED gatet ALLE Routen,
+// die diese Models lesen oder schreiben.
+//
+// Pricing-Konvention: alle Geldbeträge in Cents (Int), analog AddonOrder.
+// Effektiver EK = round(listPriceCents × (1 − tier.ekDiscountPct / 100));
+// baseEkPriceCents überschreibt die Formel, wenn gesetzt.
+// ─────────────────────────────────────────────────────────────────────────
+
+model PartnerAccount {
+  id               String                      @id @default(cuid())
+  email            String                      @unique
+  passwordHash     String
+  contactFirstName String
+  contactLastName  String
+  company          String
+  phone            String?
+  // PENDING (Default nach Self-Registration) | APPROVED | SUSPENDED | REJECTED
+  status           String                      @default("PENDING")
+  // REGISTERED (Default) | SILVER | GOLD | PLATINUM — gespiegelt von active_customer-Count, manuell überschreibbar
+  tier             String                      @default("REGISTERED")
+  logoUrl          String?
+  consentVersion   String                      @default("1.0")
+  emailVerifiedAt  DateTime?
+  approvedAt       DateTime?
+  // Admin-User-ID, KEIN FK (cross-domain → bewusst lose, damit PartnerAccount nie User-Reads braucht)
+  approvedByUserId String?
+  suspendedAt      DateTime?
+  suspendReason    String?
+  lastLoginAt      DateTime?
+  deletedAt        DateTime?
+  createdAt        DateTime                    @default(now())
+  updatedAt        DateTime                    @updatedAt
+  pricingOverrides PartnerPricing[]
+  customers        PartnerCustomer[]
+  resetTokens      PartnerPasswordResetToken[]
+  auditLogs        PartnerAuditLog[]
+
+  @@index([email])
+  @@index([status])
+  @@index([tier])
+}
+
+model PartnerPasswordResetToken {
+  id               String         @id @default(cuid())
+  partnerAccountId String
+  partnerAccount   PartnerAccount @relation(fields: [partnerAccountId], references: [id], onDelete: Cascade)
+  token            String         @unique
+  expiresAt        DateTime
+  usedAt           DateTime?
+  ip               String?
+  createdAt        DateTime       @default(now())
+
+  @@index([partnerAccountId])
+  @@index([expiresAt])
+}
+
+model PartnerAuditLog {
+  id               String          @id @default(cuid())
+  partnerAccountId String?
+  partnerAccount   PartnerAccount? @relation(fields: [partnerAccountId], references: [id], onDelete: SetNull)
+  action           String
+  entity           String
+  entityId         String?
+  // JSON-stringified Details — NIE Klartext-EK-Preise im Audit-Log
+  details          String?
+  ip               String?
+  createdAt        DateTime        @default(now())
+
+  @@index([partnerAccountId])
+  @@index([action])
+}
+
+model PartnerTier {
+  // Primärschlüssel = Tier-Code (REGISTERED | SILVER | GOLD | PLATINUM).
+  // 4-Zeilen-Tabelle, vom Seed gefüllt, im Admin editierbar.
+  tier               String   @id
+  label              String
+  // Schwellenwert; gezählt werden PartnerCustomer mit status='ACTIVE'
+  minActiveCustomers Int
+  // 0..50; angewendet auf listPriceCents wenn kein baseEk-Override existiert
+  ekDiscountPct      Int
+  sortOrder          Int      @default(0)
+  updatedAt          DateTime @updatedAt
+}
+
+model PartnerPricing {
+  id                    String          @id @default(cuid())
+  // NULL = globale Default-Zeile (eine pro planKey, vom Seed angelegt).
+  // Gesetzt = Per-Partner-Override für einen einzelnen Deal.
+  partnerAccountId      String?
+  partnerAccount        PartnerAccount? @relation(fields: [partnerAccountId], references: [id], onDelete: Cascade)
+  // Match gegen Plan.id in lib/utils.ts (STARTER, PROFESSIONAL, …, AGENCY_SCALE)
+  planKey               String
+  // Gespiegelt aus HR_PLANS/AGENCY_PLANS via seed:partner-pricing (Cent-Werte).
+  listPriceMonthlyCents Int
+  listPriceAnnualCents  Int
+  // Per-Plan-Override (nullable). Wenn gesetzt → überschreibt die Tier-Discount-Formel.
+  baseEkMonthlyCents    Int?
+  baseEkAnnualCents     Int?
+  notes                 String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  @@unique([partnerAccountId, planKey])
+  @@index([planKey])
+}
+
+model PartnerCustomer {
+  id               String         @id @default(cuid())
+  partnerAccountId String
+  partnerAccount   PartnerAccount @relation(fields: [partnerAccountId], references: [id], onDelete: Cascade)
+  company          String
+  contactFirstName String
+  contactLastName  String
+  contactEmail     String
+  planKey          String
+  // MONTHLY | YEARLY — bestimmt, welcher der beiden Cent-Beträge zur Margin-Berechnung gilt
+  billingCycle     String         @default("MONTHLY")
+  // EK-Snapshot zum Anlage-Zeitpunkt (Cents). Eingefroren auch wenn Tier später steigt.
+  ekPriceCents     Int
+  // Verkaufspreis, den der Partner seinem Endkunden berechnet (Cents).
+  endPriceCents    Int
+  // Computed at write-time: endPriceCents - ekPriceCents. Persistiert für schnelle Aggregation.
+  marginCents      Int
+  // ACTIVE (zählt für Tier-Aufstieg) | PAUSED | CHURNED
+  status           String         @default("ACTIVE")
+  notes            String?
+  activatedAt      DateTime       @default(now())
+  pausedAt         DateTime?
+  churnedAt        DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([partnerAccountId, company, planKey])
+  @@index([partnerAccountId, status])
+  @@index([planKey])
+}

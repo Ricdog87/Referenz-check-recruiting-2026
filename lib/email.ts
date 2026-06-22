@@ -515,3 +515,67 @@ AVV: https://candiq.de/avv`
     text,
   }
 }
+
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Partner-Programm: Co-Branded End-Mandanten-Welcome
+//
+// Headline: Partner-Logo (oder Partner-Name) PROMINENT \u2014 candiq-Siegel
+// im Footer als Vertrauens-Anker (Co-Brand-Pflicht aus README, getestet
+// in partner-landing-gating.test.ts).
+// \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+function partnerShell(opts: {
+  content: string
+  partnerName: string
+  partnerLogoUrl: string | null
+}): string {
+  const header = opts.partnerLogoUrl
+    ? `<img src="${opts.partnerLogoUrl}" alt="${escapeAttr(opts.partnerName)}" style="max-height:40px;max-width:160px;display:block;margin:0 0 24px;">`
+    : `<div class="logo" style="color:#0f172a">${escapeText(opts.partnerName)}</div>`
+  // candiq-Siegel \u2014 UNENTFERNBAR per Co-Brand-Vertrag
+  const seal = `<div style="margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;font-size:11px;color:#64748b;">verifiziert durch <strong style="color:#4f46e5">candiq</strong></div>`
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${BASE_STYLES}</style></head><body><div class="wrap"><div class="card">${header}${opts.content}${seal}<div class="meta">Diese E-Mail wurde im Auftrag von ${escapeText(opts.partnerName)} \u00fcber candiq versendet.</div></div></div></body></html>`
+}
+
+function escapeText(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+function escapeAttr(s: string): string {
+  return escapeText(s).replace(/"/g, '&quot;')
+}
+
+export function partnerCustomerWelcomeEmail(opts: {
+  partnerName: string
+  partnerLogoUrl: string | null
+  customerContactName: string
+  customerCompany: string
+  planName: string
+  signupUrl: string
+}): { subject: string; html: string; text: string } {
+  const greeting = opts.customerContactName.trim() ? `Hallo ${escapeText(opts.customerContactName)},` : 'Hallo,'
+  const html = partnerShell({
+    partnerName: opts.partnerName,
+    partnerLogoUrl: opts.partnerLogoUrl,
+    content: `
+      <h1>Willkommen, ${escapeText(opts.customerCompany)}</h1>
+      <p>${greeting}</p>
+      <p>${escapeText(opts.partnerName)} hat Ihnen einen verifizierten Referenz-Check-Workspace eingerichtet \u2014
+         betrieben auf candiq, der DSGVO-konformen Plattform f\u00fcr Bewerber-Referenz-Pr\u00fcfung.</p>
+      <p><strong>Plan:</strong> ${escapeText(opts.planName)}</p>
+      <p style="margin: 24px 0;">
+        <a class="btn" href="${opts.signupUrl}">Konto aktivieren</a>
+      </p>
+      <p>Im Aktivierungs-Schritt legen Sie ein eigenes Passwort fest. Danach k\u00f6nnen Sie sofort
+         Kandidaten anlegen und Referenz-Pr\u00fcfungen starten. Reports tragen das Logo von
+         ${escapeText(opts.partnerName)} \u2014 die verifizierte Tiefe liefert candiq im Hintergrund.</p>
+      <p>Sie erreichen ${escapeText(opts.partnerName)} jederzeit als Ansprechpartner. Technische Fragen zur
+         Plattform beantworten wir gern unter <a href="mailto:hello@candiq.de">hello@candiq.de</a>.</p>
+    `,
+  })
+  const text = `Willkommen, ${opts.customerCompany}\n\n${opts.customerContactName ? `Hallo ${opts.customerContactName},` : 'Hallo,'}\n\n${opts.partnerName} hat Ihnen einen verifizierten Referenz-Check-Workspace eingerichtet \u2014 betrieben auf candiq.\n\nPlan: ${opts.planName}\n\nKonto aktivieren: ${opts.signupUrl}\n\nReports tragen das Logo von ${opts.partnerName} \u2014 verifiziert durch candiq.`
+  return {
+    subject: `Ihr Referenz-Check-Workspace bei ${opts.partnerName} ist bereit`,
+    html,
+    text,
+  }
+}

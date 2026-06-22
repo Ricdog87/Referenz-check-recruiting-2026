@@ -9,6 +9,8 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "seed:partner-tiers": "npx tsx scripts/seed-partner-tiers.ts",
+    "seed:partner-pricing": "npx tsx scripts/seed-partner-pricing.ts",
     "postinstall": "prisma generate",
     "test": "vitest run"
   },
