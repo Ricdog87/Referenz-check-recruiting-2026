@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs'
 import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, partnerApplicationAdminNotificationEmail } from '@/lib/email'
 import { isPartnerProgramEnabled } from '@/lib/flags'
 import { logger } from '@/lib/logger'
 
@@ -132,20 +132,22 @@ export async function POST(req: NextRequest) {
       .catch((err) => logger.warn('partner_register_audit_warn', err))
 
     // Admin-Notification: an LEAD_ALERT_EMAIL (Default: r.serrano@…)
+    // Nutzt das candiq-branded Template aus lib/email.ts (shell() Layout).
     const adminEmail = process.env.LEAD_ALERT_EMAIL || 'r.serrano@recruiting-sg.de'
     const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
+    const adminTpl = partnerApplicationAdminNotificationEmail({
+      company: cleanCompany,
+      contactFirstName: cleanFirstName,
+      contactLastName: cleanLastName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      approvalUrl: `${baseUrl}/admin/partners`,
+    })
     sendEmail({
       to: adminEmail,
-      subject: `Neue Partner-Bewerbung: ${cleanCompany}`,
-      html: `<p>Eine neue Bewerbung im Partner-Programm:</p>
-             <ul>
-               <li><strong>Firma:</strong> ${escapeHtml(cleanCompany)}</li>
-               <li><strong>Kontakt:</strong> ${escapeHtml(cleanFirstName)} ${escapeHtml(cleanLastName)}</li>
-               <li><strong>E-Mail:</strong> ${escapeHtml(cleanEmail)}</li>
-               <li><strong>Telefon:</strong> ${escapeHtml(cleanPhone ?? '—')}</li>
-             </ul>
-             <p>Zur Approval-Queue: <a href="${baseUrl}/admin/partners">${baseUrl}/admin/partners</a></p>`,
-      text: `Neue Partner-Bewerbung: ${cleanCompany} (${cleanEmail}). Approval: ${baseUrl}/admin/partners`,
+      subject: adminTpl.subject,
+      html: adminTpl.html,
+      text: adminTpl.text,
       category: 'partner-application-admin',
     }).catch((err) => logger.warn('partner_admin_notify_warn', err))
 
@@ -167,13 +169,4 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     )
   }
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
 }
