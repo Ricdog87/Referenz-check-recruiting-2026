@@ -10,7 +10,7 @@ import { PartnerLanding } from '@/components/landing/sections/PartnerLanding'
 export const metadata: Metadata = pageMeta({
   title: 'Partner-Programm für Personaldienstleister',
   description:
-    'Verkaufen Sie candiq unter Ihrer Marke. Co-Branded Referenzprüfung für Personaldienstleister: Sie behalten die Kundenbeziehung, candiq liefert die verifizierte Tiefe. Vier Stufen, faire Margen, kein Mindestumsatz.',
+    'Verkaufen Sie unter Ihrem Namen – verifiziert von candiq. Co-Branded Referenzprüfung für Personaldienstleister: Sie behalten die Kundenbeziehung, candiq liefert die verifizierte Tiefe. Vier Stufen, faire Margen, kein Mindestumsatz.',
   path: '/partner',
   // Solange das Programm im Soft-Launch läuft, nicht indexieren.
   noindex: true,
