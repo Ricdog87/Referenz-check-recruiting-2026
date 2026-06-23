@@ -149,9 +149,12 @@ export default async function AdminPartnersPage({
                         <div className="flex items-start gap-2">
                           <Building2 className="w-4 h-4 text-text-muted mt-0.5 flex-shrink-0" />
                           <div>
-                            <div className="font-semibold text-text-primary leading-tight">
+                            <Link
+                              href={`/admin/partners/${p.id}`}
+                              className="font-semibold text-text-primary leading-tight hover:text-indigo-600 hover:underline"
+                            >
                               {p.company}
-                            </div>
+                            </Link>
                             <div className="text-xs text-text-secondary mt-0.5">
                               {p.contactFirstName} {p.contactLastName}
                             </div>
