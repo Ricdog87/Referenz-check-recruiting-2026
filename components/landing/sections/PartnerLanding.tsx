@@ -37,7 +37,7 @@ const STEPS = [
     n: '02',
     title: 'Co-Brand einrichten',
     body:
-      'Logo hochladen, Domain wahlen, Reports white-labeln. Das candiq-Siegel „verifiziert durch candiq" bleibt sichtbarer Pflichtbestandteil — das ist die Vertrauensschicht, die Ihre Kunden kaufen.',
+      'Logo hochladen, Domain wählen, Reports mit Ihrem Logo co-branden. Das candiq-Siegel „verifiziert durch candiq" bleibt sichtbarer Pflichtbestandteil — das ist die Vertrauensschicht, die Ihre Kunden kaufen.',
   },
   {
     n: '03',
@@ -60,7 +60,7 @@ const TIERS = [
     position: 'Einstieg',
     perks: [
       'Voller Zugriff aufs Reseller-Dashboard',
-      'White-Label-Reports mit Ihrem Logo',
+      'Co-Branded Reports mit Ihrem Logo',
       'Co-Brand-Welcome-Mail an Endkunden',
     ],
   },
@@ -192,7 +192,7 @@ export function PartnerLanding() {
             <Handshake className="w-3.5 h-3.5" /> Partner-Programm für Personaldienstleister
           </div>
           <h1 className="text-[clamp(34px,5vw,56px)] font-bold leading-[1.05] tracking-tightest text-text-primary mb-5">
-            Verkaufen Sie unter Ihrer Marke.{' '}
+            Verkaufen Sie unter Ihrem Namen – verifiziert von candiq.{' '}
             <span className="text-gradient-brand">candiq macht die Tiefe.</span>
           </h1>
           <p className="text-lg text-text-secondary leading-relaxed max-w-2xl mx-auto">
@@ -370,7 +370,7 @@ export function PartnerLanding() {
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-[clamp(28px,4vw,40px)] font-bold tracking-tightest text-text-primary mb-4">
-            Bereit, candiq unter Ihrer Marke anzubieten?
+            Bereit, candiq als Ihren Service anzubieten?
           </h2>
           <p className="text-text-secondary mb-8 leading-relaxed">
             Kurze Bewerbung, 2 Werktage Prüfung, dann Erstgespräch zu

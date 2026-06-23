@@ -42,6 +42,7 @@ export function LandingFooter() {
               { label: 'Add-ons & Services', href: '/preise#addons' },
               { label: 'ROI-Rechner', href: '/roi-rechner' },
               { label: 'Pilot-Programm', href: '/pilotprogramm' },
+              { label: 'Partner werden', href: '/partner' },
               { label: 'Compliance & DSGVO', href: '/compliance' },
               { label: 'Ressourcen', href: '/resources' },
               { label: 'Termin buchen', href: BOOKING_URL, external: true },
