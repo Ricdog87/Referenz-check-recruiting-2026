@@ -10,7 +10,13 @@
  */
 
 import { prisma } from '@/lib/db'
-import { sendEmail } from '@/lib/email'
+import {
+  sendEmail,
+  partnerApprovedEmail,
+  partnerRejectedEmail,
+  partnerSuspendedEmail,
+  partnerReactivatedEmail,
+} from '@/lib/email'
 import { logger } from '@/lib/logger'
 
 type AdminAction = 'APPROVE' | 'REJECT' | 'SUSPEND' | 'REACTIVATE'
@@ -107,6 +113,11 @@ export async function applyAdminAction(opts: {
   return { ok: true, status: nextStatus }
 }
 
+/**
+ * Versendet die Status-Mail an den Partner nach einer Admin-Aktion.
+ * Alle Templates leben in lib/email.ts und nutzen den candiq-shell()
+ * (Marken-Header, Karten-Layout, Footer-Hinweis) — keine rohen `<p>`-Mails.
+ */
 async function notifyPartner(opts: {
   action: AdminAction
   partnerEmail: string
@@ -116,71 +127,65 @@ async function notifyPartner(opts: {
   reason?: string
 }) {
   const loginUrl = `${opts.baseUrl}/partner/login`
-  const greeting = opts.partnerName ? `Hallo ${opts.partnerName},` : 'Hallo,'
 
   if (opts.action === 'APPROVE') {
+    const tpl = partnerApprovedEmail({
+      partnerName: opts.partnerName,
+      company: opts.company,
+      loginUrl,
+    })
     await sendEmail({
       to: opts.partnerEmail,
-      subject: `Ihre Partner-Bewerbung wurde freigegeben — ${opts.company}`,
-      html: `<p>${greeting}</p>
-             <p>Ihre Partner-Bewerbung ist freigegeben — willkommen im candiq-Reseller-Programm.</p>
-             <p>Sie können sich jetzt einloggen und Mandanten anlegen: <a href="${loginUrl}">${loginUrl}</a></p>
-             <p>Wir melden uns separat zum Erstgespräch (EK-Konditionen, Co-Brand-Setup).</p>
-             <p>Bis bald,<br>candiq</p>`,
-      text: `${greeting}\n\nIhre Partner-Bewerbung ist freigegeben.\nLogin: ${loginUrl}\n\nWir melden uns separat zum Erstgespräch.`,
+      subject: tpl.subject,
+      html: tpl.html,
+      text: tpl.text,
       category: 'partner-approved',
     })
     return
   }
 
   if (opts.action === 'REJECT') {
+    const tpl = partnerRejectedEmail({
+      partnerName: opts.partnerName,
+      reason: opts.reason,
+    })
     await sendEmail({
       to: opts.partnerEmail,
-      subject: `Ihre Partner-Bewerbung — Rückmeldung`,
-      html: `<p>${greeting}</p>
-             <p>Vielen Dank für Ihre Bewerbung. Aktuell können wir Sie nicht ins Programm aufnehmen.</p>
-             ${opts.reason ? `<p>Begründung: ${escapeHtml(opts.reason)}</p>` : ''}
-             <p>Sie können sich später erneut bewerben.</p>
-             <p>candiq</p>`,
-      text: `${greeting}\n\nVielen Dank für Ihre Bewerbung. Aktuell können wir Sie nicht ins Programm aufnehmen.${opts.reason ? `\n\nBegründung: ${opts.reason}` : ''}\n\ncandiq`,
+      subject: tpl.subject,
+      html: tpl.html,
+      text: tpl.text,
       category: 'partner-rejected',
     })
     return
   }
 
   if (opts.action === 'SUSPEND') {
+    const tpl = partnerSuspendedEmail({
+      partnerName: opts.partnerName,
+      reason: opts.reason,
+    })
     await sendEmail({
       to: opts.partnerEmail,
-      subject: `Ihr Partner-Zugang wurde pausiert`,
-      html: `<p>${greeting}</p>
-             <p>Ihr Partner-Zugang ist aktuell pausiert.${opts.reason ? ` Begründung: ${escapeHtml(opts.reason)}` : ''}</p>
-             <p>Bitte melden Sie sich unter <a href="mailto:partner@candiq.de">partner@candiq.de</a>, falls Sie das klären möchten.</p>
-             <p>candiq</p>`,
-      text: `${greeting}\n\nIhr Partner-Zugang ist aktuell pausiert.${opts.reason ? `\nBegründung: ${opts.reason}` : ''}\n\npartner@candiq.de`,
+      subject: tpl.subject,
+      html: tpl.html,
+      text: tpl.text,
       category: 'partner-suspended',
     })
     return
   }
 
   if (opts.action === 'REACTIVATE') {
+    const tpl = partnerReactivatedEmail({
+      partnerName: opts.partnerName,
+      loginUrl,
+    })
     await sendEmail({
       to: opts.partnerEmail,
-      subject: `Ihr Partner-Zugang ist wieder aktiv`,
-      html: `<p>${greeting}</p>
-             <p>Ihr Partner-Zugang ist wieder freigegeben. Login: <a href="${loginUrl}">${loginUrl}</a></p>
-             <p>candiq</p>`,
-      text: `${greeting}\n\nIhr Partner-Zugang ist wieder freigegeben.\nLogin: ${loginUrl}\n\ncandiq`,
+      subject: tpl.subject,
+      html: tpl.html,
+      text: tpl.text,
       category: 'partner-reactivated',
     })
     return
   }
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
 }
