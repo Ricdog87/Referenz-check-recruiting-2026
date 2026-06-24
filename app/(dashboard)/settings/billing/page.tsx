@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { safeQuery } from '@/lib/safe-query'
+import { trialDaysLeft } from '@/lib/utils'
 import { Header } from '@/components/layout/Header'
 import { BillingPortalButton } from './BillingPortalButton'
 
@@ -51,6 +52,7 @@ export default async function BillingPage() {
         billingInterval: true,
         currentPeriodEnd: true,
         stripeCustomerId: true,
+        trialEndsAt: true,
       },
     }),
     null,
@@ -69,6 +71,13 @@ export default async function BillingPage() {
 
   return (
     <>
+      {user.planStatus === 'TRIALING' && (trialDaysLeft(user.trialEndsAt) ?? 0) > 0 && (
+        <div className="mx-auto max-w-5xl px-4 mb-4">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            ⏳ Testphase: noch {trialDaysLeft(user.trialEndsAt)} Tag(e) übrig. <Link href="/settings/billing" className="font-medium underline">Jetzt upgraden</Link>
+          </div>
+        </div>
+      )}
       <Header title="Abrechnung" subtitle="Plan & Zahlungsdetails" />
       <div className="max-w-2xl space-y-5">
         <div className="card-lg shadow-card-md">

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { getPlanById, trialDaysLeft } from '@/lib/utils'
 
 const MAX_NAME_LEN = 80
 const MAX_EMAIL_LEN = 254
@@ -30,6 +31,25 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: 'Nicht autorisiert.' }, { status: 401 })
+
+  // Quota-Guard
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { planStatus: true, plan: true, trialEndsAt: true }
+  })
+  const plan = getPlanById(user?.plan || 'STARTER')
+  const daysLeft = trialDaysLeft(user?.trialEndsAt)
+  const isActive = (user?.planStatus === 'TRIALING' && (daysLeft ?? 0) > 0) || user?.planStatus === 'ACTIVE'
+  if (!isActive) {
+    return NextResponse.json({ error: 'Kein aktiver Plan. Bitte abonnieren Sie einen Plan.' }, { status: 402 })
+  }
+  const candidateLimit = plan.includedChecks * 3
+  const candidateCount = await prisma.candidate.count({ where: { userId: session.user.id } })
+  if (candidateCount >= candidateLimit) {
+    return NextResponse.json({
+      error: `Kandidatenlimit erreicht: max. ${candidateLimit} Kandidaten in Ihrem ${plan.name}-Plan.`
+    }, { status: 402 })
+  }
 
   let body: any
   try {
