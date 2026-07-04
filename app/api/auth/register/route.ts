@@ -49,20 +49,68 @@ export async function POST(req: NextRequest) {
   const cleanEmail = String(email ?? '').trim().toLowerCase().slice(0, MAX_EMAIL_LEN)
   const rawPassword = typeof password === 'string' ? password : ''
 
+  // ── Partner-Referral (?via=<PartnerCustomer.id>) ────────────────────
+  // Wenn der Signup über die Co-Branded Welcome-Mail eines Partners kommt,
+  // ist der Plan AUTORITATIV der vom Partner angelegte planKey aus der DB —
+  // nicht der Body-Wert (der ist nur UI-Hint und manipulierbar). Das
+  // erlaubt auch AGENCY_*-Pläne, die im Self-Service sonst gesperrt sind:
+  // der Partner hat den Mandanten geprüft angelegt, das Referral IST die
+  // Einladung in die Closed Beta.
+  let referral: { id: string; planKey: string; partnerAccountId: string; contactEmail: string } | null = null
+  if (typeof via === 'string' && via.length > 0 && via.length < 50) {
+    try {
+      const ref = await prisma.partnerCustomer.findUnique({
+        where: { id: via },
+        select: {
+          id: true,
+          planKey: true,
+          partnerAccountId: true,
+          contactEmail: true,
+          status: true,
+          partnerAccount: { select: { status: true, deletedAt: true } },
+        },
+      })
+      if (
+        ref &&
+        ref.status !== 'CHURNED' &&
+        ref.partnerAccount &&
+        !ref.partnerAccount.deletedAt &&
+        ref.partnerAccount.status === 'APPROVED'
+      ) {
+        referral = {
+          id: ref.id,
+          planKey: ref.planKey,
+          partnerAccountId: ref.partnerAccountId,
+          contactEmail: ref.contactEmail,
+        }
+      }
+    } catch (err) {
+      console.warn('register_referral_lookup_warn', err)
+    }
+  }
+
+  const referralIsAgencyPlan = referral?.planKey.startsWith('AGENCY_') ?? false
+
   // PDL-Registrierung: standardmäßig GESCHLOSSEN — PDL-Pakete sind in
   // Vorbereitung und werden später über den dedizierten Sales-Flow
   // freigegeben. Falls geöffnet werden soll, in Vercel-Env explizit:
   // PDL_REGISTRATION_OPEN=true setzen.
+  // AUSNAHME: valides Partner-Referral mit AGENCY-Plan (siehe oben).
   const pdlOpen = (process.env.PDL_REGISTRATION_OPEN ?? 'false').toLowerCase() === 'true'
-  if (accountType === 'RECRUITMENT_AGENCY' && !pdlOpen) {
+  if (accountType === 'RECRUITMENT_AGENCY' && !pdlOpen && !referralIsAgencyPlan) {
     return NextResponse.json(
       { error: 'PDL-Konten sind aktuell in der Closed Beta. Bitte nutzen Sie die Warteliste unter /waitlist-agency.' },
       { status: 403 }
     )
   }
 
-  const cleanAccountType = VALID_ACCOUNT_TYPES.includes(accountType) ? accountType : 'HR_DEPARTMENT'
-  const cleanPlan = VALID_PLANS.includes(plan) ? plan : 'STARTER'
+  // Referral bestimmt Plan + AccountType autoritativ; sonst Body mit Whitelist.
+  const cleanAccountType = referral
+    ? (referralIsAgencyPlan ? 'RECRUITMENT_AGENCY' : 'HR_DEPARTMENT')
+    : VALID_ACCOUNT_TYPES.includes(accountType) ? accountType : 'HR_DEPARTMENT'
+  const cleanPlan = referral
+    ? referral.planKey
+    : VALID_PLANS.includes(plan) ? plan : 'STARTER'
 
   if (!cleanName || !cleanCompany || !cleanEmail || !rawPassword) {
     return NextResponse.json({ error: 'Bitte füllen Sie alle Felder aus.' }, { status: 400 })
@@ -173,30 +221,23 @@ export async function POST(req: NextRequest) {
       console.error('register_audit_warn', auditErr)
     }
 
-    // Partner-Conversion-Tracking — wenn der User über einen
-    // PartnerCustomer-Referral-Link (?via=<id>) kam, vermerken wir die
-    // Conversion in PartnerAuditLog. Der Partner sieht das im Dashboard
-    // — bekommt aber WEDER die User-ID noch sonstige HR-Daten zu sehen,
-    // nur das Boolean "konvertiert ja/nein".
-    if (typeof via === 'string' && via.length > 0 && via.length < 50) {
+    // Partner-Conversion-Tracking — der Referral wurde bereits oben
+    // validiert (existiert, Partner APPROVED). Der Partner sieht im
+    // Dashboard nur das Boolean "konvertiert ja/nein" — WEDER die
+    // User-ID noch sonstige HR-Daten (Cross-Domain-Grenze).
+    if (referral) {
       try {
-        const ref = await prisma.partnerCustomer.findUnique({
-          where: { id: via },
-          select: { id: true, partnerAccountId: true, contactEmail: true },
+        await prisma.partnerAuditLog.create({
+          data: {
+            partnerAccountId: referral.partnerAccountId,
+            action: 'PARTNER_CUSTOMER_CONVERTED',
+            entity: 'PartnerCustomer',
+            entityId: referral.id,
+            // userId bewusst NICHT mitloggen — Cross-Domain-Grenze
+            details: `email_matches=${referral.contactEmail.toLowerCase() === cleanEmail ? 'true' : 'false'} plan=${referral.planKey}`,
+            ip,
+          },
         })
-        if (ref) {
-          await prisma.partnerAuditLog.create({
-            data: {
-              partnerAccountId: ref.partnerAccountId,
-              action: 'PARTNER_CUSTOMER_CONVERTED',
-              entity: 'PartnerCustomer',
-              entityId: ref.id,
-              // userId bewusst NICHT mitloggen — Cross-Domain-Grenze
-              details: `email_matches=${ref.contactEmail.toLowerCase() === cleanEmail ? 'true' : 'false'}`,
-              ip,
-            },
-          })
-        }
       } catch (err) {
         console.warn('partner_conversion_audit_warn', err)
       }
