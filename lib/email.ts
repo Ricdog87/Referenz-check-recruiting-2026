@@ -579,3 +579,147 @@ export function partnerCustomerWelcomeEmail(opts: {
     text,
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Partner-Programm: Admin-Aktions-Mails an Partner
+//
+// ALLE diese Mails sind reine candiq → Partner Kommunikation und nutzen
+// daher den candiq-shell() (Logo, Branding, Footer-Hinweis). KEIN
+// partnerShell — die Partner-Logo-Variante ist nur für Mails an die
+// End-Mandanten gedacht.
+// ─────────────────────────────────────────────────────────────────────────
+
+function partnerSalutation(fullName: string | null | undefined): string {
+  const n = (fullName ?? '').trim()
+  return n ? `Hallo ${escapeText(n)},` : 'Hallo,'
+}
+
+export function partnerApprovedEmail(opts: {
+  partnerName: string
+  company: string
+  loginUrl: string
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Willkommen im candiq-Reseller-Programm</h1>
+    <p>${partnerSalutation(opts.partnerName)}</p>
+    <p>Ihre Partner-Bewerbung für <strong>${escapeText(opts.company)}</strong> ist freigegeben.
+       Sie können sich jetzt einloggen und Ihren ersten Mandanten anlegen.</p>
+    <p style="margin: 24px 0;"><a class="btn" href="${opts.loginUrl}">Zum Partner-Dashboard</a></p>
+    <p><strong>Nächste Schritte:</strong></p>
+    <p>1. Co-Brand-Logo hochladen (wird auf Reports und Welcome-Mails Ihrer Mandanten gezeigt)<br>
+       2. Ersten Mandanten anlegen — wir verschicken die Welcome-Mail mit Ihrem Branding<br>
+       3. Konditionen und Tier-Status im Dashboard prüfen</p>
+    <p>Wir melden uns separat zum Erstgespräch (EK-Konditionen-Walkthrough und Co-Brand-Setup).
+       Bei Fragen jederzeit gern an <a href="mailto:partner@candiq.de">partner@candiq.de</a>.</p>
+  `)
+  const text = `Willkommen im candiq-Reseller-Programm\n\n${partnerSalutation(opts.partnerName).replace(/<[^>]+>/g, '')}\n\nIhre Partner-Bewerbung für ${opts.company} ist freigegeben.\n\nLogin: ${opts.loginUrl}\n\nNächste Schritte: 1. Co-Brand-Logo hochladen 2. Ersten Mandanten anlegen 3. Konditionen prüfen\n\nWir melden uns separat zum Erstgespräch.`
+  return {
+    subject: `Ihre Partner-Bewerbung wurde freigegeben — ${opts.company}`,
+    html,
+    text,
+  }
+}
+
+export function partnerRejectedEmail(opts: {
+  partnerName: string
+  reason?: string | null
+}): { subject: string; html: string; text: string } {
+  const reasonBlock = opts.reason
+    ? `<p><strong>Begründung:</strong><br>${escapeText(opts.reason)}</p>`
+    : ''
+  const html = shell(`
+    <h1>Zur Ihrer Partner-Bewerbung</h1>
+    <p>${partnerSalutation(opts.partnerName)}</p>
+    <p>vielen Dank, dass Sie sich für das candiq-Partner-Programm beworben haben.
+       Nach Prüfung können wir Sie aktuell leider nicht ins Programm aufnehmen.</p>
+    ${reasonBlock}
+    <p>Eine erneute Bewerbung ist jederzeit möglich, sobald sich die Rahmenbedingungen
+       geändert haben. Falls Sie Rückfragen zur Entscheidung haben, antworten Sie
+       gern auf diese E-Mail.</p>
+  `)
+  const text = `Zur Ihrer Partner-Bewerbung\n\n${partnerSalutation(opts.partnerName).replace(/<[^>]+>/g, '')}\n\nvielen Dank für Ihre Bewerbung. Nach Prüfung können wir Sie aktuell leider nicht ins Programm aufnehmen.${opts.reason ? `\n\nBegründung: ${opts.reason}` : ''}\n\nEine erneute Bewerbung ist jederzeit möglich.`
+  return {
+    subject: 'Zur Ihrer Partner-Bewerbung — Rückmeldung',
+    html,
+    text,
+  }
+}
+
+export function partnerSuspendedEmail(opts: {
+  partnerName: string
+  reason?: string | null
+}): { subject: string; html: string; text: string } {
+  const reasonBlock = opts.reason
+    ? `<p><strong>Begründung:</strong><br>${escapeText(opts.reason)}</p>`
+    : ''
+  const html = shell(`
+    <h1>Ihr Partner-Zugang wurde pausiert</h1>
+    <p>${partnerSalutation(opts.partnerName)}</p>
+    <p>Wir haben Ihren Partner-Zugang vorübergehend pausiert. Bestehende Mandanten
+       laufen unverändert weiter — Sie können sich aktuell jedoch nicht einloggen
+       und keine neuen Mandanten anlegen.</p>
+    ${reasonBlock}
+    <p>Bitte melden Sie sich unter
+       <a href="mailto:partner@candiq.de">partner@candiq.de</a>,
+       damit wir die nächsten Schritte gemeinsam klären können.</p>
+  `)
+  const text = `Ihr Partner-Zugang wurde pausiert\n\n${partnerSalutation(opts.partnerName).replace(/<[^>]+>/g, '')}\n\nWir haben Ihren Partner-Zugang vorübergehend pausiert.${opts.reason ? `\n\nBegründung: ${opts.reason}` : ''}\n\nBitte melden Sie sich unter partner@candiq.de.`
+  return {
+    subject: 'Ihr candiq-Partner-Zugang wurde pausiert',
+    html,
+    text,
+  }
+}
+
+export function partnerReactivatedEmail(opts: {
+  partnerName: string
+  loginUrl: string
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Ihr Partner-Zugang ist wieder aktiv</h1>
+    <p>${partnerSalutation(opts.partnerName)}</p>
+    <p>Wir haben Ihren Partner-Zugang wieder freigeschaltet. Sie können sich jetzt
+       wieder einloggen und Ihre Mandanten verwalten.</p>
+    <p style="margin: 24px 0;"><a class="btn" href="${opts.loginUrl}">Zum Partner-Dashboard</a></p>
+    <p>Bei Rückfragen stehen wir Ihnen unter
+       <a href="mailto:partner@candiq.de">partner@candiq.de</a> jederzeit zur Verfügung.</p>
+  `)
+  const text = `Ihr Partner-Zugang ist wieder aktiv\n\n${partnerSalutation(opts.partnerName).replace(/<[^>]+>/g, '')}\n\nWir haben Ihren Partner-Zugang wieder freigeschaltet.\n\nLogin: ${opts.loginUrl}`
+  return {
+    subject: 'Ihr candiq-Partner-Zugang ist wieder aktiv',
+    html,
+    text,
+  }
+}
+
+/**
+ * Interne Notification an LEAD_ALERT_EMAIL bei neuer Partner-Bewerbung.
+ * Geht an candiq-interne Adresse — kein Partner-Branding, candiq-shell.
+ */
+export function partnerApplicationAdminNotificationEmail(opts: {
+  company: string
+  contactFirstName: string
+  contactLastName: string
+  email: string
+  phone: string | null
+  approvalUrl: string
+}): { subject: string; html: string; text: string } {
+  const html = shell(`
+    <h1>Neue Partner-Bewerbung</h1>
+    <p>Eine neue Bewerbung im candiq-Partner-Programm ist eingegangen:</p>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
+      <tr><td style="padding:6px 0;color:#64748b;width:120px;">Firma</td><td style="padding:6px 0;"><strong>${escapeText(opts.company)}</strong></td></tr>
+      <tr><td style="padding:6px 0;color:#64748b;">Kontakt</td><td style="padding:6px 0;">${escapeText(opts.contactFirstName)} ${escapeText(opts.contactLastName)}</td></tr>
+      <tr><td style="padding:6px 0;color:#64748b;">E-Mail</td><td style="padding:6px 0;"><a href="mailto:${escapeAttr(opts.email)}">${escapeText(opts.email)}</a></td></tr>
+      <tr><td style="padding:6px 0;color:#64748b;">Telefon</td><td style="padding:6px 0;">${escapeText(opts.phone ?? '—')}</td></tr>
+    </table>
+    <p style="margin: 24px 0;"><a class="btn" href="${opts.approvalUrl}">Zur Approval-Queue</a></p>
+    <p style="font-size:12px;color:#94a3b8;">Bewerbungen werden manuell geprüft. Bitte innerhalb von 2 Werktagen über Approve/Reject entscheiden.</p>
+  `)
+  const text = `Neue Partner-Bewerbung\n\nFirma: ${opts.company}\nKontakt: ${opts.contactFirstName} ${opts.contactLastName}\nE-Mail: ${opts.email}\nTelefon: ${opts.phone ?? '—'}\n\nApproval-Queue: ${opts.approvalUrl}`
+  return {
+    subject: `Neue Partner-Bewerbung: ${opts.company}`,
+    html,
+    text,
+  }
+}
