@@ -130,7 +130,9 @@ export async function POST(req: NextRequest) {
           Promise.resolve(getPlanById(planKey)),
         ])
         const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
-        const signupUrl = `${baseUrl}/register?via=${created.id}`
+        // plan= ist nur UI-Hint für die sofortige Anzeige; die autoritative
+        // Plan-Zuweisung macht /api/auth/register über den via-Lookup in der DB.
+        const signupUrl = `${baseUrl}/register?via=${created.id}&plan=${encodeURIComponent(planKey)}`
         const tpl = partnerCustomerWelcomeEmail({
           partnerName: partnerRecord?.company ?? session.name ?? 'Ihr Partner',
           partnerLogoUrl: partnerRecord?.logoUrl ?? null,

@@ -1,11 +1,24 @@
 'use client'
 
-import { Suspense, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
-import { Building2, Users2, ShieldCheck, Loader2, ArrowRight, Check, Eye, EyeOff } from 'lucide-react'
+import { Building2, Users2, ShieldCheck, Loader2, ArrowRight, Check, Eye, EyeOff, Handshake } from 'lucide-react'
 import { ACCOUNT_TYPES, type AccountType, getPlanById } from '@/lib/utils'
+
+// Prefill-Daten aus /api/partner/referral/[id] — der Mandant wurde vom
+// Partner angelegt, wir kennen Firma/Kontakt/Plan bereits.
+type ReferralPrefill = {
+  referralId: string
+  company: string
+  contactFirstName: string
+  contactLastName: string
+  contactEmail: string
+  planKey: string
+  planName: string
+  partnerCompany: string
+}
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
@@ -48,6 +61,36 @@ function RegisterForm() {
   const [accountType, setAccountType] = useState<AccountType>(initialType)
   const [form, setForm] = useState({ name: '', company: '', email: '', password: '', passwordConfirm: '' })
   const [showPw, setShowPw] = useState(false)
+  const [referral, setReferral] = useState<ReferralPrefill | null>(null)
+
+  // Partner-Referral-Prefill: Firma, Name, E-Mail sind aus der Mandanten-
+  // Anlage des Partners bekannt. Nur leere Felder werden befüllt — was der
+  // User schon getippt hat, bleibt. Der Account-Typ-Step entfällt, weil
+  // der Server Plan + Typ ohnehin autoritativ aus dem Referral ableitet.
+  useEffect(() => {
+    if (!via) return
+    let cancelled = false
+    fetch(`/api/partner/referral/${encodeURIComponent(via)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: ReferralPrefill | null) => {
+        if (cancelled || !data?.referralId) return
+        setReferral(data)
+        setForm((f) => ({
+          ...f,
+          name: f.name || `${data.contactFirstName} ${data.contactLastName}`.trim(),
+          company: f.company || data.company,
+          email: f.email || data.contactEmail,
+        }))
+        setStep(2)
+      })
+      .catch(() => {
+        // Referral nicht ladbar (abgelaufen/ungültig) → normaler Signup-Flow.
+      })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [via])
   // DSGVO: granulare Einwilligungen — AGB (Vertragsschluss) und Datenschutz
   // (Informationspflicht) dürfen nicht gebuendelt werden (Planet49-Urteil).
   const [acceptTerms, setAcceptTerms] = useState(false)
@@ -152,14 +195,33 @@ function RegisterForm() {
       </div>
 
       <div className="card-lg shadow-card-md p-6">
+        {/* Partner-Referral-Banner */}
+        {referral && (
+          <div className="mb-5 p-3 rounded-xl bg-indigo-50 border border-indigo-200 flex items-start gap-2.5">
+            <Handshake className="w-4 h-4 text-indigo-700 mt-0.5 flex-shrink-0" />
+            <div className="text-xs text-indigo-900 leading-relaxed">
+              Sie wurden von <strong>{referral.partnerCompany}</strong> eingeladen.
+              Ihre Daten und Ihr Paket sind bereits hinterlegt — Sie müssen nur
+              noch ein Passwort festlegen.
+            </div>
+          </div>
+        )}
+
         {/* Plan badge */}
         <div className="mb-5 p-3 rounded-xl bg-brand-50 border border-brand-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-700">Gewähltes Paket</div>
-              <div className="text-sm font-semibold text-text-primary">{plan.name}</div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-brand-700">
+                {referral ? 'Ihr Paket' : 'Gewähltes Paket'}
+              </div>
+              <div className="text-sm font-semibold text-text-primary">
+                {referral ? referral.planName : plan.name}
+              </div>
             </div>
-            <Link href="/preise" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Ändern →</Link>
+            {/* Bei Referral ist der Plan vom Partner fixiert — kein Ändern-Link. */}
+            {!referral && (
+              <Link href="/preise" className="text-xs text-brand-700 hover:text-brand-800 font-semibold">Ändern →</Link>
+            )}
           </div>
         </div>
 
