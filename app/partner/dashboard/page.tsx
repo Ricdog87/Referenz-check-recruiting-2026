@@ -5,7 +5,10 @@ import { pageMeta } from '@/lib/seo'
 import { requireApprovedPartner } from '@/lib/partner/session'
 import { withPartnerScope } from '@/lib/partner/scope'
 import { allTiers, currentTierFromCount, nextTierAbove } from '@/lib/partner/tier'
-import { Briefcase, TrendingUp, Tag, ArrowRight, Sparkles, Image as ImageIcon } from 'lucide-react'
+import {
+  Briefcase, TrendingUp, Tag, ArrowRight, Sparkles,
+  Image as ImageIcon, CheckCircle2, Circle, Rocket,
+} from 'lucide-react'
 
 export const metadata: Metadata = pageMeta({
   title: 'Partner-Dashboard',
@@ -22,7 +25,7 @@ export default async function PartnerDashboardOverviewPage() {
   // Alle Reads sind partner-gescoped via withPartnerScope().
   const scope = withPartnerScope(partner.id)
 
-  const [activeCount, allCount, customers, tiers] = await Promise.all([
+  const [activeCount, allCount, customers, tiers, account] = await Promise.all([
     prisma.partnerCustomer.count({ where: { ...scope, status: 'ACTIVE' } }),
     prisma.partnerCustomer.count({ where: scope }),
     prisma.partnerCustomer.findMany({
@@ -36,7 +39,16 @@ export default async function PartnerDashboardOverviewPage() {
       },
     }),
     allTiers(),
+    prisma.partnerAccount.findUnique({
+      where: { id: partner.id },
+      select: { logoUrl: true },
+    }),
   ])
+
+  // Onboarding-Checkliste: sichtbar bis Logo + erster Mandant da sind.
+  const hasLogo = Boolean(account?.logoUrl)
+  const hasCustomer = allCount > 0
+  const showOnboarding = !hasLogo || !hasCustomer
 
   const computedTier = currentTierFromCount(tiers, activeCount)
   const next = nextTierAbove(tiers, partner.tier)
@@ -62,6 +74,45 @@ export default async function PartnerDashboardOverviewPage() {
           Übersicht über Ihre Mandanten und aktuelle Konditionen.
         </p>
       </header>
+
+      {/* Onboarding-Checkliste — verschwindet, sobald Logo + 1. Mandant da sind */}
+      {showOnboarding && (
+        <section className="card-md mb-8 border-2 border-indigo-200 bg-indigo-50/40">
+          <div className="flex items-start gap-3 mb-4">
+            <Rocket className="w-5 h-5 text-indigo-700 flex-shrink-0 mt-0.5" />
+            <div>
+              <h2 className="text-base font-bold text-text-primary">
+                In 3 Schritten startklar
+              </h2>
+              <p className="text-xs text-text-secondary mt-0.5">
+                Danach läuft Ihr erster Mandant vollautomatisch — inklusive
+                Co-Branded Welcome-Mail mit 1-Klick-Aktivierung.
+              </p>
+            </div>
+          </div>
+          <ol className="space-y-2.5">
+            <OnboardingStep
+              done={hasLogo}
+              href="/partner/dashboard/co-brand"
+              title="Co-Brand-Logo hochladen"
+              detail="Erscheint auf Reports und in den Welcome-Mails Ihrer Mandanten — ohne Logo sehen Endkunden nur den candiq-Schriftzug."
+            />
+            <OnboardingStep
+              done={hasCustomer}
+              href="/partner/dashboard/customers"
+              title="Ersten Mandanten anlegen"
+              detail="EK wird aus Ihrer Tier-Kondition eingefroren, Sie setzen den Verkaufspreis — die Welcome-Mail geht automatisch raus."
+            />
+            <OnboardingStep
+              done={false}
+              href="/partner/dashboard/pricing"
+              title="Konditionen prüfen"
+              detail="Ihre EK-Tabelle pro Plan, monatlich und jährlich — Basis für Ihre Verkaufspreis-Kalkulation."
+              optional
+            />
+          </ol>
+        </section>
+      )}
 
       {/* KPI-Karten ────────────────────────────────────────────────── */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -165,6 +216,51 @@ export default async function PartnerDashboardOverviewPage() {
         )}
       </section>
     </div>
+  )
+}
+
+function OnboardingStep(props: {
+  done: boolean
+  href: string
+  title: string
+  detail: string
+  optional?: boolean
+}) {
+  return (
+    <li>
+      <Link
+        href={props.href}
+        className={
+          'flex items-start gap-3 p-3 rounded-lg border transition-colors ' +
+          (props.done
+            ? 'bg-white/60 border-emerald-200'
+            : 'bg-white border-border-default hover:border-indigo-300 hover:bg-white')
+        }
+      >
+        {props.done ? (
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+        ) : (
+          <Circle className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" />
+        )}
+        <div className="flex-1 min-w-0">
+          <div
+            className={
+              'text-sm font-semibold ' +
+              (props.done ? 'text-text-muted line-through' : 'text-text-primary')
+            }
+          >
+            {props.title}
+            {props.optional && !props.done && (
+              <span className="ml-2 text-[10px] font-normal text-text-muted uppercase tracking-wide">
+                empfohlen
+              </span>
+            )}
+          </div>
+          <div className="text-xs text-text-secondary mt-0.5 leading-relaxed">{props.detail}</div>
+        </div>
+        {!props.done && <ArrowRight className="w-4 h-4 text-text-muted flex-shrink-0 mt-1" />}
+      </Link>
+    </li>
   )
 }
 
