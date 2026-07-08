@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Plus, Loader2, AlertCircle, Pause, Play, X, Save, Edit3, CheckCircle2, UserCheck,
+  Send, Link as LinkIcon, Mail,
 } from 'lucide-react'
 
 type Customer = {
@@ -44,6 +45,7 @@ export function PartnerCustomerList({
 }) {
   const router = useRouter()
   const [showForm, setShowForm] = useState(initialCustomers.length === 0)
+  const [mailNotice, setMailNotice] = useState<'ok' | 'failed' | null>(null)
 
   return (
     <div className="space-y-6">
@@ -62,12 +64,31 @@ export function PartnerCustomerList({
         </button>
       </div>
 
+      {/* Zustell-Status der Welcome-Mail nach Anlage */}
+      {mailNotice === 'ok' && (
+        <div className="flex items-start gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+          <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span>Mandant angelegt — die Einladungs-Mail ist raus.</span>
+        </div>
+      )}
+      {mailNotice === 'failed' && (
+        <div className="flex items-start gap-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <span>
+            Mandant angelegt, aber die <strong>Einladungs-Mail konnte nicht zugestellt
+            werden</strong>. Nutzen Sie beim Mandanten {'„'}Mail erneut senden{'"'} oder
+            {'„'}Link kopieren{'"'} und verschicken Sie den Link über Ihren eigenen Kanal.
+          </span>
+        </div>
+      )}
+
       {/* Neu-Form */}
       {showForm && (
         <CustomerForm
           planOptions={planOptions}
-          onSuccess={() => {
+          onSuccess={(sent) => {
             setShowForm(false)
+            setMailNotice(sent ? 'ok' : 'failed')
             router.refresh()
           }}
         />
@@ -96,7 +117,7 @@ function CustomerForm({
   onSuccess,
 }: {
   planOptions: PlanOption[]
-  onSuccess: () => void
+  onSuccess: (mailSent: boolean) => void
 }) {
   const [form, setForm] = useState({
     company: '',
@@ -153,7 +174,7 @@ function CustomerForm({
         setMessage(data.error ?? 'Mandant konnte nicht angelegt werden.')
         return
       }
-      onSuccess()
+      onSuccess(data.mailSent !== false)
     } catch {
       setStatus('error')
       setMessage('Netzwerk-Fehler.')
@@ -282,6 +303,7 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
   const [endPrice, setEndPrice] = useState(((customer.endPriceCents / 100)).toFixed(2))
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
   const [, startTransition] = useTransition()
 
   async function patchStatus(next: Customer['status']) {
@@ -332,6 +354,69 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
         return
       }
       setEditing(false)
+      startTransition(() => onChange())
+    } catch {
+      setError('Netzwerk-Fehler')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function resendWelcome() {
+    setBusy(true)
+    setError('')
+    setNotice('')
+    try {
+      const res = await fetch(`/api/partner/customers/${customer.id}/resend-welcome`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error ?? 'Versand fehlgeschlagen')
+        return
+      }
+      setNotice(`Einladungs-Mail erneut an ${customer.contactEmail} verschickt.`)
+    } catch {
+      setError('Netzwerk-Fehler')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function copyInviteLink() {
+    // Fallback-Kanal: Partner verschickt den Link selbst (z. B. wenn die
+    // Mail im Spam landet). Gleiche URL wie in der Welcome-Mail.
+    const url = `${window.location.origin}/register?via=${customer.id}&plan=${encodeURIComponent(customer.planKey)}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setNotice('Einladungslink kopiert — Sie können ihn jetzt direkt an den Mandanten schicken.')
+      setError('')
+    } catch {
+      setError('Kopieren fehlgeschlagen — bitte manuell: ' + url)
+    }
+  }
+
+  async function changeContactEmail() {
+    const next = window.prompt(
+      `Neue Kontakt-E-Mail für ${customer.company} (aktuell: ${customer.contactEmail}):`,
+      customer.contactEmail,
+    )
+    if (next === null) return
+    const email = next.trim().toLowerCase()
+    if (!email || email === customer.contactEmail) return
+    setBusy(true)
+    setError('')
+    setNotice('')
+    try {
+      const res = await fetch(`/api/partner/customers/${customer.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contactEmail: email }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error ?? 'Änderung fehlgeschlagen')
+        return
+      }
+      setNotice(`Kontakt-E-Mail geändert. Jetzt „Mail erneut senden" klicken, damit die Einladung an ${email} geht.`)
       startTransition(() => onChange())
     } catch {
       setError('Netzwerk-Fehler')
@@ -410,6 +495,13 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
         </div>
       )}
 
+      {notice && (
+        <div className="mt-3 flex items-start gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1.5">
+          <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+          <span>{notice}</span>
+        </div>
+      )}
+
       <div className="flex gap-1.5 mt-3 flex-wrap">
         {editing ? (
           <>
@@ -427,6 +519,27 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
             )}
             {customer.status === 'PAUSED' && (
               <ActionBtn icon={busy ? Loader2 : Play} spin={busy} label="Reaktivieren" onClick={() => patchStatus('ACTIVE')} variant="primary" />
+            )}
+            {/* Onboarding-Rettungswege — nur solange die Einladung noch offen ist */}
+            {!customer.converted && customer.status !== 'CHURNED' && (
+              <>
+                <ActionBtn
+                  icon={busy ? Loader2 : Send}
+                  spin={busy}
+                  label="Mail erneut senden"
+                  onClick={resendWelcome}
+                />
+                <ActionBtn
+                  icon={LinkIcon}
+                  label="Link kopieren"
+                  onClick={copyInviteLink}
+                />
+                <ActionBtn
+                  icon={Mail}
+                  label="E-Mail ändern"
+                  onClick={changeContactEmail}
+                />
+              </>
             )}
             {customer.status === 'CHURNED' && (
               <span className="text-xs text-text-muted italic">Gekündigt — read-only</span>

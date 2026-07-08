@@ -78,6 +78,26 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     data.notes = body.notes.slice(0, 1000)
   }
 
+  // Kontaktdaten-Korrektur (Tippfehler in der Welcome-Mail-Adresse ist der
+  // Haupt-Anwendungsfall — danach /resend-welcome aufrufen).
+  if (body?.contactEmail !== undefined) {
+    const email = String(body.contactEmail ?? '').trim().toLowerCase().slice(0, 254)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      return NextResponse.json({ error: 'Ungültige Kontakt-E-Mail.' }, { status: 400 })
+    }
+    data.contactEmail = email
+  }
+  if (body?.contactFirstName !== undefined) {
+    const v = String(body.contactFirstName ?? '').trim().slice(0, 120)
+    if (!v) return NextResponse.json({ error: 'Vorname darf nicht leer sein.' }, { status: 400 })
+    data.contactFirstName = v
+  }
+  if (body?.contactLastName !== undefined) {
+    const v = String(body.contactLastName ?? '').trim().slice(0, 120)
+    if (!v) return NextResponse.json({ error: 'Nachname darf nicht leer sein.' }, { status: 400 })
+    data.contactLastName = v
+  }
+
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: 'Keine Änderungen.' }, { status: 400 })
   }
