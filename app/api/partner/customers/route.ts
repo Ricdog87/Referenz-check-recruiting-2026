@@ -5,7 +5,7 @@ import { isPartnerProgramEnabled } from '@/lib/flags'
 import { getPartnerSession } from '@/lib/partner/session'
 import { withPartnerScope } from '@/lib/partner/scope'
 import { resolveEk, type BillingCycle } from '@/lib/partner/pricing'
-import { sendEmail, partnerCustomerWelcomeEmail } from '@/lib/email'
+import { sendCustomerWelcomeMail } from '@/lib/partner/welcome'
 import { HR_PLANS, AGENCY_PLANS } from '@/lib/utils'
 import { logger } from '@/lib/logger'
 
@@ -176,38 +176,19 @@ export async function POST(req: NextRequest) {
       .catch((err) => logger.warn('partner_customer_audit_warn', err))
 
     // ── Co-Branded Welcome-Mail an den End-Mandanten ───────────────
-    // WICHTIG: AWAITED. Diese Mail ist der einzige Kanal für den
-    // Aktivierungslink (?via=…) — ein fire-and-forget-Promise geht auf
-    // Vercel nach dem Response-Return verloren (Lambda-Freeze).
-    // sendEmail wirft nie (liefert {ok:false}); ein Mail-Fehler failt den
-    // Request nicht, wird aber im Response-Feld mailSent sichtbar, damit
-    // die UI einen Hinweis zeigen kann.
-    let mailSent = false
-    try {
-      const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
-      // plan= ist nur UI-Hint für die sofortige Anzeige; die autoritative
-      // Plan-Zuweisung macht /api/auth/register über den via-Lookup in der DB.
-      const signupUrl = `${baseUrl}/register?via=${created.id}&plan=${encodeURIComponent(planKey)}`
-      const tpl = partnerCustomerWelcomeEmail({
-        partnerName: partnerRecord.company || session.name || 'Ihr Partner',
-        partnerLogoUrl: partnerRecord.logoUrl ?? null,
-        customerContactName: `${contactFirstName} ${contactLastName}`.trim(),
-        customerCompany: company,
-        planName: plan.name,
-        signupUrl,
-      })
-      const sendResult = await sendEmail({
-        to: contactEmail,
-        subject: tpl.subject,
-        html: tpl.html,
-        text: tpl.text,
-        category: 'partner-customer-welcome',
-      })
-      mailSent = sendResult.ok
-      if (!sendResult.ok) logger.error('partner_customer_welcome_failed', sendResult)
-    } catch (err) {
-      logger.error('partner_customer_welcome_error', err)
-    }
+    // AWAITED (Vercel-Lambda-Freeze). Ein Mail-Fehler failt den Request
+    // nicht, wird aber im Response-Feld mailSent sichtbar — die UI zeigt
+    // dann Warnung + „Mail erneut senden".
+    const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
+    const { sent: mailSent } = await sendCustomerWelcomeMail({
+      partnerAccountId: session.id,
+      partnerCompanyFallback: session.name,
+      customer: {
+        id: created.id,
+        company, contactFirstName, contactLastName, contactEmail, planKey,
+      },
+      baseUrl,
+    })
 
     return NextResponse.json({ id: created.id, mailSent, revived }, { status: 201 })
   } catch (err) {
