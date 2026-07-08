@@ -220,30 +220,38 @@ function CustomerForm({
         </label>
       </div>
 
-      {/* Pricing-Vorschau */}
+      {/* Pricing-Vorschau — ALLE Werte sind Monatsraten, auch bei jährlicher
+          Zahlweise (dann eben die günstigere Monatsrate). */}
       <div className="grid sm:grid-cols-4 gap-3 p-3 bg-surface-subtle rounded-lg text-xs">
-        <Snippet label="Listenpreis" value={`${formatEur(listCents / 100)} €`} />
-        <Snippet label="Ihr EK" value={`${formatEur(ekCents / 100)} €`} tone="indigo" />
+        <Snippet label="Listenpreis / Mo." value={`${formatEur(listCents / 100)} €`} />
+        <Snippet label="Ihr EK / Mo." value={`${formatEur(ekCents / 100)} €`} tone="indigo" />
         <Snippet
-          label="Ihr VK"
+          label="Ihr VK / Mo."
           value={form.endPriceEuro ? `${formatEur(endCents / 100)} €` : '—'}
         />
         <Snippet
-          label="Marge"
+          label="Marge / Mo."
           value={marginCents !== 0 ? `${formatEur(marginCents / 100)} €` : '—'}
           tone={marginValid && marginCents > 0 ? 'emerald' : 'muted'}
         />
       </div>
+      {form.billingCycle === 'YEARLY' && (
+        <p className="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+          Jährliche Zahlweise: Alle Beträge sind trotzdem <strong>Monatsraten</strong> —
+          der Mandant zahlt 12× diese Rate pro Jahr im Voraus. Bitte KEINEN
+          Jahresbetrag eintragen.
+        </p>
+      )}
 
       <Field
-        label="Ihr Verkaufspreis (€)"
+        label="Ihr Verkaufspreis (€ pro Monat)"
         type="number"
         value={form.endPriceEuro}
         onChange={(v) => setForm({ ...form, endPriceEuro: v })}
         required
         min={(ekCents / 100).toFixed(2)}
         step="0.01"
-        hint={`Mindestens ${formatEur(ekCents / 100)} € (Ihr EK).`}
+        hint={`Monatsrate, mindestens ${formatEur(ekCents / 100)} € (Ihr EK / Mo.).`}
       />
 
       {status === 'error' && (
@@ -373,9 +381,9 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
         </div>
 
         <div className="grid grid-cols-3 gap-3 text-xs text-right min-w-[240px]">
-          <Snippet label="EK" value={`${formatEur(customer.ekPriceCents / 100)} €`} />
+          <Snippet label="EK / Mo." value={`${formatEur(customer.ekPriceCents / 100)} €`} />
           <Snippet
-            label="VK"
+            label="VK / Mo."
             value={editing ? (
               <input
                 type="number"
@@ -388,7 +396,7 @@ function CustomerRow({ customer, onChange }: { customer: Customer; onChange: () 
             ) : `${formatEur(customer.endPriceCents / 100)} €`}
           />
           <Snippet
-            label="Marge"
+            label="Marge / Mo."
             value={`${formatEur(customer.marginCents / 100)} €`}
             tone="emerald"
           />

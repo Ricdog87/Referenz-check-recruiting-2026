@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Briefcase, Tag, Image as ImageIcon, LogOut, ShieldCheck, Menu, X, Wallet,
 } from 'lucide-react'
@@ -32,6 +32,12 @@ export function PartnerDashboardShell({
 }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Drawer beim Navigieren schließen — sonst bleibt er nach einem
+  // Link-Klick offen und verdeckt die neue Seite.
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
   async function handleLogout() {
     try {

@@ -5,6 +5,11 @@
  * AGENCY_PLANS) als globale Default-Zeilen in PartnerPricing
  * (partnerAccountId = NULL).
  *
+ * EINHEITEN: Plan.priceMonthly UND Plan.priceAnnual sind beide MONATSRATEN
+ * (priceAnnual = günstigere Monatsrate bei jährlicher Zahlweise, vgl.
+ * PricingClient „€/Mo."). listPriceAnnualCents ist also ebenfalls eine
+ * Monatsrate — NICHT die Jahressumme. Siehe lib/partner/README.md.
+ *
  * ENTERPRISE wird übersprungen (Custom-Quoting, priceMonthly=0 in der
  * Source-of-Truth) — die Decision dazu ist in lib/partner/README.md
  * dokumentiert.
@@ -63,7 +68,7 @@ async function main() {
         },
       })
       console.log(
-        `  ↻ update  ${plan.id.padEnd(14)}  list ${(listMonthly / 100).toFixed(0)}€/mo · ${(listAnnual / 100).toFixed(0)}€/yr`,
+        `  ↻ update  ${plan.id.padEnd(14)}  list ${(listMonthly / 100).toFixed(0)}€/Mo. · ${(listAnnual / 100).toFixed(0)}€/Mo. (jährl. Zahlweise)`,
       )
     } else {
       await prisma.partnerPricing.create({
@@ -75,7 +80,7 @@ async function main() {
         },
       })
       console.log(
-        `  + create  ${plan.id.padEnd(14)}  list ${(listMonthly / 100).toFixed(0)}€/mo · ${(listAnnual / 100).toFixed(0)}€/yr`,
+        `  + create  ${plan.id.padEnd(14)}  list ${(listMonthly / 100).toFixed(0)}€/Mo. · ${(listAnnual / 100).toFixed(0)}€/Mo. (jährl. Zahlweise)`,
       )
     }
     upserted++

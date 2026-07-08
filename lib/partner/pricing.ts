@@ -1,6 +1,14 @@
 /**
  * EK-Preis-Resolver für das Partner-Programm.
  *
+ * EINHEITEN-SEMANTIK (verbindlich, siehe auch lib/partner/README.md):
+ * ALLE Cent-Beträge in PartnerPricing UND PartnerCustomer sind
+ * MONATSRATEN. Die *AnnualCents-Spalten enthalten die (günstigere)
+ * Monatsrate bei jährlicher Zahlweise — NICHT die Jahressumme. Das
+ * spiegelt lib/utils.ts (Plan.priceAnnual ist dort ebenfalls €/Monat,
+ * vgl. PricingClient „€/Mo."). Konsumenten dürfen daher NIEMALS durch
+ * 12 teilen oder mit 12 multiplizieren, um „Monatswerte" zu bekommen.
+ *
  * Effektiver Einkaufspreis = entweder Per-Plan-Override aus
  * PartnerPricing(partnerAccountId=X), ODER Tier-Discount-Formel auf der
  * globalen Default-Zeile (partnerAccountId=NULL).
@@ -48,8 +56,12 @@ export async function resolveEk(opts: {
         },
       },
     }),
+    // Deterministisch: NULL≠NULL in Postgres-Unique heißt, es KÖNNTEN
+    // versehentlich mehrere Default-Zeilen pro planKey existieren —
+    // orderBy stellt sicher, dass immer dieselbe (älteste) gewinnt.
     prisma.partnerPricing.findFirst({
       where: { partnerAccountId: null, planKey: opts.planKey },
+      orderBy: { createdAt: 'asc' },
     }),
     prisma.partnerTier.findUnique({ where: { tier: opts.partnerTier } }),
   ])
@@ -101,11 +113,22 @@ export async function resolveAllEkForPartner(opts: {
   partnerAccountId: string
   partnerTier: string
 }): Promise<{ monthly: EkResolution[]; yearly: EkResolution[] }> {
-  const [defaults, overrides, tierRow] = await Promise.all([
-    prisma.partnerPricing.findMany({ where: { partnerAccountId: null } }),
+  const [defaultsRaw, overrides, tierRow] = await Promise.all([
+    prisma.partnerPricing.findMany({
+      where: { partnerAccountId: null },
+      orderBy: { createdAt: 'asc' },
+    }),
     prisma.partnerPricing.findMany({ where: { partnerAccountId: opts.partnerAccountId } }),
     prisma.partnerTier.findUnique({ where: { tier: opts.partnerTier } }),
   ])
+
+  // Duplikat-Schutz analog resolveEk: pro planKey gewinnt die älteste Zeile.
+  const seenPlan = new Set<string>()
+  const defaults = defaultsRaw.filter((d) => {
+    if (seenPlan.has(d.planKey)) return false
+    seenPlan.add(d.planKey)
+    return true
+  })
 
   const overrideByPlan = new Map(overrides.map((o) => [o.planKey, o]))
   const discountPct = tierRow?.ekDiscountPct ?? 0

@@ -108,9 +108,21 @@ export const partnerAuthOptions: NextAuthOptions = {
         token.partnerAccountId = (user as any).id
         token.status = (user as any).status
         token.tier = (user as any).tier
+        token.statusCheckedAt = Date.now()
       }
-      // Bei explizitem Update: status/tier aus DB nachladen (z. B. nach Approval).
-      if (trigger === 'update' && token.partnerAccountId) {
+      // Status/Tier regelmäßig aus der DB nachladen — NICHT nur bei
+      // trigger==='update'. Sonst behält ein suspendierter Partner bis zu
+      // 24h (JWT-maxAge) vollen Zugriff, und ein frisch approvter Partner
+      // hängt auf /partner/pending fest, bis er sich neu einloggt.
+      // 60s-Intervall: bei Partner-Traffic-Volumen vernachlässigbare DB-Last,
+      // Sperrungen greifen praktisch sofort.
+      const STATUS_REFRESH_MS = 60 * 1000
+      const lastChecked = (token.statusCheckedAt as number | undefined) ?? 0
+      const needsRefresh =
+        trigger === 'update' ||
+        (token.partnerAccountId && Date.now() - lastChecked > STATUS_REFRESH_MS)
+
+      if (needsRefresh && token.partnerAccountId) {
         try {
           const fresh = await prisma.partnerAccount.findUnique({
             where: { id: token.partnerAccountId as string },
@@ -122,7 +134,10 @@ export const partnerAuthOptions: NextAuthOptions = {
           }
           token.status = fresh.status
           token.tier = fresh.tier
+          token.statusCheckedAt = Date.now()
         } catch (err) {
+          // DB kurz nicht erreichbar → alten Status weiterverwenden,
+          // beim nächsten Request erneut versuchen (Timestamp NICHT setzen).
           logger.warn('partner_jwt_refresh_warn', err)
         }
       }
@@ -186,5 +201,6 @@ declare module 'next-auth/jwt' {
     partnerAccountId?: string
     status?: string
     tier?: string
+    statusCheckedAt?: number
   }
 }

@@ -174,3 +174,43 @@ describe('POST /api/auth/register — ungültiges Referral fällt sauber zurück
     expect(mockUserCreate).not.toHaveBeenCalled()
   })
 })
+
+describe('POST /api/auth/register — Referral-Härtung (Audit-Fixes)', () => {
+  it('E-Mail-Bindung: fremde Adresse am validen Referral → 400, kein User, kein Log', async () => {
+    const POST = await importPost()
+    mockPartnerCustomerFindUnique.mockResolvedValue(VALID_REFERRAL_ROW)
+
+    const res = await POST(
+      makeReq({ ...BASE_BODY, email: 'angreifer@anders.de', via: VALID_REFERRAL_ROW.id }),
+    )
+
+    expect(res.status).toBe(400)
+    const data = await res.json()
+    expect(data.field).toBe('email')
+    expect(mockUserCreate).not.toHaveBeenCalled()
+    expect(mockPartnerAuditCreate).not.toHaveBeenCalled()
+  })
+
+  it('E-Mail-Bindung ist case-insensitive', async () => {
+    const POST = await importPost()
+    mockPartnerCustomerFindUnique.mockResolvedValue({
+      ...VALID_REFERRAL_ROW,
+      contactEmail: 'Kontakt@Mandant.DE',
+    })
+
+    const res = await POST(makeReq({ ...BASE_BODY, via: VALID_REFERRAL_ROW.id }))
+
+    expect(res.status).toBe(201)
+    expect(mockUserCreate.mock.calls[0][0].data.plan).toBe('AGENCY_PRO')
+  })
+
+  it('transienter DB-Fehler beim Referral-Lookup → 503 statt stillem STARTER-Downgrade', async () => {
+    const POST = await importPost()
+    mockPartnerCustomerFindUnique.mockRejectedValue(new Error('connection reset'))
+
+    const res = await POST(makeReq({ ...BASE_BODY, via: VALID_REFERRAL_ROW.id }))
+
+    expect(res.status).toBe(503)
+    expect(mockUserCreate).not.toHaveBeenCalled()
+  })
+})

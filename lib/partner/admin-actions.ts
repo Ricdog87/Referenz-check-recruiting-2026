@@ -100,15 +100,22 @@ export async function applyAdminAction(opts: {
     })
   })
 
-  // Mail an den Partner (best-effort)
-  notifyPartner({
-    action: opts.action,
-    partnerEmail: partner.email,
-    partnerName: `${partner.contactFirstName} ${partner.contactLastName}`.trim(),
-    company: partner.company,
-    baseUrl: opts.baseUrl,
-    reason: opts.reason,
-  }).catch((err) => logger.warn('partner_admin_mail_warn', err))
+  // Mail an den Partner — AWAITED: die aufrufende API-Route returned direkt
+  // nach applyAdminAction(); ein fire-and-forget-Promise geht auf Vercel
+  // nach dem Response-Return verloren (Lambda-Freeze). Fehler beim Versand
+  // failen die Aktion nicht (Status ist schon committed), werden aber geloggt.
+  try {
+    await notifyPartner({
+      action: opts.action,
+      partnerEmail: partner.email,
+      partnerName: `${partner.contactFirstName} ${partner.contactLastName}`.trim(),
+      company: partner.company,
+      baseUrl: opts.baseUrl,
+      reason: opts.reason,
+    })
+  } catch (err) {
+    logger.error('partner_admin_mail_error', err)
+  }
 
   return { ok: true, status: nextStatus }
 }
