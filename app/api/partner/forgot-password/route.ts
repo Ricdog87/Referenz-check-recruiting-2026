@@ -53,9 +53,17 @@ export async function POST(req: NextRequest) {
       const tokenHash = createHash('sha256').update(rawToken).digest('hex')
       const expiresAt = new Date(Date.now() + RESET_TTL_MINUTES * 60 * 1000)
 
-      await prisma.partnerPasswordResetToken
-        .create({ data: { partnerAccountId: partner.id, token: tokenHash, expiresAt, ip } })
-        .catch((err) => logger.warn('partner_forgot_token_warn', err))
+      // Wenn das Token-Create fehlschlägt, darf KEINE Mail rausgehen —
+      // sonst bekommt der Partner einen Link, der nie funktionieren kann.
+      // Response bleibt trotzdem das generische ok (kein Enumeration-Oracle).
+      try {
+        await prisma.partnerPasswordResetToken.create({
+          data: { partnerAccountId: partner.id, token: tokenHash, expiresAt, ip },
+        })
+      } catch (err) {
+        logger.error('partner_forgot_token_error', err)
+        return NextResponse.json({ ok: true })
+      }
 
       const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
       const resetUrl = `${baseUrl}/partner/reset-password?token=${encodeURIComponent(rawToken)}`
@@ -72,7 +80,8 @@ export async function POST(req: NextRequest) {
         category: 'partner-password-reset',
       }).catch((err) => logger.warn('partner_forgot_send_warn', err))
 
-      prisma.partnerAuditLog
+      // Awaited — fire-and-forget geht auf Vercel nach Response-Return verloren.
+      await prisma.partnerAuditLog
         .create({
           data: {
             partnerAccountId: partner.id,

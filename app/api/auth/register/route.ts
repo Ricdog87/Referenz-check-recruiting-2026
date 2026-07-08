@@ -58,8 +58,9 @@ export async function POST(req: NextRequest) {
   // Einladung in die Closed Beta.
   let referral: { id: string; planKey: string; partnerAccountId: string; contactEmail: string } | null = null
   if (typeof via === 'string' && via.length > 0 && via.length < 50) {
+    let ref
     try {
-      const ref = await prisma.partnerCustomer.findUnique({
+      ref = await prisma.partnerCustomer.findUnique({
         where: { id: via },
         select: {
           id: true,
@@ -70,22 +71,44 @@ export async function POST(req: NextRequest) {
           partnerAccount: { select: { status: true, deletedAt: true } },
         },
       })
-      if (
-        ref &&
-        ref.status !== 'CHURNED' &&
-        ref.partnerAccount &&
-        !ref.partnerAccount.deletedAt &&
-        ref.partnerAccount.status === 'APPROVED'
-      ) {
-        referral = {
-          id: ref.id,
-          planKey: ref.planKey,
-          partnerAccountId: ref.partnerAccountId,
-          contactEmail: ref.contactEmail,
-        }
-      }
     } catch (err) {
-      console.warn('register_referral_lookup_warn', err)
+      // Transienter DB-Fehler: NICHT still als Normal-Signup weitermachen —
+      // sonst bekommt der Mandant irreversibel STARTER/HR_DEPARTMENT statt
+      // des vom Partner gekauften Plans. Sauber abbrechen, User probiert
+      // den Link erneut.
+      console.error('register_referral_lookup_error', err)
+      return NextResponse.json(
+        { error: 'Einladung konnte gerade nicht geprüft werden. Bitte in einem Moment erneut versuchen.' },
+        { status: 503 },
+      )
+    }
+    if (
+      ref &&
+      ref.status !== 'CHURNED' &&
+      ref.partnerAccount &&
+      !ref.partnerAccount.deletedAt &&
+      ref.partnerAccount.status === 'APPROVED'
+    ) {
+      // E-Mail-Bindung: Referral-Vorteile (Partner-Plan, AGENCY-Freischaltung)
+      // gibt es NUR für die Adresse, an die die Welcome-Mail ging. Sonst kann
+      // jeder mit dem Link beliebig viele Konten mit dem Partner-Plan anlegen.
+      // Mismatch → klare Fehlermeldung statt stillem STARTER-Downgrade.
+      if (cleanEmail && ref.contactEmail.toLowerCase() !== cleanEmail) {
+        return NextResponse.json(
+          {
+            error:
+              'Diese Einladung ist an die E-Mail-Adresse gebunden, an die sie verschickt wurde. Bitte registrieren Sie sich mit dieser Adresse oder bitten Sie Ihren Partner, die Kontakt-E-Mail zu aktualisieren.',
+            field: 'email',
+          },
+          { status: 400 },
+        )
+      }
+      referral = {
+        id: ref.id,
+        planKey: ref.planKey,
+        partnerAccountId: ref.partnerAccountId,
+        contactEmail: ref.contactEmail,
+      }
     }
   }
 
@@ -252,7 +275,10 @@ export async function POST(req: NextRequest) {
     // gerade eingegeben hat.
     const baseUrl = process.env.NEXTAUTH_URL ?? `${req.nextUrl.protocol}//${req.nextUrl.host}`
     const tpl = welcomeEmail({ name: cleanName, email: cleanEmail, loginUrl: `${baseUrl}/login` })
-    sendEmail({ to: cleanEmail, subject: tpl.subject, html: tpl.html, text: tpl.text, userId: user.id, category: 'welcome' })
+    // AWAITED: fire-and-forget geht auf Vercel nach dem Response-Return
+    // verloren (Lambda-Freeze). sendEmail wirft nie — der Signup failt
+    // dadurch nicht, der Versand kostet ~200-400ms Latenz.
+    await sendEmail({ to: cleanEmail, subject: tpl.subject, html: tpl.html, text: tpl.text, userId: user.id, category: 'welcome' })
       .catch((err) => console.error('welcome_email_warn', err))
 
     return NextResponse.json({ id: user.id, email: user.email }, { status: 201 })

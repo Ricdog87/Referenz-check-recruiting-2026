@@ -28,9 +28,12 @@ function euro(cents: number): string {
   return (cents / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
 }
 
-// Jahres-Vertraege auf den Monat normalisieren (MRR).
-function monthly(cents: number, cycle: string): number {
-  return cycle === 'YEARLY' ? Math.round(cents / 12) : cents
+// Einheiten-Semantik (siehe lib/partner/README.md): ALLE gespeicherten
+// Cent-Beträge (ekPriceCents/endPriceCents/marginCents) sind bereits
+// MONATSRATEN — bei YEARLY die günstigere Monatsrate bei jährlicher
+// Zahlweise. Ein /12 wäre also doppelt normalisiert (MRR 12x zu niedrig).
+function monthly(cents: number, _cycle: string): number {
+  return cents
 }
 
 export default async function AdminPartnerDetailPage({

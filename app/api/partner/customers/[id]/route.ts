@@ -59,6 +59,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     if (!Number.isFinite(n) || n <= 0) {
       return NextResponse.json({ error: 'Ungültiger Verkaufspreis.' }, { status: 400 })
     }
+    // 1 Mio € Obergrenze — verhindert Int4-Überlauf → Prisma-Fehler → 500.
+    if (n > 100_000_000) {
+      return NextResponse.json({ error: 'Verkaufspreis unplausibel hoch — bitte prüfen.' }, { status: 400 })
+    }
     const cents = Math.round(n)
     if (cents < customer.ekPriceCents) {
       return NextResponse.json(

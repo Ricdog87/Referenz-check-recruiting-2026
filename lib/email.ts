@@ -69,7 +69,12 @@ export async function sendEmail(msg: EmailMessage): Promise<SendResult> {
   }
 
   // ── 2. Kein Provider → in AuditLog vermerken ───────────────────
-  logger.warn('email_no_provider', {
+  // In Production ist ein fehlender RESEND_API_KEY ein stiller Totalausfall
+  // aller Mails (Reset-Links, Partner-Aktivierung, Welcome) — deshalb dort
+  // error-Level, damit es in den Vercel-Logs auffällt. In Dev ist der
+  // Log-Only-Modus gewollt.
+  const noProviderLog = process.env.NODE_ENV === 'production' ? logger.error : logger.warn
+  noProviderLog('email_no_provider', {
     to: Array.isArray(msg.to) ? msg.to.join(', ') : msg.to,
     subject: msg.subject,
   })
@@ -129,10 +134,15 @@ function shell(content: string): string {
 // „Sehr geehrte/r {Voller Name}," ist die deutsche Business-Etikette wenn
 // das Geschlecht nicht zuverlaessig bekannt ist. Fallback: nur „Sehr geehrte
 // Damen und Herren," falls Name leer.
+//
+// SECURITY: Der Name ist User-Input (Signup-Formular) und landet direkt im
+// HTML-Body — MUSS escaped werden, sonst kann sich jemand mit einem Namen wie
+// `<a href="https://phish.example">…</a>` Phishing-HTML in candiq-gebrandete
+// Mails injizieren.
 function salutation(fullName: string | null | undefined): string {
   const name = (fullName ?? '').trim()
   if (!name) return 'Sehr geehrte Damen und Herren'
-  return `Sehr geehrte/r ${name}`
+  return `Sehr geehrte/r ${escapeText(name)}`
 }
 
 export function welcomeEmail(opts: { name: string; email: string; loginUrl: string }): { subject: string; html: string; text: string } {

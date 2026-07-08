@@ -72,6 +72,17 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: 'Einladung nicht gefunden oder abgelaufen.' }, { status: 404 })
     }
 
+    // Verbrauchte Einladung: nach erfolgter Conversion keine persönlichen
+    // Prefill-Daten mehr ausliefern — der Link steckt in einer Mail und
+    // kann weitergeleitet worden sein. Gleiches generisches 404.
+    const converted = await prisma.partnerAuditLog.findFirst({
+      where: { entityId: customer.id, action: 'PARTNER_CUSTOMER_CONVERTED' },
+      select: { id: true },
+    })
+    if (converted) {
+      return NextResponse.json({ error: 'Einladung nicht gefunden oder abgelaufen.' }, { status: 404 })
+    }
+
     const plan = getPlanById(customer.planKey)
 
     return NextResponse.json({

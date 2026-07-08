@@ -143,13 +143,16 @@ export async function POST(req: NextRequest) {
       phone: cleanPhone,
       approvalUrl: `${baseUrl}/admin/partners`,
     })
-    sendEmail({
+    // AWAITED: fire-and-forget geht auf Vercel nach dem Response-Return
+    // verloren — dann bleibt eine Bewerbung unbemerkt liegen. sendEmail
+    // wirft nie; ein Versand-Fehler failt die Bewerbung nicht.
+    await sendEmail({
       to: adminEmail,
       subject: adminTpl.subject,
       html: adminTpl.html,
       text: adminTpl.text,
       category: 'partner-application-admin',
-    }).catch((err) => logger.warn('partner_admin_notify_warn', err))
+    }).catch((err) => logger.error('partner_admin_notify_error', err))
 
     return NextResponse.json({ id: partner.id, status: 'PENDING' }, { status: 201 })
   } catch (error) {

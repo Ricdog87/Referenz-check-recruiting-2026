@@ -17,6 +17,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 const mockFindUnique = vi.fn()
+const mockAuditFindFirst = vi.fn()
 
 const VALID_CUSTOMER = {
   id: 'clxreferral0000000000001',
@@ -35,7 +36,10 @@ async function importGet(flagOn = true) {
   vi.doMock('server-only', () => ({}))
   vi.doMock('@/lib/flags', () => ({ isPartnerProgramEnabled: () => flagOn }))
   vi.doMock('@/lib/db', () => ({
-    prisma: { partnerCustomer: { findUnique: mockFindUnique } },
+    prisma: {
+      partnerCustomer: { findUnique: mockFindUnique },
+      partnerAuditLog: { findFirst: mockAuditFindFirst },
+    },
   }))
   vi.doMock('@/lib/rate-limit', () => ({
     rateLimit: () => ({ ok: true, retryAfter: 0 }),
@@ -54,6 +58,7 @@ function makeReq(): any {
 
 beforeEach(() => {
   mockFindUnique.mockReset()
+  mockAuditFindFirst.mockReset().mockResolvedValue(null)
 })
 
 describe('GET /api/partner/referral/[id] — kein Preis-Leak', () => {
@@ -114,6 +119,18 @@ describe('GET /api/partner/referral/[id] — generische 404 für alle Sperr-Fäl
       expect(data.error).toBe('Einladung nicht gefunden oder abgelaufen.')
     })
   }
+
+  it('404 after conversion — verbrauchter Link liefert keine Prefill-Daten mehr', async () => {
+    const GET = await importGet()
+    mockFindUnique.mockResolvedValue(VALID_CUSTOMER)
+    mockAuditFindFirst.mockResolvedValue({ id: 'log_1' }) // PARTNER_CUSTOMER_CONVERTED existiert
+    const res = await GET(makeReq(), { params: { id: VALID_CUSTOMER.id } })
+    expect(res.status).toBe(404)
+    const data = await res.json()
+    expect(data.error).toBe('Einladung nicht gefunden oder abgelaufen.')
+    // Keine persönlichen Daten im Body
+    expect(JSON.stringify(data)).not.toContain('max@testfirma.de')
+  })
 })
 
 describe('GET /api/partner/referral/[id] — Input-Gates', () => {

@@ -47,10 +47,39 @@ Pflichtbestandteil.
 
 | Entscheidung | Wahl | Begründung |
 |---|---|---|
-| **Auth** | `User.role='PARTNER'` + 1:1-Relation auf `Partner` | Bestehendes NextAuth wiederverwenden, eine Account-Pipeline |
-| **EK-Preise** | DB-Tabelle `partner_pricing` pro Plan × Partner | Admin-editierbar, auditierbar, pro Deal verhandelbar |
-| **Tier-Schwellen** | Registered 1 / Silver 5 / Gold 15 / Platinum 30 aktive Kunden | Realistisch für DACH-PDL-Markt; in `partner_tier` editierbar |
-| **Isolation** | App-Layer-Guards + Vitest, kein RLS | Konsistent mit bestehendem candiq-Pattern (Prisma als Owner) |
+| **Auth** | Separates `PartnerAccount` + eigener NextAuth-Handler (`/api/auth/partner/*`, eigener Cookie) | Harte Domain-Grenze: Partner fasst NIE Kandidaten-/Consent-/CLIENT-Daten an |
+| **EK-Preise** | DB-Tabelle `PartnerPricing` pro Plan × Partner | Admin-editierbar, auditierbar, pro Deal verhandelbar |
+| **Tier-Schwellen** | Registered 0 / Silver 5 / Gold 15 / Platinum 30 aktive Kunden | Realistisch für DACH-PDL-Markt; in `PartnerTier` editierbar |
+| **Isolation** | App-Layer-Guards (`withPartnerScope`) + Vitest, kein RLS | Konsistent mit bestehendem candiq-Pattern (Prisma als Owner) |
+| **Session-Frische** | JWT-Status/Tier-Refresh alle 60 s aus der DB | Suspend wirkt sofort; frisch Approvte kommen ohne Re-Login aus /partner/pending |
+| **Referral-Bindung** | `?via=`-Vorteile nur für die Mail-Empfänger-Adresse; Prefill nach Conversion gesperrt | Verhindert Link-Weitergabe → beliebige AGENCY-Konten |
+
+## Einheiten-Semantik (verbindlich!)
+
+**Alle Cent-Beträge im Partner-Modell sind MONATSRATEN** — in
+`PartnerPricing.list/baseEk*Cents` genauso wie in
+`PartnerCustomer.ek/end/marginCents`:
+
+- `*MonthlyCents` = Monatsrate bei monatlicher Zahlweise
+- `*AnnualCents` = **günstigere Monatsrate bei jährlicher Zahlweise** —
+  NICHT die Jahressumme! (spiegelt `Plan.priceAnnual` aus `lib/utils.ts`,
+  dort ebenfalls „€/Mo.")
+- Konsumenten dürfen **niemals ×12 oder ÷12** rechnen, um „Monatswerte"
+  zu erhalten — die Werte SIND Monatswerte. Margen-Summen
+  (Dashboard-KPI, Payouts, Admin-MRR) sind damit direkt Monats-Margen.
+
+## Bewusste Ops-/Security-Entscheidungen
+
+- **`vercel.json` buildCommand macht `prisma db push` gegen die Prod-DB
+  bei jedem Deploy.** Bestands-Pattern des Repos (kein Migrations-Baseline
+  in Prod). Bekannte Schuld: Schema-Änderungen wirken ungate-t beim Deploy.
+  Umstellung auf `migrate deploy` erfordert Baseline-Resolve — separat planen.
+- **E-Mail-Enumeration bei `/api/partner/register` (409 bei existierender
+  Adresse)**: bewusst konsistent mit dem HR-Signup; Trade-off UX > Anonymität
+  bei einem B2B-Bewerbungsformular mit Rate-Limit 3/h.
+- **Alle transaktionalen Mails werden AWAITED versendet** (kein
+  fire-and-forget) — Vercel friert Lambdas nach dem Response-Return ein,
+  nicht-awaitete Promises gehen verloren.
 
 ## Gating (kritisch)
 

@@ -103,10 +103,10 @@ export default async function PartnerPricingPage() {
             <tr>
               <th className="text-left px-4 py-3 font-semibold">Plan</th>
               <th className="text-left px-4 py-3 font-semibold">Zielgruppe</th>
-              <th className="text-right px-4 py-3 font-semibold">Listenpreis / Mo</th>
-              <th className="text-right px-4 py-3 font-semibold">Ihr EK / Mo</th>
-              <th className="text-right px-4 py-3 font-semibold">Listenpreis / Jahr</th>
-              <th className="text-right px-4 py-3 font-semibold">Ihr EK / Jahr</th>
+              <th className="text-right px-4 py-3 font-semibold">Listenpreis / Mo.</th>
+              <th className="text-right px-4 py-3 font-semibold">Ihr EK / Mo.</th>
+              <th className="text-right px-4 py-3 font-semibold">Listenpreis / Mo. (jährl. Zahlweise)</th>
+              <th className="text-right px-4 py-3 font-semibold">Ihr EK / Mo. (jährl. Zahlweise)</th>
               <th className="text-center px-4 py-3 font-semibold">Quelle</th>
             </tr>
           </thead>
@@ -164,9 +164,12 @@ export default async function PartnerPricingPage() {
       </section>
 
       <p className="text-xs text-text-muted mt-4">
-        Konditionen sind <strong>brutto</strong> (ohne USt). Endkunden-Preis ist
-        Ihre Marge plus EK. EK wird je Mandant zum Anlage-Zeitpunkt eingefroren —
-        spätere Tier-Aufstiege wirken nur auf neue Mandanten.
+        <strong>Alle Beträge sind Monatsraten</strong> — die Spalten {'„'}jährl.
+        Zahlweise{'"'} zeigen die günstigere Monatsrate bei jährlicher Abrechnung
+        (nicht die Jahressumme). Konditionen sind <strong>netto</strong> (zzgl. USt).
+        Endkunden-Preis ist Ihre Marge plus EK. EK wird je Mandant zum
+        Anlage-Zeitpunkt eingefroren — spätere Tier-Aufstiege wirken nur auf
+        neue Mandanten.
       </p>
     </div>
   )

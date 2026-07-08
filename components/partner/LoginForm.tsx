@@ -50,24 +50,19 @@ export function PartnerLoginForm() {
         json: 'true',
       })
 
-      const res = await fetch('/api/auth/partner/callback/partner-credentials', {
+      await fetch('/api/auth/partner/callback/partner-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: body.toString(),
         redirect: 'manual',
       })
 
-      // NextAuth antwortet mit JSON { url: '…' } bei Erfolg oder mit Redirect
-      // auf pages.error bei Misserfolg.
-      const data = await res.json().catch(() => ({}))
-
-      if (data?.url && !String(data.url).includes('/partner/login')) {
-        router.push(data.url)
-        return
-      }
-
-      // Fallback: prüfe, ob eine Session entstanden ist
-      const sess = await fetch('/api/auth/partner/session').then((r) => r.json())
+      // NextAuths Fehler-Redirect-URLs zeigen bei einer zweiten Instanz
+      // (basePath-Annahme /api/auth) auf den HR-Handler — data.url blind zu
+      // pushen würde den Partner bei falschem Passwort auf das HR-Login
+      // (/login) schicken. Deshalb ignorieren wir die Redirect-URL komplett:
+      // die EINZIGE Wahrheit ist, ob danach eine Partner-Session existiert.
+      const sess = await fetch('/api/auth/partner/session').then((r) => r.json()).catch(() => null)
       if (sess?.partner?.id) {
         router.push(callbackUrl)
         return
