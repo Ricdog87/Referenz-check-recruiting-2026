@@ -5,8 +5,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { isAdmin } from '@/lib/reviewer'
 import { isPartnerProgramEnabled } from '@/lib/flags'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, HR_PLANS, AGENCY_PLANS } from '@/lib/utils'
 import { PartnerAdminActions } from '@/components/partner/PartnerAdminActions'
+import { PartnerPricingOverrides, type PricingRow } from '@/components/partner/PartnerPricingOverrides'
 import { ArrowLeft, Mail, Phone, Building2, Users } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
@@ -78,6 +79,42 @@ export default async function AdminPartnerDetailPage({
   })
 
   if (!partner) notFound()
+
+  // EK-Override-Tabelle: Default-Preise + Partner-Overrides + Tier-Discount.
+  // Gleiche Auflösungslogik wie lib/partner/pricing.ts (Override beats Formel).
+  const [pricingDefaults, pricingOverrides, tierRow] = await Promise.all([
+    prisma.partnerPricing.findMany({
+      where: { partnerAccountId: null },
+      orderBy: { createdAt: 'asc' },
+    }),
+    prisma.partnerPricing.findMany({ where: { partnerAccountId: partner.id } }),
+    prisma.partnerTier.findUnique({ where: { tier: partner.tier } }),
+  ])
+  const overrideByPlan = new Map(pricingOverrides.map((o) => [o.planKey, o]))
+  const ekDiscountPct = tierRow?.ekDiscountPct ?? 0
+  const planMeta = new Map(
+    [...HR_PLANS, ...AGENCY_PLANS].filter((p) => p.id !== 'ENTERPRISE').map((p) => [p.id, p]),
+  )
+  const seenPlanKeys = new Set<string>()
+  const pricingRows: PricingRow[] = pricingDefaults
+    .filter((d) => {
+      if (!planMeta.has(d.planKey) || seenPlanKeys.has(d.planKey)) return false
+      seenPlanKeys.add(d.planKey)
+      return true
+    })
+    .map((d) => {
+      const ov = overrideByPlan.get(d.planKey)
+      return {
+        planKey: d.planKey,
+        planName: planMeta.get(d.planKey)?.name ?? d.planKey,
+        listMonthlyCents: d.listPriceMonthlyCents,
+        listAnnualCents: d.listPriceAnnualCents,
+        tierEkMonthlyCents: Math.round(d.listPriceMonthlyCents * (1 - ekDiscountPct / 100)),
+        tierEkAnnualCents: Math.round(d.listPriceAnnualCents * (1 - ekDiscountPct / 100)),
+        overrideMonthlyCents: ov?.baseEkMonthlyCents ?? null,
+        overrideAnnualCents: ov?.baseEkAnnualCents ?? null,
+      }
+    })
 
   const active = partner.customers.filter((c) => c.status === 'ACTIVE')
   const pausedCount = partner.customers.filter((c) => c.status === 'PAUSED').length
@@ -189,6 +226,15 @@ export default async function AdminPartnerDetailPage({
             <div className="text-2xl font-bold text-text-primary">{euro(marginMrr)}</div>
             <div className="text-xs text-text-muted mt-1">End-Umsatz minus EK</div>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <PartnerPricingOverrides
+            partnerId={partner.id}
+            tier={partner.tier}
+            ekDiscountPct={ekDiscountPct}
+            rows={pricingRows}
+          />
         </div>
 
         <div className="card-md overflow-x-auto p-0">
