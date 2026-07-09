@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Sparkles, Search, Menu } from 'lucide-react'
+import { Sparkles, Search, Menu, ArrowLeftRight } from 'lucide-react'
 import { ACCOUNT_TYPES, getPlanById } from '@/lib/utils'
 import { useMobileSidebar } from './MobileSidebarContext'
 
@@ -11,9 +11,12 @@ interface TopBarProps {
   accountType: string
   plan: string
   role?: string
+  // Doppelrolle: true, wenn zur Login-E-Mail auch ein APPROVED
+  // Partner-Konto existiert → Wechsel-Link zum Partner-Dashboard.
+  hasPartnerAccount?: boolean
 }
 
-export function TopBar({ name, company, accountType, plan, role }: TopBarProps) {
+export function TopBar({ name, company, accountType, plan, role, hasPartnerAccount }: TopBarProps) {
   const { toggle } = useMobileSidebar()
   const accountMeta = ACCOUNT_TYPES[accountType as keyof typeof ACCOUNT_TYPES]
   const planMeta = getPlanById(plan)
@@ -70,6 +73,19 @@ export function TopBar({ name, company, accountType, plan, role }: TopBarProps) 
               />
             </div>
           </div>
+        )}
+
+        {/* Doppelrolle: Wechsel zum Partner-Dashboard (eigene Session dort).
+            Bewusst NICHT hidden auf Mobile — der Link existiert sonst
+            nirgends im Mobile-Layout. */}
+        {!isInternal && hasPartnerAccount && (
+          <Link
+            href="/partner/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors flex-shrink-0"
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Partner</span>
+          </Link>
         )}
 
         {/* Upgrade-CTA nur für Kunden. ADMIN/REVIEWER haben keinen Plan. */}

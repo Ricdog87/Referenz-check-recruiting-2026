@@ -376,6 +376,10 @@ model PartnerAccount {
   suspendedAt      DateTime?
   suspendReason    String?
   lastLoginAt      DateTime?
+  // Gesetzt bei jeder Passwort-Änderung (Settings ODER Reset-Flow).
+  // Der JWT-Callback entwertet Tokens, die davor ausgestellt wurden —
+  // kompromittierte Sessions sterben so binnen 60s statt nach 24h.
+  passwordChangedAt DateTime?
   deletedAt        DateTime?
   createdAt        DateTime                    @default(now())
   updatedAt        DateTime                    @updatedAt

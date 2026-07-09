@@ -126,10 +126,17 @@ export const partnerAuthOptions: NextAuthOptions = {
         try {
           const fresh = await prisma.partnerAccount.findUnique({
             where: { id: token.partnerAccountId as string },
-            select: { status: true, tier: true, deletedAt: true },
+            select: { status: true, tier: true, deletedAt: true, passwordChangedAt: true },
           })
           if (!fresh || fresh.deletedAt) {
             // Account weg → Token entwerten (NextAuth erwartet leeres Objekt).
+            return {} as any
+          }
+          // Passwort wurde NACH Ausstellung dieses Tokens geändert →
+          // Session entwerten. Kompromittierte Cookies sterben so binnen
+          // 60s statt erst nach 24h JWT-maxAge. token.iat ist Sekunden.
+          const issuedAtMs = typeof token.iat === 'number' ? token.iat * 1000 : 0
+          if (fresh.passwordChangedAt && issuedAtMs < fresh.passwordChangedAt.getTime()) {
             return {} as any
           }
           token.status = fresh.status

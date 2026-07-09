@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Briefcase, Tag, Image as ImageIcon, LogOut, ShieldCheck, Menu, X, Wallet,
+  Settings, ArrowLeftRight,
 } from 'lucide-react'
 import type { PartnerSession } from '@/lib/partner/session'
 
@@ -14,6 +15,7 @@ const NAV = [
   { href: '/partner/dashboard/pricing',    label: 'Konditionen',  icon: Tag },
   { href: '/partner/dashboard/co-brand',   label: 'Co-Branding',  icon: ImageIcon },
   { href: '/partner/dashboard/payouts',    label: 'Abrechnung',   icon: Wallet },
+  { href: '/partner/dashboard/settings',   label: 'Einstellungen', icon: Settings },
 ]
 
 const TIER_LABELS: Record<string, string> = {
@@ -25,9 +27,13 @@ const TIER_LABELS: Record<string, string> = {
 
 export function PartnerDashboardShell({
   partner,
+  hasHrAccount = false,
   children,
 }: {
   partner: PartnerSession
+  // Doppelrolle: existiert ein HR-Konto mit derselben E-Mail, zeigen wir
+  // einen Wechsel-Link. Reine Navigation — Cookie-Trennung bleibt.
+  hasHrAccount?: boolean
   children: React.ReactNode
 }) {
   const pathname = usePathname()
@@ -59,7 +65,7 @@ export function PartnerDashboardShell({
     <div className="min-h-screen bg-bg-secondary flex">
       {/* Sidebar — Desktop ─────────────────────────────────────────── */}
       <aside className="hidden md:flex flex-col w-60 bg-white border-r border-border-default">
-        <SidebarContent partner={partner} pathname={pathname} onLogout={handleLogout} />
+        <SidebarContent partner={partner} pathname={pathname} onLogout={handleLogout} hasHrAccount={hasHrAccount} />
       </aside>
 
       {/* Sidebar — Mobile Drawer ───────────────────────────────────── */}
@@ -74,7 +80,7 @@ export function PartnerDashboardShell({
             >
               <X className="w-5 h-5" />
             </button>
-            <SidebarContent partner={partner} pathname={pathname} onLogout={handleLogout} />
+            <SidebarContent partner={partner} pathname={pathname} onLogout={handleLogout} hasHrAccount={hasHrAccount} />
           </aside>
         </div>
       )}
@@ -104,10 +110,12 @@ function SidebarContent({
   partner,
   pathname,
   onLogout,
+  hasHrAccount,
 }: {
   partner: PartnerSession
   pathname: string
   onLogout: () => void
+  hasHrAccount: boolean
 }) {
   return (
     <>
@@ -152,6 +160,21 @@ function SidebarContent({
           )
         })}
       </nav>
+
+      {/* Doppelrolle: Wechsel zum HR-Workspace (gleiche E-Mail in beiden
+          Welten). Reine Navigation — ohne gültige HR-Session landet man
+          auf /login. Datentrennung bleibt vollständig erhalten. */}
+      {hasHrAccount && (
+        <div className="px-3 py-2 border-t border-border-default">
+          <Link
+            href="/dashboard"
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-text-secondary hover:bg-surface-subtle hover:text-text-primary transition-colors"
+          >
+            <ArrowLeftRight className="w-4 h-4" />
+            Zum HR-Dashboard
+          </Link>
+        </div>
+      )}
 
       {/* Logout */}
       <div className="px-3 py-3 border-t border-border-default">
