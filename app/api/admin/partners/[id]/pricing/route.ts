@@ -115,9 +115,15 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
           action: clearing ? 'PARTNER_PRICING_OVERRIDE_CLEARED' : 'PARTNER_PRICING_OVERRIDE_SET',
           entity: 'PartnerPricing',
           entityId: planKey,
+          // KEINE Cent-Beträge im Audit-Log (Schema-Invariante: details nie
+          // Klartext-EK). Welche Felder betroffen waren reicht — die Werte
+          // stehen versioniert in PartnerPricing.
           details: clearing
             ? `by_admin=${session.user.id} plan=${planKey}`
-            : `by_admin=${session.user.id} plan=${planKey} ekMo=${monthly.value ?? '—'}c ekJz=${annual.value ?? '—'}c`,
+            : `by_admin=${session.user.id} plan=${planKey} fields=${[
+                monthly.value !== null ? 'ekMo' : null,
+                annual.value !== null ? 'ekJz' : null,
+              ].filter(Boolean).join(',')}`,
         },
       })
       .catch((err) => logger.warn('partner_pricing_audit_warn', err))

@@ -77,7 +77,10 @@ export async function POST(req: NextRequest) {
     await prisma.$transaction([
       prisma.partnerAccount.update({
         where: { id: tokenRow.partnerAccountId },
-        data: { passwordHash },
+        // passwordChangedAt entwertet bestehende JWT-Sessions binnen 60s
+        // (siehe lib/partner/auth.ts) — beim Reset besonders wichtig, weil
+        // der Anlass oft ein kompromittiertes Passwort ist.
+        data: { passwordHash, passwordChangedAt: new Date() },
       }),
       prisma.partnerPasswordResetToken.update({
         where: { id: tokenRow.id },

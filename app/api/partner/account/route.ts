@@ -17,14 +17,34 @@ export const dynamic = 'force-dynamic'
  *   - status/tier → Admin- bzw. Cron-Hoheit
  *
  * Auch PENDING-Partner dürfen ihre Stammdaten korrigieren (z. B. Tippfehler
- * in der Firma vor dem Approval) — nur SUSPENDED/REJECTED kommen ohnehin
- * nicht an eine Session.
+ * in der Firma vor dem Approval). SUSPENDED/REJECTED werden explizit
+ * geblockt: der Login verweigert sie zwar, aber eine VOR der Sperrung
+ * ausgestellte Session bleibt bis zu 24h gültig (JWT) — deshalb hier
+ * zusätzlich Status-Gate + DB-Frischcheck (status/deletedAt), analog zu
+ * allen anderen Partner-Routen.
  */
 export async function PATCH(req: NextRequest) {
   if (!isPartnerProgramEnabled()) return new NextResponse('Not Found', { status: 404 })
 
   const session = await getPartnerSession()
   if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 401 })
+  if (session.status !== 'APPROVED' && session.status !== 'PENDING') {
+    return NextResponse.json({ error: 'Account gesperrt.' }, { status: 403 })
+  }
+
+  // DB-Frischcheck: Session-Status kann bis zu 60s alt sein (JWT-Refresh) —
+  // für Schreiboperationen zählt der echte DB-Zustand.
+  const freshAccount = await prisma.partnerAccount.findUnique({
+    where: { id: session.id },
+    select: { status: true, deletedAt: true },
+  })
+  if (
+    !freshAccount ||
+    freshAccount.deletedAt ||
+    (freshAccount.status !== 'APPROVED' && freshAccount.status !== 'PENDING')
+  ) {
+    return NextResponse.json({ error: 'Account gesperrt.' }, { status: 403 })
+  }
 
   const ip = getClientIp(req)
   const rl = rateLimit(`partner-account:${session.id}`, 20, 60 * 60 * 1000)

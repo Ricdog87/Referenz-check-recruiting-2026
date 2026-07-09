@@ -17,6 +17,7 @@ const mockAccountUpdate = vi.fn().mockResolvedValue({})
 const mockAccountFindUnique = vi.fn()
 const mockTokenUpdateMany = vi.fn().mockResolvedValue({ count: 2 })
 const mockAuditCreate = vi.fn().mockResolvedValue({})
+const mockAuditCount = vi.fn()
 const mockTransaction = vi.fn(async (ops: unknown[]) => ops)
 const mockGetPartnerSession = vi.fn()
 const mockCompare = vi.fn()
@@ -33,7 +34,7 @@ function mockDeps(flagOn = true) {
     prisma: {
       partnerAccount: { update: mockAccountUpdate, findUnique: mockAccountFindUnique },
       partnerPasswordResetToken: { updateMany: mockTokenUpdateMany },
-      partnerAuditLog: { create: mockAuditCreate },
+      partnerAuditLog: { create: mockAuditCreate, count: mockAuditCount },
       $transaction: mockTransaction,
     },
   }))
@@ -72,9 +73,11 @@ beforeEach(() => {
     id: 'partner_A',
     passwordHash: 'old-hash',
     deletedAt: null,
+    status: 'APPROVED',
   })
   mockTokenUpdateMany.mockClear()
   mockAuditCreate.mockClear()
+  mockAuditCount.mockReset().mockResolvedValue(0)
   mockTransaction.mockClear()
   mockGetPartnerSession.mockReset().mockResolvedValue(SESSION)
   mockCompare.mockReset().mockResolvedValue(true)
@@ -144,7 +147,7 @@ describe('POST /api/partner/account/password', () => {
     expect(mockCompare).not.toHaveBeenCalled()
   })
 
-  it('Erfolg: Transaction mit Hash-Update + Token-Invalidierung + Audit', async () => {
+  it('Erfolg: Transaction mit Hash + passwordChangedAt + Token-Invalidierung + Audit', async () => {
     const POST = await importPasswordPost()
     const res = await POST(makeReq({ currentPassword: 'current-pw', newPassword: 'brandnew-secret-pw' }))
     expect(res.status).toBe(200)
@@ -152,7 +155,8 @@ describe('POST /api/partner/account/password', () => {
     expect(mockTransaction).toHaveBeenCalledTimes(1)
     expect(mockAccountUpdate).toHaveBeenCalledWith({
       where: { id: 'partner_A' },
-      data: { passwordHash: 'new-hash' },
+      // passwordChangedAt entwertet bestehende JWT-Sessions (60s-Refresh)
+      data: { passwordHash: 'new-hash', passwordChangedAt: expect.any(Date) },
     })
     expect(mockTokenUpdateMany).toHaveBeenCalledWith({
       where: { partnerAccountId: 'partner_A', usedAt: null },
@@ -163,8 +167,62 @@ describe('POST /api/partner/account/password', () => {
 
   it('gelöschter Account → 401', async () => {
     const POST = await importPasswordPost()
-    mockAccountFindUnique.mockResolvedValue({ id: 'partner_A', passwordHash: 'h', deletedAt: new Date() })
+    mockAccountFindUnique.mockResolvedValue({ id: 'partner_A', passwordHash: 'h', deletedAt: new Date(), status: 'APPROVED' })
     const res = await POST(makeReq({ currentPassword: 'current-pw', newPassword: 'brandnew-secret-pw' }))
     expect(res.status).toBe(401)
+  })
+})
+
+describe('Status-Gates + Brute-Force-Härtung (Review-Fixes)', () => {
+  it('SUSPENDED-Session → 403 auf PATCH account, kein Update', async () => {
+    const PATCH = await importAccountPatch()
+    mockGetPartnerSession.mockResolvedValue({ ...SESSION, status: 'SUSPENDED' })
+    const res = await PATCH(makeReq({ company: 'Hijack GmbH' }))
+    expect(res.status).toBe(403)
+    expect(mockAccountUpdate).not.toHaveBeenCalled()
+  })
+
+  it('Session sagt APPROVED, DB sagt SUSPENDED → 403 (Frischcheck gewinnt)', async () => {
+    const PATCH = await importAccountPatch()
+    mockAccountFindUnique.mockResolvedValue({ status: 'SUSPENDED', deletedAt: null })
+    const res = await PATCH(makeReq({ company: 'Hijack GmbH' }))
+    expect(res.status).toBe(403)
+    expect(mockAccountUpdate).not.toHaveBeenCalled()
+  })
+
+  it('PENDING darf Stammdaten korrigieren (dokumentierte Absicht)', async () => {
+    const PATCH = await importAccountPatch()
+    mockGetPartnerSession.mockResolvedValue({ ...SESSION, status: 'PENDING' })
+    mockAccountFindUnique.mockResolvedValue({ status: 'PENDING', deletedAt: null })
+    const res = await PATCH(makeReq({ company: 'Korrigiert GmbH' }))
+    expect(res.status).toBe(200)
+  })
+
+  it('REJECTED-Session → 403 auf Passwort-Route', async () => {
+    const POST = await importPasswordPost()
+    mockGetPartnerSession.mockResolvedValue({ ...SESSION, status: 'REJECTED' })
+    const res = await POST(makeReq({ currentPassword: 'x', newPassword: 'brandnew-secret-pw' }))
+    expect(res.status).toBe(403)
+    expect(mockAccountFindUnique).not.toHaveBeenCalled()
+  })
+
+  it('5 DB-Fehlversuche in der letzten Stunde → 429 VOR dem bcrypt-Vergleich', async () => {
+    const POST = await importPasswordPost()
+    mockAuditCount.mockResolvedValue(5)
+    const res = await POST(makeReq({ currentPassword: 'guess', newPassword: 'brandnew-secret-pw' }))
+    expect(res.status).toBe(429)
+    expect(mockCompare).not.toHaveBeenCalled()
+  })
+
+  it('falsches Passwort schreibt durablen FAILED-Zähler (awaited)', async () => {
+    const POST = await importPasswordPost()
+    mockCompare.mockResolvedValue(false)
+    const res = await POST(makeReq({ currentPassword: 'wrong', newPassword: 'brandnew-secret-pw' }))
+    expect(res.status).toBe(400)
+    expect(mockAuditCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ action: 'PARTNER_PASSWORD_CHANGE_FAILED' }),
+      }),
+    )
   })
 })

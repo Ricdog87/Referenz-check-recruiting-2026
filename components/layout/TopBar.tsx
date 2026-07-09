@@ -75,13 +75,16 @@ export function TopBar({ name, company, accountType, plan, role, hasPartnerAccou
           </div>
         )}
 
-        {/* Doppelrolle: Wechsel zum Partner-Dashboard (eigene Session dort). */}
+        {/* Doppelrolle: Wechsel zum Partner-Dashboard (eigene Session dort).
+            Bewusst NICHT hidden auf Mobile — der Link existiert sonst
+            nirgends im Mobile-Layout. */}
         {!isInternal && hasPartnerAccount && (
           <Link
             href="/partner/dashboard"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors flex-shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-700 hover:text-indigo-800 px-3 py-1.5 rounded-full bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors flex-shrink-0"
           >
-            <ArrowLeftRight className="w-3.5 h-3.5" /> Partner
+            <ArrowLeftRight className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Partner</span>
           </Link>
         )}
 

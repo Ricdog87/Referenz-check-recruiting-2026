@@ -80,6 +80,19 @@ Pflichtbestandteil.
 - **Alle transaktionalen Mails werden AWAITED versendet** (kein
   fire-and-forget) — Vercel friert Lambdas nach dem Response-Return ein,
   nicht-awaitete Promises gehen verloren.
+- **Account-Linking basiert auf E-Mail-Gleichheit ohne Verifikation**:
+  Wer ein HR-Konto mit der E-Mail eines Partners registriert, sieht im
+  Dashboard einen „Partner"-Wechsel-Link (= erfährt, dass zu dieser
+  Adresse ein Partner-Konto existiert). Bewusst akzeptiert: kein
+  Datenzugriff möglich (Cookie-Trennung), nur Existenz-Signal; die
+  Alternative (beidseitig bestätigte Verknüpfung) kommt mit dem
+  E-Mail-Verifikations-Flow.
+- **Partner-Login ist ein ungedrosseltes Passwort-Orakel** (Bestands-
+  Pattern aller Credentials-Flows im Repo, In-Memory-Rate-Limits greifen
+  auf Serverless nur pro Instanz). Der Password-CHANGE-Endpoint hat
+  seit dem Audit einen durablen DB-Fehlversuchszähler (5/h) — Login +
+  HR-Flows brauchen dasselbe als eigenes Vorhaben (Lockout-Spalte oder
+  zentraler Rate-Limit-Store).
 
 ## Gating (kritisch)
 

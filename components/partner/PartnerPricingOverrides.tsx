@@ -71,10 +71,33 @@ function centsToEuroInput(cents: number | null): string {
   return cents === null ? '' : (cents / 100).toFixed(2)
 }
 
+/**
+ * Parst Euro-Eingaben strikt in Cents. Akzeptiert:
+ *   "1234" · "1234,56" · "1234.56" · "1.234,56" (dt. Tausenderpunkte)
+ * Alles andere → NaN (Aufrufer blockt). Insbesondere darf "1.234" NIEMALS
+ * als 1,234 € interpretiert werden (Number("1.234") === 1.234 → Faktor-1000-
+ * Fehler beim EK!) — mit Punkt UND ohne Komma sind max. 2 Nachkommastellen
+ * erlaubt, sonst gilt es als (abgelehnte) mehrdeutige Eingabe.
+ */
 function euroInputToCents(v: string): number | null {
-  const trimmed = v.trim().replace(',', '.')
+  const trimmed = v.trim()
   if (!trimmed) return null
-  const n = Number(trimmed)
+
+  let normalized: string
+  if (/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(trimmed)) {
+    // Deutsches Format mit Tausenderpunkten: 1.234 / 1.234,56
+    normalized = trimmed.replace(/\./g, '').replace(',', '.')
+  } else if (/^\d+(,\d{1,2})?$/.test(trimmed)) {
+    // Komma-Dezimal: 1234,56
+    normalized = trimmed.replace(',', '.')
+  } else if (/^\d+(\.\d{1,2})?$/.test(trimmed)) {
+    // Punkt-Dezimal (max 2 Stellen): 1234.56 — "1.234" fällt NICHT hierunter
+    normalized = trimmed
+  } else {
+    return NaN as unknown as number
+  }
+
+  const n = Number(normalized)
   if (!Number.isFinite(n) || n <= 0) return NaN as unknown as number
   return Math.round(n * 100)
 }
@@ -156,11 +179,19 @@ function OverrideRow({ partnerId, row }: { partnerId: string; row: PricingRow })
       </td>
       <td className="px-4 py-3 text-right text-xs text-text-secondary whitespace-nowrap">
         {(row.listMonthlyCents / 100).toFixed(2).replace('.', ',')} €
+        <div className="text-[10px] text-text-muted">
+          jz. {(row.listAnnualCents / 100).toFixed(2).replace('.', ',')} €
+        </div>
       </td>
+      {/* Durchstreichen PRO Cycle: ein Override nur für monatlich lässt die
+          jährliche Zahlweise weiterhin über die Tier-Formel laufen. */}
       <td className="px-4 py-3 text-right text-xs whitespace-nowrap">
-        <span className={hasOverride ? 'text-text-muted line-through' : 'text-indigo-700 font-semibold'}>
+        <span className={row.overrideMonthlyCents !== null ? 'text-text-muted line-through' : 'text-indigo-700 font-semibold'}>
           {(row.tierEkMonthlyCents / 100).toFixed(2).replace('.', ',')} €
         </span>
+        <div className={'text-[10px] ' + (row.overrideAnnualCents !== null ? 'text-text-muted line-through' : 'text-indigo-600')}>
+          jz. {(row.tierEkAnnualCents / 100).toFixed(2).replace('.', ',')} €
+        </div>
       </td>
       <td className="px-4 py-3 text-right">
         <input

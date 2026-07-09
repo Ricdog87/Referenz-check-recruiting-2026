@@ -26,6 +26,12 @@ export async function POST(req: NextRequest) {
 
   const session = await getPartnerSession()
   if (!session) return NextResponse.json({ error: 'Forbidden' }, { status: 401 })
+  // SUSPENDED/REJECTED: Login ist zwar geblockt, aber eine VOR der Sperrung
+  // ausgestellte Session lebt bis zu 24h — Passwort-Rotation durch gesperrte
+  // Accounts explizit verhindern. (DB-Frischcheck folgt unten via findUnique.)
+  if (session.status !== 'APPROVED' && session.status !== 'PENDING') {
+    return NextResponse.json({ error: 'Account gesperrt.' }, { status: 403 })
+  }
 
   const ip = getClientIp(req)
   const rl = rateLimit(`partner-pwchange:${session.id}`, 5, 60 * 60 * 1000)
@@ -65,14 +71,50 @@ export async function POST(req: NextRequest) {
   try {
     const account = await prisma.partnerAccount.findUnique({
       where: { id: session.id },
-      select: { id: true, passwordHash: true, deletedAt: true },
+      select: { id: true, passwordHash: true, deletedAt: true, status: true },
     })
-    if (!account || account.deletedAt) {
+    if (
+      !account ||
+      account.deletedAt ||
+      (account.status !== 'APPROVED' && account.status !== 'PENDING')
+    ) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 401 })
+    }
+
+    // Durabler Fehlversuchszähler (instanzübergreifend + cold-start-fest):
+    // Das In-Memory-Rate-Limit oben greift auf Vercel nur pro Lambda-Instanz.
+    // Da dieser Endpoint ein Passwort-Orakel ist (bestätigt richtig/falsch),
+    // zählen wir Fehlversuche zusätzlich in der DB und sperren bei >= 5/h.
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
+    const recentFailures = await prisma.partnerAuditLog.count({
+      where: {
+        partnerAccountId: account.id,
+        action: 'PARTNER_PASSWORD_CHANGE_FAILED',
+        createdAt: { gte: oneHourAgo },
+      },
+    })
+    if (recentFailures >= 5) {
+      return NextResponse.json(
+        { error: 'Zu viele Fehlversuche. Bitte in einer Stunde erneut — oder nutzen Sie „Passwort vergessen".' },
+        { status: 429 },
+      )
     }
 
     const valid = await bcrypt.compare(currentPassword, account.passwordHash).catch(() => false)
     if (!valid) {
+      // AWAITED — der Zähler ist die eigentliche Verteidigung, er darf
+      // nicht im Lambda-Freeze verloren gehen.
+      await prisma.partnerAuditLog
+        .create({
+          data: {
+            partnerAccountId: account.id,
+            action: 'PARTNER_PASSWORD_CHANGE_FAILED',
+            entity: 'PartnerAccount',
+            entityId: account.id,
+            ip,
+          },
+        })
+        .catch((err) => logger.warn('partner_pwchange_fail_audit_warn', err))
       return NextResponse.json(
         { error: 'Aktuelles Passwort ist falsch.', field: 'currentPassword' },
         { status: 400 },
@@ -81,11 +123,13 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await bcrypt.hash(newPassword, 12)
 
-    // Atomar: neues Passwort + alle offenen Reset-Tokens entwerten.
+    // Atomar: neues Passwort + passwordChangedAt (entwertet alle bestehenden
+    // JWT-Sessions beim nächsten 60s-Refresh, siehe lib/partner/auth.ts) +
+    // alle offenen Reset-Tokens entwerten.
     await prisma.$transaction([
       prisma.partnerAccount.update({
         where: { id: account.id },
-        data: { passwordHash },
+        data: { passwordHash, passwordChangedAt: new Date() },
       }),
       prisma.partnerPasswordResetToken.updateMany({
         where: { partnerAccountId: account.id, usedAt: null },
