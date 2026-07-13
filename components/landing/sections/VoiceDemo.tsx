@@ -81,8 +81,6 @@ export default function VoiceDemo() {
           candiq Voice spricht mit Ihren Kandidaten — niemals mit deren Referenzgebern. Die Verifizierung läuft immer über geschulte Menschen. Mikrofonzugriff nur während dieses Demo-Gesprächs.
         </p>
       </div>
-
-      <style>{'@keyframes candiqWave{0%,100%{transform:scaleY(0.18)}50%{transform:scaleY(1)}}'}</style>
     </section>
   )
 }
