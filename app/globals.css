@@ -321,3 +321,14 @@ option { background: #ffffff; color: #0f172a; }
     padding-right: 3rem;
   }
 }
+
+/* Voice-Wave-Keyframes (VoiceConsole im Hero + VoiceDemo).
+   Bewusst HIER statt (a) inline <style> in der Komponente — das würde die
+   CSP blocken (style-src mit Nonce ⇒ Browser ignorieren 'unsafe-inline') —
+   und statt (b) tailwind.config keyframes — die emittiert Tailwind nur,
+   wenn eine animate-*-Utility sie referenziert; die Nutzung ist aber ein
+   inline style-Attribut mit per-Balken-Delay. */
+@keyframes candiqWave {
+  0%, 100% { transform: scaleY(0.18); }
+  50% { transform: scaleY(1); }
+}

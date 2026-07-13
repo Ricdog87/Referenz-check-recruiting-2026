@@ -178,13 +178,6 @@ module.exports = {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
-        // Voice-Wave (VoiceConsole/VoiceDemo). Hier statt inline <style>,
-        // damit die Keyframes im gelinkten Tailwind-Stylesheet landen —
-        // ein nonce-loses inline <style> würde von der CSP geblockt.
-        candiqWave: {
-          '0%, 100%': { transform: 'scaleY(0.18)' },
-          '50%': { transform: 'scaleY(1)' },
-        },
       },
       letterSpacing: {
         tightest: '-0.05em',
