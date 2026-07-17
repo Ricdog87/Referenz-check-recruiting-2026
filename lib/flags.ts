@@ -24,3 +24,16 @@ export function isFlagEnabled(name: string): boolean {
 export function isPartnerProgramEnabled(): boolean {
   return isFlagEnabled('PARTNER_PROGRAM_ENABLED')
 }
+
+/**
+ * Master-Switch für die LLM-gestützte CV-Plausibilitätsprüfung.
+ *
+ * Default OFF: solange nicht explizit aktiviert, verlässt KEIN CV-Inhalt
+ * die Plattform Richtung Anthropic/OpenAI — die deterministischen Checks
+ * laufen weiter (safe fallback). Gibt einem Betreiber/Käufer einen
+ * Config-Kill-Switch für den externen Datenabfluss, unabhängig davon,
+ * ob API-Keys hinterlegt sind (R4/G13).
+ */
+export function isCvAnalysisLlmEnabled(): boolean {
+  return isFlagEnabled('CV_ANALYSIS_LLM_ENABLED')
+}

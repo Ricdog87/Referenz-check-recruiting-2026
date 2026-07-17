@@ -72,8 +72,16 @@ export default function DatenschutzPage() {
         </li>
         <li>
           <strong>Anthropic Inc. (USA)</strong> — KI-gestützte CV-Plausibilitätsprüfung und
-          Diskrepanz-Erkennung (modell: Claude). Verarbeitung nur, wenn Sie die KI-Analyse
-          explizit anstoßen; keine Trainings-Nutzung Ihrer Daten lt. API-Vertrag.
+          Diskrepanz-Erkennung (Modell: Claude). Verarbeitung nur, wenn die KI-Analyse
+          serverseitig aktiviert ist und Sie sie explizit anstoßen; keine Trainings-Nutzung
+          Ihrer Daten lt. API-Vertrag. Übertragung auf Basis der EU-Standardvertragsklauseln (SCC).
+        </li>
+        <li>
+          <strong>OpenAI, L.L.C. (USA)</strong> — alternativer KI-Anbieter für dieselbe
+          CV-Plausibilitätsprüfung (Ausweich-Modell, nur aktiv wenn kein Anthropic-Zugang
+          konfiguriert ist). Verarbeitung nur bei aktivierter KI-Analyse; keine
+          Trainings-Nutzung Ihrer Daten lt. API-Vertrag (OpenAI API Data Usage Policy).
+          Übertragung auf Basis der EU-Standardvertragsklauseln (SCC).
         </li>
         <li>
           <strong>ElevenLabs Inc. (USA)</strong> — Live-Sprachagent in der Hero-Demo. Details

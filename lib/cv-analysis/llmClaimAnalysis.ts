@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { z } from 'zod'
+import { isCvAnalysisLlmEnabled } from '@/lib/flags'
 import {
   candidateInputSchema,
   llmClaimAnalysisSchema,
@@ -71,6 +72,10 @@ async function callAnthropic(system: string, user: string): Promise<string> {
 }
 
 async function callConfiguredLlm(system: string, user: string): Promise<string> {
+  // Master-Switch (R4/G13): ohne CV_ANALYSIS_LLM_ENABLED verlässt kein
+  // CV-Inhalt die Plattform — auch nicht, wenn ein API-Key gesetzt ist.
+  // Die deterministischen Checks bleiben maßgeblich (safe fallback '{}').
+  if (!isCvAnalysisLlmEnabled()) return '{}'
   if (process.env.ANTHROPIC_API_KEY) return callAnthropic(system, user)
   if (process.env.OPENAI_API_KEY) return callOpenAI(system, user)
   return '{}'

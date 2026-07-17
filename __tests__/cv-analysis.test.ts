@@ -60,6 +60,7 @@ describe('external CV checks', () => {
 describe('LLM claim analysis resilience', () => {
   it('falls back instead of throwing when the LLM API call fails', async () => {
     vi.resetModules()
+    vi.stubEnv('CV_ANALYSIS_LLM_ENABLED', 'true') // Flag AN → Anthropic-Pfad wird erreicht
     vi.stubEnv('ANTHROPIC_API_KEY', 'sk-ant-test-invalid')
     vi.doMock('@anthropic-ai/sdk', () => ({
       default: class {
@@ -74,6 +75,30 @@ describe('LLM claim analysis resilience', () => {
     const { runLlmClaimAnalysis } = await import('@/lib/cv-analysis/llmClaimAnalysis')
     const analysis = await runLlmClaimAnalysis(candidateInputSchema.parse(cleanCv))
 
+    expect(analysis.claims).toEqual([])
+    expect(analysis.checklist.length).toBeGreaterThan(0)
+
+    vi.doUnmock('@anthropic-ai/sdk')
+    vi.unstubAllEnvs()
+  })
+
+  it('R4-Gate: Flag OFF → KEIN LLM-Call, auch mit gesetztem API-Key', async () => {
+    vi.resetModules()
+    // Flag NICHT gesetzt (= off), aber Key vorhanden:
+    vi.stubEnv('ANTHROPIC_API_KEY', 'sk-ant-should-not-be-used')
+    const createSpy = vi.fn()
+    vi.doMock('@anthropic-ai/sdk', () => ({
+      default: class {
+        messages = { create: createSpy }
+      },
+    }))
+
+    const { runLlmClaimAnalysis } = await import('@/lib/cv-analysis/llmClaimAnalysis')
+    const analysis = await runLlmClaimAnalysis(candidateInputSchema.parse(cleanCv))
+
+    // Kein CV-Inhalt an die LLM-API — der Client wurde nie aufgerufen.
+    expect(createSpy).not.toHaveBeenCalled()
+    // Deterministische Checks laufen trotzdem (Report bleibt nutzbar).
     expect(analysis.claims).toEqual([])
     expect(analysis.checklist.length).toBeGreaterThan(0)
 
