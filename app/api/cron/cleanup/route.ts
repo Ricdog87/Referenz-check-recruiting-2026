@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { logger } from '@/lib/logger'
+import { deleteBlobUrls, deleteBlobsByPrefix } from '@/lib/blob-cleanup'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -79,15 +80,24 @@ async function handleCleanup(req: NextRequest) {
       })
       const candidateIds = candidatesToDelete.map((c) => c.id)
 
-      // 3) Vor dem Delete: Anzahl der mitgerissenen Records zaehlen (für Audit-Trail).
-      const [documentsAffected, checksAffected, tokensViaCascade] =
+      // 3) Vor dem Cascade-Delete: Blob-Referenzen einsammeln (R2).
+      //    Die DB-Cascade entfernt nur Zeilen — die Datei-Objekte im Blob-
+      //    Store müssen wir separat NACH dem Commit löschen. Pfade + Check-IDs
+      //    daher jetzt sichern, solange die Zeilen noch existieren.
+      const [docsToDelete, checksToDelete, tokensViaCascade] =
         candidateIds.length > 0
           ? await Promise.all([
-              tx.document.count({ where: { candidateId: { in: candidateIds } } }),
-              tx.referenceCheck.count({ where: { candidateId: { in: candidateIds } } }),
+              tx.document.findMany({
+                where: { candidateId: { in: candidateIds } },
+                select: { path: true },
+              }),
+              tx.referenceCheck.findMany({
+                where: { candidateId: { in: candidateIds } },
+                select: { id: true },
+              }),
               tx.consentToken.count({ where: { candidateId: { in: candidateIds } } }),
             ])
-          : [0, 0, 0]
+          : [[], [], 0]
 
       // 4) Candidate-Delete — onDelete: Cascade zieht Document, ReferenceCheck und ConsentToken mit.
       const deletedCandidates =
@@ -97,12 +107,33 @@ async function handleCleanup(req: NextRequest) {
 
       return {
         candidatesDeleted: deletedCandidates.count,
-        documentsDeleted: documentsAffected,
-        checksDeleted: checksAffected,
+        documentsDeleted: docsToDelete.length,
+        checksDeleted: checksToDelete.length,
         tokensExpiredStandalone: expiredTokens.count,
         tokensViaCandidateCascade: tokensViaCascade,
+        // Für die Post-Commit-Blob-Löschung durchreichen:
+        _docPaths: docsToDelete.map((d) => d.path),
+        _checkIds: checksToDelete.map((c) => c.id),
       }
     })
+
+    // 4b) Blob-Objekte löschen — NACH erfolgreichem DB-Commit (sonst würden
+    //     Dateien gelöscht, während die Transaction noch zurückrollen könnte).
+    //     CV-/Zeugnis-Dateien via Document.path, Report-PDFs per Prefix
+    //     (reports/<checkId>/ ist nicht DB-getrackt).
+    const docBlobs = await deleteBlobUrls(result._docPaths)
+    let reportBlobsDeleted = 0
+    let reportBlobsFailed = 0
+    for (const checkId of result._checkIds) {
+      const r = await deleteBlobsByPrefix(`reports/${checkId}/`)
+      reportBlobsDeleted += r.deleted
+      reportBlobsFailed += r.failed
+    }
+    const blobsDeleted = docBlobs.deleted + reportBlobsDeleted
+    const blobsFailed = docBlobs.failed + reportBlobsFailed
+    if (blobsFailed > 0) {
+      logger.error('cron_cleanup_blob_partial', { blobsDeleted, blobsFailed })
+    }
 
     // 5) Audit-Log-Entry — IMMER schreiben, auch bei 0 Löschungen.
     //    Damit ist nachweisbar, dass der Cron-Job gelaufen ist.
@@ -112,17 +143,19 @@ async function handleCleanup(req: NextRequest) {
         action: 'AUTO_CLEANUP_180D',
         entity: 'System',
         entityId: null,
-        details: `candidates=${result.candidatesDeleted} tokens=${totalTokens} documents=${result.documentsDeleted} checks=${result.checksDeleted}`,
+        details: `candidates=${result.candidatesDeleted} tokens=${totalTokens} documents=${result.documentsDeleted} checks=${result.checksDeleted} blobsDeleted=${blobsDeleted} blobsFailed=${blobsFailed}`,
       },
     })
 
-    logger.info('cron_cleanup_ok', { cutoff: cutoff.toISOString(), ...result })
+    // Interne Felder aus der Response entfernen (keine Pfade nach außen).
+    const { _docPaths, _checkIds, ...deletedSummary } = result
+    logger.info('cron_cleanup_ok', { cutoff: cutoff.toISOString(), ...deletedSummary, blobsDeleted, blobsFailed })
 
     return NextResponse.json({
       ok: true,
       cutoffDate: cutoff.toISOString(),
       retentionDays: RETENTION_DAYS,
-      deleted: result,
+      deleted: { ...deletedSummary, blobsDeleted, blobsFailed },
     })
   } catch (err: any) {
     logger.error('cron_cleanup_error', err)

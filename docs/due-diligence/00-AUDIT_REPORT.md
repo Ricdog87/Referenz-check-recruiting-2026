@@ -72,8 +72,10 @@ export function hasCvAccess(doc, actor) {
 
 **Fix-Skizze:** Owner-oder-Reviewer-Check in der Route ergänzen (der `isOwner`-Wert wird bereits berechnet, aber nur an den Gate durchgereicht), statt für non-CV-Docs auf den Gate zu vertrauen.
 
-### R2 — CV-Dateien werden bei keiner Löschung tatsächlich entfernt (Blob-Leak)
+### R2 — CV-Dateien werden bei keiner Löschung tatsächlich entfernt (Blob-Leak) ✅ BEHOBEN
 **Dateien:** `app/api/cron/cleanup/route.ts:92-96` · `app/api/gdpr/delete/route.ts:16-25` · **Aufwand: M**
+
+> **Fix:** Neuer zentraler Helper `lib/blob-cleanup.ts` (`deleteBlobUrls` + `deleteBlobsByPrefix`, best-effort mit Fehler-Zählung, URL-Redaction im Log). **Cron-Cleanup:** sammelt `Document.path` + `ReferenceCheck.id` in der Transaction, löscht nach dem DB-Commit CV-/Zeugnis-Blobs (per URL) und Report-PDFs (per Prefix `reports/<checkId>/`, da nicht DB-getrackt); Audit-Details um `blobsDeleted/blobsFailed` erweitert. **gdpr/delete:** ersetzt den toten lokalen `rm(public/uploads/…)`-Pfad durch dieselbe Blob-Löschung nach dem User-Delete + `GDPR_ACCOUNT_DELETED`-Audit. Blob-Löschung erfolgt bewusst **nach** dem DB-Commit (kein Datei-Verlust bei Transaction-Rollback). **Test:** 8 Fälle in `__tests__/gdpr-blob-cleanup.test.ts` (Helper-Filterung/No-Token/Fehler-Zählung; Route: Reihenfolge collect→db-delete→blob-delete, 503 ohne Blob-Löschung bei DB-Fehler). Suite 149/149 grün.
 
 - **Auto-Cleanup (180 Tage):** löscht nur DB-Zeilen (`candidate.deleteMany` + Cascade). **Kein `del()` gegen Vercel Blob.** Die CV-Dateien bleiben nach dem Löschlauf dauerhaft im Store. Das im Code zitierte Versprechen „Daten werden nach 6 Monaten automatisch gelöscht" ist damit für die Dateien selbst **unwahr**.
 - **User-Art.-17-Löschung:** `gdpr/delete` löscht `public/uploads/{userId}` vom **lokalen Filesystem** — dort liegt seit der Blob-Umstellung nichts. Ergebnis: Account-Löschung entfernt DB-Daten, aber **alle CV-Blobs bleiben liegen**.
