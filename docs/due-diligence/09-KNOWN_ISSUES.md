@@ -15,8 +15,6 @@
 |---|---|---|
 | G3 | Rate-Limiter in-memory (per Lambda) | Auf Upstash/Redis umstellen — härtet Login + alle 24 Call-Sites auf einmal |
 | G6 | Kein Stripe-Reconciliation-Cron | Event-Log-Tabelle + täglicher Sub-Sync gegen verpasste Webhooks |
-| G7 | Consent-Lifecycle-Routen ungetestet | Route-Tests für accept/revoke/upload |
-| G8 | Core-Owner-Scoping nicht per Route getestet | Route-Tests checks/candidates/gdpr |
 | G10 | AuditLog Klartext-Emails, unbegrenzte Aufbewahrung | Pseudonymisierung + Frist |
 | G11 | Emails im Klartext in einzelnen Logs | Redaction in `email_no_provider`, HubSpot-Fehlerlogs |
 | G12 | CV-Analyse-Consent = Boolean, nicht an ConsentToken gebunden | Gegen `ACCEPTED`-Status verifizieren |
@@ -31,6 +29,8 @@
 
 ## Behoben in `feat/dd-readiness` (Vollständigkeit)
 R1 IDOR · R2 Blob-Löschung · R4 LLM-Switch+OpenAI-Disclosure · R5 Next-SSRF · R7 CI · G1 Login-Rate-Limit · G2/G4 HR-Auth-Parität · G5 Stripe-Tests · G9 Retention · G13 LLM-Flag · G17 env.example · G18 Demo-Seed (`demo:seed`, synthetisch, prod-guarded) · G21 stale AUDIT.md · G24 Quota. (Jeweils mit Test + Report-Eintrag.)
+
+**G7** Consent-Lifecycle-Tests (accept/revoke) · **G8** Owner-Scoping-Route-Tests (checks/candidates/gdpr).
 
 Zusätzlich geliefert: **Phase 3** KPI-Cockpit (`/admin/kpi`, flag-gated) · **Phase 4** Demo-Umgebung.
 

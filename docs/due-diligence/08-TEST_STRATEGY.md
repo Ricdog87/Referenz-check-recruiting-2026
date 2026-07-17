@@ -1,11 +1,11 @@
 # 08 — Teststrategie
 
-**Stand:** 2026-07-17 · **20 Testdateien / 190 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
+**Stand:** 2026-07-17 · **22 Testdateien / 207 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
 
 ## Suite lokal fahren
 ```bash
 npm ci
-npm test            # vitest run — 190/190
+npm test            # vitest run — 207/207
 npm run typecheck   # tsc --noEmit
 npm run lint        # next lint
 ```
@@ -23,10 +23,11 @@ CI (`.github/workflows/ci.yml`) fährt dieselben Gates + build + license-check +
 | **Auth-Härtung** | 🟢 Login-Rate-Limit + HR-PW-Orakel/Session-Kill | `login-guard.test.ts`, `hr-password-hardening.test.ts` |
 | **Partner-Scoping & -Pricing** | 🟢 11 Dateien / ~93 Fälle (Isolation, EK-Auflösung, Referral, Settings) | `partner-*.test.ts` |
 | **CV-Analyse (LLM-Gate)** | 🟢 Flag-off → kein LLM-Call | `cv-analysis.test.ts` |
+| **Consent-Lifecycle (G7)** | 🟢 accept/revoke-Zustandsübergänge + CV-Gate-Aufruf + Audit | `consent-lifecycle.test.ts` |
+| **Owner-Scoping auf Routen (G8)** | 🟢 checks/[id], candidates/[id], gdpr/export — 401 + userId-Scope + 404 fremd | `owner-scoping.test.ts` |
 
 ## Bewusst (noch) nicht abgedeckt
-- **Consent-Lifecycle-Routen** (accept/revoke/upload setzen `cvStatus`) — Gate-Entscheidung getestet, Zustandsübergänge noch nicht (G7).
-- **Core-Owner-Scoping auf Routen-Ebene** (checks/[id], candidates/[id], gdpr/export) — Logik ist überall vorhanden, aber nicht per Route-Test belegt (G8).
+- **Consent-Upload-Route** (`upload` setzt `cvStatus`) — accept/revoke sind belegt (G7); der Upload-Zweig bleibt für einen späteren Durchgang.
 - **E2E:** `tests/example.spec.ts` ist noch Playwright-Scaffold (G19) → echter Smoke-Pfad empfohlen.
 
 ## Teststil
