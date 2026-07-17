@@ -24,6 +24,12 @@ DATABASE_URL=… npm run seed:partner-pricing
 ```
 Optionale Seeds (mit `REVIEWER_*` / `PROSPECT_*`-Env): `scripts/seed-reviewer.ts`, `scripts/seed-prospect.ts`.
 
+**Demo-Umgebung (Staging/lokal, vollständig synthetisch):**
+```bash
+DATABASE_URL=… npm run demo:seed   # 3 Kunden + 1 Partner + Beispiel-Reports
+```
+Idempotent, keine echte PII (E-Mails `@demo.candiq.invalid`, Firmen `[DEMO] …`). Bricht hart ab, wenn `NEXTAUTH_URL` auf `candiq.de` zeigt (kein Prod-Seed).
+
 ## Erste Runde verifizieren
 ```bash
 npm test        # 190 Vitest-Fälle, offline (keine DB nötig)

@@ -220,6 +220,7 @@ Die Prüf-Frage „merge-ready?" ist wichtig und wurde manuell aufgelöst (ein A
 DSGVO-Doku (DSFA/TOM/RoPA), Retention-Erweiterung, Sentry+Alerting, Backup-Runbook, Demo-Seed, `.env.example`, KPI-Cockpit, `docs/due-diligence/01–10`.
 - ✅ **Phase 2 — DD-Dokupaket:** `docs/due-diligence/01–10` + README (aus dem Code abgeleitet).
 - ✅ **Phase 3 — KPI-Cockpit:** Admin-only `/admin/kpi` hinter Flag `KPI_COCKPIT_ENABLED` (default off). Server-seitig berechnet: MRR/ARR, zahlende Kunden, Checks gesamt & letzte 30 Tage, Ø Durchlaufzeit bis Report, Credential-Bestand (verifizierte Profile), Partner-Kunden, zvoove-verknüpft (=0, PR #137). CSV-Export je Metrik (`/api/admin/kpi/export?metric=summary|revenue`). 16 Aggregations-Tests (`__tests__/kpi.test.ts`). Doppel-Gate: Flag + ADMIN-Rolle.
+- ✅ **Phase 4 — Demo-Umgebung (G18):** `npm run demo:seed` (`scripts/seed-demo.ts`) legt eine VOLLSTÄNDIG SYNTHETISCHE Landschaft an (3 Kunden: HR/PDL/Trial, 1 Partner mit Endkunden, abgeschlossene Checks → live-Reports). Keine echte PII (E-Mails auf `.invalid`, Firmen `[DEMO] …`). Idempotent (kein Passwort-Überschreiben), additiv. **ENV-Guard:** harter Abbruch bei Prod-Host (`candiq.de`) — kein Escape-Hatch. Verifiziert (Prod-Host + fehlende `DATABASE_URL` → exit 1 vor jedem DB-Zugriff).
 
 **Aufwands-Grobschätzung Gesamt bis „DD-fest":** ~2 fokussierte Sprints für ROT + Kern-GELB; Doku-/Cockpit-/Demo-Phasen laufen parallel.
 

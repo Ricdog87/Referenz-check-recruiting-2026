@@ -13,6 +13,7 @@
     "db:studio": "prisma studio",
     "seed:partner-tiers": "npx tsx scripts/seed-partner-tiers.ts",
     "seed:partner-pricing": "npx tsx scripts/seed-partner-pricing.ts",
+    "demo:seed": "npx tsx scripts/seed-demo.ts",
     "postinstall": "prisma generate",
     "test": "vitest run"
   },

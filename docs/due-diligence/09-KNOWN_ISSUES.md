@@ -23,7 +23,6 @@
 | G14 | Kein Error-Tracking/Alerting | Sentry (EU) + Alert auf Health-503 |
 | G15 | Kein getestetes Backup/Restore-Verfahren | RPO/RTO + Restore-Test, in `06-OPERATIONS.md` eintragen |
 | G16 | Kein Incident-Runbook | Minimal-Runbook (Skizze in `06-OPERATIONS.md`) |
-| G18 | Kein Demo-Seed; `prisma/seed.ts` leer | Synthetischer Demo-Datensatz (Phase 4) |
 | G19 | E2E ist Scaffold-Platzhalter | Echten Smoke-Pfad verdrahten |
 | G20 | DSFA/TOM/RoPA fehlen | Legal-Workstream (technische Basis vorhanden) |
 | G22 | `style-src 'unsafe-inline'` neben Nonce | Framer-Motion-Kompat; Hash-basiert lösbar |
@@ -31,7 +30,9 @@
 | Next-DoS | 1 verbleibendes `next`-High (DoS-Klasse) | Next-15/16-Migration als eigenes Epic (Image-Optimizer betrifft self-hosted; candiq = managed Vercel) |
 
 ## Behoben in `feat/dd-readiness` (Vollständigkeit)
-R1 IDOR · R2 Blob-Löschung · R4 LLM-Switch+OpenAI-Disclosure · R5 Next-SSRF · R7 CI · G1 Login-Rate-Limit · G2/G4 HR-Auth-Parität · G5 Stripe-Tests · G9 Retention · G13 LLM-Flag · G17 env.example · G21 stale AUDIT.md · G24 Quota. (Jeweils mit Test + Report-Eintrag.)
+R1 IDOR · R2 Blob-Löschung · R4 LLM-Switch+OpenAI-Disclosure · R5 Next-SSRF · R7 CI · G1 Login-Rate-Limit · G2/G4 HR-Auth-Parität · G5 Stripe-Tests · G9 Retention · G13 LLM-Flag · G17 env.example · G18 Demo-Seed (`demo:seed`, synthetisch, prod-guarded) · G21 stale AUDIT.md · G24 Quota. (Jeweils mit Test + Report-Eintrag.)
+
+Zusätzlich geliefert: **Phase 3** KPI-Cockpit (`/admin/kpi`, flag-gated) · **Phase 4** Demo-Umgebung.
 
 ## Architektur-Debt (dokumentiert, kein Bug)
 - **Dreifache Schema-Wahrheit:** `db push` + `prisma/migrations/*` (vestigial) + `lib/db-init.ts` (Raw-SQL-Self-Healing). Konsolidierung Teil des R6-Cutovers.

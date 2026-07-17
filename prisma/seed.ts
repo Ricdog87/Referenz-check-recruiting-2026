@@ -10,6 +10,9 @@
  * Das Seed-Skript ist absichtlich leer. Falls neue Demo-Daten gebraucht
  * werden, gehören sie in ein separates Sales-Skript wie seed-prospect.ts —
  * NICHT als oeffentliche Default-Accounts.
+ *
+ * Für eine vollständig synthetische Demo-Landschaft (Staging/lokal, keine
+ * echte PII, prod-guarded): `npm run demo:seed` (scripts/seed-demo.ts).
  */
 import { PrismaClient } from '@prisma/client'
 
