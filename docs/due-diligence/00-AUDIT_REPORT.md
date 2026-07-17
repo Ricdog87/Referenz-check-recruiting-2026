@@ -93,8 +93,12 @@ Alle Uploads (CVs, Zeugnisse) und die Report-PDFs mit Bewertungsdaten landen in 
 
 Die CV-Analyse sendet Roh-CV-Text an eine LLM-API (`parseRawCvText`). Provider-Wahl: Anthropic wenn Key gesetzt, sonst **OpenAI-Fallback**. Der Sanitizer filtert nur AGG-Schlüsselwörter (Alter/Herkunft/Religion) — Name, Arbeitgeber, Ausbildung und die **Kontaktdaten der Referenzgeber** gehen ungefiltert raus. Anthropic ist in der Datenschutzerklärung disclosed, **OpenAI nicht** (0 Treffer), obwohl `.env.example` `OPENAI_API_KEY` ausliefert und der Code aktiv dorthin sendet. → Art.-13/14-Informationslücke + fehlende SCC-Nennung. Fix: entweder Doku ergänzen **oder** OpenAI-Fallback entfernen. Verwandt (GELB, G-Serie): die LLM-Analyse hat kein Feature-Flag und keine harte Kopplung an den `ACCEPTED`-Consent-Status.
 
-### R5 — Veraltete Next.js-Version mit kritischem Advisory
+### R5 — Veraltete Next.js-Version mit kritischem Advisory ✅ BEHOBEN (kritisch eliminiert; 1 DoS-High als dokumentierter Residual)
 **Datei:** `package.json` (`next@14.0.4`) · **Aufwand: M**
+
+> **Fix:** `next` 14.0.4 → **14.2.35** (pinned) — **eliminiert das kritische SSRF** in Server Actions. Transitive Highs via `overrides` (`undici ^6.27.0`, `minimatch ^10`) + direkter `postcss ^8.5.19`-Bump. **Ergebnis `npm audit`: critical 1→0, high 4→1, total 10→5.** Bewusst auf Next **14.2.x** geblieben (kein 15/16-Major-Sprung → minimales Regressionsrisiko): Build kompiliert (84 Seiten), 150/150 Tests, lint + tsc clean.
+>
+> **Dokumentierter Residual (ehrlich):** Das eine verbleibende `next`-High (DoS-Klasse: Image-Optimizer-remotePatterns + RSC-Deserialisierung) ist erst in **Next 16** (Major) gefixt. Der Image-Optimizer-Vektor betrifft primär self-hosted Deployments — candiq läuft auf managed Vercel. Empfehlung: Next-15/16-Migration als **separates Epic** planen, nicht DD-blockierend. Die 4 verbleibenden Moderates (js-yaml, next-auth, postcss, uuid) sind Dev-/Build-Chain und erfordern Major-Bumps der jeweiligen Deps — als Wartungs-Backlog geführt.
 
 `npm audit`: **1 kritisch** (Next.js SSRF in Server Actions), **4 high** (undici unbounded decompression, minimatch ReDoS, 2× @typescript-eslint), 5 moderate. `next@14.0.4` ist ~14 Minor-Releases alt. Die Ausnutzbarkeit des SSRF hängt von der Server-Actions-Nutzung ab (zu prüfen), aber eine öffentlich bekannte kritische Schwachstelle in der Kern-Framework-Version ist ein Standard-DD-Flag. Empfehlung: kontrolliertes Upgrade auf aktuelles Next 14.2.x (oder 15) + `undici`/`minimatch`-Bumps.
 
