@@ -12,8 +12,8 @@ Technischer Datenraum für die Käufer-DD. Alle Aussagen aus dem Code abgeleitet
 | [05-INTEGRATIONS](05-INTEGRATIONS.md) | Stripe/Resend/Blob/LLM/HubSpot/zvoove — real vs. mock, Lock-in |
 | [06-OPERATIONS](06-OPERATIONS.md) | Deploy, Envs, Crons, Monitoring, Backup, Incident, R6-Runbook |
 | [07-IP_LICENSES](07-IP_LICENSES.md) | Lizenz-Scan (kein Copyleft), Eigencode, Marken/Domains |
-| [08-TEST_STRATEGY](08-TEST_STRATEGY.md) | 229 Tests, Abdeckung kritischer Pfade, lokal fahren |
+| [08-TEST_STRATEGY](08-TEST_STRATEGY.md) | 270 Tests, Abdeckung kritischer Pfade, lokal fahren |
 | [09-KNOWN_ISSUES](09-KNOWN_ISSUES.md) | Ehrliches Tech-Debt-Register (offen + behoben) |
 | [10-ONBOARDING](10-ONBOARDING.md) | Neuer Dev produktiv in < 1 Tag |
 
-**Kurzfazit:** Überdurchschnittliche Grundhygiene; 5 von 7 ROT-Funden behoben (2 GO-gated Prod-Operationen mit Runbook), 16 GELB behoben, alle mit Regressionstests. Suite 229/229 grün, CI aktiv.
+**Kurzfazit:** Überdurchschnittliche Grundhygiene; 5 von 7 ROT-Funden behoben (2 GO-gated Prod-Operationen mit Runbook), 16 GELB behoben, alle mit Regressionstests. Suite 270/270 grün, CI aktiv.

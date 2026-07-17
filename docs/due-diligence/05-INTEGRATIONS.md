@@ -37,11 +37,12 @@
 - **Offen:** Agent-ID hardcoded, kein Quota-Fallback (G23).
 - **Lock-in:** niedrig (isolierte Demo-Komponente).
 
-## zvoove (ATS-Integration) — **PHASE 1 in offenem PR #137, NICHT in `main`**
-- **Status:** `lib/integrations/zvoove/{types,client,mapper,consent-guard}.ts`, `lib/crypto/aes-gcm.ts`, MockClient, 33 Tests, README — **modularisiert, aber unmerged, auf altem Base (Rebase nötig)**.
-- **Realität:** In-Produktion 0 %. Phase 1/6 (API-Routes, Sync, UI, Cron fehlen). Mock-First mit `TODO(zvoove-doc):`-Markern.
-- **Verschlüsselung:** AES-GCM-Credential-Vault vorbereitet (`encryptSecret`, strict bei fehlendem `INTEGRATION_ENC_KEY`).
-- **DD-Hinweis:** Falls zvoove im Deal zugesichert wurde, ist der Reifegrad (Phase 1, unmerged) explizit zu adressieren.
+## zvoove (ATS-Integration) — **flag-gated (default OFF), Demo gegen Mock lauffähig**
+- **Status:** Phase 1 (aus PR #137) auf `feat/dd-readiness` **integriert + rebased** + **Phase 2 (Demo)** ergänzt: Sync-Service, API-Routes (`connect`/`import`/`push-result`), Settings-UI. Hinter `INTEGRATION_ZVOOVE_ENABLED` (default off).
+- **Realität gegen echten Tenant:** weiterhin 0 % — alle Endpunkte sind `TODO(zvoove-doc):`-Platzhalter, nicht gegen echtes zvoove verifiziert. **Demo-Modus** (`INTEGRATION_ZVOOVE_DEMO=true`) fährt den vollen candiq-Flow (Import → Consent → Check → Rückschreiben) gegen einen In-Memory-Mock.
+- **Consent-Gate:** Import läuft zwingend durch den `consent-guard` — Kandidaten starten `gdprConsent=false`/`PENDING`, Checks `OPEN`. Getestet (`zvoove-sync.test.ts`).
+- **Verschlüsselung:** AES-256-GCM-Credential-Vault (`encryptSecret`, strict bei fehlendem `INTEGRATION_ENC_KEY`); API-Key nur als Envelope + Fingerprint in der DB.
+- **Was für Live fehlt:** echte API-Doku/Swagger + Auth-Schema + Sandbox-Tenant + Sync-Mechanismus (Polling/Webhook) + AVV-Update. Details: `docs/partnerships/zvoove/`.
 
 ## Google Analytics — **real, consent-gated**
 - Nur nach Cookie-Einwilligung (`NEXT_PUBLIC_GA_ID`); ohne ID kein gtag.

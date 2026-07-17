@@ -2,9 +2,19 @@
 
 Bidirektionale Anbindung von **zvoove Recruit** an candiq für Personaldienstleister.
 
-> **Status**: Phase 1 — Skelett & Mock-Layer. Default OFF (`INTEGRATION_ZVOOVE_ENABLED=false`).
-> Vor Production-Schaltung müssen die `TODO(zvoove-doc):`-Stellen gegen die per-Tenant
-> Swagger-Doku unter `<tenant>/swagger` verifiziert werden.
+> **Status**: Phase 1 (Fundament) + Phase 2 (Demo gegen Mock). Default OFF
+> (`INTEGRATION_ZVOOVE_ENABLED=false`). Vor Production-Schaltung müssen die
+> `TODO(zvoove-doc):`-Stellen gegen die per-Tenant Swagger-Doku unter
+> `<tenant>/swagger` verifiziert werden.
+>
+> **Demo-Modus** (`INTEGRATION_ZVOOVE_DEMO=true`): `getZvooveClientForWorkspace`
+> liefert den `MockZvooveClient` mit 2 Fixtures. `/integrations/zvoove` +
+> `/api/integrations/zvoove/{import,push-result}` fahren den VOLLEN candiq-Flow
+> (Import → Consent → Check → Rückschreiben) ohne echten Tenant. Für Sales-Demos.
+>
+> **Phase 2 neu:** `sync.ts` (Import/Push + Consent-Guard-Enforcement),
+> API-Routes `connect`/`import`/`push-result`, UI `app/(dashboard)/integrations/zvoove`.
+> Tests: `__tests__/zvoove-sync.test.ts`.
 
 ## Architektur
 

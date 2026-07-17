@@ -33,5 +33,5 @@ Zusätzlich geliefert: **Phase 3** KPI-Cockpit (`/admin/kpi`, flag-gated) · **P
 
 ## Architektur-Debt (dokumentiert, kein Bug)
 - **Dreifache Schema-Wahrheit:** `db push` + `prisma/migrations/*` (vestigial) + `lib/db-init.ts` (Raw-SQL-Self-Healing). Konsolidierung Teil des R6-Cutovers.
-- **zvoove:** Phase 1/6 in offenem PR #137, nicht in `main` (s. `05-INTEGRATIONS.md`).
+- **zvoove:** Phase 1+2 auf `feat/dd-readiness` integriert (flag-gated, Demo gegen Mock lauffähig); Live gegen echten Tenant braucht zvoove-API-Doku/Sandbox. PR #137 damit obsolet. S. `05-INTEGRATIONS.md` + `docs/partnerships/zvoove/`.
 - **Offene PRs:** #137 (zvoove), #138 (Bugs/Quota — teils durch main überholt), #126/#36/#21/#19 (Docs/Draft, größtenteils obsolet) → aufräumen.

@@ -1,11 +1,11 @@
 # 08 — Teststrategie
 
-**Stand:** 2026-07-17 · **26 Testdateien / 229 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
+**Stand:** 2026-07-17 · **28 Testdateien / 270 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
 
 ## Suite lokal fahren
 ```bash
 npm ci
-npm test            # vitest run — 229/229
+npm test            # vitest run — 270/270
 npm run typecheck   # tsc --noEmit
 npm run lint        # next lint
 ```
@@ -26,6 +26,7 @@ CI (`.github/workflows/ci.yml`) fährt dieselben Gates + build + license-check +
 | **CV-Analyse (LLM-Gate)** | 🟢 Flag-off → kein LLM-Call | `cv-analysis.test.ts` |
 | **Consent-Lifecycle (G7)** | 🟢 accept/revoke-Zustandsübergänge + CV-Gate-Aufruf + Audit | `consent-lifecycle.test.ts` |
 | **Owner-Scoping auf Routen (G8)** | 🟢 checks/[id], candidates/[id], gdpr/export — 401 + userId-Scope + 404 fremd | `owner-scoping.test.ts` |
+| **zvoove-Integration** | 🟢 Mapper/Crypto/Consent-Guard/Flags (33) + Sync: consent-safe Import, Idempotenz, Push-Ownership (8) | `zvoove-integration.test.ts`, `zvoove-sync.test.ts` |
 
 ## Bewusst (noch) nicht abgedeckt
 - **Consent-Upload-Route** (`upload` setzt `cvStatus`) — accept/revoke sind belegt (G7); der Upload-Zweig bleibt für einen späteren Durchgang.

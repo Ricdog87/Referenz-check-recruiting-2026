@@ -2,6 +2,14 @@
 
 **Stand:** 2026-07-17 · Interne Bewertung für die Gesprächsvorbereitung. Nicht extern teilen.
 
+> **Update (nach diesem Review umgesetzt):** Phase 1 aus PR #137 ist inzwischen
+> auf `feat/dd-readiness` **integriert/rebased** (Konflikte gelöst, 33 Tests grün)
+> **und um Phase 2 (Demo) ergänzt**: Sync-Service, API-Routes
+> (`connect`/`import`/`push-result`), Settings-UI — hinter `INTEGRATION_ZVOOVE_ENABLED`
+> (default off). Mit `INTEGRATION_ZVOOVE_DEMO=true` läuft der volle Flow gegen einen
+> Mock. Der ursprüngliche PR #137 kann damit geschlossen werden (Inhalt ist übernommen).
+> Das Folgende ist die ursprüngliche Bewertung von PR #137.
+
 **PR:** [#137 „feat(zvoove): Phase 1"](https://github.com/Ricdog87/Referenz-check-recruiting-2026/pull/137) · Branch `feat/zvoove-integration` · Default OFF · 1 Commit, 11 Dateien, +1178.
 
 ## Kurzfazit
