@@ -49,3 +49,14 @@ export function isCvAnalysisLlmEnabled(): boolean {
 export function isKpiCockpitEnabled(): boolean {
   return isFlagEnabled('KPI_COCKPIT_ENABLED')
 }
+
+/**
+ * Master-Switch für die zvoove-Recruit-Integration (feat/zvoove-integration).
+ *
+ * Default OFF: Code + Schema sind deployed, aber Routes/UI/Sync bleiben
+ * inaktiv, bis ein Betreiber `INTEGRATION_ZVOOVE_ENABLED=true` setzt.
+ * Konvention `INTEGRATION_<NAME>_ENABLED`.
+ */
+export function isZvooveEnabled(): boolean {
+  return isFlagEnabled('INTEGRATION_ZVOOVE_ENABLED')
+}
