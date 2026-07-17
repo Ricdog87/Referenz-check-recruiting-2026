@@ -107,8 +107,10 @@ DATABASE_URL=$DIRECT_URL npx prisma db push --skip-generate && npx prisma genera
 
 `db push` synchronisiert das Schema per Drift-Abgleich **ohne Migrationshistorie** direkt gegen Prod (`DIRECT_URL`) bei **jedem** Deploy — kann bei Divergenz Spalten/Daten droppen, kein Rollback. Es existieren echte Migrations (`prisma/migrations/*`, 10 Ordner), die dadurch aber **nie angewandt** werden (vestigial). Zusätzlich pflegt `lib/db-init.ts` parallel Raw-SQL (`CREATE TABLE/ADD COLUMN IF NOT EXISTS`) auf Hot-Paths (register, reset-password) → **drei überlappende Schema-Wahrheiten**. `lib/partner/README.md` vermerkt die Umstellungs-Absicht bereits. Empfehlung: auf `prisma migrate deploy` konsolidieren (Baseline-Resolve nötig), `db-init.ts` zurückbauen.
 
-### R7 — Keine CI/CD-Pipeline
+### R7 — Keine CI/CD-Pipeline ✅ BEHOBEN
 **Pfad:** `.github/workflows/` (fehlt) · **Aufwand: M**
+
+> **Fix:** `.github/workflows/ci.yml` mit drei Jobs, getriggert bei PR→main + Push→main: (1) **quality** — Lint · Typecheck (`tsc --noEmit`) · Test (`vitest run`) · Build (Production-Phase mit Dummy-Env, kein DB-Connect nötig); (2) **licenses** — Allowlist-Gate (bricht bei GPL/AGPL/LGPL/MPL ab); (3) **secrets** — gitleaks über volle Historie + Diff. Neue npm-Scripts `typecheck` + `license-check`. Alle Gates lokal validiert (Build grün mit Dummy-Env, license-check PASS, 150/150 Tests). **Empfehlung an Betreiber:** die drei Jobs als *required status checks* in den GitHub-Branch-Protection-Regeln für `main` aktivieren (macht die Gates verpflichtend statt nur informativ).
 
 Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Scripts, werden aber **bei keinem Push/PR erzwungen** — Merges laufen ohne Gate. Kein `tsc --noEmit`-Gate, kein secret-scan, kein license-check, keine pre-commit-Hooks. `scripts/smoke-routes.sh` existiert, ist aber nirgends eingebunden. Für einen Käufer bedeutet fehlende CI: keine belegbare Qualitätssicherung, jede Regressionsschutz-Aussage ist unbewiesen. Dies ist Phase 5 des Auftrags und Voraussetzung, um die Test-Suite als Asset zu werten.
 

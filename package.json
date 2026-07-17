@@ -7,6 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "license-check": "license-checker --production --onlyAllow 'MIT;MIT*;ISC;Apache-2.0;BSD-2-Clause;BSD-3-Clause;0BSD;CC0-1.0;CC-BY-4.0;Unlicense;BlueOak-1.0.0;MIT-0;Python-2.0;(MIT AND Zlib);(MIT AND ISC);(Apache-2.0 AND BSD-3-Clause);UNLICENSED'",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "seed:partner-tiers": "npx tsx scripts/seed-partner-tiers.ts",

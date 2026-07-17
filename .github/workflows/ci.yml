@@ -1,0 +1,82 @@
+name: CI
+
+# Pflicht-Gates für jeden PR nach main + Push auf main.
+# Kein Deploy hier — Vercel deployt separat. Diese Pipeline ist reines
+# Qualitäts-/Sicherheits-Gate (DD-Readiness, Audit R7).
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # postinstall ruft `prisma generate` — braucht kein DB-Connect.
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit/Integration tests
+        run: npm test
+
+      # Build im Production-Phase-Modus mit Dummy-Env: env.ts überspringt
+      # die Runtime-Validierung in der Build-Phase, Prisma-Queries laufen
+      # erst zur Request-Zeit — es wird KEINE echte DB benötigt.
+      - name: Build
+        env:
+          NEXT_PHASE: phase-production-build
+          DATABASE_URL: postgresql://u:p@localhost:5432/db?sslmode=disable
+          DIRECT_URL: postgresql://u:p@localhost:5432/db?sslmode=disable
+          NEXTAUTH_SECRET: ci-dummy-secret-min-32-chars-xxxxxxxx
+          NEXTAUTH_URL: https://example.com
+        run: npm run build
+
+  licenses:
+    name: License check (kein Copyleft)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Bricht ab, wenn eine Production-Dependency eine nicht-freigegebene
+      # (insb. GPL/AGPL/LGPL/MPL) Lizenz trägt.
+      - name: License allowlist
+        run: npm run license-check
+
+  secrets:
+    name: Secret scan (Historie + Diff)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
