@@ -168,7 +168,7 @@ Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Script
 | G21 | Überholte `AUDIT.md` im Root (behauptet fehlende Features, die existieren) | `AUDIT.md` | S |
 | G22 | `style-src`/`style-src-attr 'unsafe-inline'` neben Nonce (Framer-Motion-Kompat) | `middleware.ts:56-59` | S |
 | G23 | ElevenLabs-Agent-ID hardcoded, kein Quota-Fallback (Marketing-Demo bricht) | `components/landing/sections/VoiceConsole.tsx:8` | S |
-| G24 | **Keine Quota-Enforcement** in `/api/checks` + `/api/candidates` (`includedChecks` nie durchgesetzt) → Umsatz-Leck | `app/api/checks/route.ts`, `app/api/candidates/route.ts` | S–M |
+| G24 | ✅ **BEHOBEN** — Monats-Quota in `/api/checks` (POST): `lib/quota.ts` zählt Checks ab Monatsanfang gegen `plan.includedChecks`, `>=` → 402 `QUOTA_EXCEEDED`; ENTERPRISE unbegrenzt. Kandidaten bewusst ungemetert (nicht die abrechenbare Einheit). 5 Tests. | `app/api/checks/route.ts`, `app/api/candidates/route.ts` | S–M |
 
 ---
 

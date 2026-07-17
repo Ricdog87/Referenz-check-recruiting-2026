@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { getCheckQuota } from '@/lib/quota'
 
 const MAX_NAME_LEN = 160
 const MAX_EMAIL_LEN = 254
@@ -53,6 +54,20 @@ export async function POST(req: NextRequest) {
     where: { id: candidateId, userId: session.user.id },
   })
   if (!candidate) return NextResponse.json({ error: 'Kandidat nicht gefunden.' }, { status: 404 })
+
+  // Monats-Kontingent durchsetzen (G24). ENTERPRISE = unbegrenzt.
+  const quota = await getCheckQuota(session.user.id, session.user.plan)
+  if (!quota.allowed) {
+    return NextResponse.json(
+      {
+        error: `Monatskontingent erschöpft (${quota.used}/${quota.limit} Prüfungen im Tarif „${session.user.plan}"). Bitte upgraden oder ein Check-Paket buchen.`,
+        code: 'QUOTA_EXCEEDED',
+        used: quota.used,
+        limit: quota.limit,
+      },
+      { status: 402 },
+    )
+  }
 
   const check = await prisma.referenceCheck.create({
     data: {
