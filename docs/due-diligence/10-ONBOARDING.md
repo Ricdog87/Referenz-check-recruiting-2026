@@ -32,7 +32,7 @@ Idempotent, keine echte PII (E-Mails `@demo.candiq.invalid`, Firmen `[DEMO] …`
 
 ## Erste Runde verifizieren
 ```bash
-npm test        # 219 Vitest-Fälle, offline (keine DB nötig)
+npm test        # 229 Vitest-Fälle, offline (keine DB nötig)
 npm run typecheck
 npm run lint
 ```

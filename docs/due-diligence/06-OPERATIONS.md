@@ -17,6 +17,7 @@
 | Job | Zeit | Zweck |
 |---|---|---|
 | `/api/cron/cleanup` | tägl. 03:00 | DSGVO-Löschung 180d (DB + Blobs) + AuditLog-Pseudonymisierung (G10) |
+| `/api/cron/stripe-reconcile` | tägl. 02:30 | Stripe-Abo-Abgleich gegen verpasste Webhooks (G6) |
 | `/api/internal/indexnow-ping` | tägl. 04:00 | SEO-Recrawl-Ping |
 | `/api/cron/pilot-reminders` | tägl. 09:00 | Pilot-Drip-Mails |
 | `/api/cron/partner-tier-sync` | monatl. 1., 05:00 | Partner-Tier-Neuberechnung |

@@ -14,7 +14,6 @@
 | ID | Thema | Empfehlung |
 |---|---|---|
 | G3 | Rate-Limiter in-memory (per Lambda) | Auf Upstash/Redis umstellen — härtet Login + alle 24 Call-Sites auf einmal |
-| G6 | Kein Stripe-Reconciliation-Cron | Event-Log-Tabelle + täglicher Sub-Sync gegen verpasste Webhooks |
 | G12 | CV-Analyse-Consent = Boolean, nicht an ConsentToken gebunden | Gegen `ACCEPTED`-Status verifizieren |
 | G14 | Kein Error-Tracking/Alerting | Sentry (EU) + Alert auf Health-503 |
 | G15 | Backup/Restore-Runbook steht (`06-OPERATIONS.md`), aber **echter Restore-Test** noch nicht ausgeführt (Betreiber-Aktion) | RPO/RTO-Ziele + Prozedur dokumentiert; einmaligen Restore auf Staging fahren, Log-Zeile füllen |
@@ -26,7 +25,7 @@
 ## Behoben in `feat/dd-readiness` (Vollständigkeit)
 R1 IDOR · R2 Blob-Löschung · R4 LLM-Switch+OpenAI-Disclosure · R5 Next-SSRF · R7 CI · G1 Login-Rate-Limit · G2/G4 HR-Auth-Parität · G5 Stripe-Tests · G9 Retention · G13 LLM-Flag · G17 env.example · G18 Demo-Seed (`demo:seed`, synthetisch, prod-guarded) · G21 stale AUDIT.md · G24 Quota. (Jeweils mit Test + Report-Eintrag.)
 
-**G7** Consent-Lifecycle-Tests (accept/revoke) · **G8** Owner-Scoping-Route-Tests (checks/candidates/gdpr) · **G10** AuditLog-Pseudonymisierung nach Frist (Cleanup-Cron) · **G11** PII-Redaction in Logs (`email_no_provider`, HubSpot) · **G16** Incident-Runbook (`06-OPERATIONS.md`) · **G23** ElevenLabs-Agent-ID via ENV + Graceful-Degradation.
+**G6** Stripe-Reconciliation-Cron (Abgleich gegen verpasste Webhooks) · **G7** Consent-Lifecycle-Tests (accept/revoke) · **G8** Owner-Scoping-Route-Tests (checks/candidates/gdpr) · **G10** AuditLog-Pseudonymisierung nach Frist (Cleanup-Cron) · **G11** PII-Redaction in Logs (`email_no_provider`, HubSpot) · **G16** Incident-Runbook (`06-OPERATIONS.md`) · **G23** ElevenLabs-Agent-ID via ENV + Graceful-Degradation.
 
 **Teil-erledigt:** **G15** Backup/Restore-Runbook dokumentiert (Restore-Test noch offen).
 

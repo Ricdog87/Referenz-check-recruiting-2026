@@ -76,6 +76,44 @@ export function mapStripeStatus(status: Stripe.Subscription.Status): string {
   }
 }
 
+/**
+ * Frühester Item-Period-End einer Subscription (Stripe „dahlia" hat
+ * current_period_end auf die Items verschoben). Identisch zur Inline-Logik
+ * im Webhook (`periodEndOf`) — hier als geteilter, testbarer Helper für den
+ * Reconciliation-Cron (G6).
+ */
+export function subscriptionPeriodEnd(sub: Stripe.Subscription): Date | null {
+  const ends =
+    sub.items?.data
+      ?.map((i) => i.current_period_end)
+      .filter((v): v is number => typeof v === 'number') ?? []
+  if (ends.length === 0) return null
+  return new Date(Math.min(...ends) * 1000)
+}
+
+export type SubscriptionFields = {
+  plan: PlanUpper | undefined
+  planStatus: string
+  billingInterval: IntervalUpper | undefined
+  currentPeriodEnd: Date | null
+}
+
+/**
+ * Kanonische Ableitung User-Billing-Felder ← Stripe-Subscription.
+ * MUSS zur Webhook-Logik (BRANCH B / customer.subscription.updated)
+ * äquivalent bleiben — der Reconciliation-Cron vergleicht genau hiergegen.
+ */
+export function deriveSubscriptionFields(sub: Stripe.Subscription): SubscriptionFields {
+  const priceId = sub.items.data[0]?.price?.id ?? ''
+  const { plan, interval } = planFromPriceId(priceId)
+  return {
+    plan: plan ?? undefined,
+    planStatus: mapStripeStatus(sub.status),
+    billingInterval: interval ? (interval.toUpperCase() as IntervalUpper) : undefined,
+    currentPeriodEnd: subscriptionPeriodEnd(sub),
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────
 // ONE-TIME ADD-ON PRICES
 // ─────────────────────────────────────────────────────────────────

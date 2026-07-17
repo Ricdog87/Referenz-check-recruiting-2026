@@ -5,11 +5,13 @@
                   "app/api/upload/route.ts": { "maxDuration": 30 },
                   "app/api/gdpr/export/route.ts": { "maxDuration": 30 },
                   "app/api/cron/cleanup/route.ts": { "maxDuration": 60 },
+                  "app/api/cron/stripe-reconcile/route.ts": { "maxDuration": 60 },
                   "app/api/cron/pilot-reminders/route.ts": { "maxDuration": 60 },
                   "app/api/cron/partner-tier-sync/route.ts": { "maxDuration": 60 }
         },
         "crons": [
                   { "path": "/api/cron/cleanup", "schedule": "0 3 * * *" },
+                  { "path": "/api/cron/stripe-reconcile", "schedule": "30 2 * * *" },
                   { "path": "/api/internal/indexnow-ping", "schedule": "0 4 * * *" },
                   { "path": "/api/cron/pilot-reminders", "schedule": "0 9 * * *" },
                   { "path": "/api/cron/partner-tier-sync", "schedule": "0 5 1 * *" }

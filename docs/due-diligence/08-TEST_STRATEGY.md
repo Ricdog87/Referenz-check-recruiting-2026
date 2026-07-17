@@ -1,11 +1,11 @@
 # 08 — Teststrategie
 
-**Stand:** 2026-07-17 · **25 Testdateien / 219 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
+**Stand:** 2026-07-17 · **26 Testdateien / 229 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
 
 ## Suite lokal fahren
 ```bash
 npm ci
-npm test            # vitest run — 219/219
+npm test            # vitest run — 229/229
 npm run typecheck   # tsc --noEmit
 npm run lint        # next lint
 ```
@@ -18,6 +18,7 @@ CI (`.github/workflows/ci.yml`) fährt dieselben Gates + build + license-check +
 | **Consent-/CV-Gate** | 🟢 Gate-Enforcement + IDOR-Regression + Blob-Leak-Schutz | `cv-gate.test.ts` |
 | **DSGVO-Löschung (Blobs)** | 🟢 Cron + Art.-17, Reihenfolge, Fehlerpfade | `gdpr-blob-cleanup.test.ts`, `cron-retention.test.ts` |
 | **Billing / Stripe-Webhook** | 🟢 Signatur, Idempotenz, Status-Mapping, payment_failed | `stripe-webhook.test.ts` |
+| **Billing / Reconciliation (G6)** | 🟢 Drift-Erkennung, Korrektur, Fehler-Resilienz, Webhook-äquivalente Ableitung | `stripe-reconcile.test.ts` |
 | **Quota / Umsatz-Integrität** | 🟢 Monatskontingent je Tarif | `quota.test.ts` |
 | **KPI-Cockpit (Phase 3)** | 🟢 MRR/ARR, Turnaround, Credential-Bestand, 30d-Fenster, CSV-Export | `kpi.test.ts` |
 | **Auth-Härtung** | 🟢 Login-Rate-Limit + HR-PW-Orakel/Session-Kill | `login-guard.test.ts`, `hr-password-hardening.test.ts` |
