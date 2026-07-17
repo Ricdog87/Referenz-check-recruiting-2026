@@ -70,6 +70,19 @@ async function handleCleanup(req: NextRequest) {
         where: { expiresAt: { lt: cutoff } },
       })
 
+      // 1b) Retention für Neben-Tabellen (G9): Marketing-/Analyse-Daten,
+      //     die nicht am Candidate-Cascade hängen, aber ebenfalls PII tragen.
+      //     Gleiche 180-Tage-Frist, Datenminimierung.
+      const [leadMagnets, pilots, cvReports] = await Promise.all([
+        tx.leadMagnetRequest.deleteMany({ where: { createdAt: { lt: cutoff } } }),
+        // Pilot-Bewerbungen: nur in Endzuständen löschen (offene bleiben).
+        tx.pilotApplication.deleteMany({
+          where: { createdAt: { lt: cutoff }, status: { in: ['REJECTED', 'WITHDRAWN'] } },
+        }),
+        // CV-Analyse-Reports (CV-abgeleitete Claims) — hart nach Frist.
+        tx.cvAnalysisReport.deleteMany({ where: { createdAt: { lt: cutoff } } }),
+      ])
+
       // 2) Alte Candidates in finalem Status finden.
       const candidatesToDelete = await tx.candidate.findMany({
         where: {
@@ -111,6 +124,9 @@ async function handleCleanup(req: NextRequest) {
         checksDeleted: checksToDelete.length,
         tokensExpiredStandalone: expiredTokens.count,
         tokensViaCandidateCascade: tokensViaCascade,
+        leadMagnetsDeleted: leadMagnets.count,
+        pilotsDeleted: pilots.count,
+        cvReportsDeleted: cvReports.count,
         // Für die Post-Commit-Blob-Löschung durchreichen:
         _docPaths: docsToDelete.map((d) => d.path),
         _checkIds: checksToDelete.map((c) => c.id),
@@ -143,7 +159,7 @@ async function handleCleanup(req: NextRequest) {
         action: 'AUTO_CLEANUP_180D',
         entity: 'System',
         entityId: null,
-        details: `candidates=${result.candidatesDeleted} tokens=${totalTokens} documents=${result.documentsDeleted} checks=${result.checksDeleted} blobsDeleted=${blobsDeleted} blobsFailed=${blobsFailed}`,
+        details: `candidates=${result.candidatesDeleted} tokens=${totalTokens} documents=${result.documentsDeleted} checks=${result.checksDeleted} leadMagnets=${result.leadMagnetsDeleted} pilots=${result.pilotsDeleted} cvReports=${result.cvReportsDeleted} blobsDeleted=${blobsDeleted} blobsFailed=${blobsFailed}`,
       },
     })
 

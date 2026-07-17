@@ -153,7 +153,7 @@ Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Script
 | G6 | Kein Reconciliation-Cron für verpasste Stripe-Events → stiller `planStatus`-Drift | `vercel.json` / `lib/stripe.ts` | M |
 | G7 | Consent-Lifecycle-Routen ungetestet (accept/revoke/upload setzen `cvStatus`) | `app/api/consent/[token]/**` | M |
 | G8 | Core-Owner-Scoping (checks/candidates/gdpr) auf Routen-Ebene ungetestet | `__tests__/` (fehlt) | M |
-| G9 | Keine Retention für LeadMagnetRequest / PilotApplication / CvAnalysisReport / GdprConsent | `cron/cleanup` (fehlt) | S–M |
+| G9 | ✅ **BEHOBEN** (teilw.) — Cleanup-Cron löscht jetzt LeadMagnetRequest + CvAnalysisReport (180d) + PilotApplication[REJECTED/WITHDRAWN]. GdprConsent bleibt bewusst (Nachweispflicht Art. 7). 2 Tests. | `cron/cleanup` | S–M |
 | G10 | AuditLog mit Klartext-Emails, unbegrenzte Aufbewahrung | `lib/email.ts:93-98`, `lib/consent-invite.ts:104` | M |
 | G11 | Emails im Klartext in Logs (`email_no_provider`, HubSpot-Fehler) | `lib/email.ts:77-80`, `lib/hubspot.ts:~127` | S |
 | G12 | CV-Analyse-Consent = selbst-behaupteter Boolean, nicht an ConsentToken gebunden | `app/api/cv-analysis/route.ts:25-31` | M |
@@ -161,11 +161,11 @@ Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Script
 | G14 | Kein Error-Tracking (Sentry/APM) / kein Alerting auf Health-503 | (fehlt) | S–M |
 | G15 | Kein dokumentiertes/getestetes Backup-Restore-Verfahren (RPO/RTO/PITR) | `docs/` (fehlt) | S |
 | G16 | Kein Incident-Runbook / On-Call | `docs/` (fehlt) | S |
-| G17 | `.env.example` unvollständig: `ASSIGNMENT_AUTO`, `PDL_REGISTRATION_OPEN`, `REVIEWER_*`, `PROSPECT_*` | `.env.example` | S |
+| G17 | ✅ **BEHOBEN** — `.env.example` um `ASSIGNMENT_AUTO`, `PDL_REGISTRATION_OPEN`, `CV_ANALYSIS_LLM_ENABLED`, `REVIEWER_*`, `PROSPECT_*` ergänzt (mit Erklärungen). | `.env.example` | S |
 | G18 | Kein Demo-Seed; `prisma/seed.ts` leer + nicht als `prisma.seed` verdrahtet | `prisma/seed.ts` | S–M |
 | G19 | E2E ist unveränderter Playwright-Scaffold (testet `playwright.dev`, nicht candiq) | `tests/example.spec.ts` | S–M |
 | G20 | Fehlende DSFA (Art. 35) / kein TOM-/RoPA-Dokument | `docs/` | L (org.) |
-| G21 | Überholte `AUDIT.md` im Root (behauptet fehlende Features, die existieren) | `AUDIT.md` | S |
+| G21 | ✅ **BEHOBEN** — `AUDIT.md` durch Verweis auf `docs/due-diligence/00-AUDIT_REPORT.md` ersetzt (überholter Inhalt entfernt). | `AUDIT.md` | S |
 | G22 | `style-src`/`style-src-attr 'unsafe-inline'` neben Nonce (Framer-Motion-Kompat) | `middleware.ts:56-59` | S |
 | G23 | ElevenLabs-Agent-ID hardcoded, kein Quota-Fallback (Marketing-Demo bricht) | `components/landing/sections/VoiceConsole.tsx:8` | S |
 | G24 | ✅ **BEHOBEN** — Monats-Quota in `/api/checks` (POST): `lib/quota.ts` zählt Checks ab Monatsanfang gegen `plan.includedChecks`, `>=` → 402 `QUOTA_EXCEEDED`; ENTERPRISE unbegrenzt. Kandidaten bewusst ungemetert (nicht die abrechenbare Einheit). 5 Tests. | `app/api/checks/route.ts`, `app/api/candidates/route.ts` | S–M |
