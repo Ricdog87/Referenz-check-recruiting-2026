@@ -5,10 +5,11 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { safeQuery } from '@/lib/safe-query'
 import { isAdmin, slaState, formatHoursShort, SLA_HOURS } from '@/lib/reviewer'
+import { isKpiCockpitEnabled } from '@/lib/flags'
 import { ALL_PLANS, formatDate } from '@/lib/utils'
 import {
   Building2, Users, ClipboardList, CheckCircle2, AlertTriangle,
-  Clock, ShieldCheck, ArrowRight, UserPlus, Euro,
+  Clock, ShieldCheck, ArrowRight, UserPlus, Euro, BarChart3,
 } from 'lucide-react'
 
 // Internes Cockpit ist immer frisch — kein Caching.
@@ -108,6 +109,14 @@ export default async function AdminCockpitPage() {
         <p className="text-sm text-white/70 mt-1">
           Plattform-Kennzahlen, Kunden &amp; Reviewer-Betrieb — nur für das candiq-Team sichtbar.
         </p>
+        {isKpiCockpitEnabled() && (
+          <Link
+            href="/admin/kpi"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-white/80 hover:text-white mt-3"
+          >
+            <BarChart3 className="w-3.5 h-3.5" /> KPI-Cockpit (MRR/ARR, Credential-Bestand …)
+          </Link>
+        )}
       </div>
 
       {/* Kennzahlen */}

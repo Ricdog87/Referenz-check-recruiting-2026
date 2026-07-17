@@ -26,7 +26,7 @@ Optionale Seeds (mit `REVIEWER_*` / `PROSPECT_*`-Env): `scripts/seed-reviewer.ts
 
 ## Erste Runde verifizieren
 ```bash
-npm test        # 174 Vitest-Fälle, offline (keine DB nötig)
+npm test        # 190 Vitest-Fälle, offline (keine DB nötig)
 npm run typecheck
 npm run lint
 ```

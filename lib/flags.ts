@@ -37,3 +37,15 @@ export function isPartnerProgramEnabled(): boolean {
 export function isCvAnalysisLlmEnabled(): boolean {
   return isFlagEnabled('CV_ANALYSIS_LLM_ENABLED')
 }
+
+/**
+ * KPI-Cockpit (Admin-only, /admin/kpi) — Phase 3 des DD-Pakets.
+ *
+ * Default OFF: die aggregierten Geschäftskennzahlen (MRR/ARR, Kunden,
+ * Check-Volumen, Credential-Bestand) sind ein internes Vertriebs-/DD-
+ * Instrument. Route + CSV-Export bleiben hinter diesem Flag verborgen,
+ * bis ein Betreiber sie bewusst aktiviert.
+ */
+export function isKpiCockpitEnabled(): boolean {
+  return isFlagEnabled('KPI_COCKPIT_ENABLED')
+}

@@ -218,6 +218,8 @@ Die Prüf-Frage „merge-ready?" ist wichtig und wurde manuell aufgelöst (ein A
 
 **Sprint 3 — DD-Dokupaket + Betrieb + Cockpit (Phasen 2–5 des Auftrags):**
 DSGVO-Doku (DSFA/TOM/RoPA), Retention-Erweiterung, Sentry+Alerting, Backup-Runbook, Demo-Seed, `.env.example`, KPI-Cockpit, `docs/due-diligence/01–10`.
+- ✅ **Phase 2 — DD-Dokupaket:** `docs/due-diligence/01–10` + README (aus dem Code abgeleitet).
+- ✅ **Phase 3 — KPI-Cockpit:** Admin-only `/admin/kpi` hinter Flag `KPI_COCKPIT_ENABLED` (default off). Server-seitig berechnet: MRR/ARR, zahlende Kunden, Checks gesamt & letzte 30 Tage, Ø Durchlaufzeit bis Report, Credential-Bestand (verifizierte Profile), Partner-Kunden, zvoove-verknüpft (=0, PR #137). CSV-Export je Metrik (`/api/admin/kpi/export?metric=summary|revenue`). 16 Aggregations-Tests (`__tests__/kpi.test.ts`). Doppel-Gate: Flag + ADMIN-Rolle.
 
 **Aufwands-Grobschätzung Gesamt bis „DD-fest":** ~2 fokussierte Sprints für ROT + Kern-GELB; Doku-/Cockpit-/Demo-Phasen laufen parallel.
 
