@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { logger } from '@/lib/logger'
 import { deleteBlobUrls, deleteBlobsByPrefix } from '@/lib/blob-cleanup'
+import { pseudonymizeStaleAuditLogs } from '@/lib/audit-retention'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -21,7 +22,10 @@ export const maxDuration = 60
  *   ReferenceChecks und ConsentTokens dieses Bewerbers mit.
  *
  * Was NICHT gelöscht wird
- * - AuditLog (Art. 7 DSGVO + § 257 HGB-Nachweispflicht, 3+ Jahre)
+ * - AuditLog (Art. 7 DSGVO + § 257 HGB-Nachweispflicht, 3+ Jahre) — wird
+ *   aber nach `AUDIT_PII_RETENTION_DAYS` (default 180) PSEUDONYMISIERT
+ *   (userId/ip genullt, E-Mails maskiert), G10. Das Ereignis bleibt, der
+ *   Personenbezug fällt weg.
  * - Buchhaltungsrelevante User-/AddonOrder-Daten (§ 147 AO, 10 Jahre)
  * - Candidates in PENDING/IN_REVIEW/CONSENT_GIVEN (laufender Prozess)
  *
@@ -151,6 +155,10 @@ async function handleCleanup(req: NextRequest) {
       logger.error('cron_cleanup_blob_partial', { blobsDeleted, blobsFailed })
     }
 
+    // 4c) AuditLog-Pseudonymisierung (G10) — Personenbezug alter Trail-Einträge
+    //     entfernen, Ereignis bleibt für die Nachweispflicht erhalten.
+    const auditPseudonymized = await pseudonymizeStaleAuditLogs()
+
     // 5) Audit-Log-Entry — IMMER schreiben, auch bei 0 Löschungen.
     //    Damit ist nachweisbar, dass der Cron-Job gelaufen ist.
     const totalTokens = result.tokensExpiredStandalone + result.tokensViaCandidateCascade
@@ -159,7 +167,7 @@ async function handleCleanup(req: NextRequest) {
         action: 'AUTO_CLEANUP_180D',
         entity: 'System',
         entityId: null,
-        details: `candidates=${result.candidatesDeleted} tokens=${totalTokens} documents=${result.documentsDeleted} checks=${result.checksDeleted} leadMagnets=${result.leadMagnetsDeleted} pilots=${result.pilotsDeleted} cvReports=${result.cvReportsDeleted} blobsDeleted=${blobsDeleted} blobsFailed=${blobsFailed}`,
+        details: `candidates=${result.candidatesDeleted} tokens=${totalTokens} documents=${result.documentsDeleted} checks=${result.checksDeleted} leadMagnets=${result.leadMagnetsDeleted} pilots=${result.pilotsDeleted} cvReports=${result.cvReportsDeleted} blobsDeleted=${blobsDeleted} blobsFailed=${blobsFailed} auditPseudonymized=${auditPseudonymized.pseudonymized}`,
       },
     })
 
@@ -172,6 +180,7 @@ async function handleCleanup(req: NextRequest) {
       cutoffDate: cutoff.toISOString(),
       retentionDays: RETENTION_DAYS,
       deleted: { ...deletedSummary, blobsDeleted, blobsFailed },
+      auditPseudonymized: auditPseudonymized.pseudonymized,
     })
   } catch (err: any) {
     logger.error('cron_cleanup_error', err)

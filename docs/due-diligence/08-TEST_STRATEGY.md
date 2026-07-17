@@ -1,11 +1,11 @@
 # 08 — Teststrategie
 
-**Stand:** 2026-07-17 · **24 Testdateien / 214 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
+**Stand:** 2026-07-17 · **25 Testdateien / 219 Fälle**, alle grün. Vitest (Unit/Integration, Prisma + NextAuth gemockt, offline). Laufen ohne DB.
 
 ## Suite lokal fahren
 ```bash
 npm ci
-npm test            # vitest run — 214/214
+npm test            # vitest run — 219/219
 npm run typecheck   # tsc --noEmit
 npm run lint        # next lint
 ```

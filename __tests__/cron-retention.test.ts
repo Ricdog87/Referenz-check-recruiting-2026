@@ -12,7 +12,12 @@ const dm = {
   candidate: { findMany: vi.fn().mockResolvedValue([]), deleteMany: vi.fn().mockResolvedValue({ count: 0 }) },
   document: { findMany: vi.fn().mockResolvedValue([]) },
   referenceCheck: { findMany: vi.fn().mockResolvedValue([]) },
-  auditLog: { create: vi.fn().mockResolvedValue({}) },
+  auditLog: {
+    create: vi.fn().mockResolvedValue({}),
+    // G10-Pseudonymisierung: der Cleanup ruft findMany/update auf auditLog.
+    findMany: vi.fn().mockResolvedValue([]),
+    update: vi.fn().mockResolvedValue({}),
+  },
 }
 
 async function importGet() {
@@ -61,5 +66,8 @@ describe('cron/cleanup — Retention Neben-Tabellen (G9)', () => {
     expect(data.deleted.leadMagnetsDeleted).toBe(3)
     expect(data.deleted.cvReportsDeleted).toBe(2)
     expect(data.deleted.pilotsDeleted).toBe(1)
+    // G10: Pseudonymisierung lief mit (hier 0 Treffer) und wird gemeldet.
+    expect(dm.auditLog.findMany).toHaveBeenCalledTimes(1)
+    expect(data.auditPseudonymized).toBe(0)
   })
 })
