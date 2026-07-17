@@ -251,4 +251,43 @@ describe('GET /api/documents/[id] — Route mit Gate-Enforcement', () => {
     const res = await handler(makeReq() as any, { params: { id: 'doc_1' } })
     expect(res.status).toBe(403)
   })
+
+  // ── IDOR-Regression (R1): Nicht-CV-Dokumente MÜSSEN mandanten-gescoped sein ──
+  it('403 fuer FREMDEN HR-User auf NON-CV-Dokument (Zeugnis/Referenz) — IDOR geschlossen', async () => {
+    mockGetServerSession.mockResolvedValue({
+      user: { id: 'hr_attacker', role: 'CLIENT' },
+    })
+    mockFindUnique.mockResolvedValue({
+      id: 'doc_cert_of_B',
+      type: 'CERTIFICATE', // non-CV → hasCvAccess() allein würde durchwinken
+      cvStatus: 'RELEASED',
+      path: 'https://blob.example/cert.pdf',
+      candidate: { userId: 'hr_owner_B' }, // gehört einem FREMDEN Mandanten
+    })
+    const handler = await importHandler()
+    const res = await handler(makeReq() as any, { params: { id: 'doc_cert_of_B' } })
+    expect(res.status).toBe(403)
+    // Kein Stream-Fetch der fremden Datei
+    expect(fetchMock).not.toHaveBeenCalled()
+    const audit = mockAuditCreate.mock.calls[0]?.[0]
+    expect(audit?.data.action).toBe('CV_ACCESS_DENIED')
+  })
+
+  it('200 fuer EIGENEN HR-User auf NON-CV-Dokument (Regression: Owner-Zugriff bleibt)', async () => {
+    mockGetServerSession.mockResolvedValue({
+      user: { id: 'hr_owner_A', role: 'CLIENT' },
+    })
+    mockFindUnique.mockResolvedValue({
+      id: 'doc_cert_A',
+      type: 'CERTIFICATE',
+      cvStatus: 'RELEASED',
+      path: 'https://blob.example/cert.pdf',
+      mimeType: 'application/pdf',
+      originalName: 'zeugnis.pdf',
+      candidate: { userId: 'hr_owner_A' },
+    })
+    const handler = await importHandler()
+    const res = await handler(makeReq() as any, { params: { id: 'doc_cert_A' } })
+    expect(res.status).toBe(200)
+  })
 })

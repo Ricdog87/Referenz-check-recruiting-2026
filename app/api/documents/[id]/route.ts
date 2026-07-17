@@ -42,6 +42,32 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     ? { kind: 'reviewer' }
     : { kind: 'public' }
 
+  // MANDANTEN-GATE (schließt IDOR auf Nicht-CV-Dokumente):
+  // Wer weder Eigentümer noch Reviewer ist, hat NIE Zugriff — unabhängig
+  // vom Dokumenttyp. hasCvAccess() erfasst non-CV-Dokumente bewusst nicht
+  // (siehe lib/cv-gate.ts), daher muss diese Route ihre eigene Ownership-
+  // Prüfung halten. Ohne diesen Block könnte ein eingeloggter HR-User per
+  // geratener/geleakter Doc-ID Zeugnisse/Referenzen fremder Mandanten laden.
+  if (actor.kind === 'public') {
+    await prisma.auditLog
+      .create({
+        data: {
+          userId: session.user.id,
+          action: 'CV_ACCESS_DENIED',
+          entity: 'Document',
+          entityId: doc.id,
+          details: JSON.stringify({
+            actor: 'public',
+            docType: doc.type,
+            cvStatus: doc.cvStatus,
+            reason: 'not_owner_not_reviewer',
+          }),
+        },
+      })
+      .catch(() => {})
+    return NextResponse.json({ error: 'Zugriff verweigert.' }, { status: 403 })
+  }
+
   const gate = hasCvAccess(doc, actor)
 
   await prisma.auditLog

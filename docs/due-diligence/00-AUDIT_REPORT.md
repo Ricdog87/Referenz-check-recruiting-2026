@@ -51,8 +51,10 @@ Keiner dieser Punkte ist ein struktureller Deal-Killer — alle sind mit übersc
 
 ## 🔴 ROT-Findings (Deal-Risiko — vor Signing adressieren)
 
-### R1 — IDOR: Cross-Tenant-Read auf Nicht-CV-Dokumente
+### R1 — IDOR: Cross-Tenant-Read auf Nicht-CV-Dokumente ✅ BEHOBEN (Commit siehe `feat/dd-readiness`)
 **Datei:** `app/api/documents/[id]/route.ts:30-72` + `lib/cv-gate.ts:60` · **Aufwand: S** · *manuell verifiziert*
+
+> **Fix:** Mandanten-Gate in `app/api/documents/[id]/route.ts` ergänzt — wer weder Eigentümer noch Reviewer ist (`actor.kind === 'public'`), erhält jetzt für **jeden** Dokumenttyp 403 (mit Audit-Beleg), bevor der Stream-Proxy greift. `hasCvAccess()` bleibt unangetastet (Consent-Gate tabu). **Vorher:** non-CV-Docs (CERTIFICATE/REFERENCE/OTHER) fremder Mandanten streambar. **Nachher:** 403 + kein Blob-Fetch. **Test:** 2 Regressionstests in `__tests__/cv-gate.test.ts` (fremder HR-User auf Zeugnis → 403 ohne Fetch; eigener HR-User auf Zeugnis → 200). Suite 141/141 grün.
 
 Die einzige inhaltsausliefernde Dokument-Route lädt das Dokument per `findUnique({ where: { id } })` **ohne** Ownership-Constraint und delegiert die gesamte Autorisierung an `hasCvAccess()`. Diese Funktion gibt für **jedes** Nicht-CV-Dokument bedingungslos frei:
 
