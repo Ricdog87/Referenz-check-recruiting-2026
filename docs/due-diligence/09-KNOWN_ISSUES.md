@@ -18,8 +18,7 @@
 | G10 | AuditLog Klartext-Emails, unbegrenzte Aufbewahrung | Pseudonymisierung + Frist |
 | G12 | CV-Analyse-Consent = Boolean, nicht an ConsentToken gebunden | Gegen `ACCEPTED`-Status verifizieren |
 | G14 | Kein Error-Tracking/Alerting | Sentry (EU) + Alert auf Health-503 |
-| G15 | Kein getestetes Backup/Restore-Verfahren | RPO/RTO + Restore-Test, in `06-OPERATIONS.md` eintragen |
-| G16 | Kein Incident-Runbook | Minimal-Runbook (Skizze in `06-OPERATIONS.md`) |
+| G15 | Backup/Restore-Runbook steht (`06-OPERATIONS.md`), aber **echter Restore-Test** noch nicht ausgeführt (Betreiber-Aktion) | RPO/RTO-Ziele + Prozedur dokumentiert; einmaligen Restore auf Staging fahren, Log-Zeile füllen |
 | G19 | E2E ist Scaffold-Platzhalter | Echten Smoke-Pfad verdrahten |
 | G20 | DSFA/TOM/RoPA fehlen | Legal-Workstream (technische Basis vorhanden) |
 | G22 | `style-src 'unsafe-inline'` neben Nonce | Framer-Motion-Kompat; Hash-basiert lösbar |
@@ -28,7 +27,9 @@
 ## Behoben in `feat/dd-readiness` (Vollständigkeit)
 R1 IDOR · R2 Blob-Löschung · R4 LLM-Switch+OpenAI-Disclosure · R5 Next-SSRF · R7 CI · G1 Login-Rate-Limit · G2/G4 HR-Auth-Parität · G5 Stripe-Tests · G9 Retention · G13 LLM-Flag · G17 env.example · G18 Demo-Seed (`demo:seed`, synthetisch, prod-guarded) · G21 stale AUDIT.md · G24 Quota. (Jeweils mit Test + Report-Eintrag.)
 
-**G7** Consent-Lifecycle-Tests (accept/revoke) · **G8** Owner-Scoping-Route-Tests (checks/candidates/gdpr) · **G11** PII-Redaction in Logs (`email_no_provider`, HubSpot) · **G23** ElevenLabs-Agent-ID via ENV + Graceful-Degradation.
+**G7** Consent-Lifecycle-Tests (accept/revoke) · **G8** Owner-Scoping-Route-Tests (checks/candidates/gdpr) · **G11** PII-Redaction in Logs (`email_no_provider`, HubSpot) · **G16** Incident-Runbook (`06-OPERATIONS.md`) · **G23** ElevenLabs-Agent-ID via ENV + Graceful-Degradation.
+
+**Teil-erledigt:** **G15** Backup/Restore-Runbook dokumentiert (Restore-Test noch offen).
 
 Zusätzlich geliefert: **Phase 3** KPI-Cockpit (`/admin/kpi`, flag-gated) · **Phase 4** Demo-Umgebung.
 
