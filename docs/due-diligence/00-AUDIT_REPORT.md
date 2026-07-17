@@ -146,9 +146,9 @@ Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Script
 | # | Finding | Datei:Zeile | Aufwand |
 |---|---|---|---|
 | G1 | ✅ **BEHOBEN** — Login (HR + Partner) Rate-Limit: `lib/login-guard.ts` (10/15min je IP + je Email), in beide `authorize()` verdrahtet; Blockade → `null` (kein Oracle). 5 Tests. | `lib/auth.ts:42-77`, `lib/partner/auth.ts:59-102` | S–M |
-| G2 | **HR-Passwortwechsel als ungedrosseltes Passwort-Orakel** (Partner hat durablen DB-Zähler, HR nicht) | `app/api/auth/profile/route.ts:57-64` | S |
+| G2 | ✅ **BEHOBEN** — HR-Passwortwechsel: In-Memory-Rate-Limit (5/h) + durabler DB-Fehlversuchszähler (`PASSWORD_CHANGE_FAILED`, 5/h vor bcrypt) + `PASSWORD_CHANGED`-Audit. Parität mit Partner. | `app/api/auth/profile/route.ts:57-64` | S |
 | G3 | Rate-Limiter in-memory/per-Lambda, auf Serverless nicht durchsetzbar | `lib/rate-limit.ts:1-8` | M |
-| G4 | HR-JWT ohne Passwort-Wechsel-Invalidierung (Partner hat `passwordChangedAt`-Check) | `lib/auth.ts:91-108` | S–M |
+| G4 | ✅ **BEHOBEN** — `User.passwordChangedAt` (additive Migration) + 60s-JWT-Refresh mit `iat < passwordChangedAt` → Token entwertet; auch im Reset-Flow gesetzt. Kompromittierte HR-Session stirbt ≤1h statt 24h. | `lib/auth.ts:91-108` | S–M |
 | G5 | ✅ **BEHOBEN** — Stripe-Webhook-Tests: `__tests__/stripe-webhook.test.ts` (7 Fälle: fehlendes Secret→500, fehlende/ungültige Signatur→400, subscription→ACTIVE+Plan-Mapping, past_due→PAST_DUE, Add-on-Idempotenz P2002→200, unerwarteter DB-Fehler→500). Test-only, kein Verhaltens-Change. | `app/api/stripe/**`, `lib/stripe.ts` | M |
 | G6 | Kein Reconciliation-Cron für verpasste Stripe-Events → stiller `planStatus`-Drift | `vercel.json` / `lib/stripe.ts` | M |
 | G7 | Consent-Lifecycle-Routen ungetestet (accept/revoke/upload setzen `cvStatus`) | `app/api/consent/[token]/**` | M |

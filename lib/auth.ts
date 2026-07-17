@@ -95,22 +95,43 @@ export const authOptions: NextAuthOptions = {
         token.plan = (user as any).plan
         token.trialEndsAt = (user as any).trialEndsAt ?? null
       }
-      // Bei expliziten Updates Token aus DB nachladen — z. B. nach Plan-Upgrade.
-      if (trigger === 'update' && token.id) {
+      // Token aus DB nachladen: bei explizitem Update (z. B. Plan-Upgrade)
+      // ODER zeitgesteuert alle 60s (G4 — Passwort-Wechsel-Invalidierung,
+      // Parität mit dem Partner-Flow). Ohne den periodischen Refresh würde
+      // eine kompromittierte HR-Session bis zu 24h gültig bleiben, auch
+      // nach einem Passwortwechsel.
+      const STATUS_REFRESH_MS = 60 * 1000
+      const lastChecked = (token.checkedAt as number | undefined) ?? 0
+      const needsRefresh = trigger === 'update' || (token.id && Date.now() - lastChecked > STATUS_REFRESH_MS)
+
+      if (needsRefresh && token.id) {
         try {
           const fresh = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { plan: true, accountType: true, trialEndsAt: true, company: true, role: true, name: true },
+            select: {
+              plan: true, accountType: true, trialEndsAt: true, company: true,
+              role: true, name: true, passwordChangedAt: true,
+            },
           })
-          if (fresh) {
-            token.plan = fresh.plan
-            token.accountType = fresh.accountType
-            token.role = fresh.role
-            token.company = fresh.company
-            token.trialEndsAt = fresh.trialEndsAt?.toISOString() ?? null
-            token.name = fresh.name
+          if (!fresh) {
+            // User gelöscht → Token entwerten.
+            return {} as any
           }
+          // Passwort NACH Ausstellung dieses Tokens geändert → Session killen.
+          const issuedAtMs = typeof token.iat === 'number' ? token.iat * 1000 : 0
+          if (fresh.passwordChangedAt && issuedAtMs < fresh.passwordChangedAt.getTime()) {
+            return {} as any
+          }
+          token.plan = fresh.plan
+          token.accountType = fresh.accountType
+          token.role = fresh.role
+          token.company = fresh.company
+          token.trialEndsAt = fresh.trialEndsAt?.toISOString() ?? null
+          token.name = fresh.name
+          token.checkedAt = Date.now()
         } catch (err) {
+          // DB kurz nicht erreichbar → alten Token weiterverwenden, nächster
+          // Request versucht erneut (checkedAt NICHT setzen).
           logger.warn('jwt_refresh_warn', err)
         }
       }
@@ -184,5 +205,6 @@ declare module 'next-auth/jwt' {
     accountType: string
     plan: string
     trialEndsAt: string | null
+    checkedAt?: number
   }
 }

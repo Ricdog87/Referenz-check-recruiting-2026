@@ -65,7 +65,9 @@ export async function POST(req: NextRequest) {
     await prisma.$transaction([
       prisma.user.update({
         where: { id: tokenRow.userId },
-        data: { password: hashed },
+        // passwordChangedAt entwertet bestehende JWT-Sessions (G4) — beim
+        // Reset besonders wichtig (Anlass ist oft ein kompromittiertes PW).
+        data: { password: hashed, passwordChangedAt: new Date() },
       }),
       prisma.passwordResetToken.update({
         where: { id: tokenRow.id },
