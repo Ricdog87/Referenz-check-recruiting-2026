@@ -1,108 +1,116 @@
-# candiq – CV Fabrication & Consistency Analyzer
+# candiq
 
-This repository contains the Next.js application for candiq and now includes a backend module that helps human reviewers identify factual CV fabrication and consistency risks.
+**DSGVO-konforme Referenzprüfung & CV-Verifikation als SaaS.** candiq
+unterstützt HR-Abteilungen und Personaldienstleister dabei, Angaben aus
+Lebensläufen und Zeugnissen strukturiert, einwilligungsbasiert und
+nachvollziehbar zu verifizieren — mit menschlichen Reviewern im Loop, nicht
+per Auto-Ablehnung.
 
-## What the analyzer does — and does not do
+- **Live:** [candiq.de](https://candiq.de)
+- **Version:** siehe [`CHANGELOG.md`](CHANGELOG.md) · [`package.json`](package.json)
+- **Tech-Datenraum (Due Diligence):** [`docs/due-diligence/`](docs/due-diligence/README.md)
 
-The analyzer is **decision support only**. It never auto-rejects a candidate and it never attempts to detect whether a CV was written with AI.
+---
 
-It focuses on:
+## Stack
 
-- factual timeline contradictions,
-- impossible or future-dated periods,
-- unexplained gaps and implausible role progression,
-- employer and referee verification risk,
-- verifiable claims that should be prioritized in the reference call.
+| Schicht | Technologie |
+|---|---|
+| Framework | Next.js 14 (App Router), TypeScript |
+| Datenbank | PostgreSQL (Supabase, EU/Frankfurt) via Prisma |
+| Auth | NextAuth v4 — getrennte Domänen HR & Partner (Credentials/bcrypt) |
+| Billing | Stripe (Checkout, Webhooks, Add-ons) |
+| Storage | Vercel Blob (EU) — CVs/Zeugnisse, Stream-Proxy hinter Consent-Gate |
+| Mail | Resend |
+| Hosting | Vercel (EU, serverless + Cron) |
+| KI (optional, flag-gated) | Anthropic / OpenAI — nur für CV-Plausibilität, default aus |
 
-It explicitly does **not** score or flag:
+Architektur-Details, Datenmodell und Sicherheitsposition:
+[`docs/due-diligence/01-ARCHITECTURE.md`](docs/due-diligence/01-ARCHITECTURE.md) ff.
 
-- writing style,
-- grammar,
-- fluency,
-- formatting quality,
-- perceived AI authorship,
-- protected or sensitive characteristics such as gender, age, origin, religion, disability, family status, photo, or name origin.
+---
 
-## Architecture
-
-The module lives in `lib/cv-analysis/` and is orchestrated by `analyzeCv()`:
-
-1. `types.ts` defines zod schemas and TypeScript types for `CandidateInput`, `ClaimFlag`, and `RiskReport`.
-2. `llmClaimAnalysis.ts` optionally parses raw CV text into structured fields and extracts factual claims via Anthropic or OpenAI SDKs. The system prompt contains strict guardrails against style, AI-writing, and protected-characteristic analysis.
-3. `deterministicChecks.ts` runs pure TypeScript checks without any LLM dependency.
-4. `externalChecks.ts` contains an adapter interface for company/referee plausibility lookups. The default DNS adapter has a timeout and returns `unknown` when external checks are disabled or unavailable.
-5. `score.ts` aggregates explainable flags into sub-scores (`timeline`, `employer`, `referee`, `claims`), a `riskScore` from 0–100, and a RAG status (`green`, `amber`, `red`).
-6. `index.ts` runs the full pipeline and validates the final report with zod.
-
-## API
-
-`POST /api/cv-analysis`
-
-### Request body
-
-```json
-{
-  "rawCvText": "optional raw CV text",
-  "stations": [{ "company": "Example GmbH", "title": "Sales Manager", "startDate": "2021-01", "endDate": "2024-12", "location": "Berlin" }],
-  "education": [{ "institution": "Example University", "degree": "B.Sc.", "startDate": "2017", "endDate": "2020" }],
-  "certifications": [{ "name": "Example Certificate", "issuer": "Example Org", "year": 2023 }],
-  "referees": [{ "name": "Jane Manager", "company": "Example GmbH", "role": "Head of Sales", "email": "jane.manager@example.com" }],
-  "consentGiven": true
-}
-```
-
-### Consent and DSGVO flow
-
-- `consentGiven=false` returns `403` before running parsing, deterministic checks, external checks, LLM calls, or persistence.
-- Successful analyses are persisted as compact report JSON in `CvAnalysisReport` with a SHA-256 hash of the input rather than storing a second raw CV copy.
-- Every successful analysis writes an `AuditLog` entry with action `CV_ANALYSIS_CREATE`.
-- Deploy the database in Supabase's EU region and set `DATABASE_URL` to that EU-hosted Postgres endpoint.
-- Keep external lookups disabled unless the candidate consent and data-processing agreement cover them. Enable with `CV_ANALYSIS_ENABLE_EXTERNAL_LOOKUPS=true`.
-
-## LLM configuration
-
-The analyzer supports Anthropic and OpenAI SDKs. If both are configured, Anthropic is used first.
+## Schnellstart (lokal)
 
 ```bash
-ANTHROPIC_API_KEY=...
-CV_ANALYSIS_ANTHROPIC_MODEL=claude-3-5-haiku-latest
-OPENAI_API_KEY=...
-CV_ANALYSIS_OPENAI_MODEL=gpt-4o-mini
+cp .env.example .env          # Pflicht: DATABASE_URL, DIRECT_URL, NEXTAUTH_SECRET
+npm ci                        # postinstall: prisma generate
+DATABASE_URL=$DIRECT_URL npx prisma db push
+npm run dev                   # http://localhost:3000
 ```
 
-If no key is configured, the pipeline still returns deterministic and external-adapter results with a safe LLM fallback explanation.
+Pflicht-Env für den Start: `DATABASE_URL`, `DIRECT_URL`,
+`NEXTAUTH_SECRET` (≥ 32 Zeichen), `NEXTAUTH_URL`. Mail/Blob/Stripe/KI
+degradieren ohne Keys graceful. Ausführliche Anleitung:
+[`SETUP.md`](SETUP.md) und
+[`docs/due-diligence/10-ONBOARDING.md`](docs/due-diligence/10-ONBOARDING.md).
 
-## Risk report and Trust-Score integration
-
-`RiskReport` has this shape:
-
-```ts
-{
-  riskScore: number
-  rag: 'green' | 'amber' | 'red'
-  subScores: { timeline: number; employer: number; referee: number; claims: number }
-  flags: ClaimFlag[]
-  verificationChecklist: string[]
-  explanations: string[]
-}
-```
-
-Each `ClaimFlag` includes `{ claim, type, severity, reason, source }`. A missing `reason` is rejected by schema validation.
-
-For the candiq report and Trust-Score, use the analyzer as a verification-risk input:
-
-- `green`: normal reference workflow.
-- `amber`: reviewer should prioritize the checklist before final assessment.
-- `red`: senior reviewer should validate high-severity flags, but still no automatic rejection.
-
-The Trust-Score should present this as **verification confidence / risk**, not as a candidate quality score.
-
-## Testing
+### Nützliche Skripte
 
 ```bash
-npm run test
-npm run lint
-npm run build
+npm test                 # Vitest (offline, keine DB) — Unit/Integration
+npm run typecheck        # tsc --noEmit
+npm run lint             # next lint
+npm run build            # Production-Build
+npm run seed:partner-tiers && npm run seed:partner-pricing   # Partner-Pflicht-Seeds
+npm run demo:seed        # synthetische Demo-Umgebung (nur Staging/lokal)
 ```
 
-The unit tests cover deterministic checks, schema validation, explainable flags, and fixture CVs for fabricated and clean scenarios.
+---
+
+## Feature-Flags
+
+Neue/riskante Features stehen hinter ENV-Flags (default **off**,
+`lib/flags.ts`):
+
+| Flag | Wirkung |
+|---|---|
+| `CV_ANALYSIS_LLM_ENABLED` | Master-Switch für den LLM-gestützten CV-Check. Off → kein CV-Inhalt verlässt die Plattform. |
+| `PARTNER_PROGRAM_ENABLED` | Reseller-/Partner-Programm (`/partner`). |
+| `KPI_COCKPIT_ENABLED` | Admin-KPI-Cockpit `/admin/kpi` (MRR/ARR, Credential-Bestand, CSV-Export). |
+
+Vollständige Liste inkl. Ops-Flags: [`.env.example`](.env.example).
+
+---
+
+## Qualität & CI
+
+CI (`.github/workflows/ci.yml`) läuft bei jedem PR nach `main` und blockt bei
+Rot. **Als Required-Checks in den Branch-Protection-Regeln von `main`
+setzen:**
+
+- **`Lint · Typecheck · Test · Build`** — Lint, `tsc`, Vitest, Production-Build
+- **`License check (kein Copyleft)`** — Allowlist, bricht bei GPL/AGPL/LGPL/MPL
+- **`Secret scan (Historie + Diff)`** — gitleaks über die volle Historie
+
+Lokal vor jedem Push: `npm run lint && npm run typecheck && npm test`.
+
+---
+
+## Kernprinzipien (Contributing)
+
+- **Consent-Gate ist tabu.** Jede CV-Content-Route MUSS `hasCvAccess()`
+  (`lib/cv-gate.ts`) nutzen — Single Source of Truth.
+- **App-Layer-Enforcement** (bewusst kein RLS, siehe
+  [`03-SECURITY.md`](docs/due-diligence/03-SECURITY.md)).
+- **Secrets nur via ENV**, nie committen/loggen.
+- **Migrationen additiv** (`ADD COLUMN IF NOT EXISTS`).
+- **Mails awaited** versenden (Vercel-Lambda-Freeze).
+- **Jeder Fix mit Test**, CI-Gates grün.
+
+---
+
+## Weiterführende Doku
+
+- [`docs/due-diligence/`](docs/due-diligence/README.md) — technischer
+  Datenraum: Architektur, Datenmodell, Security, DSGVO, Integrationen,
+  Betrieb, Lizenzen, Teststrategie, Known Issues, Onboarding.
+- [`docs/cv-analysis.md`](docs/cv-analysis.md) — CV-Fabrication-/Consistency-Analyzer
+  (`lib/cv-analysis/`).
+- [`SETUP.md`](SETUP.md) — Setup aus Nutzer-Perspektive.
+- [`CHANGELOG.md`](CHANGELOG.md) — Versionshistorie.
+
+---
+
+*© candiq. Proprietär (`UNLICENSED`). Kein Copyleft in den Dependencies —
+siehe [`07-IP_LICENSES.md`](docs/due-diligence/07-IP_LICENSES.md).*
