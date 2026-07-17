@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { ensureSchema, withDbRecovery } from '@/lib/db-init'
 import { logger } from '@/lib/logger'
+import { loginAttemptAllowed } from '@/lib/login-guard'
 import '@/lib/env'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -39,10 +40,17 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'E-Mail', type: 'email' },
         password: { label: 'Passwort', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null
         const email = String(credentials.email).trim().toLowerCase()
         if (!email || email.length > 254) return null
+
+        // Brute-Force-Bremse (G1): pro IP + pro E-Mail. Blockade → null
+        // (kein Oracle, ununterscheidbar von falschem Passwort).
+        if (!loginAttemptAllowed('hr', email, req)) {
+          logger.warn('auth_rate_limited', { scope: 'hr' })
+          return null
+        }
 
         try {
           await ensureSchema()

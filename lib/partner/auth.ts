@@ -16,6 +16,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { logger } from '@/lib/logger'
+import { loginAttemptAllowed } from '@/lib/login-guard'
 import '@/lib/env'
 
 const isProd = process.env.NODE_ENV === 'production'
@@ -56,10 +57,16 @@ export const partnerAuthOptions: NextAuthOptions = {
         email: { label: 'E-Mail', type: 'email' },
         password: { label: 'Passwort', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null
         const email = String(credentials.email).trim().toLowerCase()
         if (!email || email.length > 254) return null
+
+        // Brute-Force-Bremse (G1), analog HR-Login.
+        if (!loginAttemptAllowed('partner', email, req)) {
+          logger.warn('partner_auth_rate_limited')
+          return null
+        }
 
         const partner = await prisma.partnerAccount
           .findFirst({

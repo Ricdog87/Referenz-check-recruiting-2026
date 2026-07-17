@@ -145,7 +145,7 @@ Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Script
 
 | # | Finding | Datei:Zeile | Aufwand |
 |---|---|---|---|
-| G1 | **Login (HR + Partner) ohne Rate-Limit** → Brute-Force/Credential-Stuffing | `lib/auth.ts:42-77`, `lib/partner/auth.ts:59-102` | S–M |
+| G1 | ✅ **BEHOBEN** — Login (HR + Partner) Rate-Limit: `lib/login-guard.ts` (10/15min je IP + je Email), in beide `authorize()` verdrahtet; Blockade → `null` (kein Oracle). 5 Tests. | `lib/auth.ts:42-77`, `lib/partner/auth.ts:59-102` | S–M |
 | G2 | **HR-Passwortwechsel als ungedrosseltes Passwort-Orakel** (Partner hat durablen DB-Zähler, HR nicht) | `app/api/auth/profile/route.ts:57-64` | S |
 | G3 | Rate-Limiter in-memory/per-Lambda, auf Serverless nicht durchsetzbar | `lib/rate-limit.ts:1-8` | M |
 | G4 | HR-JWT ohne Passwort-Wechsel-Invalidierung (Partner hat `passwordChangedAt`-Check) | `lib/auth.ts:91-108` | S–M |
