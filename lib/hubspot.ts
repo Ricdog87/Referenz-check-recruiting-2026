@@ -10,6 +10,8 @@
  * weil HubSpot mal hustet.
  */
 
+import { redactEmail, redactEmails } from '@/lib/redact'
+
 const HUBSPOT_API_KEY = process.env.HUBSPOT_API_KEY
 const HUBSPOT_API_BASE = process.env.HUBSPOT_API_BASE ?? 'https://api.hubapi.com'
 
@@ -86,8 +88,8 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     })
     if (!searchRes.ok) {
       const text = await searchRes.text()
-      const reason = `search ${searchRes.status}: ${text.slice(0, 200)}`
-      console.error('[hubspot] search-failed', { status: searchRes.status, body: text.slice(0, 500) })
+      const reason = `search ${searchRes.status}: ${redactEmails(text.slice(0, 200))}`
+      console.error('[hubspot] search-failed', { status: searchRes.status, body: redactEmails(text.slice(0, 500)) })
       return { ok: false, reason }
     }
     const searchData = (await searchRes.json()) as {
@@ -110,7 +112,7 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     )
     if (dropped.length > 0) {
       console.warn('[hubspot] properties-dropped-not-in-allowlist', {
-        email: props.email,
+        email: redactEmail(props.email),
         dropped,
         hint: 'In lib/hubspot.ts in das ALLOWED-Set aufnehmen.',
       })
@@ -129,11 +131,11 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
       })
       if (!updateRes.ok) {
         const text = await updateRes.text()
-        const reason = `update ${updateRes.status}: ${text.slice(0, 200)}`
+        const reason = `update ${updateRes.status}: ${redactEmails(text.slice(0, 200))}`
         console.error('[hubspot] update-failed', {
           contactId: id,
           status: updateRes.status,
-          body: text.slice(0, 500),
+          body: redactEmails(text.slice(0, 500)),
           sentProperties: Object.keys(properties),
         })
         return { ok: false, reason }
@@ -152,11 +154,11 @@ export async function upsertContact(props: ContactProperties): Promise<SyncResul
     })
     if (!createRes.ok) {
       const text = await createRes.text()
-      const reason = `create ${createRes.status}: ${text.slice(0, 200)}`
+      const reason = `create ${createRes.status}: ${redactEmails(text.slice(0, 200))}`
       console.error('[hubspot] create-failed', {
-        email: props.email,
+        email: redactEmail(props.email),
         status: createRes.status,
-        body: text.slice(0, 500),
+        body: redactEmails(text.slice(0, 500)),
         sentProperties: Object.keys(properties),
       })
       return { ok: false, reason }

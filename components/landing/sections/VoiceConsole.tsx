@@ -4,8 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ConversationProvider, useConversation } from '@elevenlabs/react'
 import { Mic, PhoneOff, Loader2 } from 'lucide-react'
 import { trackConversion } from '@/lib/conversionTracking'
+import { resolveAgentId } from '@/lib/voice-config'
 
-const AGENT_ID = 'agent_9601ktktemgwfk3tey407mkkxnc5'
+// Konfigurierbar via NEXT_PUBLIC_ELEVENLABS_AGENT_ID; Default = Prod-Agent (G23).
+const AGENT_ID = resolveAgentId()
 
 function Waveform({ active }: { active: boolean }) {
   const bars = Array.from({ length: 32 })
@@ -51,6 +53,12 @@ function Console() {
   }, [status])
 
   const start = useCallback(() => {
+    // Graceful-Degradation (G23): ohne konfigurierte Agent-ID keine leere
+    // Session starten, sondern freundlich abweisen.
+    if (!AGENT_ID) {
+      setError('Voice-Demo ist derzeit nicht verfügbar.')
+      return
+    }
     setError(null)
     setStarting(true)
     startedAtRef.current = Date.now()
@@ -82,7 +90,7 @@ function Console() {
       <button
         type="button"
         onClick={isActive ? stop : start}
-        disabled={isConnecting}
+        disabled={isConnecting || !AGENT_ID}
         className="mt-3 sm:mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-6 py-3.5 sm:py-4 text-base font-semibold text-white shadow-lg transition hover:opacity-90 disabled:opacity-60"
       >
         {isConnecting ? (

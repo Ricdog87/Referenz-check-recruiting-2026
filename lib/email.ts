@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { logger } from '@/lib/logger'
+import { redactEmail } from '@/lib/redact'
 
 /**
  * Lightweight transactional-email service mit graceful Fallback.
@@ -75,7 +76,8 @@ export async function sendEmail(msg: EmailMessage): Promise<SendResult> {
   // Log-Only-Modus gewollt.
   const noProviderLog = process.env.NODE_ENV === 'production' ? logger.error : logger.warn
   noProviderLog('email_no_provider', {
-    to: Array.isArray(msg.to) ? msg.to.join(', ') : msg.to,
+    // PII-Redaction (G11): Empfänger nur maskiert in flüchtige Logs.
+    to: (Array.isArray(msg.to) ? msg.to : [msg.to]).map(redactEmail).join(', '),
     subject: msg.subject,
   })
   await logEmailEvent(msg, 'LOG_ONLY (kein RESEND_API_KEY gesetzt)').catch(() => {})
