@@ -149,7 +149,7 @@ Kein `.github/`-Verzeichnis. `lint`/`test`/`build` existieren nur als npm-Script
 | G2 | **HR-Passwortwechsel als ungedrosseltes Passwort-Orakel** (Partner hat durablen DB-Zähler, HR nicht) | `app/api/auth/profile/route.ts:57-64` | S |
 | G3 | Rate-Limiter in-memory/per-Lambda, auf Serverless nicht durchsetzbar | `lib/rate-limit.ts:1-8` | M |
 | G4 | HR-JWT ohne Passwort-Wechsel-Invalidierung (Partner hat `passwordChangedAt`-Check) | `lib/auth.ts:91-108` | S–M |
-| G5 | **Stripe-Webhook / Billing: 0 Tests** (Signatur, Idempotenz, Plan-Mapping, `payment_failed`) | `app/api/stripe/**`, `lib/stripe.ts` | M |
+| G5 | ✅ **BEHOBEN** — Stripe-Webhook-Tests: `__tests__/stripe-webhook.test.ts` (7 Fälle: fehlendes Secret→500, fehlende/ungültige Signatur→400, subscription→ACTIVE+Plan-Mapping, past_due→PAST_DUE, Add-on-Idempotenz P2002→200, unerwarteter DB-Fehler→500). Test-only, kein Verhaltens-Change. | `app/api/stripe/**`, `lib/stripe.ts` | M |
 | G6 | Kein Reconciliation-Cron für verpasste Stripe-Events → stiller `planStatus`-Drift | `vercel.json` / `lib/stripe.ts` | M |
 | G7 | Consent-Lifecycle-Routen ungetestet (accept/revoke/upload setzen `cvStatus`) | `app/api/consent/[token]/**` | M |
 | G8 | Core-Owner-Scoping (checks/candidates/gdpr) auf Routen-Ebene ungetestet | `__tests__/` (fehlt) | M |
