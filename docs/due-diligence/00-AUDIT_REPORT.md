@@ -81,8 +81,18 @@ export function hasCvAccess(doc, actor) {
 - **User-Art.-17-Löschung:** `gdpr/delete` löscht `public/uploads/{userId}` vom **lokalen Filesystem** — dort liegt seit der Blob-Umstellung nichts. Ergebnis: Account-Löschung entfernt DB-Daten, aber **alle CV-Blobs bleiben liegen**.
 - **Positiv:** Der Bewerber-eigene Ersetzen-Pfad macht es korrekt (`consent/[token]/upload/[documentId]/route.ts:46` ruft `del(doc.path)`). Das Muster existiert im Repo — es fehlt nur an den zwei entscheidenden Stellen.
 
-### R3 — CV-Blobs liegen `access: 'public'`
+### R3 — CV-Blobs liegen `access: 'public'` 🟠 PLAN BEREIT · Live-Cutover GO-gated
 **Dateien:** `app/api/upload/route.ts:68` · `app/api/consent/[token]/upload/route.ts:92` · `lib/check-report.tsx:155` · **Aufwand: M–L**
+
+> **Warum nicht in Sprint 1 mitgefixt:** `@vercel/blob@0.22.3` (installiert) unterstützt **nur** `access: 'public'` — private Blobs + signierte URLs gibt es erst ab `@vercel/blob@2.x` (breaking API). Der Fix ist damit ein eigenes, live-berührendes Vorhaben, kein Einzeiler.
+>
+> **Runbook (empfohlen, GO-erforderlich):**
+> 1. `@vercel/blob` 0.22 → 2.6 upgraden; die 4 `put()`-Call-Sites (upload, consent-upload, check-report, partner-co-brand) auf `access: 'private'` + `addRandomSuffix` migrieren.
+> 2. Lese-Pfad: der Stream-Proxy (`documents/[id]`) holt die Datei bereits server-seitig — für private Blobs statt `fetch(doc.path)` einen kurzlebigen signierten Download-URL (`getDownloadUrl`/Token) erzeugen. Co-Brand-Logos (öffentlich gewollt) bleiben public.
+> 3. **Daten-Migration der Bestands-Blobs:** einmaliges Skript, das existierende public Blobs nach privat kopiert und die `Document.path`/Report-Referenzen umschreibt (auf Staging trocken testen, dann Prod).
+> 4. Voller Regressionslauf: CV-Upload → Consent-Release → Reviewer-Download → Report-PDF → Co-Brand.
+>
+> **Kompensierende Kontrollen bereits aktiv (Rest-Risiko gemindert):** Stream-Proxy leakt die Blob-URL nicht (kein 302-Redirect), `cuid`-Pfade nicht erratbar, und **R1 schließt jetzt die IDOR** — d. h. die App-Ebene ist dicht; das Rest-Risiko ist „URL abrufbar *falls* sie extern leakt". Vertretbar als kurzfristiger Zustand, vor Signing zu schließen.
 
 Alle Uploads (CVs, Zeugnisse) und die Report-PDFs mit Bewertungsdaten landen in Vercel Blob mit `access: 'public'`. Die App-Layer-Kontrolle (Gate + Stream-Proxy) ist gut gebaut und leakt die URL nicht aktiv — aber die Blob-URL selbst ist **ohne jede Authentifizierung** abrufbar, sobald sie irgendwo auftaucht (Logs, Error-Tracking, Support, DB-Leak, Browser-History). Für Bewerber-CVs (potenziell Art.-9-nahe Daten) ist ein Public-ACL-Store ein hartes Finding. Der Stream-Proxy existiert bereits — Umstellung auf private Blobs + signierte, kurzlebige URLs ist der saubere Weg.
 
@@ -102,8 +112,19 @@ Die CV-Analyse sendet Roh-CV-Text an eine LLM-API (`parseRawCvText`). Provider-W
 
 `npm audit`: **1 kritisch** (Next.js SSRF in Server Actions), **4 high** (undici unbounded decompression, minimatch ReDoS, 2× @typescript-eslint), 5 moderate. `next@14.0.4` ist ~14 Minor-Releases alt. Die Ausnutzbarkeit des SSRF hängt von der Server-Actions-Nutzung ab (zu prüfen), aber eine öffentlich bekannte kritische Schwachstelle in der Kern-Framework-Version ist ein Standard-DD-Flag. Empfehlung: kontrolliertes Upgrade auf aktuelles Next 14.2.x (oder 15) + `undici`/`minimatch`-Bumps.
 
-### R6 — Deployment fährt `prisma db push` gegen die Produktions-DB
+### R6 — Deployment fährt `prisma db push` gegen die Produktions-DB 🟠 RUNBOOK BEREIT · Prod-Baseline GO-gated
 **Datei:** `vercel.json` (buildCommand) · **Aufwand: M–L**
+
+> **Warum nicht blind umgestellt:** Ein Flip von `db push` auf `migrate deploy` **ohne** vorheriges Prod-Baseline-Resolve würde den **nächsten Deploy zum Absturz bringen** — `migrate deploy` fände keine `_prisma_migrations`-Historie und versuchte, alle Migrationen gegen bereits existierende Tabellen anzuwenden (Konflikt). Die Reihenfolge ist zwingend, der Baseline-Schritt ist ein **Prod-Event** (GO-gated per Guardrail).
+>
+> **Runbook (empfohlen, GO-erforderlich):**
+> 1. Sicherstellen, dass `prisma/migrations/*` den aktuellen Prod-Schema-Stand exakt abbildet (ggf. eine konsolidierte Baseline-Migration via `prisma migrate diff` erzeugen).
+> 2. **Auf Prod (einmalig):** jede bestehende Migration als angewandt markieren — `prisma migrate resolve --applied <migration>` für alle Ordner in `prisma/migrations/` — damit `_prisma_migrations` den Ist-Zustand kennt, ohne DDL auszuführen.
+> 3. **Erst danach:** `vercel.json` buildCommand `db push` → `prisma migrate deploy` umstellen.
+> 4. `lib/db-init.ts` (paralleles Raw-SQL-Self-Healing auf Hot-Paths) zurückbauen, sobald Migrations autoritativ sind — beseitigt die dritte überlappende Schema-Wahrheit.
+> 5. Staging-Deploy verifizieren (voller Build + Migrate), dann Prod.
+>
+> Bis zum Cutover bleibt `db push` aktiv (funktioniert, nur ohne Migrationskette/Rollback). Kein Datenverlust im Normalbetrieb — das Risiko materialisiert sich nur bei Schema-Divergenz zwischen Branch und Prod.
 
 ```
 DATABASE_URL=$DIRECT_URL npx prisma db push --skip-generate && npx prisma generate && next build
@@ -181,16 +202,16 @@ Die Prüf-Frage „merge-ready?" ist wichtig und wurde manuell aufgelöst (ein A
 
 ## Priorisierte Fix-Roadmap (ROT zuerst)
 
-**Sprint 1 — Vor-Signing-kritisch (Ziel: keine offenen ROT):**
-1. R1 IDOR-Fix (Owner/Reviewer-Check in `documents/[id]`) — **S**
-2. R2 CV-Blob-Löschung an beiden Stellen (`del(path)` in cleanup + gdpr/delete) — **M**
-3. R4 OpenAI disclosure **oder** Fallback entfernen — **S**
-4. R5 Next.js + undici/minimatch Upgrade — **M**
-5. R7 CI-Pipeline (lint + tsc + vitest + build + secret-scan + license-check) — **M**
+**Sprint 1 — Vor-Signing-kritisch (Ziel: keine offenen ROT):** ✅ ABGESCHLOSSEN
+1. ✅ R1 IDOR-Fix (Owner/Reviewer-Check in `documents/[id]`) — **S**
+2. ✅ R2 CV-Blob-Löschung an beiden Stellen (`del(path)` in cleanup + gdpr/delete) — **M**
+3. ✅ R4 LLM-Master-Switch (default off) + OpenAI disclosure — **S**
+4. ✅ R5 Next.js 14.2.35 (kritisch weg) + undici/minimatch-Overrides — **M**
+5. ✅ R7 CI-Pipeline (lint + tsc + vitest + build + secret-scan + license-check) — **M**
 
-**Sprint 2 — Vor-Signing wichtig:**
-6. R3 CVs auf private Blobs + signierte URLs — **M–L**
-7. R6 `db push` → `migrate deploy` (Baseline-Resolve) — **M–L**
+**Sprint 2 — Vor-Signing wichtig (Live-Cutover, GO-gated):** 🟠 RUNBOOKS BEREIT, warten auf Freigabe
+6. 🟠 R3 CVs auf private Blobs + signierte URLs — **M–L** — braucht `@vercel/blob`-Major + Bestands-Blob-Migration (Live-Storage)
+7. 🟠 R6 `db push` → `migrate deploy` — **M–L** — braucht einmaliges Prod-Baseline-Resolve (Prod-Event)
 8. G5 Stripe-Webhook-Tests — **M**
 9. G1/G2/G4 Login-Rate-Limit + HR-Passwort-Härtung + JWT-Invalidierung — **S–M**
 10. G24 Quota-Enforcement (Umsatz-Integrität) — **S–M**
