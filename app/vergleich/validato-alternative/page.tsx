@@ -9,19 +9,19 @@ import { BOOKING_URL } from '@/lib/site'
 export const metadata: Metadata = pageMeta({
   title: 'candiq als Validato-Alternative',
   description:
-    'candiq vs. Validato im ehrlichen Vergleich: Datenstandort Deutschland, transparente Preise ab 65 €/Mo, Reviewer statt Bots, ATS-Integration und Auto-Löschung. Wann candiq die bessere Wahl ist.',
+    'candiq vs. Validato im Vergleich: Spezialisierung auf Referenzprüfung im Recruiting, Server in Deutschland, Consent-Portal mit Audit-Trail. Wann candiq passt — und wann Validato.',
   path: '/vergleich/validato-alternative',
-  ogTitle: 'candiq vs. Validato — der ehrliche Vergleich | candiq',
+  ogTitle: 'candiq vs. Validato — der Vergleich | candiq',
 })
 
 const FAQ = [
   {
     q: 'Ist candiq eine echte Alternative zu Validato?',
-    a: 'Ja — wenn Ihr Fokus auf Referenzprüfung im Recruiting liegt. candiq ist auf telefonische Referenz-, Zeugnis- und CV-Verifizierung spezialisiert, mit Servern in Deutschland, transparenten Preisen ab 65 €/Monat und einem granularen Einwilligungs-Portal für Kandidaten. Validato deckt ein breiteres Screening-Portfolio ab.',
+    a: 'Ja — wenn Ihr Fokus auf Referenzprüfung im Recruiting liegt. candiq ist auf telefonische Referenz-, Zeugnis- und CV-Verifizierung spezialisiert, mit Servern in Deutschland, Paketen ab 65 €/Monat und einem granularen Einwilligungs-Portal für Kandidaten. Validato deckt ein breiteres Screening-Portfolio ab.',
   },
   {
     q: 'Wo liegt der Hauptunterschied?',
-    a: 'Datenstandort (candiq: Server in Deutschland), Preistransparenz (candiq veröffentlicht Preise, Validato auf Anfrage), Self-Service-Einwilligung der Kandidaten mit Audit-Trail und die Spezialisierung auf Recruiting-Referenzprüfung statt breitem Pre-Employment-Screening.',
+    a: 'Datenstandort (candiq: Server in Deutschland), Self-Service-Einwilligung der Kandidaten mit Audit-Trail und die Spezialisierung auf Recruiting-Referenzprüfung statt breitem Pre-Employment-Screening.',
   },
   {
     q: 'Wann passt Validato besser?',
@@ -51,7 +51,7 @@ export default function ValidatoAlternativePage() {
           </h1>
           <p className="text-lg text-text-secondary max-w-2xl mx-auto leading-relaxed">
             Sie evaluieren Tools zur Kandidaten-Verifizierung und Validato steht auf Ihrer Liste?
-            Hier sehen Sie sachlich, wo candiq die bessere Wahl ist — und wo Validato seine Stärken hat.
+            Hier sehen Sie, wo candiq die passende Wahl ist — und wo Validato seine Stärken hat.
           </p>
         </div>
       </section>
@@ -63,7 +63,7 @@ export default function ValidatoAlternativePage() {
       <section className="py-16 px-6 bg-bg-secondary">
         <div className="max-w-3xl mx-auto prose-candiq">
           <h2 className="text-2xl font-bold tracking-tight mb-4 text-text-primary">
-            Wann candiq die bessere Wahl ist
+            Wann candiq die passende Wahl ist
           </h2>
           <p className="text-text-secondary leading-relaxed mb-4">
             candiq ist gebaut für HR-Teams und Personaldienstleister im DACH-Raum, die <strong>Referenzen,
@@ -77,9 +77,8 @@ export default function ValidatoAlternativePage() {
               als Vergabe-Kriterium behandeln, ist das oft das ausschlaggebende Argument.
             </li>
             <li>
-              <strong>Transparente Preise statt &bdquo;auf Anfrage&ldquo;.</strong> candiq veröffentlicht Pakete ab
-              65 €/Monat und Einzelchecks ab 49 €. Sie können kalkulieren, ohne erst ein Sales-Gespräch zu
-              durchlaufen — monatlich kündbar, ohne Mindestvertrag.
+              <strong>Klare Pakete.</strong> candiq bietet Pakete ab 65 €/Monat und Einzelchecks ab 49 € —
+              monatlich kündbar, ohne Mindestvertrag. Sie können direkt kalkulieren und starten.
             </li>
             <li>
               <strong>Einwilligung, die einem Audit standhält.</strong> Kandidaten erteilen ihre
@@ -92,7 +91,7 @@ export default function ValidatoAlternativePage() {
             Wann Validato besser passt
           </h2>
           <p className="text-text-secondary leading-relaxed mb-4">
-            Wir bleiben ehrlich: Validato hat Stärken, die candiq aktuell bewusst nicht abbildet. Wenn Sie
+            Validato hat Stärken, die candiq aktuell bewusst nicht abbildet. Wenn Sie
             ein <strong>breites Zusatz-Portfolio</strong> wie Bonitäts-, Strafregister- oder OSINT-Prüfungen
             aus einer Hand benötigen, oder eine bestehende <strong>ISO-27001-Zertifizierung</strong> zwingende
             Voraussetzung für Ihre Beschaffung ist, ist Validato die naheliegendere Wahl. candiq fokussiert
@@ -100,8 +99,8 @@ export default function ValidatoAlternativePage() {
             und schnell — eine ISO-27001-Zertifizierung ist bei uns in Vorbereitung.
           </p>
           <p className="text-text-secondary leading-relaxed">
-            Unser Rat: Wenn Referenzprüfung Ihr eigentliches Problem ist und Datenstandort, Tempo und
-            Preistransparenz zählen, testen Sie candiq in einem 15-Minuten-Termin. Brauchen Sie ein breites
+            Unser Rat: Wenn Referenzprüfung Ihr eigentliches Problem ist und Datenstandort und Tempo
+            zählen, testen Sie candiq in einem 15-Minuten-Termin. Brauchen Sie ein breites
             Screening-Portfolio mit Bonität und Strafregister, ist ein Generalist wie Validato passender.
           </p>
         </div>
