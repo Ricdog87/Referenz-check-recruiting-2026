@@ -5,18 +5,35 @@ import { BOOKING_URL } from '@/lib/site'
 type Cell = { text: string; positive?: boolean }
 type Row = { criterion: string; candiq: Cell; validato: Cell }
 
-// Daten auf Basis öffentlich verfügbarer Informationen (Stand Juni 2026).
+// Vergleich ausschließlich auf Basis vom Wettbewerber selbst öffentlich kommunizierter
+// Angaben (Stand September 2026). Keine Zeilen mit "k. A." — Kriterien, zu denen keine
+// belastbare öffentliche Quelle vorliegt, werden nicht gegenübergestellt.
 const ROWS: Row[] = [
-  { criterion: 'Spezialisierung', candiq: { text: 'Referenzprüfung für Recruiting (HR & Personaldienstleister)', positive: true }, validato: { text: 'Breites Pre-Employment-Screening' } },
-  { criterion: 'Hosting & Datenstandort', candiq: { text: 'Server in Deutschland 🇩🇪', positive: true }, validato: { text: 'EU-Rechenzentren · Anbieter aus der Schweiz' } },
-  { criterion: 'Durchlaufzeit bis zum Report', candiq: { text: 'unter 48 h · Express 24 h', positive: true }, validato: { text: 'ca. 24 h' } },
-  { criterion: 'Verifizierung', candiq: { text: 'Geschulte Reviewer · echte Telefonate (keine Bots)', positive: true }, validato: { text: 'Analysten · telefonische Interviews' } },
-  { criterion: 'Preise öffentlich einsehbar', candiq: { text: 'Ja — ab 65 €/Mo · Einzelcheck 49 €', positive: true }, validato: { text: 'Auf Anfrage' } },
-  { criterion: 'Monatlich kündbar · kein Mindestvertrag', candiq: { text: 'Ja', positive: true }, validato: { text: 'k. A.' } },
-  { criterion: 'Self-Service-Einwilligung der Kandidaten', candiq: { text: 'Granulares Consent-Portal + Audit-Trail (Art. 6 & 7 DSGVO)', positive: true }, validato: { text: 'DSGVO-konform' } },
-  { criterion: 'ATS-Integration (Personio, SAP SF, Workday)', candiq: { text: 'Ja', positive: true }, validato: { text: 'k. A.' } },
-  { criterion: 'Automatische Löschung nach 180 Tagen', candiq: { text: 'Ja, per Cron-Job', positive: true }, validato: { text: 'k. A.' } },
-  { criterion: 'Live-Demo ohne Anmeldung', candiq: { text: 'Ja', positive: true }, validato: { text: 'k. A.' } },
+  {
+    criterion: 'Spezialisierung',
+    candiq: { text: 'Referenzprüfung für Recruiting (HR & Personaldienstleister)', positive: true },
+    validato: { text: 'Breites Pre-Employment-Screening, Background-Checks & HR-Risk-Management' },
+  },
+  {
+    criterion: 'Hosting & Datenstandort',
+    candiq: { text: 'Server in Deutschland 🇩🇪', positive: true },
+    validato: { text: 'Anbieter aus der Schweiz · EU-Rechenzentren' },
+  },
+  {
+    criterion: 'Durchlaufzeit bis zum Report',
+    candiq: { text: 'unter 48 h · Express 24 h', positive: true },
+    validato: { text: 'ca. 24 h' },
+  },
+  {
+    criterion: 'Verifizierung',
+    candiq: { text: 'Geschulte Reviewer · telefonische Referenz-Interviews', positive: true },
+    validato: { text: 'Analysten · telefonische Interviews' },
+  },
+  {
+    criterion: 'Self-Service-Einwilligung der Kandidaten',
+    candiq: { text: 'Granulares Consent-Portal + Audit-Trail (Art. 6 & 7 DSGVO)', positive: true },
+    validato: { text: 'DSGVO-konform' },
+  },
 ]
 
 function Mark({ cell, accent }: { cell: Cell; accent: 'emerald' | 'muted' }) {
@@ -39,14 +56,14 @@ export function ComparisonTable({ withHeading = true }: { withHeading?: boolean 
         {withHeading && (
           <div className="text-center max-w-3xl mx-auto mb-12">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest text-emerald-700 bg-emerald-50 border border-emerald-200 mb-5">
-              Ehrlicher Vergleich
+              Vergleich
             </div>
             <h2 className="text-[clamp(28px,4.5vw,44px)] font-bold tracking-tighter mb-4 text-text-primary leading-[1.1]">
-              candiq oder Validato? <span className="text-gradient-brand">Der ehrliche Vergleich.</span>
+              candiq oder Validato? <span className="text-gradient-brand">Der Vergleich.</span>
             </h2>
             <p className="text-lg text-text-secondary leading-relaxed">
-              Beide verifizieren Kandidaten DSGVO-konform. Der Unterschied liegt im Detail — Datenstandort,
-              Tempo, transparente Preise und wie reibungslos sich das ins Recruiting einfügt.
+              Beide verifizieren Kandidaten DSGVO-konform. Der Unterschied liegt in Fokus,
+              Datenstandort und Integration ins Recruiting.
             </p>
           </div>
         )}
@@ -125,11 +142,11 @@ export function ComparisonTable({ withHeading = true }: { withHeading?: boolean 
           </Link>
         </div>
 
-        {/* Pflicht-Disclaimer */}
+        {/* Disclaimer */}
         <p className="mt-8 text-[11px] leading-relaxed text-text-muted max-w-3xl mx-auto text-center">
-          Vergleich auf Basis öffentlich verfügbarer Informationen, Stand Juni 2026. Angaben zu
-          Wettbewerbern ohne Gewähr — „k. A.&ldquo; bedeutet keine öffentlich einsehbare Angabe, nicht
-          das Fehlen der Funktion. Marken- und Produktnamen gehören ihren jeweiligen Inhabern.
+          Angaben zu Validato basieren auf den vom Anbieter selbst veröffentlichten Informationen
+          (validato.com, Stand September 2026). Aktuelle Konditionen, Preise und Funktionen entnehmen
+          Sie bitte der Website des Anbieters. Marken- und Produktnamen gehören ihren jeweiligen Inhabern.
         </p>
       </div>
     </section>
