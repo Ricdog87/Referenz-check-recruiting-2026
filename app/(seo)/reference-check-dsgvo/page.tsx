@@ -47,7 +47,6 @@ const data: KeywordPageData = {
     { href: '/referenzpruefung', label: 'Referenzprüfung — der komplette Leitfaden' },
     { href: '/lebenslauf-verifizieren', label: 'Lebenslauf verifizieren' },
     { href: '/preise', label: 'Preise & Pakete' },
-    { href: '/vergleich/validato-alternative', label: 'candiq vs. Validato im Vergleich' },
   ],
   ctaHeadline: 'Reference Checks, die einem Audit standhalten',
 }
