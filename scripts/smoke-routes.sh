@@ -37,7 +37,6 @@ ROUTES=(
   "/branchen/healthcare-recruiting"
   "/referenzpruefung"
   "/referenzpruefung/berlin"
-  "/vergleich/validato-alternative"
   "/reference-check-dsgvo"
   "/zeugnis-pruefen-lassen"
   "/lebenslauf-verifizieren"
