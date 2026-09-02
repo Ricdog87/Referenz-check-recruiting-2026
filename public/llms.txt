@@ -30,7 +30,6 @@ HR-Abteilungen, Personaldienstleister (PDL), Mittelstand (200+ MA), DAX-Konzerne
 - [Background Check DSGVO](https://candiq.de/background-check-dsgvo): Hintergrundprüfung von Bewerbern, rechtskonform.
 - [Zeugnis prüfen lassen](https://candiq.de/zeugnis-pruefen-lassen): Arbeitszeugnisse verifizieren.
 - [Lebenslauf verifizieren](https://candiq.de/lebenslauf-verifizieren): CV-Substanz statt Schreibstil prüfen.
-- [Validato-Alternative](https://candiq.de/vergleich/validato-alternative): Vergleich candiq vs. Validato.
 - [Preise](https://candiq.de/preise): Starter 65 €/Mo., Professional 199 €/Mo., Business 499 €/Mo.; Einzel-Refcheck ab 49 €.
 - [Branchen](https://candiq.de/branchen): Tech-, Sales- und Healthcare-Recruiting.
 - [ROI-Rechner](https://candiq.de/roi-rechner): Einsparpotenzial durch vermiedene Fehlbesetzungen berechnen.
