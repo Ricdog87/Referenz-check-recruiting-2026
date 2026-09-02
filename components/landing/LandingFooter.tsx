@@ -71,7 +71,6 @@ export function LandingFooter() {
               { label: 'Lebenslauf verifizieren', href: '/lebenslauf-verifizieren' },
               { label: 'Pre-Employment Screening', href: '/pre-employment-screening' },
               { label: 'Background Check DSGVO', href: '/background-check-dsgvo' },
-              { label: 'candiq vs. Validato', href: '/vergleich/validato-alternative' },
             ]}
           />
 
