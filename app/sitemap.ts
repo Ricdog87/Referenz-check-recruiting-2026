@@ -28,7 +28,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...staedte,
 
     // Wettbewerbs-Vergleich
-    { url: `${BASE_URL}/vergleich/validato-alternative`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
 
     // Produkt & Branchen
     // /demo wurde abgeschafft (Self-Service-Demo entfernt). /demo redirected
