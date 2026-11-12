@@ -1,14 +1,15 @@
 import { redirect } from 'next/navigation'
+import { PDL_ENTRY_URL } from '@/lib/site'
 
 /**
- * Die Closed-Beta-Warteliste für Personaldienstleister ist seit
- * 06/2026 obsolet — PDL-Konten sind ab sofort regulaer registrierbar.
- * Diese Seite leitet daher 308-permanent auf das Registrierungs-
- * Formular mit vor-ausgewaehltem PDL-Typ um.
+ * Die Closed-Beta-Warteliste für Personaldienstleister ist seit 06/2026
+ * obsolet. Diese Seite leitet auf den aktuellen PDL-Einstieg um: das
+ * Registrierungs-Formular mit vor-ausgewähltem PDL-Typ, solange der
+ * App-Zugang offen ist — sonst auf die Terminbuchung.
  *
- * Vorteil dieser Loesung: alte URLs aus Footer-Caches, Google-Index
+ * Vorteil dieser Lösung: alte URLs aus Footer-Caches, Google-Index
  * und Mail-Signaturen landen weiterhin im richtigen Funnel statt 404.
  */
 export default function AgencyWaitlistRedirectPage() {
-  redirect('/register?type=RECRUITMENT_AGENCY')
+  redirect(PDL_ENTRY_URL)
 }

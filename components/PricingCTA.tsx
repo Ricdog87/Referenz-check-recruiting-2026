@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { ArrowRight, Loader2 } from 'lucide-react'
+import { APP_ACCESS_OPEN, BOOKING_LABEL, BOOKING_URL } from '@/lib/site'
 
 type Plan = 'starter' | 'professional' | 'business'
 type Interval = 'monthly' | 'yearly'
@@ -50,15 +52,28 @@ export function PricingCTA({
   const label =
     status === 'authenticated' ? 'Plan auswählen' : 'Konto erstellen'
 
+  const className = `w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all disabled:opacity-60 disabled:cursor-wait ${
+    highlight
+      ? 'bg-white text-brand-700 hover:bg-bg-secondary'
+      : 'btn-primary'
+  }`
+
+  // App-Zugang geschlossen: kein Konto, kein Self-Checkout — Pakete werden
+  // im Termin gebucht.
+  if (!APP_ACCESS_OPEN) {
+    return (
+      <Link href={BOOKING_URL} className={className}>
+        {BOOKING_LABEL}
+        <ArrowRight className="w-4 h-4" />
+      </Link>
+    )
+  }
+
   return (
     <button
       onClick={startCheckout}
       disabled={loading}
-      className={`w-full inline-flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm transition-all disabled:opacity-60 disabled:cursor-wait ${
-        highlight
-          ? 'bg-white text-brand-700 hover:bg-bg-secondary'
-          : 'btn-primary'
-      }`}
+      className={className}
     >
       {loading ? (
         <>

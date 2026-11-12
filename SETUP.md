@@ -2,6 +2,8 @@
 
 ## Was Tester sofort ausprobieren können
 
+> **Voraussetzung:** `NEXT_PUBLIC_APP_ACCESS_ENABLED="true"`. Ohne dieses Flag (Default) sind Registrierung, Login und Dashboard geschlossen und leiten auf `/termin` um — candiq läuft dann als reine Marketing-Seite.
+
 1. **Eigenes Konto registrieren** auf `/register` → 14 Tage Trial, Welcome-Mail (wenn Resend konfiguriert)
 2. **Beispiel-Daten laden** auf dem Dashboard (für leere Konten) → 4 Demo-Kandidaten + 6 Prüfungen mit einem Klick
 3. **Kandidat anlegen → Referenz prüfen → Report als PDF exportieren** (Druck-Dialog des Browsers, „Als PDF speichern")

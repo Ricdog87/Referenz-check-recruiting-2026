@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { BOOKING_URL } from '@/lib/site'
+import { APP_ACCESS_OPEN, BOOKING_URL, PDL_ENTRY_URL } from '@/lib/site'
 import { CookieSettingsButton } from '@/components/analytics/CookieSettingsButton'
 
 export function LandingFooter() {
@@ -42,7 +42,8 @@ export function LandingFooter() {
               { label: 'Add-ons & Services', href: '/preise#addons' },
               { label: 'ROI-Rechner', href: '/roi-rechner' },
               { label: 'Pilot-Programm', href: '/pilotprogramm' },
-              { label: 'Partner werden', href: '/partner' },
+              // Partner-Portal setzt ein Konto voraus → nur bei offenem App-Zugang.
+              ...(APP_ACCESS_OPEN ? [{ label: 'Partner werden', href: '/partner' }] : []),
               { label: 'Compliance & DSGVO', href: '/compliance' },
               { label: 'Ressourcen', href: '/resources' },
               { label: 'Termin buchen', href: BOOKING_URL, external: true },
@@ -54,7 +55,7 @@ export function LandingFooter() {
             links={[
               { label: 'HR-Abteilungen', href: '/fuer/hr-abteilungen' },
               { label: 'Mittelstand 200+ MA', href: '/fuer/mittelstand' },
-              { label: 'Personaldienstleister', href: '/register?type=RECRUITMENT_AGENCY' },
+              { label: 'Personaldienstleister', href: PDL_ENTRY_URL },
               { label: 'Bewerber:innen (Beta Q4 2026)', href: '/bewerber' },
               { label: 'Tech-Recruiting', href: '/branchen/tech-recruiting' },
               { label: 'Sales-Recruiting', href: '/branchen/sales-recruiting' },
@@ -107,8 +108,12 @@ export function LandingFooter() {
           </div>
           <div className="flex items-center gap-4">
             <CookieSettingsButton />
-            <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
-            <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>
+            {APP_ACCESS_OPEN && (
+              <>
+                <Link href="/login" className="hover:text-text-primary transition-colors">Anmelden</Link>
+                <Link href="/register" className="hover:text-text-primary transition-colors">Konto erstellen</Link>
+              </>
+            )}
             <a href="mailto:hello@candiq.de" className="hover:text-text-primary transition-colors">hello@candiq.de</a>
           </div>
         </div>

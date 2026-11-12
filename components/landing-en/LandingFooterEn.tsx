@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { BOOKING_URL } from '@/lib/site'
+import { APP_ACCESS_OPEN, BOOKING_URL } from '@/lib/site'
 
 export function LandingFooterEn() {
   return (
@@ -59,7 +59,9 @@ export function LandingFooterEn() {
           </div>
           <div className="flex items-center gap-4">
             <Link href="/" className="hover:text-text-primary transition-colors">Deutsch</Link>
-            <Link href="/login" className="hover:text-text-primary transition-colors">Sign in</Link>
+            {APP_ACCESS_OPEN && (
+              <Link href="/login" className="hover:text-text-primary transition-colors">Sign in</Link>
+            )}
             <a href="mailto:hello@candiq.de" className="hover:text-text-primary transition-colors">hello@candiq.de</a>
           </div>
         </div>
