@@ -4,14 +4,16 @@
  * Beweist:
  *   - isFlagEnabled() liest tolerant aus ENV
  *   - isPartnerProgramEnabled() gatet auf PARTNER_PROGRAM_ENABLED
+ *     und zusätzlich auf den App-Zugang (NEXT_PUBLIC_APP_ACCESS_ENABLED)
  *   - Default ist immer false — Features sind „off until explicitly enabled"
  */
 
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, beforeEach } from 'vitest'
 import { isFlagEnabled, isPartnerProgramEnabled } from '@/lib/flags'
 
 const TEST_KEY = 'PARTNER_TEST_FLAG_X1Y2'
 const REAL_KEY = 'PARTNER_PROGRAM_ENABLED'
+const APP_KEY = 'NEXT_PUBLIC_APP_ACCESS_ENABLED'
 
 function withEnv(key: string, value: string | undefined, fn: () => void) {
   const before = process.env[key]
@@ -59,6 +61,19 @@ describe('isFlagEnabled — toleranter Parser', () => {
 })
 
 describe('isPartnerProgramEnabled — Master-Switch', () => {
+  // Das Partner-Portal setzt den App-Zugang voraus; für diese Tests offen.
+  beforeEach(() => {
+    process.env[APP_KEY] = 'true'
+  })
+  afterEach(() => {
+    delete process.env[APP_KEY]
+  })
+
+  it('stays OFF while app access is closed, even with the partner flag on', () => {
+    delete process.env[APP_KEY]
+    withEnv(REAL_KEY, 'true', () => expect(isPartnerProgramEnabled()).toBe(false))
+  })
+
   it('default is OFF when env var is unset', () => {
     withEnv(REAL_KEY, undefined, () => {
       expect(isPartnerProgramEnabled()).toBe(false)

@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, Zap, CalendarCheck } from 'lucide-react'
-import { BOOKING_URL } from '@/lib/site'
+import { APP_ACCESS_OPEN, BOOKING_URL } from '@/lib/site'
 import { LocaleSwitcher } from '@/components/locale-switcher/LocaleSwitcher'
 
 /**
@@ -49,9 +49,11 @@ export function LandingNavEn() {
 
         <div className="hidden md:flex items-center gap-2">
           <LocaleSwitcher />
-          <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-text-primary px-4 py-2 rounded-full transition-colors">
-            Sign in
-          </Link>
+          {APP_ACCESS_OPEN && (
+            <Link href="/login" className="text-sm font-medium text-text-secondary hover:text-text-primary px-4 py-2 rounded-full transition-colors">
+              Sign in
+            </Link>
+          )}
           <a
             href={BOOKING_URL}
             className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5"
@@ -86,9 +88,11 @@ export function LandingNavEn() {
             <Link href="/" onClick={() => setOpen(false)} className="block py-2 text-xs font-semibold text-text-muted">
               Deutsche Version
             </Link>
-            <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">
-              Sign in
-            </Link>
+            {APP_ACCESS_OPEN && (
+              <Link href="/login" onClick={() => setOpen(false)} className="btn-secondary w-full">
+                Sign in
+              </Link>
+            )}
             <a
               href={BOOKING_URL}
               onClick={() => setOpen(false)}

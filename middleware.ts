@@ -1,26 +1,19 @@
 import { withAuth } from 'next-auth/middleware'
+import type { NextRequestWithAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import type { NextFetchEvent, NextRequest } from 'next/server'
+import { isAppAccessEnabled } from '@/lib/flags'
+import {
+  CLOSED_APP_REDIRECT,
+  PROTECTED_PREFIXES,
+  closedAppAction,
+} from '@/lib/appAccess'
 
 /**
- * Auth-geschützte Pfade. Alle anderen Routen dürfen ohne Token besucht werden,
- * laufen aber trotzdem durch die Middleware, damit sie eine Per-Request-CSP
- * mit Nonce bekommen.
+ * PROTECTED_PREFIXES (lib/appAccess.ts) sind die auth-geschützten Pfade.
+ * Alle anderen Routen dürfen ohne Token besucht werden, laufen aber trotzdem
+ * durch die Middleware, damit sie eine Per-Request-CSP mit Nonce bekommen.
  */
-const PROTECTED_PREFIXES = [
-  '/dashboard',
-  '/candidates',
-  '/checks',
-  '/clients',
-  '/integrations',
-  '/analytics',
-  '/settings',
-  '/audit',
-  '/addons',
-  '/report',
-  '/reviewer',
-  '/admin',
-]
 
 // HubSpot Meetings Embed (z. B. auf /termin) lädt Script + iframe von
 // dedizierten Subdomains; alle hier explizit, kein Wildcard.
@@ -96,7 +89,7 @@ function withNonceAndCsp(req: NextRequest): NextResponse {
   return response
 }
 
-export default withAuth(
+const authMiddleware = withAuth(
   function middleware(req) {
     return withNonceAndCsp(req)
   },
@@ -111,6 +104,34 @@ export default withAuth(
   },
 )
 
+export default function middleware(req: NextRequest, event: NextFetchEvent) {
+  const { pathname } = req.nextUrl
+  const isApi = pathname.startsWith('/api/')
+
+  if (isAppAccessEnabled()) {
+    // API-Routen prüfen ihre Session selbst und bekommen ihre Header aus
+    // next.config.js — sie stehen nur wegen der Sperre unten im Matcher.
+    if (isApi) return NextResponse.next()
+    return authMiddleware(req as NextRequestWithAuth, event)
+  }
+
+  // App-Zugang geschlossen (Default): keine Registrierung, kein Login, kein
+  // Dashboard. Bestehende Session-Cookies werden nirgends mehr akzeptiert.
+  switch (closedAppAction(pathname)) {
+    case 'redirect':
+      return NextResponse.redirect(new URL(CLOSED_APP_REDIRECT, req.url), 307)
+    case 'empty-session':
+      return NextResponse.json({}, { headers: { 'Cache-Control': 'no-store' } })
+    case 'not-found':
+      return NextResponse.json(
+        { error: 'Not found' },
+        { status: 404, headers: { 'Cache-Control': 'no-store' } },
+      )
+    default:
+      return isApi ? NextResponse.next() : withNonceAndCsp(req)
+  }
+}
+
 export const config = {
   matcher: [
     /*
@@ -120,5 +141,23 @@ export const config = {
      *  - favicon, logos, OG-/Twitter-Bilder, robots, sitemap (statisches Marketing-Material)
      */
     '/((?!api|_next/static|_next/image|favicon\\.ico|favicon\\.svg|logo.*\\.svg|opengraph-image|twitter-image|apple-icon|robots\\.txt|sitemap\\.xml).*)',
+    /*
+     * Konto- und Session-APIs — nur damit die Sperre bei geschlossenem
+     * App-Zugang greift. Muss zu CLOSED_API_PREFIXES / CLOSED_API_EXACT in
+     * lib/appAccess.ts passen (Next.js verlangt hier statische Strings).
+     */
+    '/api/auth/:path*',
+    '/api/addons/:path*',
+    '/api/admin/partners/:path*',
+    '/api/candidates/:path*',
+    '/api/checks/:path*',
+    '/api/cv-analysis',
+    '/api/documents/:path*',
+    '/api/gdpr/:path*',
+    '/api/reviewer/:path*',
+    '/api/sample-data/:path*',
+    '/api/stripe/checkout',
+    '/api/stripe/portal',
+    '/api/upload/:path*',
   ],
 }

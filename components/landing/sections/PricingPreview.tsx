@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { Check, ArrowRight, Building2, Users2, Clock3 } from 'lucide-react'
 import { HR_PLANS } from '@/lib/utils'
 import { Reveal } from '../Reveal'
-import { BOOKING_URL } from '@/lib/site'
+import { APP_ACCESS_OPEN, BOOKING_URL, PDL_ENTRY_URL } from '@/lib/site'
 
 export function PricingPreview() {
   const [tab, setTab] = useState<'hr' | 'agency'>('hr')
@@ -178,11 +178,14 @@ export function PricingPreview() {
 
             <div className="card-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="text-sm text-text-secondary">
-                PDL-Konten sind ab sofort buchbar. Multi-Mandanten + White-Label folgen iterativ — wir
+                {APP_ACCESS_OPEN
+                  ? 'PDL-Konten sind ab sofort buchbar.'
+                  : 'PDL-Zugänge richten wir persönlich im Termin ein.'}{' '}
+                Multi-Mandanten + White-Label folgen iterativ — wir
                 planen die Roadmap gemeinsam mit den ersten Pilotkunden.
               </div>
-              <Link href="/register?type=RECRUITMENT_AGENCY" className="btn-primary whitespace-nowrap">
-                PDL-Konto anlegen <ArrowRight className="w-4 h-4" />
+              <Link href={PDL_ENTRY_URL} className="btn-primary whitespace-nowrap">
+                {APP_ACCESS_OPEN ? 'PDL-Konto anlegen' : 'Termin buchen'} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </motion.div>

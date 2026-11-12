@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Building2, Users2, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { Reveal } from '../Reveal'
+import { APP_ACCESS_OPEN, PDL_ENTRY_URL } from '@/lib/site'
 
 const audiences = [
   {
@@ -35,8 +36,8 @@ const audiences = [
       'Geplant: Mandanten-Verwaltung mit eigenen Workflows',
       'Geplant: White-Label inkl. Logo & Reports',
     ],
-    cta: 'PDL-Konto anlegen',
-    href: '/register?type=RECRUITMENT_AGENCY',
+    cta: APP_ACCESS_OPEN ? 'PDL-Konto anlegen' : 'Termin für PDL buchen',
+    href: PDL_ENTRY_URL,
     gradient: 'from-violet via-violet to-cyan',
     bg: 'from-violet/10 to-white',
   },

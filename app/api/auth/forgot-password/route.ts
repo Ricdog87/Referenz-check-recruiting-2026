@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isAppAccessEnabled } from '@/lib/flags'
 import { randomBytes, createHash } from 'crypto'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
@@ -21,6 +22,12 @@ const RESET_TTL_MINUTES = 60
  *  • Rate-Limit: 5/h pro IP.
  */
 export async function POST(req: NextRequest) {
+  // Zweite Sperre hinter der Middleware: App-Zugang geschlossen → kein Konto,
+  // kein Passwort-Reset.
+  if (!isAppAccessEnabled()) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
   const ip = getClientIp(req)
   const rl = rateLimit(`forgot:${ip}`, 5, 60 * 60 * 1000)
   if (!rl.ok) {

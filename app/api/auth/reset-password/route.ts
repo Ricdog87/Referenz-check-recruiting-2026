@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { isAppAccessEnabled } from '@/lib/flags'
 import bcrypt from 'bcryptjs'
 import { createHash } from 'crypto'
 import { prisma } from '@/lib/db'
@@ -11,6 +12,12 @@ const MIN_PASSWORD_LEN = 8
 const MAX_PASSWORD_LEN = 128
 
 export async function POST(req: NextRequest) {
+  // Zweite Sperre hinter der Middleware: App-Zugang geschlossen → kein Konto,
+  // kein Passwort-Reset.
+  if (!isAppAccessEnabled()) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
   const ip = getClientIp(req)
   const rl = rateLimit(`reset:${ip}`, 10, 60 * 60 * 1000)
   if (!rl.ok) {

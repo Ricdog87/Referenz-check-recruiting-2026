@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { APP_ACCESS_OPEN, BOOKING_LABEL, BOOKING_URL } from '@/lib/site'
 
 export default function NotFound() {
   return (
@@ -17,7 +18,11 @@ export default function NotFound() {
         </p>
         <div className="flex gap-2 justify-center">
           <Link href="/" className="btn-primary">Zur Startseite</Link>
-          <Link href="/dashboard" className="btn-secondary">Zum Dashboard</Link>
+          {APP_ACCESS_OPEN ? (
+            <Link href="/dashboard" className="btn-secondary">Zum Dashboard</Link>
+          ) : (
+            <Link href={BOOKING_URL} className="btn-secondary">{BOOKING_LABEL}</Link>
+          )}
         </div>
       </div>
     </main>
